@@ -1,0 +1,35 @@
+name: "Kupanga Front — Déploiement CI/CD"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (production)
+        run: npm run build -- --configuration production
+
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: ${{ secrets.FTP_HOST_ADMIN }}
+          username: ${{ secrets.FTP_USERNAME_ADMIN }}
+          password: ${{ secrets.FTP_PASSWORD_ADMIN }}
+          local-dir: dist/kupanga-front/browser/
+          server-dir: /
