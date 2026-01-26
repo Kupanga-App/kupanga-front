@@ -13,7 +13,7 @@
         <div class=" search-container">
           <span class="p-input-icon-left w-full search-content">
             <i class="pi pi-search"></i>
-            <input type="text" placeholder="Rechercher un bien, un document..." class="w-full input-field" />
+            <input type="text" placeholder="Rechercher un bien..." class="w-full input-field" />
           </span>
         </div>
       </div>
@@ -26,7 +26,8 @@
 
         <!-- User Menu -->
         <div class="flex items-center gap-2 cursor-pointer" (click)="userMenu.toggle($event)">
-          <p-avatar [label]="(user$ | async)?.name?.charAt(0) || 'U'" shape="circle" styleClass="bg-emerald-500 text-white"></p-avatar>
+          <button pButton icon="pi pi-user" [text]="true" severity="primary"></button>
+          <!-- p-avatar [label]="(user$ | async)?.name?.charAt(0) || 'U'" shape="circle" styleClass="bg-emerald-500 text-white"></p-avatar -->
           <p-menu #userMenu [model]="userMenuItems" [popup]="true"></p-menu>
         </div>
       </div>

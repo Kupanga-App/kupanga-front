@@ -7,7 +7,7 @@
   background: #944894;
   color: #ffffff;
   padding: 0.3rem 1rem;
-  border-radius: 5rem;
+  border-radius: 0.7rem;
 }
 
 .center .search-container {
@@ -20,9 +20,9 @@
 }
 
 .search-container{
-  //border: 1px solid #9448946b;
-  border-radius: 5rem;
-  padding: 0.2rem 1rem;
+  border: 1px solid #9448946b;
+  border-radius: 0.7rem;
+  padding: 0.2rem 0.7rem;
   background: #9448941a;
 
   .search-content{
