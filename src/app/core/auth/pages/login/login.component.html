@@ -1,0 +1,69 @@
+<div class="login-page">
+  <div class="login-card">
+
+    <!-- Header -->
+    <header class="login-card__header">
+      <h1 class="login-card__title">Bienvenue sur Kupanga</h1>
+      <p class="login-card__subtitle">Connectez-vous pour continuer</p>
+    </header>
+
+    <!-- Login Form -->
+    <div *ngIf="!isForgotPasswordMode" @fadeSlide class="form-container">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+
+        <div class="form-group">
+          <label for="email" class="form-group__label">Email</label>
+          <input id="email" type="text" pInputText formControlName="email" class="form-group__input" placeholder="Votre adresse email">
+          <small *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="form-group__error">
+            Email invalide ou requis.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-group__label">Mot de passe</label>
+          <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false" styleClass="p-password-full" placeholder="Votre mot de passe"></p-password>
+          <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="form-group__error">
+            Mot de passe requis.
+          </small>
+        </div>
+
+        <div class="login-card__actions">
+          <div class="actions__remember-me">
+            <p-checkbox id="rememberme" [binary]="true"></p-checkbox>
+            <label for="rememberme">Se souvenir de moi</label>
+          </div>
+          <a (click)="toggleMode()" class="actions__link">Mot de passe oublié ?</a>
+        </div>
+
+        <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" class="login-card__message"></p-message>
+
+        <p-button label="Se connecter" type="submit" [loading]="isLoading" styleClass="p-button-full"></p-button>
+
+        <footer class="login-card__footer">
+          <span>Pas encore de compte ? </span>
+          <a routerLink="/auth/register" class="footer__link">Créer un compte</a>
+        </footer>
+      </form>
+    </div>
+
+    <!-- Forgot Password Form -->
+    <div *ngIf="isForgotPasswordMode" @fadeSlide class="form-container">
+      <form [formGroup]="forgotPasswordForm" (ngSubmit)="onForgotPassword()">
+        <div class="form-group">
+          <label for="reset-email" class="form-group__label">Email de récupération</label>
+          <input id="reset-email" type="text" pInputText formControlName="email" class="form-group__input" placeholder="Votre adresse email">
+          <small *ngIf="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched" class="form-group__error">
+            Email invalide ou requis.
+          </small>
+        </div>
+
+        <p-button label="Réinitialiser le mot de passe" type="submit" [loading]="isLoading" styleClass="p-button-full p-button-forgot-password"></p-button>
+
+        <footer class="login-card__footer">
+          <a (click)="toggleMode()" class="footer__link">Retour à la connexion</a>
+        </footer>
+      </form>
+    </div>
+
+  </div>
+</div>

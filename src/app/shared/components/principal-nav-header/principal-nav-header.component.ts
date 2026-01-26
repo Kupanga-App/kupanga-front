@@ -1,8 +1,6 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -13,8 +11,6 @@ import { MenubarModule } from 'primeng/menubar';
 import { ToolbarModule } from 'primeng/toolbar';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-
-import { selectUser, selectUserType } from '../../../core/auth/auth.reducer';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
@@ -39,17 +35,12 @@ import { ThemeService } from '../../../core/services/theme.service';
 export class PrincipalNavHeaderComponent implements OnInit {
   @Input() navItems: MenuItem[] = [];
 
-  private store = inject(Store);
   public themeService = inject(ThemeService);
-
-  userType$: Observable<'owner' | 'tenant' | null>;
-  user$: Observable<any>;
+  private router = inject(Router);
 
   userMenuItems: MenuItem[] = [];
 
   constructor() {
-    this.userType$ = this.store.select(selectUserType);
-    this.user$ = this.store.select(selectUser);
   }
 
   ngOnInit(): void {
@@ -57,7 +48,13 @@ export class PrincipalNavHeaderComponent implements OnInit {
       { label: 'Mon Profil', icon: 'pi pi-fw pi-user' },
       { label: 'Paramètres', icon: 'pi pi-fw pi-cog' },
       { separator: true },
-      { label: 'Déconnexion', icon: 'pi pi-fw pi-sign-out' },
+      {
+        label: 'Déconnexion',
+        icon: 'pi pi-fw pi-sign-out',
+        command: () => {
+          this.router.navigate(['/auth/logout']);
+        }
+      },
     ];
   }
 }
