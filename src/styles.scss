@@ -1,19 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Custom component styles can be imported here if needed */
+@use "assets/styles/components/index";
 
+/* PrimeIcons */
 @import "primeicons/primeicons.css";
 
-/* PrimeNG Theme Overrides */
-:root {
-  --primary-color: #9448941a; /* Bleu profond */
-  --primary-color-text: #ffffff;
-  --secondary-color: #944894; /* Vert émeraude */
-}
-
+/* Global Reset & Typography */
 body {
-  @apply text-slate-900; /* Utilisation de Tailwind sur le body */
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;  -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--p-text-color);
+  background-color: var(--p-surface-ground); /* PrimeNG variable for page background */
 }

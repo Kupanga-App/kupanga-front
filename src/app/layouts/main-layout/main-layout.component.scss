@@ -1,16 +1,126 @@
-.box-logo{
-  background: #9448941a;
+:host {
+  display: block;
 }
 
-.header-container {
-  background: #9448941a;
-  color: #944894;
+.ml-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--p-surface-ground);
+  color: var(--p-text-color);
 }
 
-.btn{
-  background: #944894;
-  color: #ffffff;
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 1rem;
+  padding-left: 1rem;
+
+  @media (min-width: 768px) {
+    max-width: 768px;
+  }
+  @media (min-width: 1024px) {
+    max-width: 1024px;
+  }
+  @media (min-width: 1280px) {
+    max-width: 1280px;
+  }
 }
-.text-center h1{
-  color: #944894;
+
+.ml-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 1rem;
+  background-color: var(--p-surface-0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.ml-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ml-logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--p-primary-color);
+}
+
+.ml-main {
+  flex-grow: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.ml-hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 11rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--p-primary-50);
+  color: var(--p-primary-900);
+
+  @media (min-width: 768px) {
+    height: 25rem;
+  }
+}
+
+.ml-hero-content {
+  text-align: center;
+}
+
+.ml-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--p-text-color);
+}
+
+.ml-subtitle {
+  font-size: 1.25rem;
+  color: var(--p-text-muted-color);
+  margin-bottom: 2rem;
+}
+
+.ml-cta-section {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  height: 10rem;
+  background-color: var(--p-surface-50);
+  border: 1px solid var(--p-surface-200);
+}
+
+.ml-cta-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ml-cta-text {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--p-text-color);
+  margin: 0;
+}
+
+.ml-footer {
+  background-color: var(--p-surface-900);
+  color: var(--p-surface-0);
+  padding: 1rem;
+  text-align: center;
 }

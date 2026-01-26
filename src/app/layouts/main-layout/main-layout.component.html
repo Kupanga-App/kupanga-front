@@ -1,43 +1,32 @@
-<div class="min-h-screen flex flex-col">
-  <header class="header-container shadow-md sticky top-0 z-20 p-4">
-    <nav class="container mx-auto flex justify-between items-center">
-      <div class="font-bold text-2xl">Kupanga</div>
+<div class="ml-layout">
+  <header class="ml-header">
+    <nav class="ml-nav container">
+      <div class="ml-logo">Kupanga</div>
       <div>
-        <a routerLink="/admin" class="btn font-bold py-2 px-4 rounded-lg transition duration-300">
-          Go to Admin
-        </a>
+        <p-button label="Go to Admin" routerLink="/admin" [rounded]="true" />
       </div>
     </nav>
   </header>
 
-  <main class="flex-grow container mx-auto p-6">
-    <div class="mx-auto w-full flex justify-center items-center h-[11rem] md:h-[25rem] my-4 rounded-lg box-logo">
-      <div class="text-center">
-        <h1 class="text-5xl font-extrabold text-slate-800 mb-4">Welcome to Kupanga</h1>
-        <p class="text-xl text-slate-600 mb-8">Your modern solution for property management.</p>
-      </div>
-        <!-- img alt="Logo" class="object-contain h-1/4" src="/assets/logos/logo.e2d1b831.svg" -->
-    </div>
-
-
-    <div class="relative overflow-hidden flex items-center justify-center rounded-lg h-40 box-logo">
-      <div class="relative flex flex-col items-center z-10">
-        <p class="mb-4 text-3xl font-bold text-slate-800">C’est le moment de vendre</p>
-        <a routerLink="/deposer-une-annonce" class="inline-flex items-center justify-center gap-2 px-6 py-3 text-white font-bold rounded-lg btn hover:bg-emerald-600 transition duration-300 cursor-pointer">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6">
-            <path d="M11.9999 6.84133C12.5571 6.84133 13.0088 7.29306 13.0088 7.85029V10.991H16.1498C16.707 10.991 17.1588 11.4428 17.1588 12C17.1588 12.5572 16.707 13.009 16.1498 13.009H13.0088V16.1497C13.0088 16.7069 12.5571 17.1587 11.9999 17.1587C11.4426 17.1587 10.9909 16.7069 10.9909 16.1497V13.009H7.85038C7.29314 13.009 6.84141 12.5572 6.84141 12C6.84141 11.4428 7.29314 10.991 7.85038 10.991H10.9909V7.85029C10.9909 7.29306 11.4426 6.84133 11.9999 6.84133Z"></path>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.15867 2C4.30962 2 2 4.30962 2 7.15867V16.8413C2 19.6904 4.30962 22 7.15867 22H16.8413C19.6904 22 22 19.6904 22 16.8413V7.15867C22 4.30962 19.6904 2 16.8413 2H7.15867ZM4.01793 7.15867C4.01793 5.42409 5.42409 4.01793 7.15867 4.01793H16.8413C18.5759 4.01793 19.9821 5.42409 19.9821 7.15867V16.8413C19.9821 18.5759 18.5759 19.9821 16.8413 19.9821H7.15867C5.42409 19.9821 4.01793 18.5759 4.01793 16.8413V7.15867Z"></path>
-          </svg>
-          Déposer une annonce
-        </a>
+  <main class="ml-main container">
+    <div class="ml-hero-section">
+      <div class="ml-hero-content">
+        <h1 class="ml-title">Welcome to Kupanga</h1>
+        <p class="ml-subtitle">Your modern solution for property management.</p>
       </div>
     </div>
 
+    <div class="ml-cta-section">
+      <div class="ml-cta-content">
+        <p class="ml-cta-text">C’est le moment de vendre</p>
+        <p-button label="Déposer une annonce" icon="pi pi-plus-circle" routerLink="/deposer-une-annonce" styleClass="p-button-lg" [rounded]="true" />
+      </div>
+    </div>
 
     <router-outlet></router-outlet>
   </main>
 
-  <footer class="bg-slate-800 text-white p-4 text-center">
+  <footer class="ml-footer">
     <p>&copy; 2024 Kupanga. All rights reserved.</p>
   </footer>
 </div>

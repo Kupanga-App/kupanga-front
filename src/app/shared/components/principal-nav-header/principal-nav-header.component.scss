@@ -1,54 +1,92 @@
-.center{
-  display: flex;
-  gap: 1rem;
-}
-.center p-button {
-  flex: 0 0 auto;
-  background: #944894;
-  color: #ffffff;
-  padding: 0.3rem 1rem;
-  border-radius: 0.7rem;
+:host {
+  display: block;
 }
 
-.center .search-container {
-  flex: 1;
+.pnh-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--p-surface-0);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
+.pnh-container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 1rem;
+  padding-left: 1rem;
 
-.logo-text{
-  color: #944894;
-}
-
-.search-container{
-  border: 1px solid #9448946b;
-  border-radius: 0.7rem;
-  padding: 0.2rem 0.7rem;
-  background: #9448941a;
-
-  .search-content{
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    i{
-      color: #944894;
-    }
-    .input-field{
-      background: none;
-      font-family: inherit;
-      font-feature-settings: inherit;
-      font-variation-settings: inherit;
-      font-size: 100%;
-    }
-    .input-field:focus {
-      outline: none;
-      box-shadow: none;
-      border: none;
-    }
-
-    .input-field::placeholder {
-      color: #944894;
-    }
+  @media (min-width: 768px) {
+    max-width: 768px;
+  }
+  @media (min-width: 1024px) {
+    max-width: 1024px;
+  }
+  @media (min-width: 1280px) {
+    max-width: 1280px;
   }
 }
 
+.pnh-main-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4rem; /* h-16 */
+}
+
+.pnh-logo {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700; /* font-bold */
+  color: var(--p-text-color);
+}
+
+.pnh-center-content {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: flex;
+    width: 33.333333%;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
+.pnh-search-bar {
+  width: 100%;
+
+  .w-full {
+    width: 100%;
+  }
+}
+
+.pnh-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pnh-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.pnh-nav-bar {
+  border-top: 1px solid var(--p-surface-200);
+  background-color: var(--p-surface-0);
+}
+
+/* Override PrimeNG Menubar styles to make it flat */
+::ng-deep .pnh-menubar {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+
+  .p-menubar-root-list {
+    padding-left: 0;
+  }
+}

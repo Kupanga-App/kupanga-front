@@ -9,8 +9,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { MenuModule } from 'primeng/menu';
+import { MenubarModule } from 'primeng/menubar';
+import { ToolbarModule } from 'primeng/toolbar';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 import { selectUser, selectUserType } from '../../../core/auth/auth.reducer';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-principal-nav-header',
@@ -23,15 +28,19 @@ import { selectUser, selectUserType } from '../../../core/auth/auth.reducer';
     AvatarModule,
     BadgeModule,
     MenuModule,
+    MenubarModule,
+    ToolbarModule,
+    IconFieldModule,
+    InputIconModule
   ],
   templateUrl: './principal-nav-header.component.html',
   styleUrls: ['./principal-nav-header.component.scss'],
 })
 export class PrincipalNavHeaderComponent implements OnInit {
   @Input() navItems: MenuItem[] = [];
-  @Input() mobileNavItems: MenuItem[] = [];
 
   private store = inject(Store);
+  public themeService = inject(ThemeService);
 
   userType$: Observable<'owner' | 'tenant' | null>;
   user$: Observable<any>;

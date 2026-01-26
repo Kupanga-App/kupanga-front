@@ -6,7 +6,7 @@ import { provideState } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideHttpClient } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeng/themes/aura';
+import { KupangaTheme } from './kupanga-theme';
 import { routes } from './app.routes';
 import { authReducer } from './core/auth/auth.reducer';
 import { AuthEffects } from './core/auth/auth.effects';
@@ -26,13 +26,14 @@ export const appConfig: ApplicationConfig = {
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: KupangaTheme,
         options: {
-          darkModeSelector: '.my-app-dark',
-          cssLayer: {
-            name: 'primeng',
-            order: 'tailwind-base, primeng, tailwind-utilities'
-          }
+          darkModeSelector: '.p-dark'
+          // Temporarily removing cssLayer to debug styling issues.
+          // cssLayer: {
+          //   name: 'primeng',
+          //   order: 'tailwind-base, primeng, tailwind-utilities'
+          // }
         }
       }
     })
