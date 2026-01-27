@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -37,8 +39,11 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
     ButtonModule,
     InputTextModule,
     PasswordModule,
-    MessageModule
+    PasswordModule,
+    MessageModule,
+    ToastModule
   ],
+  providers: [MessageService],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -46,13 +51,11 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private messageService = inject(MessageService);
 
   isLoading = false;
-  errorMessage = '';
 
   registerForm = this.fb.group({
-    firstName: ['', [Validators.required]],
-    lastName: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [Validators.required]]
@@ -62,21 +65,18 @@ export class RegisterComponent {
     if (this.registerForm.invalid) return;
 
     this.isLoading = true;
-    this.errorMessage = '';
 
     const { confirmPassword, ...userData } = this.registerForm.value;
 
-    // Ajout du rôle par défaut
-    const payload = { ...userData, role: 'ROLE_PROPRIETAIRE' };
-
-    this.authService.register(payload).subscribe({
+    this.authService.register(userData).subscribe({
       next: () => {
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Inscription réussie.' });
         this.router.navigate(['/admin']);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = "Une erreur s'est produite lors de l'inscription.";
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: "Une erreur s'est produite lors de l'inscription." });
         console.error('Register error', err);
       }
     });

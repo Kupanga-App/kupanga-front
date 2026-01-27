@@ -30,8 +30,7 @@ export class AuthService {
   }
 
   register(userData: any): Observable<AuthResponse> {
-    const payload = { ...userData, role: 'ROLE_PROPRIETAIRE' };
-    return this.http.post<AuthResponse>(`${this.apiUrl}/create-count`, payload).pipe(
+    return this.http.post<AuthResponse>(`${this.apiUrl}/create-count`, userData).pipe(
       tap(response => this.handleAuthSuccess(response))
     );
   }
@@ -55,6 +54,17 @@ export class AuthService {
 
   getAccessToken(): string | null {
     return localStorage.getItem('accessToken');
+  }
+
+  forgotPassword(email: string): Observable<string> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, null, {
+      params: { email },
+      responseType: 'text'
+    });
+  }
+
+  resetPassword(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, data);
   }
 
   private handleAuthSuccess(response: AuthResponse): void {

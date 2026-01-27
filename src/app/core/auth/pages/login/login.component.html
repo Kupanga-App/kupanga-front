@@ -1,4 +1,5 @@
 <div class="login-page">
+  <p-toast position="top-right"></p-toast>
   <div class="login-card">
 
     <!-- Header -->
@@ -13,7 +14,8 @@
 
         <div class="form-group">
           <label for="email" class="form-group__label">Email</label>
-          <input id="email" type="text" pInputText formControlName="email" class="form-group__input" placeholder="Votre adresse email">
+          <input id="email" type="text" pInputText formControlName="email" class="form-group__input"
+            placeholder="Votre adresse email">
           <small *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="form-group__error">
             Email invalide ou requis.
           </small>
@@ -21,8 +23,10 @@
 
         <div class="form-group">
           <label for="password" class="form-group__label">Mot de passe</label>
-          <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false" styleClass="p-password-full" placeholder="Votre mot de passe"></p-password>
-          <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="form-group__error">
+          <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false"
+            styleClass="p-password-full" placeholder="Votre mot de passe"></p-password>
+          <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            class="form-group__error">
             Mot de passe requis.
           </small>
         </div>
@@ -35,7 +39,6 @@
           <a (click)="toggleMode()" class="actions__link">Mot de passe oublié ?</a>
         </div>
 
-        <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" class="login-card__message"></p-message>
 
         <p-button label="Se connecter" type="submit" [loading]="isLoading" styleClass="p-button-full"></p-button>
 
@@ -50,14 +53,16 @@
     <div *ngIf="isForgotPasswordMode" @fadeSlide class="form-container">
       <form [formGroup]="forgotPasswordForm" (ngSubmit)="onForgotPassword()">
         <div class="form-group">
-          <label for="reset-email" class="form-group__label">Email de récupération</label>
-          <input id="reset-email" type="text" pInputText formControlName="email" class="form-group__input" placeholder="Votre adresse email">
-          <small *ngIf="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched" class="form-group__error">
-            Email invalide ou requis.
+          <label for="forgot-email" class="form-group__label">Email</label>
+          <input pInputText id="forgot-email" type="email" formControlName="email" class="form-group__input"
+            placeholder="votre@email.com" />
+          <small class="form-group__error"
+            *ngIf="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched">
+            L'email est requis et doit être valide.
           </small>
         </div>
 
-        <p-button label="Réinitialiser le mot de passe" type="submit" [loading]="isLoading" styleClass="p-button-full p-button-forgot-password"></p-button>
+        <p-button label="Réinitialiser" type="submit" [loading]="isLoading" styleClass="p-button-full mb-3"></p-button>
 
         <footer class="login-card__footer">
           <a (click)="toggleMode()" class="footer__link">Retour à la connexion</a>

@@ -26,6 +26,10 @@ export const routes: Routes = [
         path: 'logout',
         loadComponent: () => import('./core/auth/pages/logout/logout.component').then(m => m.LogoutComponent)
       },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('./core/auth/pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+      },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },
@@ -57,7 +61,7 @@ export const routes: Routes = [
     component: DashboardLayoutComponent,
     canActivate: [authGuard], // Protection de la route parente
     children: [
-       {
+      {
         path: '',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },

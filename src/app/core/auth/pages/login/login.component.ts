@@ -10,6 +10,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -24,8 +26,10 @@ import { AuthService } from '../../services/auth.service';
     InputTextModule,
     PasswordModule,
     CheckboxModule,
-    MessageModule
+    MessageModule,
+    ToastModule
   ],
+  providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   animations: [
@@ -44,10 +48,10 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private messageService = inject(MessageService);
 
   isForgotPasswordMode = false;
   isLoading = false;
-  errorMessage = '';
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -60,7 +64,6 @@ export class LoginComponent {
 
   toggleMode() {
     this.isForgotPasswordMode = !this.isForgotPasswordMode;
-    this.errorMessage = '';
     this.loginForm.reset();
     this.forgotPasswordForm.reset();
   }
@@ -69,7 +72,6 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
 
     this.isLoading = true;
-    this.errorMessage = '';
 
     const { email, password } = this.loginForm.value;
     const credentials = {
@@ -80,11 +82,12 @@ export class LoginComponent {
     this.authService.login(credentials).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/admin']); // Redirection vers /admin
+        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Connexion réussie.' });
+        this.router.navigate(['/admin']);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = 'Email ou mot de passe incorrect.';
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Email ou mot de passe incorrect.' });
         console.error('Login error', err);
       }
     });
@@ -94,11 +97,28 @@ export class LoginComponent {
     if (this.forgotPasswordForm.invalid) return;
 
     this.isLoading = true;
-    // Simulation d'appel API pour reset password
-    setTimeout(() => {
-      this.isLoading = false;
-      // Afficher un message de succès ou autre logique
-      this.toggleMode();
-    }, 1500);
+
+    const email = this.forgotPasswordForm.value.email as string;
+
+    this.authService.forgotPassword(email).subscribe({
+      next: (token: string) => {
+        this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Un email de réinitialisation a été envoyé.' });
+
+        // Log du token reçu sous forme de texte
+        if (token) {
+          console.log('Reset Token received:', token);
+        }
+
+        setTimeout(() => {
+          this.toggleMode();
+        }, 3000);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: "Une erreur s'est produite. Veuillez réessayer." });
+        console.error('Forgot password error', err);
+      }
+    });
   }
 }
