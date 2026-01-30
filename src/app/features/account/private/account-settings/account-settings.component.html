@@ -1,0 +1,88 @@
+<div class="account-settings" *ngIf="user">
+  <div class="settings-header">
+    <button
+      pButton
+      type="button"
+      icon="pi pi-arrow-left"
+      class="p-button-text p-button-rounded"
+      (click)="goToProfileHome()">
+    </button>
+    <h2>Paramètres</h2>
+  </div>
+  <p>* Champs obligatoires</p>
+
+  <form #settingsForm="ngForm">
+    <p-card>
+      <ng-template pTemplate="title">Informations de compte</ng-template>
+      <div class="p-fluid p-formgrid p-grid">
+        <!-- Civilité -->
+        <div class="p-field p-col-12">
+          <label>Civilité :</label>
+          <div class="p-field-radio-group">
+            <div class="radio-item">
+              <p-radioButton id="madame" name="gender" value="madame" [(ngModel)]="civility"></p-radioButton>
+              <label for="madame">Madame</label>
+            </div>
+            <div class="radio-item">
+              <p-radioButton id="monsieur" name="gender" value="monsieur" [(ngModel)]="civility"></p-radioButton>
+              <label for="monsieur">Monsieur</label>
+            </div>
+            <div class="radio-item">
+              <p-radioButton id="unspecified" name="gender" value="unspecified" [(ngModel)]="civility"></p-radioButton>
+              <label for="unspecified">Non spécifiée</label>
+            </div>
+          </div>
+        </div>
+        <!-- Nom & Prénom -->
+        <div class="p-field p-col-12 p-md-6">
+          <label for="lastname">Nom *</label>
+          <input id="lastname" type="text" pInputText [(ngModel)]="user.lastName" name="lastName" required>
+        </div>
+        <div class="p-field p-col-12 p-md-6">
+          <label for="firstname">Prénom *</label>
+          <input id="firstname" type="text" pInputText [(ngModel)]="user.firstName" name="firstName" required>
+        </div>
+        <!-- Date de naissance -->
+        <div class="p-field p-col-12">
+          <label for="birthdate">Date de naissance *</label>
+          <p-datePicker id="birthdate" dateFormat="dd/mm/yy" [showIcon]="true" [(ngModel)]="birthdate" name="birthdate" required></p-datePicker>
+        </div>
+        <!-- Adresse -->
+        <div class="p-field p-col-12">
+          <label for="address">Adresse *</label>
+          <input id="address" type="text" pInputText [(ngModel)]="address" name="address" required>
+        </div>
+        <!-- E-mail -->
+        <div class="p-field p-col-12">
+          <label>E-mail</label>
+          <input id="email" disabled="true" type="text" pInputText [value]="user.email" name="email" readonly>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <div class="form-footer">
+          <button pButton type="submit" label="Enregistrer" icon="pi pi-save" [disabled]="settingsForm.invalid"></button>
+        </div>
+      </ng-template>
+    </p-card>
+
+    <p-card>
+      <ng-template pTemplate="title">Apparence</ng-template>
+      <div class="p-field">
+        <div class="p-field-radio-group">
+          <div class="radio-item">
+            <p-radioButton id="device" name="theme" value="device" [(ngModel)]="theme"></p-radioButton>
+            <label for="device">Thème de l’appareil</label>
+          </div>
+          <div class="radio-item">
+            <p-radioButton id="dark" name="theme" value="dark" [(ngModel)]="theme"></p-radioButton>
+            <label for="dark">Thème foncé</label>
+          </div>
+          <div class="radio-item">
+            <p-radioButton id="light" name="theme" value="light" [(ngModel)]="theme"></p-radioButton>
+            <label for="light">Thème clair</label>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </form>
+</div>

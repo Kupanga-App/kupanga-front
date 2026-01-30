@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.account-settings {
+  max-width: 80%;
+  margin: 0 auto;
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 2rem;
+    color: var(--text-color-secondary);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .p-card {
+    .p-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  }
+
+  .p-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-weight: 500;
+    }
+  }
+
+  .p-field-radio-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; // Espace entre les groupes radio-label
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem; // Espace entre le radio button et son label
+    }
+  }
+
+  .form-footer {
+    display: flex;
+    justify-content: flex-end; // Aligner le bouton à droite
+    padding-top: 1rem; // Ajouter un peu d'espace au-dessus du bouton
+  }
+
+  .p-button {
+    align-self: flex-start;
+  }
+}

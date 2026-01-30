@@ -4,4 +4,5 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE';
+  urlProfile?: string;
 }

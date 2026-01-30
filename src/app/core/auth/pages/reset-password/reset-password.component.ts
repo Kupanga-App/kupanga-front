@@ -74,22 +74,27 @@ export class ResetPasswordComponent implements OnInit {
         this.isLoading = true;
 
         const { password } = this.resetForm.value;
-        const resetData = {
-            token: this.token,
-            newPassword: password
-        };
 
-        this.authService.resetPassword(resetData).subscribe({
+        // On passe le token et le nouveau mot de passe en arguments séparés
+        this.authService.resetPassword(this.token, password!).subscribe({
             next: () => {
                 this.isLoading = false;
-                this.messageService.add({ severity: 'success', summary: 'Succès', detail: "Votre mot de passe a été réinitialisé avec succès." });
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Succès',
+                  detail: "Votre mot de passe a été réinitialisé avec succès."
+                });
                 setTimeout(() => {
                     this.router.navigate(['/auth/login']);
                 }, 3000);
             },
             error: (err) => {
                 this.isLoading = false;
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: "Une erreur s'est produite lors de la réinitialisation." });
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Erreur',
+                  detail: "Une erreur s'est produite lors de la réinitialisation."
+                });
                 console.error('Reset password error', err);
             }
         });

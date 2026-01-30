@@ -76,7 +76,7 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
     const credentials = {
       email: email,
-      motDepasse: password
+      password: password
     };
 
     this.authService.login(credentials).subscribe({

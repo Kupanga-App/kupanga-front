@@ -1,0 +1,59 @@
+<p-toast position="top-right"></p-toast>
+<div class="complete-profile-page">
+    <div class="complete-profile-card">
+
+        <header class="complete-profile-card__header">
+            <h1 class="complete-profile-card__title">Complétez votre profil</h1>
+            <p class="complete-profile-card__subtitle">Dernière étape avant de commencer</p>
+        </header>
+
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="firstName" class="form-group__label">Prénom</label>
+                    <input id="firstName" type="text" pInputText formControlName="firstName" class="form-group__input"
+                        placeholder="Votre prénom">
+                    @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                    <small class="form-group__error">Prénom requis.</small>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName" class="form-group__label">Nom</label>
+                    <input id="lastName" type="text" pInputText formControlName="lastName" class="form-group__input"
+                        placeholder="Votre nom">
+                    @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
+                    <small class="form-group__error">Nom requis.</small>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mail" class="form-group__label">Email</label>
+                <input id="mail" type="text" pInputText formControlName="mail" class="form-group__input" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-group__label">Je suis un...</label>
+                <div class="radio-group">
+                    @for (r of roles; track r.value) {
+                    <div class="radio-item">
+                        <p-radioButton [name]="'role'" [value]="r.value" formControlName="role" [inputId]="r.value">
+                        </p-radioButton>
+                        <label [for]="r.value" class="ml-2">{{ r.label }}</label>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <p-button label="Finaliser mon profil" type="submit" [loading]="isLoading" styleClass="p-button-full">
+                </p-button>
+            </div>
+
+        </form>
+
+    </div>
+</div>

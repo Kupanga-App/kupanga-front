@@ -12,6 +12,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-principal-nav-header',
@@ -36,17 +37,27 @@ export class PrincipalNavHeaderComponent implements OnInit {
   @Input() navItems: MenuItem[] = [];
 
   public themeService = inject(ThemeService);
-  private router = inject(Router);
+  protected router = inject(Router);
+  public authService = inject(AuthService);
 
   userMenuItems: MenuItem[] = [];
+  currentUser = this.authService.currentUser;
 
   constructor() {
   }
 
   ngOnInit(): void {
     this.userMenuItems = [
-      { label: 'Mon Profil', icon: 'pi pi-fw pi-user' },
-      { label: 'Paramètres', icon: 'pi pi-fw pi-cog' },
+      { label: 'Mon Profil', icon: 'pi pi-fw pi-user',
+        command: () => {
+          this.router.navigate(['/account/private/home']);
+        }
+      },
+      { label: 'Paramètres', icon: 'pi pi-fw pi-cog'
+        , command: () => {
+          this.router.navigate(['/account/settings']);
+        }
+      },
       { separator: true },
       {
         label: 'Déconnexion',

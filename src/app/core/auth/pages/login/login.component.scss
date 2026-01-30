@@ -7,21 +7,92 @@ $bg-surface: var(--surface-50, #f9fafb);
 $card-bg: var(--surface-card, #ffffff);
 $error-color: var(--red-500, #ef4444);
 
-.login-page {
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.auth-left {
+  width: 60%;
+  background-color: #1a202c; // Fond sombre
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+}
+
+.auth-logo img {
+  height: 40px;
+}
+
+.auth-value-prop {
+  h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.125rem;
+    opacity: 0.8;
+  }
+}
+
+.auth-carousel {
+  background-color: #2d3748; // Un peu plus clair que le fond
+  border-radius: 16px;
+  height: 300px; // Hauteur de la carte du carrousel
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+
+  &__pagination {
+    display: flex;
+    gap: 0.5rem;
+
+    span {
+      display: block;
+      width: 8px;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+
+      &.active {
+        background-color: white;
+      }
+    }
+  }
+}
+
+.auth-right {
+  width: 40%;
+  background-color: $card-bg;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background-color: $bg-surface;
+  padding: 3rem;
+  border-top-left-radius: 32px;
+  border-bottom-left-radius: 32px;
+  margin-left: -32px; // Superposition
+}
+
+.login-page {
+  width: 100%;
 }
 
 .login-card {
-  background-color: $card-bg;
-  padding: 1.5rem;
-  border-radius: $border-radius;
-  width: 100%;
   max-width: 450px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin: auto;
+  box-shadow: none; // L'ombre n'est plus nécessaire
+  padding: 0; // Le padding est maintenant sur .auth-right
 
   &__header {
     text-align: center;
@@ -54,11 +125,6 @@ $error-color: var(--red-500, #ef4444);
     color: $text-secondary-color;
     font-weight: 500;
     line-height: 1.5;
-  }
-
-  &__message {
-    width: 100%;
-    margin-bottom: 1rem;
   }
 }
 
@@ -124,9 +190,5 @@ $error-color: var(--red-500, #ef4444);
   .p-button-full {
     width: 100%;
     border-radius: $border-radius;
-  }
-
-  .p-button-forgot-password {
-    margin-bottom: 1rem;
   }
 }

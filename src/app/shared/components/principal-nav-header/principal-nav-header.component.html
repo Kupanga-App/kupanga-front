@@ -6,7 +6,9 @@
 
     <div class="pnh-center-content">
       <!-- Bouton deposer une annonce -->
-      <p-button label="Ajouter un bien" icon="pi pi-plus" [rounded]="true" />
+      <p-button label="Ajouter un bien"
+                size="small"
+                icon="pi pi-plus"/>
 
       <!-- Search Bar -->
       <div class="pnh-search-bar">
@@ -33,9 +35,14 @@
       <p-button icon="pi pi-heart" [rounded]="true" [text]="true" severity="secondary" />
 
       <!-- User Menu -->
-      <div class="pnh-user-menu" (click)="userMenu.toggle($event)">
+      <div *ngIf="currentUser()" class="pnh-user-menu" (click)="userMenu.toggle($event)">
         <p-button icon="pi pi-user" [rounded]="true" [text]="true" severity="primary" />
         <p-menu #userMenu [model]="userMenuItems" [popup]="true" />
+      </div>
+      <div *ngIf="!currentUser()" class="pnh-user-menu">
+        <p-button [rounded]="true" [text]="true" severity="primary" (click)="router.navigate(['/auth/login'])">
+          <span pButtonLabel>Se connecter</span>
+        </p-button>
       </div>
     </div>
   </div>

@@ -43,18 +43,26 @@
 
 .pnh-center-content {
   display: none;
+  width: 100%;
+
 
   @media (min-width: 768px) {
     display: flex;
-    width: 33.333333%;
+    flex: 1;
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    margin: 0 2rem;
   }
 }
 
 .pnh-search-bar {
   width: 100%;
+  max-width: 400px;
+
+  ::ng-deep .p-inputtext {
+    border-radius: 10rem;
+  }
 
   .w-full {
     width: 100%;

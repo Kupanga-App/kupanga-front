@@ -6,7 +6,7 @@ import { authGuard } from './core/auth/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    component: MainLayoutComponent,
+    component: DashboardLayoutComponent,
     children: [
       // Public routes will go here
     ]
@@ -68,6 +68,21 @@ export const routes: Routes = [
       {
         path: 'messagerie',
         loadComponent: () => import('./features/messagerie/messagerie.component').then(m => m.MessagerieComponent)
+      }
+    ]
+  },
+  {
+    path: 'account',
+    component: DashboardLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'private/home',
+        loadComponent: () => import('./features/account/private/profile-home/profile-home.component').then(m => m.ProfileHomeComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./features/account/private/account-settings/account-settings.component').then(m => m.AccountSettingsComponent)
       }
     ]
   },

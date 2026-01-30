@@ -1,0 +1,119 @@
+.complete-profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background-color: #f8fafc;
+}
+
+.complete-profile-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+    &__header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    &__title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    &__subtitle {
+        color: #64748b;
+    }
+}
+
+.verify-email-section {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    margin-bottom: 2rem;
+    text-align: center;
+
+    p {
+        margin-bottom: 1rem;
+        color: #1e3a8a;
+        font-size: 0.875rem;
+    }
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+
+    &__label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #475569;
+        font-size: 0.875rem;
+    }
+
+    &__input {
+        width: 100%;
+    }
+
+    &__error {
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+}
+
+.radio-group {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+
+    @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+
+    label {
+        margin-left: 0.5rem;
+        cursor: pointer;
+        color: #475569;
+        font-size: 0.875rem;
+    }
+}
+
+.form-actions {
+    margin-top: 2rem;
+}
+
+::ng-deep {
+    .p-button-full {
+        width: 100%;
+    }
+
+    .w-full {
+        width: 100%;
+    }
+}

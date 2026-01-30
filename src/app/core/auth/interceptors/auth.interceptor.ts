@@ -15,7 +15,7 @@ export const authInterceptor: HttpInterceptorFn = (
   const authService = inject(AuthService);
   const accessToken = authService.getAccessToken();
 
-  if (accessToken) {
+  if (accessToken && !req.url.endsWith('/register')) {
     req = addTokenToRequest(req, accessToken);
   }
 

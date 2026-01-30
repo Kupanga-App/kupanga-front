@@ -1,66 +1,185 @@
-<div class="register-page">
-  <div class="register-card">
-
-    <!-- Header -->
-    <header class="register-card__header">
-      <h1 class="register-card__title">Créer un compte</h1>
-      <p class="register-card__subtitle">Rejoignez Kupanga</p>
-    </header>
-
-    <!-- Register Form -->
-    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-
-      <div class="form-group">
-        <label for="email" class="form-group__label">Email</label>
-        <input id="email" type="text" pInputText formControlName="email" class="form-group__input"
-          placeholder="Votre adresse email">
-        <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
-          class="form-group__error">
-          Email invalide ou requis.
-        </small>
+<p-toast position="top-right"></p-toast>
+<div class="auth-container">
+  <!-- Colonne de Gauche -->
+  <div class="auth-left">
+    <div class="auth-left__content">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <img src="assets/logos/logo.e2d1b831.svg" alt="Kupanga Logo">
       </div>
 
-      <div class="form-group">
-        <label for="password" class="form-group__label">Mot de passe</label>
-        <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="true"
-          styleClass="p-password-full" placeholder="Mot de passe (min 8 caractères)">
-          <ng-template pTemplate="header">
-            <h6>Choisissez un mot de passe</h6>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <p class="mt-2">Suggestions</p>
-            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
-              <li>Au moins une minuscule</li>
-              <li>Au moins une majuscule</li>
-              <li>Au moins un chiffre</li>
-              <li>Minimum 8 caractères</li>
-            </ul>
-          </ng-template>
-        </p-password>
-        <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-          class="form-group__error">
-          Mot de passe requis (min 8 caractères).
-        </small>
+      <!-- Proposition de Valeur -->
+      <div class="auth-value-prop">
+        <h2>Gérez vos biens en toute simplicité</h2>
+        <p>Kupanga vous aide à optimiser la gestion de votre patrimoine immobilier.</p>
       </div>
 
-      <div class="form-group form-group--last">
-        <label for="confirmPassword" class="form-group__label">Confirmer le mot de passe</label>
-        <p-password id="confirmPassword" formControlName="confirmPassword" [toggleMask]="true" [feedback]="false"
-          styleClass="p-password-full" placeholder="Confirmez votre mot de passe"></p-password>
-        <small
-          *ngIf="registerForm.get('confirmPassword')?.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched"
-          class="form-group__error">
-          Les mots de passe ne correspondent pas.
-        </small>
+      <!-- Carrousel d'Images -->
+      <div class="auth-carousel">
+        <!-- Contenu du carrousel ici -->
+        <div class="auth-carousel__pagination">
+          <span></span>
+          <span class="active"></span>
+          <span></span>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <p-button label="S'inscrire" type="submit" [loading]="isLoading" styleClass="p-button-full"></p-button>
+  <!-- Colonne de Droite -->
+  <div class="auth-right">
+    <div class="register-page">
+      <div class="register-card">
 
-      <footer class="register-card__footer">
-        <span>Déjà un compte ? </span>
-        <a routerLink="/auth/login" class="footer__link">Se connecter</a>
-      </footer>
-    </form>
+        <!-- Header -->
+        <header class="register-card__header">
+          <h1 class="register-card__title">Créer un compte</h1>
+          <p class="register-card__subtitle">
+            @if (step() === 1) {
+            Rejoignez Kupanga
+            } @else {
+            Complétez votre profil
+            }
+          </p>
+        </header>
 
+        <!-- Register Form -->
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+
+          <!-- STEP 1 -->
+          @if (step() === 1) {
+          <div class="form-group">
+            <label for="email" class="form-group__label">Email</label>
+            <input id="email" type="text" pInputText formControlName="email" class="form-group__input"
+              placeholder="Votre adresse email">
+            <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+              class="form-group__error">
+              Email invalide ou requis.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-group__label">Mot de passe</label>
+            <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="true"
+              styleClass="p-password-full" placeholder="Mot de passe (min 8 caractères)">
+              <ng-template pTemplate="header">
+                <h6>Choisissez un mot de passe</h6>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <p class="mt-2">Suggestions</p>
+                <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                  <li>Au moins une minuscule</li>
+                  <li>Au moins une majuscule</li>
+                  <li>Au moins un chiffre</li>
+                  <li>Minimum 8 caractères</li>
+                </ul>
+              </ng-template>
+            </p-password>
+            <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+              class="form-group__error">
+              Mot de passe requis (min 8 caractères).
+            </small>
+          </div>
+
+          <div class="form-group form-group--last">
+            <label for="confirmPassword" class="form-group__label">Confirmer le mot de passe</label>
+            <p-password id="confirmPassword" formControlName="confirmPassword" [toggleMask]="true" [feedback]="false"
+              styleClass="p-password-full" placeholder="Confirmez votre mot de passe"></p-password>
+            <small
+              *ngIf="registerForm.get('confirmPassword')?.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched"
+              class="form-group__error">
+              Les mots de passe ne correspondent pas.
+            </small>
+          </div>
+
+          <p-button label="Suivant" (onClick)="nextStep()" styleClass="p-button-full"></p-button>
+          }
+
+          <!-- STEP 2 -->
+          @if (step() === 2) {
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="firstName" class="form-group__label">Prénom</label>
+              <input id="firstName" type="text" pInputText formControlName="firstName" class="form-group__input"
+                placeholder="Votre prénom">
+              <small *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
+                class="form-group__error">
+                Prénom requis.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="lastName" class="form-group__label">Nom</label>
+              <input id="lastName" type="text" pInputText formControlName="lastName" class="form-group__input"
+                placeholder="Votre nom">
+              <small *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
+                class="form-group__error">
+                Nom requis.
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label">Je suis un...</label>
+            <div class="radio-group">
+              @for (r of roles; track r.value) {
+              <div class="radio-item">
+                <p-radioButton [name]="'role'" [value]="r.value" formControlName="role" [inputId]="r.value">
+                </p-radioButton>
+                <label [for]="r.value" class="ml-2">{{ r.label }}</label>
+              </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label">Photo de profil</label>
+            <div class="avatar-selection">
+              <div class="avatar-preview" *ngIf="selectedAvatar || uploadedFilePreview">
+                <img [src]="selectedAvatar || uploadedFilePreview" alt="Avatar" class="avatar-img">
+              </div>
+
+              <div class="avatar-actions">
+                <p-button label="Choisir un avatar" icon="pi pi-user" (onClick)="openAvatarDialog()"
+                  styleClass="p-button-outlined p-button-sm"></p-button>
+                <span class="separator">ou</span>
+                <p-fileUpload mode="basic" name="profilePicture" accept="image/*" maxFileSize="1000000"
+                  (onSelect)="onFileUpload($event)" chooseLabel="Uploader une photo"
+                  styleClass="p-button-outlined p-button-sm">
+                </p-fileUpload>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <p-button label="Retour" (onClick)="previousStep()"
+              styleClass="p-button-outlined p-button-secondary"></p-button>
+            <p-button label="S'inscrire" type="submit" [loading]="isLoading"></p-button>
+          </div>
+          }
+
+          <footer class="register-card__footer">
+            <span>Déjà un compte ? </span>
+            <a routerLink="/auth/login" class="footer__link">Se connecter</a>
+          </footer>
+        </form>
+
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Avatar Selection Dialog -->
+<p-dialog header="Choisir un avatar" [(visible)]="showAvatarDialog" [modal]="true" [style]="{width: '50vw'}"
+  [draggable]="false" [resizable]="false">
+  <div class="avatars-grid">
+    @for (avatar of avatars; track avatar) {
+    <div class="avatar-item" (click)="selectAvatar(avatar)">
+      <img [src]="avatar" alt="Avatar" class="avatar-img-dialog">
+    </div>
+    }
+    @if (avatars.length === 0) {
+    <p>Aucun avatar disponible.</p>
+    }
+  </div>
+</p-dialog>
