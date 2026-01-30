@@ -32,3 +32,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD_ADMIN }}
           local-dir: dist/kupanga-front/browser/
           server-dir: /
+          protocol: ftps
+          port: 21
