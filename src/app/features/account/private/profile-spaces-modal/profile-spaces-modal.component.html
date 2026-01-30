@@ -1,0 +1,16 @@
+<p-dialog header="Profil & Espaces" [(visible)]="display" [modal]="true" (onHide)="onHide()" [style]="{width: '60vw'}">
+  <div class="profile-spaces-modal">
+    <div class="spaces-list">
+      <div class="space-item">
+        <i class="pi pi-users"></i>
+        <span>Espace locataire</span>
+        <button pButton type="button" label="Accéder à mon dossier locataire"></button>
+      </div>
+      <div class="space-item">
+        <i class="pi pi-briefcase"></i>
+        <span>Espace bailleur</span>
+        <button pButton type="button" label="Accéder à mon espace bailleur"></button>
+      </div>
+    </div>
+  </div>
+</p-dialog>

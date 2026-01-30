@@ -17,31 +17,19 @@ import { PrincipalNavHeaderComponent } from '../../shared/components/principal-n
 })
 export class DashboardLayoutComponent implements OnInit {
   navItems: MenuItem[] = [];
-  mobileNavItems: MenuItem[] = [];
 
   ngOnInit(): void {
     this.navItems = [
       // user
-      { label: 'Accueil', routerLink: 'home' },
-      { label: 'Mes Biens', routerLink: 'biens' },
-      { label: 'Mes Contrats', routerLink: 'contrats' },
-      { label: 'États des Lieux', routerLink: 'etats-des-lieux' },
-      { label: 'Quittances', routerLink: 'quittances' },
+      { label: 'Accueil', routerLink: 'home', icon: 'pi pi-home' },
+      { label: 'Mes Biens', routerLink: 'biens', icon: 'pi pi-building' },
+      { label: 'Mes Contrats', routerLink: 'contrats', icon: 'pi pi-file' },
+      { label: 'États des Lieux', routerLink: 'etats-des-lieux', icon: 'pi pi-check-square' },
+      { label: 'Quittances', routerLink: 'quittances', icon: 'pi pi-receipt' },
       // Catégories
       { label: 'Immobilier', routerLink: 'immobilier' },
-      { label: 'Véhicules', routerLink: 'vehicules' },
-      { label: 'Vacances', routerLink: 'vacances' },
-      { label: 'Maison & Jardin', routerLink: 'maison-jardin' },
-      { label: 'Famille', routerLink: 'famille' },
       { label: 'Autres', routerLink: 'autres' },
-      { label: 'Bons plans !', routerLink: 'bons-plans' },
-    ];
-
-    this.mobileNavItems = [
-        { label: 'Mes Biens', routerLink: 'biens' },
-        { label: 'Mes Contrats', routerLink: 'contrats' },
-        { label: 'États des Lieux', routerLink: 'etats-des-lieux' },
-        { label: 'Quittances', routerLink: 'quittances' },
+      { label: 'Bons plans !', routerLink: 'bons-plans', icon: 'pi pi-tag' },
     ];
   }
 }

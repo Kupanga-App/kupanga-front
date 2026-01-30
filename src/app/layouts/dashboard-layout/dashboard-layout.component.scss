@@ -1,3 +1,23 @@
-.db-layout{
-  background: #94489405;
+.db-layout {
+  min-height: 100vh;
+  background-color: var(--p-surface-50);
+  color: var(--p-text-color);
+}
+
+.db-container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+    max-width: 768px;
+  }
+  @media (min-width: 1024px) {
+    max-width: 1024px;
+  }
+  @media (min-width: 1280px) {
+    max-width: 1280px;
+  }
 }
