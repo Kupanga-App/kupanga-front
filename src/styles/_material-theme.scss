@@ -1,0 +1,183 @@
+// styles/_material-theme.scss — Angular Material theming Kupanga
+@use '@angular/material' as mat;
+
+// === Palette primaire Kupanga (bleu #1a56db) ===
+$kupanga-primary: mat.m2-define-palette((
+  50:  #ebf5ff,
+  100: #bfdbfe,
+  200: #93c5fd,
+  300: #60a5fa,
+  400: #3b82f6,
+  500: #1a56db,
+  600: #1e429f,
+  700: #1e3a8a,
+  800: #1e3a5f,
+  900: #1e2d6b,
+  contrast: (
+    500: white,
+    600: white,
+    700: white,
+  )
+), 500, 600, 400);
+
+// Palette accent (blue-grey) définie inline — mat.$blue-grey-palette non exposé en v20
+$kupanga-accent: mat.m2-define-palette((
+  50:  #eceff1,
+  100: #cfd8dc,
+  200: #b0bec5,
+  300: #90a4ae,
+  400: #78909c,
+  500: #607d8b,
+  600: #546e7a,
+  700: #455a64,
+  800: #37474f,
+  900: #263238,
+  A100: #cfd8dc,
+  A200: #b0bec5,
+  A400: #78909c,
+  A700: #455a64,
+  contrast: (
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A700: white,
+  )
+), A200, A100, A400);
+
+// Palette warn (red) définie inline
+$kupanga-warn: mat.m2-define-palette((
+  50:  #ffebee,
+  100: #ffcdd2,
+  200: #ef9a9a,
+  300: #e57373,
+  400: #ef5350,
+  500: #f44336,
+  600: #e53935,
+  700: #d32f2f,
+  800: #c62828,
+  900: #b71c1c,
+  A100: #ff8a80,
+  A200: #ff5252,
+  A400: #ff1744,
+  A700: #d50000,
+  contrast: (
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+));
+
+$kupanga-light-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $kupanga-primary,
+    accent:  $kupanga-accent,
+    warn:    $kupanga-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Inter, sans-serif',
+  ),
+));
+
+$kupanga-dark-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: $kupanga-primary,
+    accent:  $kupanga-accent,
+    warn:    $kupanga-warn,
+  ),
+));
+
+// Thème light par défaut
+@include mat.all-component-themes($kupanga-light-theme);
+
+// Thème sombre via classe body
+.kp-theme-dark {
+  @include mat.all-component-colors($kupanga-dark-theme);
+}
+
+// === Overrides Material — tokens Kupanga ===
+
+// === Unification border-radius des boutons ===
+:root {
+  --mdc-filled-button-container-shape: 8px;
+  --mdc-outlined-button-container-shape: 8px;
+  --mdc-text-button-container-shape: 8px;
+}
+
+.mat-mdc-button.mat-primary {
+  --mdc-text-button-label-text-color: var(--kp-primary);
+}
+
+.mat-mdc-raised-button.mat-primary {
+  --mdc-filled-button-container-color: var(--kp-primary);
+  --mdc-filled-button-label-text-color: #ffffff;
+  border-radius: var(--kp-radius-sm);
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: var(--kp-border-strong);
+  --mdc-outlined-text-field-focus-outline-color: var(--kp-primary);
+  --mdc-outlined-text-field-label-text-color: var(--kp-text-2);
+  --mdc-outlined-text-field-input-text-color: var(--kp-text-1);
+  --mdc-outlined-text-field-container-shape: var(--kp-radius-sm);
+}
+
+.mat-mdc-card {
+  --mdc-elevated-card-container-color: var(--kp-surface);
+  --mdc-elevated-card-container-shape: var(--kp-radius-md);
+  border: 0.5px solid var(--kp-border);
+  box-shadow: none !important; // flat style Kupanga
+}
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: var(--kp-surface);
+  --mdc-dialog-container-shape: var(--kp-radius-lg);
+  --mdc-dialog-subhead-color: var(--kp-text-1);
+  --mdc-dialog-supporting-text-color: var(--kp-text-2);
+}
+
+.mat-sidenav {
+  --mat-sidenav-container-background-color: var(--kp-surface-2);
+  --mat-sidenav-container-shape: 0;
+  border-right: 0.5px solid var(--kp-border) !important;
+}
+
+.mat-mdc-chip {
+  --mdc-chip-container-shape-radius: var(--kp-radius-full);
+  --mdc-chip-label-text-size: 11px;
+  --mdc-chip-label-text-weight: 500;
+}
+
+.mat-mdc-table {
+  --mat-table-background-color: var(--kp-surface);
+  --mat-table-header-headline-color: var(--kp-text-2);
+  --mat-table-header-headline-size: 12px;
+  --mat-table-header-headline-weight: 500;
+  --mat-table-row-item-label-text-color: var(--kp-text-1);
+  --mat-table-row-item-outline-color: var(--kp-border);
+}
+
+.mat-mdc-header-row {
+  background: var(--kp-surface-2);
+}
+
+.mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: var(--kp-primary);
+  --mat-tab-header-active-label-text-color: var(--kp-primary);
+  --mat-tab-header-inactive-label-text-color: var(--kp-text-2);
+  --mat-tab-header-active-focus-label-text-color: var(--kp-primary);
+}
+
+// === Helpers formulaires globaux ===
+
+.form-field-full {
+  width: 100%;
+  display: block;
+}
+
+.btn-full {
+  width: 100%;
+}

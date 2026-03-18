@@ -136,10 +136,10 @@ export class AuthService {
     );
   }
 
-  private clearClientState(): void {
+  clearClientState(): void {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
     this.currentUser.set(null);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/']);
   }
 }

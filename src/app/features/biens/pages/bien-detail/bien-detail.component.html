@@ -1,0 +1,116 @@
+<div class="kp-page">
+
+  <!-- Bouton retour contextuel -->
+  @if (isProRoute()) {
+    <button mat-button [routerLink]="['/pro/biens']">
+      <mat-icon>arrow_back</mat-icon> Mes biens
+    </button>
+  } @else {
+    <button mat-button [routerLink]="['/']">
+      <mat-icon>arrow_back</mat-icon> Retour
+    </button>
+  }
+
+  <!-- État chargement -->
+  @if (loading()) {
+    <div class="kp-detail-loading">
+      <div class="kp-skeleton" style="height:260px;border-radius:12px;"></div>
+      <div class="kp-skeleton" style="height:24px;width:50%;border-radius:6px;margin-top:20px;"></div>
+      <div class="kp-skeleton" style="height:16px;width:35%;border-radius:6px;margin-top:10px;"></div>
+    </div>
+  }
+
+  <!-- État erreur -->
+  @if (!loading() && error()) {
+    <div class="kp-detail-error">
+      <mat-icon>error_outline</mat-icon>
+      <span class="kp-text-h2">{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Contenu -->
+  @if (!loading() && bien()) {
+    <!-- Galerie photos -->
+    @if (bien()!.images.length > 0) {
+      <div class="kp-detail-gallery">
+        <img class="kp-detail-img-main"
+             [src]="bien()!.images[0]"
+             [alt]="bien()!.titre" />
+        @if (bien()!.images.length > 1) {
+          <div class="kp-detail-img-thumbs">
+            @for (img of bien()!.images.slice(1, 4); track img) {
+              <img [src]="img" [alt]="bien()!.titre" />
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="kp-detail-img-placeholder">
+        <mat-icon>image_not_supported</mat-icon>
+      </div>
+    }
+
+    <!-- En-tête du bien -->
+    <div class="kp-detail-header">
+      <div>
+        <h1 class="kp-text-h1">{{ bien()!.titre }}</h1>
+        <div class="kp-detail-location">
+          <mat-icon>place</mat-icon>
+          {{ bien()!.adresse }} — {{ bien()!.ville }}, {{ bien()!.codePostal }}, {{ bien()!.pays }}
+        </div>
+      </div>
+      <span class="kp-bien-badge kp-badge-{{ bien()!.typeBien.toLowerCase() }}">
+        {{ bien()!.typeBien }}
+      </span>
+    </div>
+
+    <!-- Description -->
+    @if (bien()!.description) {
+      <div class="kp-detail-section">
+        <h2 class="kp-text-h2">Description</h2>
+        <p class="kp-text-body">{{ bien()!.description }}</p>
+      </div>
+    }
+
+    <!-- Méta -->
+    <div class="kp-detail-meta">
+      <span class="kp-meta-item">
+        <mat-icon>calendar_today</mat-icon>
+        Ajouté le {{ bien()!.createdAt | date:'dd MMM yyyy' }}
+      </span>
+      <span class="kp-meta-item">
+        <mat-icon>person</mat-icon>
+        @if (bien()!.locataire) {
+          Locataire assigné
+        } @else {
+          Vacant
+        }
+      </span>
+    </div>
+
+    <!-- Actions contextuelles -->
+    @if (isProprietaire()) {
+      <div class="kp-detail-actions">
+        <button mat-flat-button color="primary"
+                [routerLink]="['/pro/contrats']">
+          <mat-icon>description</mat-icon>
+          Créer un contrat
+        </button>
+        <button mat-stroked-button
+                [routerLink]="['/pro/messagerie']">
+          <mat-icon>chat</mat-icon>
+          Messagerie
+        </button>
+      </div>
+    } @else {
+      <div class="kp-detail-actions">
+        <button mat-stroked-button
+                [routerLink]="['/loc/messagerie']">
+          <mat-icon>chat</mat-icon>
+          Contacter le propriétaire
+        </button>
+      </div>
+    }
+  }
+
+</div>

@@ -3,16 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
-
-// PrimeNG Imports
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { CheckboxModule } from 'primeng/checkbox';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -22,14 +18,12 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    PasswordModule,
-    CheckboxModule,
-    MessageModule,
-    ToastModule
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatIconModule,
   ],
-  providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   animations: [
@@ -48,10 +42,11 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private messageService = inject(MessageService);
+  private snackBar = inject(MatSnackBar);
 
   isForgotPasswordMode = false;
   isLoading = false;
+  hidePassword = true;
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -62,61 +57,44 @@ export class LoginComponent {
     email: ['', [Validators.required, Validators.email]]
   });
 
-  toggleMode() {
+  toggleMode(): void {
     this.isForgotPasswordMode = !this.isForgotPasswordMode;
     this.loginForm.reset();
     this.forgotPasswordForm.reset();
   }
 
-  onLogin() {
+  onLogin(): void {
     if (this.loginForm.invalid) return;
-
     this.isLoading = true;
-
     const { email, password } = this.loginForm.value;
-    const credentials = {
-      email: email,
-      password: password
-    };
-
-    this.authService.login(credentials).subscribe({
-      next: () => {
+    this.authService.login({ email, password }).subscribe({
+      next: (user) => {
         this.isLoading = false;
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Connexion réussie.' });
-        this.router.navigate(['/admin']);
+        this.snackBar.open('Connexion réussie.', 'Fermer', { duration: 4000 });
+        this.router.navigate(user.role === 'ROLE_PROPRIETAIRE' ? ['/pro'] : ['/loc']);
       },
       error: (err) => {
         this.isLoading = false;
-        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Email ou mot de passe incorrect.' });
+        this.snackBar.open('Email ou mot de passe incorrect.', 'Fermer', { duration: 4000, panelClass: ['snack-error'] });
         console.error('Login error', err);
       }
     });
   }
 
-  onForgotPassword() {
+  onForgotPassword(): void {
     if (this.forgotPasswordForm.invalid) return;
-
     this.isLoading = true;
-
     const email = this.forgotPasswordForm.value.email as string;
-
     this.authService.forgotPassword(email).subscribe({
       next: (token: string) => {
         this.isLoading = false;
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Un email de réinitialisation a été envoyé.' });
-
-        // Log du token reçu sous forme de texte
-        if (token) {
-          console.log('Reset Token received:', token);
-        }
-
-        setTimeout(() => {
-          this.toggleMode();
-        }, 3000);
+        this.snackBar.open('Un email de réinitialisation a été envoyé.', 'Fermer', { duration: 4000 });
+        if (token) { console.log('Reset Token received:', token); }
+        setTimeout(() => { this.toggleMode(); }, 3000);
       },
       error: (err) => {
         this.isLoading = false;
-        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: "Une erreur s'est produite. Veuillez réessayer." });
+        this.snackBar.open("Une erreur s'est produite. Veuillez réessayer.", 'Fermer', { duration: 4000, panelClass: ['snack-error'] });
         console.error('Forgot password error', err);
       }
     });

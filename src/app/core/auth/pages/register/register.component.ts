@@ -2,21 +2,14 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-
-// PrimeNG Imports
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { DialogModule } from 'primeng/dialog';
-import { FileUploadModule } from 'primeng/fileupload';
-import { MessageService } from 'primeng/api';
-
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 
-// Custom Validator
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password');
   const confirmPassword = control.get('confirmPassword');
@@ -39,16 +32,12 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    PasswordModule,
-    MessageModule,
-    ToastModule,
-    RadioButtonModule,
-    DialogModule,
-    FileUploadModule
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatRadioModule,
+    MatIconModule,
   ],
-  providers: [MessageService],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -56,7 +45,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private messageService = inject(MessageService);
+  private snackBar = inject(MatSnackBar);
 
   isLoading = false;
   step = signal<number>(1);
@@ -65,6 +54,8 @@ export class RegisterComponent {
   selectedAvatar: string | null = null;
   uploadedFile: File | null = null;
   uploadedFilePreview: string | null = null;
+  hidePassword = true;
+  hideConfirmPassword = true;
 
   roles = [
     { label: 'Propriétaire', value: 'ROLE_PROPRIETAIRE' },
@@ -72,23 +63,19 @@ export class RegisterComponent {
   ];
 
   registerForm = this.fb.group({
-    // Step 1
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [Validators.required]],
-
-    // Step 2
     firstName: ['', [Validators.required]],
     lastName: ['', [Validators.required]],
     role: ['ROLE_PROPRIETAIRE', [Validators.required]],
-    avatar: [''], // URL de l'avatar sélectionné
-    profilePicture: [null] // Fichier uploadé
+    avatar: [''],
+    profilePicture: [null as File | null]
   }, { validators: passwordMatchValidator });
 
-  nextStep() {
+  nextStep(): void {
     const step1Controls = ['email', 'password', 'confirmPassword'];
     const isStep1Valid = step1Controls.every(control => this.registerForm.get(control)?.valid);
-
     if (isStep1Valid) {
       this.step.set(2);
     } else {
@@ -96,11 +83,11 @@ export class RegisterComponent {
     }
   }
 
-  previousStep() {
+  previousStep(): void {
     this.step.set(1);
   }
 
-  openAvatarDialog() {
+  openAvatarDialog(): void {
     this.authService.getAvatars().subscribe({
       next: (avatars) => {
         this.avatars = avatars;
@@ -108,12 +95,12 @@ export class RegisterComponent {
       },
       error: (err) => {
         console.error('Error fetching avatars', err);
-        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les avatars.' });
+        this.snackBar.open('Impossible de charger les avatars.', 'Fermer', { duration: 4000, panelClass: ['snack-error'] });
       }
     });
   }
 
-  selectAvatar(avatarUrl: string) {
+  selectAvatar(avatarUrl: string): void {
     this.selectedAvatar = avatarUrl;
     this.registerForm.patchValue({ avatar: avatarUrl, profilePicture: null });
     this.uploadedFile = null;
@@ -121,52 +108,43 @@ export class RegisterComponent {
     this.showAvatarDialog = false;
   }
 
-  onFileUpload(event: any) {
-    const file = event.files[0];
+  onFileUpload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (file) {
       this.uploadedFile = file;
       this.registerForm.patchValue({ profilePicture: file, avatar: '' });
       this.selectedAvatar = null;
-
-      // Créer une URL pour la prévisualisation
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadedFilePreview = e.target.result;
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.uploadedFilePreview = e.target?.result as string;
       };
       reader.readAsDataURL(file);
-
-      this.messageService.add({ severity: 'info', summary: 'Photo sélectionnée', detail: file.name });
+      this.snackBar.open(file.name, 'OK', { duration: 3000 });
     }
   }
 
-  onRegister() {
+  onRegister(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
-
     this.isLoading = true;
-
     const { confirmPassword, ...userData } = this.registerForm.value;
-
-    // Appel au service avec userData et le fichier optionnel
-    // Note: uploadedFile peut être null si l'utilisateur a choisi un avatar ou rien du tout
     this.authService.register(userData, this.uploadedFile || undefined).subscribe({
       next: (user) => {
         this.isLoading = false;
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Compte créé et connecté !' });
-
-        // Redirection en fonction du rôle
+        this.snackBar.open('Compte créé et connecté !', 'Fermer', { duration: 4000 });
         if (user.role === 'ROLE_PROPRIETAIRE') {
-          this.router.navigate(['/admin']);
+          this.router.navigate(['/pro']);
         } else {
-          this.router.navigate(['/user']);
+          this.router.navigate(['/loc']);
         }
       },
       error: (err) => {
         this.isLoading = false;
         const errorMessage = err.error?.message || "Une erreur s'est produite lors de l'inscription.";
-        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: errorMessage });
+        this.snackBar.open(errorMessage, 'Fermer', { duration: 4000, panelClass: ['snack-error'] });
         console.error('Register error', err);
       }
     });

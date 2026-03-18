@@ -4,54 +4,48 @@
       <img [src]="userPhoto()" alt="User Photo" class="user-photo">
       <h2>{{ user()?.firstName }}</h2>
     </div>
-    <button pButton type="button" label="Modifier" class="p-button-secondary"></button>
+    <button mat-stroked-button type="button">Modifier</button>
   </div>
 
   <div class="profile-content">
     <div class="card-container" (click)="showSpacesModal()">
-      <p-card>
-        <ng-template pTemplate="header">
-          <i class="pi pi-users"></i>
-        </ng-template>
-        <ng-template pTemplate="title">
-          Profil & Espaces
-        </ng-template>
-        <ng-template pTemplate="content">
+      <mat-card>
+        <mat-card-header>
+          <mat-icon mat-card-avatar>group</mat-icon>
+          <mat-card-title>Profil &amp; Espaces</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
           Modifier mon profil public et accéder à mes espaces.
-        </ng-template>
-      </p-card>
+        </mat-card-content>
+      </mat-card>
     </div>
 
     <div class="card-container" [routerLink]="['/account/settings']">
-      <p-card>
-        <ng-template pTemplate="header">
-          <i class="pi pi-cog"></i>
-        </ng-template>
-        <ng-template pTemplate="title">
-          Paramètres
-        </ng-template>
-        <ng-template pTemplate="content">
+      <mat-card>
+        <mat-card-header>
+          <mat-icon mat-card-avatar>settings</mat-icon>
+          <mat-card-title>Paramètres</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
           Compléter les informations privées et les préférences.
-        </ng-template>
-      </p-card>
+        </mat-card-content>
+      </mat-card>
     </div>
 
     <div class="card-container">
-      <p-card>
-        <ng-template pTemplate="header">
-          <i class="pi pi-question-circle"></i>
-        </ng-template>
-        <ng-template pTemplate="title">
-          Aide
-        </ng-template>
-        <ng-template pTemplate="content">
-          Accéder à l’aide ou au support utilisateur.
-        </ng-template>
-      </p-card>
+      <mat-card>
+        <mat-card-header>
+          <mat-icon mat-card-avatar>help_outline</mat-icon>
+          <mat-card-title>Aide</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Accéder à l'aide ou au support utilisateur.
+        </mat-card-content>
+      </mat-card>
     </div>
   </div>
 
-  <button pButton type="button" label="Me déconnecter" class="p-button-danger"></button>
+  <button mat-raised-button color="warn" type="button">Me déconnecter</button>
 </div>
 
 <app-profile-spaces-modal [(display)]="displaySpacesModal"></app-profile-spaces-modal>

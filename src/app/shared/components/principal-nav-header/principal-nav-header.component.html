@@ -1,56 +1,128 @@
-<header class="pnh-header">
-  <!-- Level 1: Main Header -->
-  <div class="pnh-container pnh-main-bar">
-    <!-- Logo -->
-    <div class="pnh-logo">Kupanga</div>
+<!-- Niveau 1 — 56px -->
+<mat-toolbar class="kp-nav-l1">
+  <!-- Gauche : logo -->
+  <div class="kp-l1-left">
+    <a class="kp-logo" routerLink="/">
+      <span class="kp-logo-primary">ku</span><span class="kp-logo-dark">panga</span>
+    </a>
+  </div>
 
-    <div class="pnh-center-content">
-      <!-- Bouton deposer une annonce -->
-      <p-button label="Ajouter un bien"
-                size="small"
-                icon="pi pi-plus"/>
-
-      <!-- Search Bar -->
-      <div class="pnh-search-bar">
-        <p-iconField iconPosition="left">
-          <p-inputIcon styleClass="pi pi-search" />
-          <input type="text" pInputText placeholder="Rechercher un bien..." class="w-full" />
-        </p-iconField>
-      </div>
-    </div>
-
-    <!-- Right Actions -->
-    <div class="pnh-right-actions">
-      <!-- Theme Toggle Button -->
-      <p-button
-        [icon]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
-        [rounded]="true"
-        [text]="true"
-        severity="secondary"
-        (onClick)="themeService.toggleTheme()"
-      />
-
-      <p-button icon="pi pi-envelope" [rounded]="true" [text]="true" severity="secondary" pBadge value="2" badgeSeverity="danger" />
-      <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary" />
-      <p-button icon="pi pi-heart" [rounded]="true" [text]="true" severity="secondary" />
-
-      <!-- User Menu -->
-      <div *ngIf="currentUser()" class="pnh-user-menu" (click)="userMenu.toggle($event)">
-        <p-button icon="pi pi-user" [rounded]="true" [text]="true" severity="primary" />
-        <p-menu #userMenu [model]="userMenuItems" [popup]="true" />
-      </div>
-      <div *ngIf="!currentUser()" class="pnh-user-menu">
-        <p-button [rounded]="true" [text]="true" severity="primary" (click)="router.navigate(['/auth/login'])">
-          <span pButtonLabel>Se connecter</span>
-        </p-button>
-      </div>
+  <!-- Centre : barre de recherche (présente dans les deux états) -->
+  <div class="kp-l1-center">
+    <div class="kp-search">
+      <mat-icon>search</mat-icon>
+      <input placeholder="Rechercher un bien, une ville, un code postal…" />
     </div>
   </div>
 
-  <!-- Level 2: Business Navigation -->
-  <div class="pnh-nav-bar">
-    <div class="pnh-container">
-      <p-menubar [model]="navItems" styleClass="pnh-menubar" />
-    </div>
+  <!-- Droite : actions selon état d'authentification -->
+  <div class="kp-l1-right">
+    @if (!isConnected()) {
+      <a mat-stroked-button routerLink="/auth/login">Se connecter</a>
+      <a mat-raised-button color="primary" routerLink="/auth/register">
+        <mat-icon>add</mat-icon>
+        Déposer une annonce
+      </a>
+    } @else {
+      @if (isAdmin()) {
+        <a mat-raised-button color="primary" class="kp-btn-new" routerLink="/pro/biens/nouveau">
+          + Nouveau bien
+        </a>
+      }
+
+      <button mat-icon-button aria-label="Notifications">
+        <mat-icon
+          [matBadge]="notificationCount"
+          [matBadgeHidden]="notificationCount === 0"
+          matBadgeColor="warn"
+          matBadgeSize="small">
+          notifications_none
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="themeService.toggleTheme()" aria-label="Basculer le thème">
+        <mat-icon>{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <div class="kp-avatar" [matMenuTriggerFor]="userMenu" role="button" aria-label="Mon compte">
+        {{ userInitials() }}
+      </div>
+
+      <mat-menu #userMenu="matMenu">
+        <a mat-menu-item routerLink="/account/private/home">
+          <mat-icon>person</mat-icon>
+          <span>Mon profil</span>
+        </a>
+        <a mat-menu-item routerLink="/account/settings">
+          <mat-icon>settings</mat-icon>
+          <span>Paramètres</span>
+        </a>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Se déconnecter</span>
+        </button>
+      </mat-menu>
+    }
   </div>
-</header>
+</mat-toolbar>
+
+<!-- Niveau 2 — 40px -->
+<mat-toolbar class="kp-nav-l2">
+  @if (!isConnected()) {
+    <a class="kp-nav-link" routerLink="/" routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: true}">Immobilier</a>
+    <a class="kp-nav-link" routerLink="/louer" routerLinkActive="active">Louer</a>
+    <a class="kp-nav-link" routerLink="/acheter" routerLinkActive="active">Acheter</a>
+    <a class="kp-nav-link" routerLink="/estimer" routerLinkActive="active">Estimer</a>
+    <a class="kp-nav-link" routerLink="/bons-plans" routerLinkActive="active">Bons plans</a>
+  } @else if (isAdmin()) {
+    <a class="kp-nav-link" routerLink="/pro" routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: true}">
+      <mat-icon>home</mat-icon>
+      Accueil
+    </a>
+    <a class="kp-nav-link" routerLink="/pro/biens" routerLinkActive="active">
+      <mat-icon>house</mat-icon>
+      Mes biens
+    </a>
+    <a class="kp-nav-link" routerLink="/pro/contrats" routerLinkActive="active">
+      <mat-icon>description</mat-icon>
+      Contrats
+    </a>
+    <a class="kp-nav-link" routerLink="/pro/etats-des-lieux" routerLinkActive="active">
+      <mat-icon>task_alt</mat-icon>
+      États des lieux
+    </a>
+    <a class="kp-nav-link" routerLink="/pro/quittances" routerLinkActive="active">
+      <mat-icon>credit_card</mat-icon>
+      Quittances
+    </a>
+    <a class="kp-nav-link" routerLink="/pro/messagerie" routerLinkActive="active">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      Messagerie
+    </a>
+  } @else {
+    <a class="kp-nav-link" routerLink="/loc" routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: true}">
+      <mat-icon>home</mat-icon>
+      Accueil
+    </a>
+    <a class="kp-nav-link" routerLink="/loc/contrats" routerLinkActive="active">
+      <mat-icon>description</mat-icon>
+      Contrats
+    </a>
+    <a class="kp-nav-link" routerLink="/loc/etats-des-lieux" routerLinkActive="active">
+      <mat-icon>task_alt</mat-icon>
+      États des lieux
+    </a>
+    <a class="kp-nav-link" routerLink="/loc/quittances" routerLinkActive="active">
+      <mat-icon>credit_card</mat-icon>
+      Quittances
+    </a>
+    <a class="kp-nav-link" routerLink="/loc/messagerie" routerLinkActive="active">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      Messagerie
+    </a>
+  }
+</mat-toolbar>

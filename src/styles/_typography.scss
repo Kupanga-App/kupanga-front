@@ -1,0 +1,39 @@
+// styles/_typography.scss — classes utilitaires typographiques Kupanga
+
+.kp-text-display {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.kp-text-h1 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.kp-text-h2 {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.kp-text-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.kp-text-caption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--kp-text-2);
+}
+
+.kp-text-mono {
+  font-family: var(--kp-font-mono);
+  font-size: 13px;
+  font-weight: 400;
+}

@@ -1,16 +1,27 @@
-<p-dialog header="Profil & Espaces" [(visible)]="display" [modal]="true" (onHide)="onHide()" [style]="{width: '60vw'}">
-  <div class="profile-spaces-modal">
-    <div class="spaces-list">
-      <div class="space-item">
-        <i class="pi pi-users"></i>
-        <span>Espace locataire</span>
-        <button pButton type="button" label="Accéder à mon dossier locataire"></button>
+@if (display) {
+  <div class="dialog-overlay" (click)="onHide()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2>Profil &amp; Espaces</h2>
+        <button mat-icon-button type="button" (click)="onHide()">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
-      <div class="space-item">
-        <i class="pi pi-briefcase"></i>
-        <span>Espace bailleur</span>
-        <button pButton type="button" label="Accéder à mon espace bailleur"></button>
+
+      <div class="profile-spaces-modal">
+        <div class="spaces-list">
+          <div class="space-item">
+            <mat-icon>group</mat-icon>
+            <span>Espace locataire</span>
+            <button mat-stroked-button type="button">Accéder à mon dossier locataire</button>
+          </div>
+          <div class="space-item">
+            <mat-icon>work_outline</mat-icon>
+            <span>Espace bailleur</span>
+            <button mat-stroked-button type="button">Accéder à mon espace bailleur</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</p-dialog>
+}

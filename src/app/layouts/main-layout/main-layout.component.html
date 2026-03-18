@@ -3,7 +3,7 @@
     <nav class="ml-nav container">
       <div class="ml-logo">Kupanga</div>
       <div>
-        <p-button label="Se connecter" icon="pi pi-user" routerLink="/auth/login" [rounded]="true" />
+        <a mat-raised-button routerLink="/auth/login">Se connecter</a>
       </div>
     </nav>
   </header>
@@ -18,8 +18,10 @@
 
     <div class="ml-cta-section">
       <div class="ml-cta-content">
-        <p class="ml-cta-text">C’est le moment de vendre</p>
-        <p-button label="Déposer une annonce" icon="pi pi-plus-circle" routerLink="/deposer-une-annonce" styleClass="p-button-lg" [rounded]="true" />
+        <p class="ml-cta-text">C'est le moment de vendre</p>
+        <a mat-raised-button color="primary" routerLink="/deposer-une-annonce">
+          Déposer une annonce
+        </a>
       </div>
     </div>
 

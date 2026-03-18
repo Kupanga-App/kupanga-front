@@ -5,8 +5,6 @@ import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { providePrimeNG } from 'primeng/config';
-import { KupangaTheme } from './kupanga-theme';
 import { routes } from './app.routes';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
@@ -21,16 +19,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore(reducers),
     provideEffects(...effects),
-    //provideState({ name: 'auth', reducer: authReducer }),
-    //provideEffects(AuthEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
-    providePrimeNG({
-      theme: {
-        preset: KupangaTheme,
-        options: {
-          darkModeSelector: '.p-dark'
-        }
-      }
-    })
   ]
 };

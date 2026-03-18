@@ -1,100 +1,154 @@
 :host {
   display: block;
-}
-
-.pnh-header {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background-color: var(--p-surface-0);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  z-index: 100;
 }
 
-.pnh-container {
-  width: 100%;
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 1rem;
-  padding-left: 1rem;
-
-  @media (min-width: 768px) {
-    max-width: 768px;
-  }
-  @media (min-width: 1024px) {
-    max-width: 1024px;
-  }
-  @media (min-width: 1280px) {
-    max-width: 1280px;
-  }
-}
-
-.pnh-main-bar {
+.kp-nav-l1 {
+  height: 56px;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 3rem;
+  padding: 0 24px;
+  gap: 16px;
+  background: var(--kp-surface);
+  border-bottom: 0.5px solid var(--kp-border);
+  --mat-toolbar-container-background-color: var(--kp-surface);
+  --mat-toolbar-container-text-color: var(--kp-text-1);
 }
 
-.pnh-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--p-text-color);
+.kp-l1-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
-.pnh-center-content {
-  display: none;
-  width: 100%;
-
-
-  @media (min-width: 768px) {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin: 0 2rem;
-  }
+.kp-l1-center {
+  display: flex;
+  justify-content: center;
+  flex: 2;
 }
 
-.pnh-search-bar {
+.kp-l1-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.kp-nav-l2 {
+  height: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background: var(--kp-surface);
+  border-bottom: 0.5px solid var(--kp-border);
+  --mat-toolbar-container-background-color: var(--kp-surface);
+  --mat-toolbar-container-text-color: var(--kp-text-1);
+}
+
+.kp-logo {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.kp-logo-primary {
+  color: var(--kp-primary);
+}
+
+.kp-logo-dark {
+  color: var(--kp-text-1);
+}
+
+.kp-search {
   width: 100%;
   max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border-strong);
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 36px;
 
-  ::ng-deep .p-inputtext {
-    border-radius: 10rem;
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--kp-text-3);
+    flex-shrink: 0;
   }
 
-  .w-full {
+  input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: var(--kp-text-1);
+    outline: none;
     width: 100%;
+    font-family: var(--kp-font);
+
+    &::placeholder {
+      color: var(--kp-text-3);
+    }
   }
 }
 
-.pnh-right-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.kp-btn-new {
+  font-size: 13px;
+  padding: 8px 18px;
+  line-height: 1;
+  height: auto;
+  min-height: 0;
 }
 
-.pnh-user-menu {
+.kp-nav-link {
+  font-size: 13px;
+  color: var(--kp-text-2);
+  padding: 0 12px;
+  height: 40px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
-  margin-left: 0.5rem;
-}
+  transition: color var(--kp-transition), border-bottom-color var(--kp-transition);
+  white-space: nowrap;
 
-.pnh-nav-bar {
-  border-top: 1px solid var(--p-surface-200);
-  background-color: var(--p-surface-0);
-}
-
-/* Override PrimeNG Menubar styles to make it flat */
-::ng-deep .pnh-menubar {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-
-  .p-menubar-root-list {
-    padding-left: 0;
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
   }
+
+  &.active {
+    color: var(--kp-primary);
+    font-weight: 500;
+    border-bottom-color: var(--kp-primary);
+  }
+}
+
+.kp-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--kp-primary);
+  color: var(--kp-text-invert);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
 }

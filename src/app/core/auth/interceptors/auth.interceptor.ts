@@ -13,10 +13,23 @@ export const authInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
-  const accessToken = authService.getAccessToken();
 
+  // /auth/refresh exclu complètement : évite la boucle infinie si le refresh
+  // retourne 401 (l'intercepteur ne doit pas tenter un re-refresh).
+  if (req.url.includes('/auth/refresh')) {
+    return next(req);
+  }
+
+  const accessToken = authService.getAccessToken();
   if (accessToken && !req.url.endsWith('/register')) {
     req = addTokenToRequest(req, accessToken);
+  }
+
+  // /auth/login et /auth/logout exclus du retry 401 :
+  // le token est bien attaché ci-dessus si présent, mais
+  // une réponse 401 sur ces routes ne doit pas déclencher un refresh.
+  if (req.url.includes('/auth/login') || req.url.includes('/auth/logout')) {
+    return next(req);
   }
 
   return next(req).pipe(
@@ -29,7 +42,7 @@ export const authInterceptor: HttpInterceptorFn = (
   );
 };
 
-function addTokenToRequest(request: HttpRequest<any>, token: string): HttpRequest<any> {
+function addTokenToRequest(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   return request.clone({
     setHeaders: {
       Authorization: `Bearer ${token}`
@@ -38,10 +51,10 @@ function addTokenToRequest(request: HttpRequest<any>, token: string): HttpReques
 }
 
 function handle401Error(
-  request: HttpRequest<any>,
+  request: HttpRequest<unknown>,
   next: HttpHandlerFn,
   authService: AuthService
-): Observable<HttpEvent<any>> {
+): Observable<HttpEvent<unknown>> {
   if (!isRefreshing) {
     isRefreshing = true;
     refreshTokenSubject.next(null);
@@ -52,21 +65,19 @@ function handle401Error(
         refreshTokenSubject.next(authResponse.accessToken);
         return next(addTokenToRequest(request, authResponse.accessToken));
       }),
-      catchError((err) => {
+      catchError((err: HttpErrorResponse) => {
         isRefreshing = false;
-        // Si le refresh token échoue (ex: 403), on déconnecte
-        authService.logout();
+        // Refresh échoué : nettoyer l'état local sans appel HTTP supplémentaire
+        authService.clearClientState();
         return throwError(() => err);
       })
     );
   } else {
-    // Si le rafraîchissement est déjà en cours, on attend le nouveau token
+    // Refresh déjà en cours : attendre le nouveau token
     return refreshTokenSubject.pipe(
-      filter(token => token != null),
+      filter((token): token is string => token !== null),
       take(1),
-      switchMap(jwt => {
-        return next(addTokenToRequest(request, jwt!));
-      })
+      switchMap(token => next(addTokenToRequest(request, token)))
     );
   }
 }
