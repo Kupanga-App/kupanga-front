@@ -200,6 +200,13 @@
   }
 }
 
+.kp-files-info {
+  font-size: 12px;
+  color: var(--kp-text-3);
+  text-align: center;
+  margin-top: 8px;
+}
+
 .kp-photos-error {
   display: block;
   font-size: 12px;
@@ -247,6 +254,16 @@
     width: 14px;
     height: 14px;
   }
+}
+
+// === Toggles (checkboxes) ===
+
+.kp-toggles-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 16px;
+  margin-top: 4px;
 }
 
 // === Footer de l'étape ===

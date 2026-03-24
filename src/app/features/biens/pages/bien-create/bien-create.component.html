@@ -2,12 +2,12 @@
   <!-- En-tête de page -->
   <div class="kp-page-header">
     <h1 class="kp-text-h1">Ajouter un bien</h1>
-    <p class="kp-text-caption">Renseignez les informations de votre bien immobilier en 3 étapes.</p>
+    <p class="kp-text-caption">Renseignez les informations de votre bien immobilier en 4 étapes.</p>
   </div>
 
   <!-- Stepper header custom -->
   <div class="kp-stepper-header">
-    @for (step of [1, 2, 3]; track step) {
+    @for (step of [1, 2, 3, 4]; track step) {
       <div class="kp-step-item">
         <div class="kp-step-circle"
              [class.done]="currentStep() > step"
@@ -19,12 +19,11 @@
             {{ step }}
           }
         </div>
-        <span class="kp-step-label"
-              [class.active]="currentStep() === step">
-          {{ step === 1 ? 'Informations' : step === 2 ? 'Localisation' : 'Photos' }}
+        <span class="kp-step-label" [class.active]="currentStep() === step">
+          {{ step === 1 ? 'Informations' : step === 2 ? 'Caractéristiques' : step === 3 ? 'Adresse' : 'Photos' }}
         </span>
       </div>
-      @if (step < 3) {
+      @if (step < 4) {
         <div class="kp-step-connector" [class.done]="currentStep() > step"></div>
       }
     }
@@ -33,6 +32,7 @@
   <!-- Étape 1 — Informations générales -->
   @if (currentStep() === 1) {
     <div class="kp-card">
+
       <mat-form-field appearance="outline" class="form-field-full">
         <mat-label>Titre du bien</mat-label>
         <input matInput [formControl]="step1Form.controls.titre"
@@ -72,8 +72,59 @@
         }
       </mat-form-field>
 
+      <div class="kp-row-2">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Loyer mensuel</mat-label>
+          <input matInput type="number" [formControl]="step1Form.controls.loyerMensuel"
+                 placeholder="800" />
+          <span matSuffix>€/mois</span>
+          @if (step1Form.controls.loyerMensuel.hasError('required') && step1Form.controls.loyerMensuel.touched) {
+            <mat-error>Le loyer est obligatoire.</mat-error>
+          } @else if (step1Form.controls.loyerMensuel.hasError('min') && step1Form.controls.loyerMensuel.touched) {
+            <mat-error>Doit être supérieur à 0.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Charges mensuelles</mat-label>
+          <input matInput type="number" [formControl]="step1Form.controls.chargesMensuelles"
+                 placeholder="50" />
+          <span matSuffix>€/mois</span>
+          @if (step1Form.controls.chargesMensuelles.hasError('required') && step1Form.controls.chargesMensuelles.touched) {
+            <mat-error>Les charges sont obligatoires.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>Dépôt de garantie</mat-label>
+        <input matInput type="number" [formControl]="step1Form.controls.depotGarantie"
+               placeholder="1600" />
+        <span matSuffix>€</span>
+        @if (step1Form.controls.depotGarantie.hasError('required') && step1Form.controls.depotGarantie.touched) {
+          <mat-error>Le dépôt de garantie est obligatoire.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>Disponible dès</mat-label>
+        <input matInput [matDatepicker]="pickerDisponible"
+               [formControl]="step1Form.controls.disponibleDe"
+               [min]="today" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerDisponible"></mat-datepicker-toggle>
+        <mat-datepicker #pickerDisponible></mat-datepicker>
+        @if (step1Form.controls.disponibleDe.hasError('required') && step1Form.controls.disponibleDe.touched) {
+          <mat-error>La date de disponibilité est obligatoire.</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="kp-toggles-row">
+        <mat-checkbox [formControl]="step1Form.controls.meuble">Meublé</mat-checkbox>
+        <mat-checkbox [formControl]="step1Form.controls.colocation">Colocation</mat-checkbox>
+      </div>
+
       <div class="kp-step-footer">
-        <span class="kp-step-hint">Étape 1 sur 3</span>
+        <span class="kp-step-hint">Étape 1 sur 4</span>
         <button mat-flat-button color="primary" type="button" (click)="nextStep()">
           Suivant
           <mat-icon iconPositionEnd>arrow_forward</mat-icon>
@@ -82,16 +133,121 @@
     </div>
   }
 
-  <!-- Étape 2 — Localisation -->
+  <!-- Étape 2 — Caractéristiques -->
   @if (currentStep() === 2) {
     <div class="kp-card">
+
+      <div class="kp-row-2">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Surface habitable</mat-label>
+          <input matInput type="number" [formControl]="step2Form.controls.surfaceHabitable"
+                 placeholder="45" />
+          <span matSuffix>m²</span>
+          @if (step2Form.controls.surfaceHabitable.hasError('required') && step2Form.controls.surfaceHabitable.touched) {
+            <mat-error>La surface est obligatoire.</mat-error>
+          } @else if (step2Form.controls.surfaceHabitable.hasError('min') && step2Form.controls.surfaceHabitable.touched) {
+            <mat-error>Minimum 9 m².</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Nombre de pièces</mat-label>
+          <input matInput type="number" [formControl]="step2Form.controls.nombrePieces"
+                 placeholder="3" />
+          @if (step2Form.controls.nombrePieces.hasError('required') && step2Form.controls.nombrePieces.touched) {
+            <mat-error>Le nombre de pièces est obligatoire.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="kp-row-2">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Nombre de chambres (optionnel)</mat-label>
+          <input matInput type="number" [formControl]="step2Form.controls.nombreChambres"
+                 placeholder="2" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Étage (optionnel)</mat-label>
+          <input matInput type="number" [formControl]="step2Form.controls.etage"
+                 placeholder="3" />
+        </mat-form-field>
+      </div>
+
+      <div class="kp-toggles-row">
+        <mat-checkbox [formControl]="step2Form.controls.ascenseur">Ascenseur</mat-checkbox>
+      </div>
+
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>Année de construction (optionnel)</mat-label>
+        <input matInput type="number" [formControl]="step2Form.controls.anneeConstruction"
+               placeholder="1985" />
+        @if (step2Form.controls.anneeConstruction.hasError('min') && step2Form.controls.anneeConstruction.touched) {
+          <mat-error>Année minimum 1800.</mat-error>
+        } @else if (step2Form.controls.anneeConstruction.hasError('max') && step2Form.controls.anneeConstruction.touched) {
+          <mat-error>Année maximum 2100.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>Mode de chauffage (optionnel)</mat-label>
+        <mat-select [formControl]="step2Form.controls.modeChauffage">
+          <mat-option [value]="null">—</mat-option>
+          @for (mode of modeChauffageOptions; track mode.value) {
+            <mat-option [value]="mode.value">{{ mode.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="kp-row-2">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Classe énergie (optionnel)</mat-label>
+          <mat-select [formControl]="step2Form.controls.classeEnergie">
+            <mat-option [value]="null">—</mat-option>
+            @for (c of energieClasses; track c) {
+              <mat-option [value]="c">{{ c }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Classe GES (optionnel)</mat-label>
+          <mat-select [formControl]="step2Form.controls.classeGes">
+            <mat-option [value]="null">—</mat-option>
+            @for (c of energieClasses; track c) {
+              <mat-option [value]="c">{{ c }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="kp-step-footer">
+        <button mat-button type="button" (click)="prevStep()">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+        <div class="kp-step-footer-actions">
+          <span class="kp-step-hint">Étape 2 sur 4</span>
+          <button mat-flat-button color="primary" type="button" (click)="nextStep()">
+            Suivant
+            <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Étape 3 — Adresse -->
+  @if (currentStep() === 3) {
+    <div class="kp-card">
+
       <mat-form-field appearance="outline" class="form-field-full">
         <mat-label>Adresse</mat-label>
-        <input matInput [formControl]="step2Form.controls.adresse"
+        <input matInput [formControl]="step3Form.controls.adresse"
                placeholder="12 rue des Lilas" />
-        @if (step2Form.controls.adresse.hasError('required') && step2Form.controls.adresse.touched) {
+        @if (step3Form.controls.adresse.hasError('required') && step3Form.controls.adresse.touched) {
           <mat-error>L'adresse est obligatoire.</mat-error>
-        } @else if (step2Form.controls.adresse.hasError('minlength') && step2Form.controls.adresse.touched) {
+        } @else if (step3Form.controls.adresse.hasError('minlength') && step3Form.controls.adresse.touched) {
           <mat-error>Minimum 5 caractères.</mat-error>
         }
       </mat-form-field>
@@ -99,20 +255,20 @@
       <div class="kp-row-2">
         <mat-form-field appearance="outline" class="form-field-full">
           <mat-label>Ville</mat-label>
-          <input matInput [formControl]="step2Form.controls.ville"
+          <input matInput [formControl]="step3Form.controls.ville"
                  placeholder="Nantes" />
-          @if (step2Form.controls.ville.hasError('required') && step2Form.controls.ville.touched) {
+          @if (step3Form.controls.ville.hasError('required') && step3Form.controls.ville.touched) {
             <mat-error>La ville est obligatoire.</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field-full">
           <mat-label>Code postal</mat-label>
-          <input matInput [formControl]="step2Form.controls.codePostal"
+          <input matInput [formControl]="step3Form.controls.codePostal"
                  placeholder="44000" />
-          @if (step2Form.controls.codePostal.hasError('required') && step2Form.controls.codePostal.touched) {
+          @if (step3Form.controls.codePostal.hasError('required') && step3Form.controls.codePostal.touched) {
             <mat-error>Le code postal est obligatoire.</mat-error>
-          } @else if (step2Form.controls.codePostal.hasError('pattern') && step2Form.controls.codePostal.touched) {
+          } @else if (step3Form.controls.codePostal.hasError('pattern') && step3Form.controls.codePostal.touched) {
             <mat-error>Format invalide.</mat-error>
           }
         </mat-form-field>
@@ -120,9 +276,9 @@
 
       <mat-form-field appearance="outline" class="form-field-full">
         <mat-label>Pays</mat-label>
-        <input matInput [formControl]="step2Form.controls.pays"
+        <input matInput [formControl]="step3Form.controls.pays"
                placeholder="France" />
-        @if (step2Form.controls.pays.hasError('required') && step2Form.controls.pays.touched) {
+        @if (step3Form.controls.pays.hasError('required') && step3Form.controls.pays.touched) {
           <mat-error>Le pays est obligatoire.</mat-error>
         }
       </mat-form-field>
@@ -133,7 +289,7 @@
           Retour
         </button>
         <div class="kp-step-footer-actions">
-          <span class="kp-step-hint">Étape 2 sur 3</span>
+          <span class="kp-step-hint">Étape 3 sur 4</span>
           <button mat-flat-button color="primary" type="button" (click)="nextStep()">
             Suivant
             <mat-icon iconPositionEnd>arrow_forward</mat-icon>
@@ -143,13 +299,13 @@
     </div>
   }
 
-  <!-- Étape 3 — Photos -->
-  @if (currentStep() === 3) {
+  <!-- Étape 4 — Photos -->
+  @if (currentStep() === 4) {
     <div class="kp-card">
       <div class="kp-photo-drop" (click)="fileInput.click()">
         <mat-icon>upload</mat-icon>
         <span>Glissez vos photos ici ou cliquez</span>
-        <span class="kp-text-caption">JPG, PNG, WEBP · 10 Mo max · Au moins 1 photo requise</span>
+        <span class="kp-text-caption">JPG, PNG, WEBP · 1 Mo max par photo · Au moins 1 photo requise</span>
       </div>
       <input #fileInput type="file" multiple accept="image/*"
              style="display:none" (change)="onFilesSelected($event)" />
@@ -167,6 +323,12 @@
         </div>
       }
 
+      @if (selectedFiles().length > 0) {
+        <div class="kp-files-info">
+          {{ selectedFiles().length }} photo(s) · {{ totalSizeMb() }} Mo au total
+        </div>
+      }
+
       @if (selectedFiles().length === 0) {
         <mat-error class="kp-photos-error">Au moins une photo est requise.</mat-error>
       }
@@ -177,7 +339,7 @@
           Retour
         </button>
         <div class="kp-step-footer-actions">
-          <span class="kp-step-hint">Étape 3 sur 3</span>
+          <span class="kp-step-hint">Étape 4 sur 4</span>
           <button mat-flat-button color="primary" type="button"
                   (click)="onSubmit()"
                   [disabled]="isSubmitting() || selectedFiles().length === 0">

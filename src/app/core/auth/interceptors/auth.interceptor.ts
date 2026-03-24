@@ -6,7 +6,7 @@ import { AuthService } from '../services/auth.service';
 import { AuthResponse } from '../models/auth-response.model';
 
 let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+let refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -14,10 +14,8 @@ export const authInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
 
-  // /auth/refresh exclu complètement : évite la boucle infinie si le refresh
-  // retourne 401 (l'intercepteur ne doit pas tenter un re-refresh).
   if (req.url.includes('/auth/refresh')) {
-    return next(req);
+    return next(req.clone({ withCredentials: true }));
   }
 
   const accessToken = authService.getAccessToken();
@@ -25,11 +23,8 @@ export const authInterceptor: HttpInterceptorFn = (
     req = addTokenToRequest(req, accessToken);
   }
 
-  // /auth/login et /auth/logout exclus du retry 401 :
-  // le token est bien attaché ci-dessus si présent, mais
-  // une réponse 401 sur ces routes ne doit pas déclencher un refresh.
   if (req.url.includes('/auth/login') || req.url.includes('/auth/logout')) {
-    return next(req);
+    return next(req.clone({ withCredentials: true }));
   }
 
   return next(req).pipe(
@@ -65,19 +60,23 @@ function handle401Error(
         refreshTokenSubject.next(authResponse.accessToken);
         return next(addTokenToRequest(request, authResponse.accessToken));
       }),
-      catchError((err: HttpErrorResponse) => {
+      catchError((err) => {
         isRefreshing = false;
-        // Refresh échoué : nettoyer l'état local sans appel HTTP supplémentaire
+        refreshTokenSubject.error(err);
+        refreshTokenSubject = new BehaviorSubject<string | null>(null);
         authService.clearClientState();
         return throwError(() => err);
       })
     );
   } else {
-    // Refresh déjà en cours : attendre le nouveau token
     return refreshTokenSubject.pipe(
       filter((token): token is string => token !== null),
       take(1),
-      switchMap(token => next(addTokenToRequest(request, token)))
+      switchMap(token => next(addTokenToRequest(request, token))),
+      catchError(err => {
+        authService.clearClientState();
+        return throwError(() => err);
+      })
     );
   }
 }

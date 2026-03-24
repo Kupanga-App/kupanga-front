@@ -98,6 +98,110 @@
     background: var(--kp-warning-subtle);
     color: var(--kp-warning-text);
   }
+
+  &.kp-badge-villa {
+    background: var(--kp-success-subtle);
+    color: var(--kp-success-text);
+  }
+
+  &.kp-badge-bureau {
+    background: var(--kp-surface-2);
+    color: var(--kp-text-2);
+  }
+
+  &.kp-badge-commerce {
+    background: var(--kp-warning-subtle);
+    color: var(--kp-warning-text);
+  }
+
+  &.kp-badge-info {
+    background: var(--kp-info-subtle);
+    color: var(--kp-info-text);
+  }
+
+  &.kp-badge-inactive {
+    background: var(--kp-surface-2);
+    color: var(--kp-text-3);
+  }
+}
+
+// ─── Informations key-value ──────────────────────────────────────────────────
+
+.kp-kv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kp-kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kp-kv-key {
+  font-size: 13px;
+  color: var(--kp-text-3);
+  min-width: 140px;
+}
+
+.kp-kv-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kp-text-1);
+}
+
+.kp-kv-val-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.kp-badge-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+// ─── Info cards ──────────────────────────────────────────────────────────────
+
+.kp-info-card {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: var(--kp-surface);
+  border: 0.5px solid var(--kp-border);
+  border-radius: 10px;
+}
+
+.kp-info-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kp-text-2);
+  margin-bottom: 12px;
+}
+
+// ─── Diagnostic énergétique ──────────────────────────────────────────────────
+// Ces couleurs sont réglementaires (DPE) — exception autorisée aux tokens --kp-*
+
+.kp-energie-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+
+  &.kp-energie-a { background: #00843d; }
+  &.kp-energie-b { background: #51a93e; }
+  &.kp-energie-c { background: #b1cc34; }
+  &.kp-energie-d { background: #f6ec12; color: #333; }
+  &.kp-energie-e { background: #f0b40f; color: #333; }
+  &.kp-energie-f { background: #e8731a; }
+  &.kp-energie-g { background: #e52b1a; }
 }
 
 // ─── Sections ────────────────────────────────────────────────────────────────

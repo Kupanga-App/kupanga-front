@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BienService } from '../../services/bien.service';
-import { BienDTO } from '../../models/bien.model';
+import { BienDTO, ModeChauffage } from '../../models/bien.model';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 
 @Component({
@@ -29,6 +29,20 @@ export class BienDetailComponent implements OnInit {
   isProprietaire = computed(() =>
     this.authService.currentUser()?.role === 'ROLE_PROPRIETAIRE'
   );
+
+  chauffageLabel(mode: ModeChauffage): string {
+    const map: Record<ModeChauffage, string> = {
+      ELECTRIQUE:      'Électrique',
+      GAZ:             'Gaz',
+      FIOUL:           'Fioul',
+      BOIS:            'Bois',
+      POMPE_A_CHALEUR: 'Pompe à chaleur',
+      POELE:           'Poêle',
+      COLLECTIF:       'Collectif',
+      SANS_CHAUFFAGE:  'Sans chauffage',
+    };
+    return map[mode] ?? mode;
+  }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));

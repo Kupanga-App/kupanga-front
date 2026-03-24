@@ -72,6 +72,100 @@
       </div>
     }
 
+    <!-- Informations -->
+    <div class="kp-detail-section">
+      <h2 class="kp-text-h2">Informations</h2>
+      <div class="kp-kv-list">
+        @if (bien()!.surfaceHabitable) {
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Surface</span>
+            <span class="kp-kv-val">{{ bien()!.surfaceHabitable }} m²</span>
+          </div>
+        }
+        @if (bien()!.nombrePieces) {
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Pièces</span>
+            <span class="kp-kv-val">{{ bien()!.nombrePieces }}</span>
+          </div>
+        }
+        @if (bien()!.loyerMensuel) {
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Loyer</span>
+            <span class="kp-kv-val">
+              {{ bien()!.loyerMensuel }} €/mois
+              @if (bien()!.chargesMensuelles) {
+                + {{ bien()!.chargesMensuelles }} € charges
+              }
+            </span>
+          </div>
+        }
+        @if (bien()!.depotGarantie) {
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Dépôt de garantie</span>
+            <span class="kp-kv-val">{{ bien()!.depotGarantie }} €</span>
+          </div>
+        }
+        @if (bien()!.disponibleDe) {
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Disponible dès</span>
+            <span class="kp-kv-val">{{ bien()!.disponibleDe | date:'dd MMM yyyy' }}</span>
+          </div>
+        }
+        <div class="kp-kv-row">
+          <span class="kp-kv-key">Type location</span>
+          <span class="kp-kv-val kp-kv-val-badges">
+            @if (bien()!.meuble) {
+              <span class="kp-bien-badge kp-badge-info">Meublé</span>
+            } @else {
+              <span class="kp-bien-badge kp-badge-inactive">Non meublé</span>
+            }
+            @if (bien()!.colocation) {
+              <span class="kp-bien-badge kp-badge-info">Colocation</span>
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Points d'intérêt -->
+    @if (bien()!.pois.length) {
+      <div class="kp-info-card">
+        <div class="kp-info-card-title">Points d'intérêt à proximité</div>
+        <div class="kp-badge-wrap">
+          @for (poi of bien()!.pois; track poi) {
+            <span class="kp-bien-badge kp-badge-info">{{ poi }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Diagnostic énergétique -->
+    @if (bien()!.classeEnergie) {
+      <div class="kp-info-card">
+        <div class="kp-info-card-title">Diagnostic énergétique</div>
+        <div class="kp-kv-list">
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Classe énergie</span>
+            <span class="kp-kv-val kp-energie-badge kp-energie-{{ bien()!.classeEnergie!.toLowerCase() }}">
+              {{ bien()!.classeEnergie }}
+            </span>
+          </div>
+          @if (bien()!.classeGes) {
+            <div class="kp-kv-row">
+              <span class="kp-kv-key">Classe GES</span>
+              <span class="kp-kv-val">{{ bien()!.classeGes }}</span>
+            </div>
+          }
+          @if (bien()!.modeChauffage) {
+            <div class="kp-kv-row">
+              <span class="kp-kv-key">Chauffage</span>
+              <span class="kp-kv-val">{{ chauffageLabel(bien()!.modeChauffage!) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
     <!-- Méta -->
     <div class="kp-detail-meta">
       <span class="kp-meta-item">
