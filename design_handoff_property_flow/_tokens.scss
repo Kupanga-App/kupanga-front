@@ -1,0 +1,112 @@
+// ─────────────────────────────────────────────────────────
+// kupanga — Design Tokens (SCSS)
+// Source of truth for colors, typography, spacing, radii.
+// Import once at the root of your styles entry: @use 'tokens' as t;
+// ─────────────────────────────────────────────────────────
+
+// ── COLOR PALETTE ───────────────────────────────────────────
+// Primary
+$night:        #10212B;  // Background principal, surfaces sombres
+$night-mid:    #1E3545;  // Cartes, surfaces secondaires
+$night-soft:   #172C3A;  // Surfaces tertiaires, hover sur cartes
+$night-deep:   #0B181F;  // Surfaces les plus profondes, élévation négative
+
+// Accent (Olive)
+$olive:        #8FA464;  // CTA primaires, liens, icônes actives, focus
+$olive-light:  #B5CA8D;  // Hover/secondary accents, badges
+$olive-dark:   #6B7C4B;  // Pressed, texte sur fond Mint
+
+// Lumière (Mint)
+$mint:         #EFFBDB;  // Texte principal sur fond sombre
+
+// Texte (alpha sur Mint)
+$mint-soft:    rgba(#EFFBDB, 0.85);  // Texte body fort
+$mint-mute:    rgba(#EFFBDB, 0.62);  // Texte secondaire, labels
+$mint-dim:     rgba(#EFFBDB, 0.40);  // Placeholders, texte désactivé
+$mint-fade:    rgba(#EFFBDB, 0.20);  // Séparateurs très subtils
+
+// Borders
+$border:       rgba(#EFFBDB, 0.08);
+$border-2:     rgba(#EFFBDB, 0.14);
+$border-warm:  rgba(#8FA464, 0.22);
+
+// Olive — variantes d'arrière-plan
+$olive-bg:     rgba(#8FA464, 0.10);
+$olive-bg-2:   rgba(#8FA464, 0.18);
+$olive-line:   rgba(#8FA464, 0.32);
+
+// Signal
+$amber:        #E8B962;  // Avertissement, statut "Vacant"
+$amber-bg:     rgba(#E8B962, 0.12);
+$red:          #E48173;  // Danger, manque-à-gagner, retard
+$red-bg:       rgba(#E48173, 0.12);
+$green:        #8FA464;  // = olive (succès)
+
+// ── TYPOGRAPHY ──────────────────────────────────────────────
+$font-serif: 'DM Serif Display', Georgia, serif;     // H1, H2, accroches (italic = mot accentué)
+$font-sans:  'DM Sans', system-ui, sans-serif;        // body, UI (300 / 400 / 500 / 600 / 700)
+$font-mono:  'DM Mono', monospace;                    // codes, chiffres, tags, données techniques
+
+// Échelle typographique
+$text-display: 48px;   // H1 page (manage, assign)
+$text-h1:      44px;   // H1 hero
+$text-h2:      28px;   // H2 (titre carte Manage, titre forme)
+$text-h3:      24px;   // H3 section
+$text-h4:      22px;   // titres internes
+$text-h5:      19px;   // sous-titres
+$text-large:   16px;   // intro
+$text-body:    14px;   // body par défaut
+$text-small:   13px;   // labels secondaires
+$text-mini:    12px;   // crumbs, badges
+$text-tiny:    11px;   // mono labels, tags techniques
+
+// ── SPACING ─────────────────────────────────────────────────
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-7: 28px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
+
+// ── RADII ───────────────────────────────────────────────────
+$radius-sm: 8px;
+$radius:    12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-pill: 100px;
+
+// ── SHADOWS ─────────────────────────────────────────────────
+$shadow-card: 0 20px 60px -20px rgba(0, 0, 0, 0.5);
+$shadow-sticky: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+
+// ── ICONS ───────────────────────────────────────────────────
+// Lucide outline, stroke-width: 1.5, grid 24×24, alignés sur entiers.
+// Couleur par défaut: $mint-mute. État actif: $olive.
+
+// ── MIXINS UTILS ────────────────────────────────────────────
+@mixin tnum { font-variant-numeric: tabular-nums; }
+
+@mixin label-mono {
+  font-family: $font-mono;
+  font-size: $text-tiny;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $mint-mute;
+}
+
+@mixin serif-h($size) {
+  font-family: $font-serif;
+  font-weight: 400;
+  font-size: $size;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: $mint;
+  em {
+    font-style: italic;
+    color: $olive;
+  }
+}

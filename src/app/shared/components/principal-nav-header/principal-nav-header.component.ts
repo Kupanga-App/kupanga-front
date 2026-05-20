@@ -1,18 +1,16 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { MenuItem } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { AvatarModule } from 'primeng/avatar';
-import { BadgeModule } from 'primeng/badge';
-import { MenuModule } from 'primeng/menu';
-import { MenubarModule } from 'primeng/menubar';
-import { ToolbarModule } from 'primeng/toolbar';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { RouterModule } from '@angular/router';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatDividerModule } from '@angular/material/divider';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
+import { LogementContextService } from '../../../core/services/logement-context.service';
+import { ChatStoreService } from '../../../features/messagerie/services/chat-store.service';
 
 @Component({
   selector: 'app-principal-nav-header',
@@ -20,52 +18,51 @@ import { AuthService } from '../../../core/auth/services/auth.service';
   imports: [
     CommonModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    AvatarModule,
-    BadgeModule,
-    MenuModule,
-    MenubarModule,
-    ToolbarModule,
-    IconFieldModule,
-    InputIconModule
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatBadgeModule,
+    MatDividerModule,
   ],
   templateUrl: './principal-nav-header.component.html',
   styleUrls: ['./principal-nav-header.component.scss'],
 })
 export class PrincipalNavHeaderComponent implements OnInit {
-  @Input() navItems: MenuItem[] = [];
+  protected themeService = inject(ThemeService);
+  protected authService = inject(AuthService);
+  protected logementContext = inject(LogementContextService);
+  protected chatStore = inject(ChatStoreService);
 
-  public themeService = inject(ThemeService);
-  protected router = inject(Router);
-  public authService = inject(AuthService);
+  readonly notificationCount = 0;
 
-  userMenuItems: MenuItem[] = [];
-  currentUser = this.authService.currentUser;
+  isConnected = computed(() => !!this.authService.currentUser());
 
-  constructor() {
-  }
+  userInitials = computed(() => {
+    const u = this.authService.currentUser();
+    if (!u) return '';
+    return ((u.firstName?.[0] ?? '') + (u.lastName?.[0] ?? '')).toUpperCase();
+  });
+
+  isAdmin = computed(() => this.authService.currentUser()?.role === 'ROLE_PROPRIETAIRE');
+
+  hasLogement = computed(() => !!this.logementContext.logementBienId());
+
+  /** Route vers l'espace locatif selon le rôle */
+  logementRoute = computed(() => {
+    const bienId = this.logementContext.logementBienId();
+    if (!bienId) return null;
+    return this.isAdmin() ? `/pro/logements/${bienId}` : `/loc/logements/${bienId}`;
+  });
 
   ngOnInit(): void {
-    this.userMenuItems = [
-      { label: 'Mon Profil', icon: 'pi pi-fw pi-user',
-        command: () => {
-          this.router.navigate(['/account/private/home']);
-        }
-      },
-      { label: 'Paramètres', icon: 'pi pi-fw pi-cog'
-        , command: () => {
-          this.router.navigate(['/account/settings']);
-        }
-      },
-      { separator: true },
-      {
-        label: 'Déconnexion',
-        icon: 'pi pi-fw pi-sign-out',
-        command: () => {
-          this.router.navigate(['/auth/logout']);
-        }
-      },
-    ];
+    const role = this.authService.currentUser()?.role;
+    if (role) {
+      this.logementContext.load(role);
+    }
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe();
   }
 }

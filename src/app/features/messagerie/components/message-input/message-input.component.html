@@ -1,0 +1,26 @@
+<div class="kp-input-bar">
+  @if (isSelf) {
+    <div class="kp-input-self-warn">
+      <mat-icon>info_outline</mat-icon>
+      Vous ne pouvez pas vous envoyer un message.
+    </div>
+  } @else {
+    <textarea
+      class="kp-input-textarea"
+      [formControl]="control"
+      placeholder="Écrire un message… (Entrée pour envoyer)"
+      rows="1"
+      [disabled]="!wsConnected"
+      (keydown)="onKeydown($event)"
+    ></textarea>
+    <button
+      mat-icon-button
+      color="primary"
+      [disabled]="!canSend"
+      (click)="send()"
+      aria-label="Envoyer"
+    >
+      <mat-icon>send</mat-icon>
+    </button>
+  }
+</div>

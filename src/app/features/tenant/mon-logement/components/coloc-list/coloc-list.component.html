@@ -1,0 +1,29 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Mes colocataires</span>
+  </div>
+
+  @for (roommate of roommates(); track roommate.name) {
+    <div class="coloc-row">
+      <div class="coloc-avatar">
+        @if (roommate.avatarUrl) {
+          <img [src]="roommate.avatarUrl" [alt]="roommate.name" />
+        } @else {
+          {{ initials(roommate.name) }}
+        }
+      </div>
+      <div class="coloc-body">
+        <div class="coloc-name">{{ roommate.name }}</div>
+        <div class="coloc-meta">{{ roommate.room }} · Depuis {{ roommate.entryDate | date:'MMM yyyy':'':'fr' }}</div>
+      </div>
+      <div class="coloc-share">
+        <div class="share-amount">{{ roommate.share }} €</div>
+        <div class="share-label">Sa part</div>
+      </div>
+    </div>
+  }
+
+  <div class="coloc-footer">
+    Régime : <strong>{{ regime() === 'solidaire' ? 'Solidaire' : 'Individuel' }}</strong>
+  </div>
+</div>

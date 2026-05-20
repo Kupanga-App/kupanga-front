@@ -3,69 +3,53 @@
 }
 
 .account-settings {
-  max-width: 80%;
+  max-width: 720px;
   margin: 0 auto;
+  padding: var(--kp-space-6);
 
   .settings-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
+    gap: var(--kp-space-3);
+    margin-bottom: var(--kp-space-2);
   }
 
   h2 {
-    font-size: 2rem;
-    font-weight: 600;
+    font-family: var(--kp-font-display);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--kp-text-1);
   }
 
-  p {
-    margin-bottom: 2rem;
-    color: var(--text-color-secondary);
+  > p {
+    font-size: 12px;
+    color: var(--kp-text-3);
+    margin-bottom: var(--kp-space-6);
   }
 
   form {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: var(--kp-space-5);
   }
 
-  .p-card {
-    .p-card-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-  }
-
-  .p-field {
+  .form-field-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--kp-space-2);
+    margin-bottom: var(--kp-space-4);
 
-    label {
+    .field-label {
+      font-size: 13px;
       font-weight: 500;
+      color: var(--kp-text-2);
     }
   }
 
-  .p-field-radio-group {
+  .radio-group {
     display: flex;
     align-items: center;
-    gap: 1.5rem; // Espace entre les groupes radio-label
-
-    .radio-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem; // Espace entre le radio button et son label
-    }
-  }
-
-  .form-footer {
-    display: flex;
-    justify-content: flex-end; // Aligner le bouton à droite
-    padding-top: 1rem; // Ajouter un peu d'espace au-dessus du bouton
-  }
-
-  .p-button {
-    align-self: flex-start;
+    gap: var(--kp-space-5);
+    flex-wrap: wrap;
   }
 }

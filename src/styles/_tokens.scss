@@ -1,0 +1,221 @@
+// styles/_tokens.scss — Kupanga design tokens (Night / Olive / Mint)
+// ─── SCSS variables (handoff) — utilisées dans les nouveaux composants ───────
+$night:        #10212B;
+$night-mid:    #1E3545;
+$night-soft:   #172C3A;
+$night-deep:   #0B181F;
+
+$olive:        #8FA464;
+$olive-light:  #B5CA8D;
+$olive-dark:   #6B7C4B;
+$olive-bg:     rgba(#8FA464, 0.10);
+$olive-bg-2:   rgba(#8FA464, 0.18);
+$olive-line:   rgba(#8FA464, 0.32);
+
+$mint:         #EFFBDB;
+$mint-soft:    rgba(#EFFBDB, 0.85);
+$mint-mute:    rgba(#EFFBDB, 0.62);
+$mint-dim:     rgba(#EFFBDB, 0.40);
+$mint-fade:    rgba(#EFFBDB, 0.20);
+
+$border:       rgba(#EFFBDB, 0.08);
+$border-2:     rgba(#EFFBDB, 0.14);
+$border-warm:  rgba(#8FA464, 0.22);
+
+$amber:        #E8B962;
+$amber-bg:     rgba(#E8B962, 0.12);
+$red:          #E48173;
+$red-bg:       rgba(#E48173, 0.12);
+
+$font-serif: 'DM Serif Display', Georgia, serif;
+$font-sans:  'DM Sans', system-ui, sans-serif;
+$font-mono:  'DM Mono', monospace;
+
+$text-display: 48px;
+$text-h1:      44px;
+$text-h2:      28px;
+$text-h3:      24px;
+$text-h4:      22px;
+$text-h5:      19px;
+$text-large:   16px;
+$text-body:    14px;
+$text-small:   13px;
+$text-mini:    12px;
+$text-tiny:    11px;
+
+$space-1: 4px;  $space-2: 8px;   $space-3: 12px;
+$space-4: 16px; $space-5: 20px;  $space-6: 24px;
+$space-7: 28px; $space-8: 32px;  $space-10: 40px; $space-12: 48px;
+
+$radius-sm: 8px;  $radius: 12px;  $radius-lg: 16px;
+$radius-xl: 24px; $radius-pill: 100px;
+
+$shadow-card:   0 20px 60px -20px rgba(0, 0, 0, 0.5);
+$shadow-sticky: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+
+// ─── Aliases pour le handoff biens ───────────────────────────────────────────
+$olive-10:     rgba(#8FA464, 0.10);
+$olive-15:     rgba(#8FA464, 0.15);
+$olive-25:     rgba(#8FA464, 0.25);
+$mint-80:      rgba(#EFFBDB, 0.80);
+$mint-55:      rgba(#EFFBDB, 0.55);
+$mint-35:      rgba(#EFFBDB, 0.35);
+$mint-20:      rgba(#EFFBDB, 0.20);
+$font-display: $font-serif;
+
+@mixin tnum { font-variant-numeric: tabular-nums; }
+
+@mixin label-mono {
+  font-family: $font-mono;
+  font-size: $text-tiny;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $mint-mute;
+}
+
+@mixin serif-h($size) {
+  font-family: $font-serif;
+  font-weight: 400;
+  font-size: $size;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: $mint;
+  em { font-style: italic; color: $olive; }
+}
+// ─── CSS custom properties (existants — composants legacy) ────────────────────
+
+:root {
+  // === Couleur primaire — Olive ===
+  --kp-primary:               #8FA464;
+  --kp-primary-hover:         #B5CA8D;
+  --kp-primary-active:        #6B7C4B;
+  --kp-primary-subtle:        rgba(143, 164, 100, 0.10);
+  --kp-primary-subtle-md:     rgba(143, 164, 100, 0.15);
+  --kp-primary-subtle-border: rgba(143, 164, 100, 0.25);
+  --kp-primary-on:            #10212B;
+  --kp-photo-overlay:         rgba(10, 24, 32, 0.72);
+  --kp-photo-overlay-lite:    rgba(10, 24, 32, 0.55);
+
+  // === Surfaces (Night — thème sombre par défaut) ===
+  --kp-bg:                    #10212B;
+  --kp-surface:               #1E3545;
+  --kp-surface-2:             #2C4A5F;
+  --kp-surface-3:             #3A5F78;
+  --kp-border:                rgba(143, 164, 100, 0.15);
+  --kp-border-strong:         rgba(143, 164, 100, 0.25);
+
+  // === Texte (Mint sur fond sombre) ===
+  --kp-text-1:                #EFFBDB;
+  --kp-text-2:                rgba(239, 251, 219, 0.80);
+  --kp-text-3:                rgba(239, 251, 219, 0.55);
+  --kp-text-invert:           #10212B;
+
+  // === Sémantique ===
+  --kp-success:               #8FA464;
+  --kp-success-subtle:        rgba(143, 164, 100, 0.15);
+  --kp-success-text:          #B5CA8D;
+  --kp-warning:               #D4A853;
+  --kp-warning-subtle:        rgba(212, 168, 83, 0.15);
+  --kp-warning-text:          #E8C87A;
+  --kp-danger:                #C0614A;
+  --kp-danger-subtle:         rgba(192, 97, 74, 0.15);
+  --kp-danger-text:           #D4856F;
+  --kp-info:                  #5A8FAF;
+  --kp-info-subtle:           rgba(90, 143, 175, 0.15);
+  --kp-info-text:             #7AACC8;
+
+  // === Typographie ===
+  --kp-font:         'DM Sans', system-ui, sans-serif;
+  --kp-font-display: 'DM Serif Display', Georgia, serif;
+  --kp-font-mono:    'DM Mono', 'Fira Code', monospace;
+
+  // === Espacement (base 4px) ===
+  --kp-space-1:   4px;
+  --kp-space-2:   8px;
+  --kp-space-3:  12px;
+  --kp-space-4:  16px;
+  --kp-space-5:  20px;
+  --kp-space-6:  24px;
+  --kp-space-8:  32px;
+  --kp-space-10: 40px;
+  --kp-space-12: 48px;
+
+  // === Border radius ===
+  --kp-radius-sm:   6px;
+  --kp-radius-md:  10px;
+  --kp-radius-lg:  16px;
+  --kp-radius-xl:  24px;
+  --kp-radius-full: 9999px;
+
+  // === Transitions ===
+  --kp-transition:      150ms ease;
+  --kp-transition-slow: 250ms ease;
+
+  // === Auth Direction C — tokens bruts ===
+  --night:        #10212B;
+  --night-mid:    #1E3545;
+  --olive:        #8FA464;
+  --olive-light:  #B5CA8D;
+  --olive-dark:   #6B7C4B;
+  --olive-10:     rgba(143, 164, 100, 0.10);
+  --olive-15:     rgba(143, 164, 100, 0.15);
+  --olive-25:     rgba(143, 164, 100, 0.25);
+  --olive-40:     rgba(143, 164, 100, 0.40);
+  --olive-15:     rgba(143, 164, 100, 0.15);
+  --night-soft:   #172C3A;
+  --mint:         #EFFBDB;
+  --mint-80:      rgba(239, 251, 219, 0.80);
+  --mint-55:      rgba(239, 251, 219, 0.55);
+  --mint-35:      rgba(239, 251, 219, 0.35);
+  --mint-20:      rgba(239, 251, 219, 0.20);
+  --danger:       #C0614A;
+  --font-sans:    'DM Sans', system-ui, sans-serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+// === Thème clair — basculement via <body class="kp-theme-light"> ===
+.kp-theme-light {
+  --kp-primary:               #6B7C4B;
+  --kp-primary-hover:         #8FA464;
+  --kp-primary-active:        #4A5535;
+  --kp-primary-subtle:        rgba(107, 124, 75, 0.10);
+  --kp-primary-subtle-md:     rgba(107, 124, 75, 0.15);
+  --kp-primary-subtle-border: rgba(107, 124, 75, 0.25);
+  --kp-primary-on:            #EFFBDB;
+
+  --kp-bg:                    #EFFBDB;
+  --kp-surface:               #F7FDE9;
+  --kp-surface-2:             #EFFBDB;
+  --kp-surface-3:             #E4F5CC;
+  --kp-border:                rgba(107, 124, 75, 0.18);
+  --kp-border-strong:         rgba(107, 124, 75, 0.32);
+
+  --kp-text-1:                #10212B;
+  --kp-text-2:                rgba(16, 33, 43, 0.65);
+  --kp-text-3:                rgba(16, 33, 43, 0.40);
+  --kp-text-invert:           #EFFBDB;
+
+  --kp-success:               #6B7C4B;
+  --kp-success-subtle:        rgba(107, 124, 75, 0.12);
+  --kp-success-text:          #4A5535;
+  --kp-warning:               #9B6E1A;
+  --kp-warning-subtle:        rgba(155, 110, 26, 0.12);
+  --kp-warning-text:          #7A5212;
+  --kp-danger:                #9B3A28;
+  --kp-danger-subtle:         rgba(155, 58, 40, 0.12);
+  --kp-danger-text:           #7A2D1E;
+  --kp-info:                  #2C5F7A;
+  --kp-info-subtle:           rgba(44, 95, 122, 0.12);
+  --kp-info-text:             #1E4D62;
+}
+
+// === Variante Night profonde — basculement via <body class="kp-theme-dark"> ===
+.kp-theme-dark {
+  --kp-bg:                    #0A1A22;
+  --kp-surface:               #10212B;
+  --kp-surface-2:             #1E3545;
+  --kp-surface-3:             #2C4A5F;
+  --kp-border:                rgba(143, 164, 100, 0.12);
+  --kp-border-strong:         rgba(143, 164, 100, 0.20);
+}

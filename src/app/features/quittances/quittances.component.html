@@ -1,0 +1,90 @@
+<div class="kp-page">
+
+  <div class="kp-page-header">
+    <h1 class="kp-text-h1">{{ isProprietaire() ? 'Quittances' : 'Mes quittances' }}</h1>
+    @if (isProprietaire()) {
+      <p class="kp-page-subtitle">Toutes les quittances de vos biens</p>
+    }
+  </div>
+
+  <!-- Chargement -->
+  @if (loading()) {
+    <div class="kp-q-loading">
+      <mat-spinner diameter="28" />
+      <span>Chargement…</span>
+    </div>
+  }
+
+  <!-- Erreur -->
+  @if (!loading() && error()) {
+    <div class="kp-q-error">
+      <kp-icon name="alert-triangle" [size]="18" />
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Liste vide -->
+  @if (!loading() && !error() && quittances().length === 0) {
+    <div class="kp-empty-state">
+      <div class="kp-empty-state-icon">
+        <kp-icon name="receipt" [size]="36" />
+      </div>
+      <p class="kp-empty-state-title">Aucune quittance disponible</p>
+      <p class="kp-empty-state-sub">
+        @if (isProprietaire()) {
+          Aucune quittance générée pour vos biens pour le moment.
+        } @else {
+          Vos quittances de loyer apparaîtront ici dès que votre propriétaire en aura généré.
+        }
+      </p>
+    </div>
+  }
+
+  <!-- Liste -->
+  @if (!loading() && !error() && quittances().length > 0) {
+    <div class="kp-q-list">
+      @for (q of quittances(); track q.id) {
+        <div class="kp-q-card">
+
+          <div class="kp-q-card-left">
+            <div class="kp-q-icon">
+              <kp-icon name="credit-card" [size]="18" />
+            </div>
+            <div class="kp-q-info">
+              <span class="kp-q-mois">{{ q.moisLabel }} {{ q.annee }}</span>
+              <div class="kp-q-meta">
+                @if (isProprietaire() && q.emailLocataire) {
+                  <span class="kp-text-meta">{{ q.emailLocataire }}</span>
+                  <span class="kp-text-meta kp-meta-sep">·</span>
+                }
+                <span class="kp-text-meta">
+                  Échéance : {{ q.dateEcheance | date:'dd MMM yyyy':'':'fr' }}
+                </span>
+                @if (q.datePaiement) {
+                  <span class="kp-text-meta">
+                    · Payée le {{ q.datePaiement | date:'dd MMM yyyy':'':'fr' }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="kp-q-card-right">
+            <span class="kp-q-montant">{{ q.montantTotal | number:'1.2-2' }} €</span>
+            <span class="kp-statut-badge" [class]="statutClass(q.statut)">
+              {{ statutLabel(q.statut) }}
+            </span>
+            @if (q.urlPdf) {
+              <a class="btn-pdf" [href]="q.urlPdf" target="_blank" rel="noopener" download>
+                <kp-icon name="download" [size]="13" />
+                PDF
+              </a>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

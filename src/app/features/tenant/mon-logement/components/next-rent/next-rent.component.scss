@@ -1,0 +1,112 @@
+@use 'tokens' as t;
+
+.next-rent {
+  position: relative;
+  background: var(--kp-primary-subtle);
+  border: 1px solid var(--kp-primary-subtle-border);
+  border-radius: t.$radius-lg;
+  padding: 28px 32px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 28px;
+  align-items: center;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--kp-primary) 0%, transparent 70%);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+}
+
+.rent-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--kp-font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--kp-primary);
+  margin-bottom: t.$space-2;
+}
+
+.rent-title {
+  font-family: var(--kp-font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.rent-sub {
+  font-size: 14px;
+  color: var(--kp-text-3);
+  margin-top: t.$space-2;
+}
+
+.rent-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: t.$space-4;
+}
+
+.rent-amount {
+  font-family: var(--kp-font-display);
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  .rent-unit {
+    font-family: var(--kp-font);
+    font-size: 18px;
+    color: var(--kp-text-3);
+  }
+}
+
+.rent-actions {
+  display: flex;
+  gap: t.$space-2;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  padding: 10px 16px;
+  border-radius: t.$radius-sm;
+  font-family: var(--kp-font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 150ms ease;
+  white-space: nowrap;
+
+  &--ghost {
+    background: transparent;
+    color: var(--kp-text-2);
+    border-color: var(--kp-border);
+    &:hover { background: var(--kp-surface-2); }
+  }
+
+  &--primary {
+    background: var(--kp-primary);
+    color: var(--kp-primary-on);
+    &:hover { background: var(--kp-primary-hover); }
+  }
+}

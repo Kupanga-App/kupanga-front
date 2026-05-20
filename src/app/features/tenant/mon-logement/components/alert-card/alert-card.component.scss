@@ -1,0 +1,87 @@
+@use 'tokens' as t;
+
+.card {
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+  border-radius: t.$radius;
+  padding: t.$space-4 t.$space-5;
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-3;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &--warning {
+    background: var(--kp-warning-subtle);
+    border-color: var(--kp-warning-subtle);
+  }
+}
+
+.card-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .t {
+    font-family: var(--kp-font-display);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--kp-text-1);
+  }
+}
+
+.badge {
+  background: var(--kp-warning-subtle);
+  color: var(--kp-warning-text);
+  font-family: var(--kp-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: t.$radius-pill;
+}
+
+.alert-row {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: center;
+  gap: t.$space-3;
+  padding: t.$space-2;
+  border-radius: t.$radius-sm;
+  cursor: pointer;
+  transition: background 150ms ease;
+
+  &:hover { background: var(--kp-surface-2); }
+
+  .alert-ic {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--kp-primary-on);
+  }
+
+  &--warning .alert-ic { background: var(--kp-warning); }
+  &--info .alert-ic { background: var(--kp-primary); }
+  &--critical .alert-ic { background: var(--kp-danger); }
+
+  .alert-body {
+    .t { font-size: 13px; font-weight: 500; color: var(--kp-text-1); }
+    .s { font-size: 11.5px; color: var(--kp-text-3); margin-top: 2px; }
+  }
+
+  .chev { color: var(--kp-text-3); transition: transform 150ms ease; }
+  &:hover .chev { transform: translateX(2px); }
+
+  &--warning .chev { color: var(--kp-warning); }
+  &--critical .chev { color: var(--kp-danger); }
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  color: var(--kp-text-3);
+  font-size: 13px;
+  padding: t.$space-2 0;
+}

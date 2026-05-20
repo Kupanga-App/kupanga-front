@@ -1,0 +1,11 @@
+<div class="steps">
+  <span class="step-counter">ÉTAPE {{ padded(current) }} / {{ padded(total) }}</span>
+  <div class="step-dots">
+    @for (dot of dots; track dot) {
+      <span class="dot" [class.active]="dot <= current"></span>
+    }
+  </div>
+  @if (currentLabel) {
+    <span class="step-label">{{ currentLabel }}</span>
+  }
+</div>

@@ -1,0 +1,173 @@
+@if (loading()) {
+  <div class="docs-loading">
+    <div class="kp-skel" style="height:48px; border-radius:10px;"></div>
+    <div class="kp-skel" style="height:48px; border-radius:10px;"></div>
+    <div class="kp-skel" style="height:48px; border-radius:10px;"></div>
+  </div>
+} @else if (error()) {
+  <div class="docs-error">
+    <kp-icon name="alert-triangle" [size]="20" />
+    <span>{{ error() }}</span>
+  </div>
+} @else {
+
+  <!-- ── Contrats ─────────────────────────────────────────────────────── -->
+  <div class="docs-section">
+    <div class="docs-section-header">
+      <kp-icon name="file-text" [size]="14" />
+      <span class="docs-section-title">Contrats</span>
+      <span class="docs-count">{{ contrats().length }}</span>
+    </div>
+
+    @if (contrats().length === 0) {
+      <div class="docs-empty">Aucun contrat généré.</div>
+    } @else {
+      <div class="docs-list">
+        @for (c of contrats(); track c.id) {
+          <div class="doc-row">
+            <div class="doc-icon doc-icon--contract">
+              <kp-icon name="file-text" [size]="16" />
+            </div>
+            <div class="doc-info">
+              <span class="doc-label">{{ contratLabel(c) }}</span>
+              <div class="doc-meta">
+                <span class="kp-badge {{ contratBadgeClass(c.statut) }}">
+                  {{ contratStatutLabel(c.statut) }}
+                </span>
+              </div>
+            </div>
+            <div class="doc-actions">
+              @if (c.urlPdf) {
+                <a class="btn-sm" [href]="c.urlPdf" target="_blank" rel="noopener" download>
+                  <kp-icon name="download" [size]="13" />
+                  Télécharger
+                </a>
+              } @else {
+                <span class="doc-unavailable">PDF non disponible</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── États des lieux ──────────────────────────────────────────────── -->
+  <div class="docs-section">
+    <div class="docs-section-header">
+      <kp-icon name="clipboard-check" [size]="14" />
+      <span class="docs-section-title">États des lieux</span>
+      <span class="docs-count">{{ edls().length }}</span>
+    </div>
+
+    @if (edls().length === 0) {
+      <div class="docs-empty">Aucun état des lieux généré.</div>
+    } @else {
+      <div class="docs-list">
+        @for (e of edls(); track e.id) {
+          <div class="doc-row">
+            <div class="doc-icon doc-icon--edl">
+              <kp-icon name="clipboard-check" [size]="16" />
+            </div>
+            <div class="doc-info">
+              <span class="doc-label">{{ edlLabel(e) }}</span>
+              <div class="doc-meta">
+                <span class="kp-badge {{ edlTypeClass(e.type) }}">
+                  {{ e.type === 'ENTREE' ? 'Entrée' : 'Sortie' }}
+                </span>
+                <span class="kp-badge {{ edlBadgeClass(e.statut) }}">
+                  {{ edlStatutLabel(e.statut) }}
+                </span>
+              </div>
+            </div>
+            <div class="doc-actions">
+              @if (e.urlPdf) {
+                <a class="btn-sm" [href]="e.urlPdf" target="_blank" rel="noopener" download>
+                  <kp-icon name="download" [size]="13" />
+                  Télécharger
+                </a>
+              } @else {
+                <span class="doc-unavailable">PDF non disponible</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Quittances ───────────────────────────────────────────────────── -->
+  <div class="docs-section">
+    <div class="docs-section-header">
+      <kp-icon name="credit-card" [size]="14" />
+      <span class="docs-section-title">Quittances de loyer</span>
+      <span class="docs-count">{{ quittances().length }}</span>
+    </div>
+
+    @if (quittances().length === 0) {
+      <div class="docs-empty">Aucune quittance générée.</div>
+    } @else {
+      <div class="docs-list">
+        @for (q of quittances(); track q.id) {
+          <div class="doc-row">
+            <div class="doc-icon doc-icon--quittance">
+              <kp-icon name="credit-card" [size]="16" />
+            </div>
+            <div class="doc-info">
+              <span class="doc-label">{{ quittanceLabel(q) }}</span>
+              <div class="doc-meta">
+                <span class="kp-badge {{ quittanceBadgeClass(q.statut) }}">
+                  {{ quittanceStatutLabel(q.statut) }}
+                </span>
+                <span class="doc-amount">{{ q.montantTotal | number:'1.2-2' }} €</span>
+              </div>
+            </div>
+            <div class="doc-actions">
+              @if (q.urlPdf) {
+                <a class="btn-sm" [href]="q.urlPdf" target="_blank" rel="noopener" download>
+                  <kp-icon name="download" [size]="13" />
+                  Télécharger
+                </a>
+              } @else {
+                <span class="doc-unavailable">PDF non disponible</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Autres documents ─────────────────────────────────────────────── -->
+  <div class="docs-section">
+    <div class="docs-section-header">
+      <kp-icon name="folder" [size]="14" />
+      <span class="docs-section-title">Autres documents</span>
+      <span class="docs-count">{{ autresDocuments().length }}</span>
+    </div>
+
+    @if (autresDocuments().length === 0) {
+      <div class="docs-empty">Aucun document supplémentaire.</div>
+    } @else {
+      <div class="docs-list">
+        @for (url of autresDocuments(); track url) {
+          <div class="doc-row">
+            <div class="doc-icon doc-icon--file">
+              <kp-icon name="paperclip" [size]="16" />
+            </div>
+            <div class="doc-info">
+              <span class="doc-label">{{ fileName(url) }}</span>
+            </div>
+            <div class="doc-actions">
+              <a class="btn-sm" [href]="url" target="_blank" rel="noopener" download>
+                <kp-icon name="download" [size]="13" />
+                Télécharger
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+}

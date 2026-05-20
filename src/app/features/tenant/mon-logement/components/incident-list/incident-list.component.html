@@ -1,0 +1,36 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Mes demandes</span>
+    <button class="btn-sm btn-sm--primary" (click)="signalIncident.emit()">
+      <kp-icon name="plus" [size]="13" />
+      Signaler un incident
+    </button>
+  </div>
+
+  @for (incident of incidents(); track incident.title) {
+    <div class="incident" [class.incident--amber]="incident.status === 'in_progress'">
+      <div class="incident-ic" [class.incident-ic--amber]="incident.severity !== 'info'">
+        <kp-icon [name]="incident.icon" [size]="18" />
+      </div>
+      <div class="incident-body">
+        <div class="t">{{ incident.title }}</div>
+        <div class="s">{{ incident.description }}</div>
+        <div class="meta">
+          @for (m of incident.meta; track m; let last = $last) {
+            {{ m }}@if (!last) { <span class="sep">·</span> }
+          }
+        </div>
+      </div>
+      <kp-status-mini [variant]="statusVariant(incident.status)">
+        {{ statusLabel(incident.status) }}
+      </kp-status-mini>
+    </div>
+  }
+
+  @if (!incidents().length) {
+    <div class="empty">
+      <kp-icon name="check-circle" [size]="20" />
+      <span>Aucune demande en cours</span>
+    </div>
+  }
+</div>

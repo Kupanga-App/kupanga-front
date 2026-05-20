@@ -1,10 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, finalize, switchMap, of } from 'rxjs';
+import { Observable, tap, finalize, switchMap, of, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../models/auth-response.model';
 import { User } from '../models/user.model';
 import { environment } from '../../../../environments/environment';
+import { LogementContextService } from '../../services/logement-context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ import { environment } from '../../../../environments/environment';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private logementContext = inject(LogementContextService);
   private apiUrl = `${environment.apiUrl}/auth`;
 
   currentUser = signal<User | null>(null);
@@ -41,7 +43,8 @@ export class AuthService {
   constructor() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      this.currentUser.set(JSON.parse(storedUser));
+      const raw = JSON.parse(storedUser);
+      this.currentUser.set(this.normalizeUser(raw));
     }
   }
 
@@ -62,7 +65,7 @@ export class AuthService {
       mail: userData.email, // Attention: le backend attend 'mail' mais le form utilise 'email'
       password: userData.password,
       role: userData.role,
-      urlAvatar: userData.avatar || null // null si pas d'avatar sélectionné (cas upload ou rien)
+      urlAvatar: profilePictureFile ? null : (userData.avatar || null)
     };
 
     // Ajout du JSON sous forme de Blob/String
@@ -128,7 +131,8 @@ export class AuthService {
   }
 
   private fetchCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/me`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/me`).pipe(
+      map(raw => this.normalizeUser(raw)),
       tap(user => {
         this.currentUser.set(user);
         localStorage.setItem('user', JSON.stringify(user));
@@ -136,10 +140,22 @@ export class AuthService {
     );
   }
 
-  private clearClientState(): void {
+  private normalizeUser(raw: any): User {
+    return {
+      id: raw.id,
+      email: raw.email ?? raw.mail ?? '',
+      firstName: raw.firstName,
+      lastName: raw.lastName,
+      role: raw.role,
+      urlProfile: raw.urlProfile,
+    };
+  }
+
+  clearClientState(): void {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
     this.currentUser.set(null);
-    this.router.navigate(['/auth/login']);
+    this.logementContext.clear();
+    this.router.navigate(['/']);
   }
 }

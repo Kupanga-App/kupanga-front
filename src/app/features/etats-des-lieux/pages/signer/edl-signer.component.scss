@@ -1,0 +1,128 @@
+.kp-signer-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: var(--kp-bg);
+  padding: var(--kp-space-8) var(--kp-space-6);
+}
+
+.kp-signer-card {
+  width: 100%;
+  max-width: 640px;
+  background: var(--kp-surface);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-xl);
+  padding: var(--kp-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-5);
+}
+
+.kp-signer-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--kp-text-1);
+
+  mat-icon { color: var(--kp-primary); font-size: 24px; width: 24px; height: 24px; }
+}
+
+.kp-signer-loading { display: flex; flex-direction: column; align-items: center; gap: var(--kp-space-3); color: var(--kp-text-2); }
+
+.kp-signer-error {
+  display: flex; flex-direction: column; align-items: center; gap: var(--kp-space-3);
+  color: var(--kp-danger); text-align: center;
+  mat-icon { font-size: 36px; width: 36px; height: 36px; }
+}
+
+.kp-signer-success {
+  display: flex; flex-direction: column; align-items: center; gap: var(--kp-space-3);
+  text-align: center; color: var(--kp-success-text);
+  mat-icon { font-size: 48px; width: 48px; height: 48px; }
+  p { color: var(--kp-text-2); }
+}
+
+.kp-edl-obs {
+  background: var(--kp-surface-2);
+  border-radius: var(--kp-radius-md);
+  padding: var(--kp-space-3) var(--kp-space-4);
+  font-size: 14px;
+  color: var(--kp-text-2);
+
+  p { margin: 4px 0 0; }
+}
+
+.kp-edl-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-3);
+  padding-top: var(--kp-space-4);
+  border-top: 0.5px solid var(--kp-border);
+
+  h3 { margin: 0; }
+}
+
+.kp-piece-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-2);
+  padding: var(--kp-space-3) var(--kp-space-4);
+  background: var(--kp-surface-2);
+  border-radius: var(--kp-radius-md);
+}
+
+.kp-piece-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--kp-text-1);
+  margin: 0;
+}
+
+.kp-element-row {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  flex-wrap: wrap;
+}
+
+.kp-elem-type {
+  font-size: 13px;
+  color: var(--kp-text-2);
+  min-width: 100px;
+}
+
+// ─── Badges état éléments ────────────────────────────────────────────────────
+
+.kp-etat-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--kp-radius-full);
+
+  &.kp-etat-bon { background: var(--kp-success-subtle); color: var(--kp-success-text); }
+  &.kp-etat-usage_normal { background: var(--kp-info-subtle); color: var(--kp-info-text); }
+  &.kp-etat-mauvais { background: var(--kp-warning-subtle); color: var(--kp-warning-text); }
+  &.kp-etat-hors_service { background: var(--kp-danger-subtle); color: var(--kp-danger-text); }
+}
+
+.kp-kv-row { display: flex; justify-content: space-between; gap: var(--kp-space-3); }
+.kp-kv-key { font-size: 13px; color: var(--kp-text-3); }
+.kp-kv-val { font-size: 13px; font-weight: 500; color: var(--kp-text-1); }
+
+.kp-signer-signature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+  padding-top: var(--kp-space-4);
+  border-top: 0.5px solid var(--kp-border);
+}
+
+.kp-signer-btn {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+}

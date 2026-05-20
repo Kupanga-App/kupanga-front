@@ -1,0 +1,27 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Mes documents</span>
+    <span class="badge">{{ documents().length }}</span>
+  </div>
+
+  @for (doc of documents(); track doc.nom) {
+    <div class="doc-row" (click)="ouvrir(doc)" role="button" [title]="doc.nom">
+      <div class="doc-icon">
+        <span class="doc-type">PDF</span>
+      </div>
+      <div class="doc-body">
+        <div class="doc-name">{{ doc.nom }}</div>
+        <div class="doc-meta">
+          {{ doc.date | date:'d MMM yyyy':'':'fr' }} · {{ doc.taille }}
+          @if (doc.note) { <span class="doc-note">· {{ doc.note }}</span> }
+        </div>
+      </div>
+      <kp-icon name="chevron-right" [size]="14" class="doc-chev" />
+    </div>
+  }
+
+  <button class="upload-btn" (click)="televerserDocument.emit()">
+    <kp-icon name="plus" [size]="14" />
+    Téléverser un document
+  </button>
+</div>

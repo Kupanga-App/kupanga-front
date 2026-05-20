@@ -1,0 +1,12 @@
+<button
+  type="button"
+  class="avatar-tile"
+  [class.selected]="selected"
+  [style.width.px]="size"
+  [style.height.px]="size"
+  role="radio"
+  [attr.aria-checked]="selected"
+  (click)="onPick()"
+>
+  <img [src]="url" [alt]="'Avatar'" loading="lazy" />
+</button>

@@ -1,0 +1,25 @@
+<div class="role-picker" role="radiogroup" aria-label="Rôle">
+  <button
+    type="button"
+    class="radio-card"
+    role="radio"
+    [attr.aria-checked]="selected === 'ROLE_PROPRIETAIRE'"
+    [class.active]="selected === 'ROLE_PROPRIETAIRE'"
+    (click)="select('ROLE_PROPRIETAIRE')"
+  >
+    <span class="rc-dot"></span>
+    <span class="rc-label">Propriétaire</span>
+  </button>
+
+  <button
+    type="button"
+    class="radio-card"
+    role="radio"
+    [attr.aria-checked]="selected === 'ROLE_LOCATAIRE'"
+    [class.active]="selected === 'ROLE_LOCATAIRE'"
+    (click)="select('ROLE_LOCATAIRE')"
+  >
+    <span class="rc-dot"></span>
+    <span class="rc-label">Locataire</span>
+  </button>
+</div>

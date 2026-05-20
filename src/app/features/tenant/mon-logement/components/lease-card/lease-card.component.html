@@ -1,0 +1,55 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Mon bail</span>
+    <kp-tag-pill [variant]="statutVariante()">{{ statutLibelle() }}</kp-tag-pill>
+  </div>
+
+  <div class="bail-meta">
+    <span>{{ typeLibelle() }}</span>
+    @if (contrat().moisPreavis) {
+      <span class="sep">·</span>
+      <span>Préavis {{ contrat().moisPreavis }} mois</span>
+    }
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>{{ contrat().moisEcoules }} mois sur {{ contrat().dureeTotale }}</span>
+      <span class="pct">{{ progressPct() }} %</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progressPct()"></div>
+    </div>
+    <div class="progress-dates">
+      <span>{{ contrat().dateDebut | date:'d MMM yyyy':'':'fr' }}</span>
+      <span>{{ contrat().dateFin | date:'d MMM yyyy':'':'fr' }}</span>
+    </div>
+  </div>
+
+  <div class="irl-card">
+    <div class="irl-row">
+      <span class="lbl">Loyer mensuel</span>
+      <span class="val">{{ contrat().loyerMensuel }} €</span>
+    </div>
+    <div class="irl-row">
+      <span class="lbl">Charges</span>
+      <span class="val">{{ contrat().charges }} €/mois</span>
+    </div>
+    <div class="irl-row">
+      <span class="lbl">Dépôt de garantie</span>
+      <span class="val">{{ contrat().depotGarantie }} €</span>
+    </div>
+    @if (contrat().irlIndex) {
+      <div class="irl-row">
+        <span class="lbl">Indice IRL</span>
+        <span class="val val--olive">{{ contrat().irlIndex }}</span>
+      </div>
+    }
+    @if (contrat().irlProchainDate) {
+      <div class="irl-row">
+        <span class="lbl">Prochaine révision</span>
+        <span class="val">{{ contrat().irlProchainDate | date:'d MMM yyyy':'':'fr' }}</span>
+      </div>
+    }
+  </div>
+</div>

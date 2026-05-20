@@ -1,0 +1,35 @@
+@use 'tokens' as t;
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+}
+
+.chip {
+  padding: 9px t.$space-4;
+  border-radius: t.$radius-pill;
+  background: transparent;
+  border: 1px solid t.$border-2;
+  color: t.$mint-mute;
+  font-size: t.$text-small;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: t.$font-sans;
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-1;
+  transition: all 150ms ease;
+
+  &:hover {
+    color: t.$mint;
+    border-color: t.$border-2;
+    background: rgba(#EFFBDB, 0.04);
+  }
+
+  &.on {
+    background: t.$olive-bg;
+    border-color: t.$olive;
+    color: t.$olive-light;
+  }
+}

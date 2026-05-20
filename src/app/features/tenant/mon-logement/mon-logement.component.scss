@@ -1,0 +1,173 @@
+@use 'tokens' as t;
+
+// ─── Pas de logement ──────────────────────────────────────────────────────────
+.no-property {
+  max-width: 480px;
+  margin: 80px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: t.$space-4;
+}
+
+.no-property-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: t.$radius-lg;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--kp-text-3);
+}
+
+.no-property-title {
+  font-family: var(--kp-font-display);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+}
+
+.no-property-sub {
+  font-size: 14px;
+  color: var(--kp-text-3);
+  line-height: 1.6;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: t.$space-3 t.$space-3 t.$space-1;
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-3;
+}
+
+// ─── Welcome ──────────────────────────────────────────────────────────────────
+.welcome {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: flex-end;
+  gap: t.$space-6;
+  padding-bottom: t.$space-6;
+  border-bottom: 1px solid var(--kp-border);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--kp-font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--kp-primary);
+  margin-bottom: t.$space-3;
+}
+
+.welcome-h1 {
+  font-family: var(--kp-font-display);
+  font-size: 48px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 t.$space-3;
+
+  em { font-style: italic; color: var(--kp-primary); }
+}
+
+.welcome-meta-text {
+  font-size: 15px;
+  color: var(--kp-text-3);
+  margin: 0;
+}
+
+.welcome-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: t.$space-2;
+}
+
+.welcome-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--kp-text-3);
+  strong { color: var(--kp-text-1); font-weight: 500; }
+}
+
+// ─── Body grid ────────────────────────────────────────────────────────────────
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: t.$space-6;
+  align-items: flex-start;
+}
+
+.body-main {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+}
+
+.body-side {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+}
+
+// ─── En cours de développement ────────────────────────────────────────────────
+.coming-soon-card {
+  display: flex;
+  align-items: center;
+  gap: t.$space-4;
+  background: var(--kp-surface);
+  border: 1px dashed var(--kp-border);
+  border-radius: t.$radius;
+  padding: t.$space-4 t.$space-5;
+  opacity: 0.8;
+}
+
+.cs-ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--kp-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--kp-text-3);
+  flex-shrink: 0;
+}
+
+.cs-body {
+  flex: 1;
+  .cs-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--kp-text-2);
+  }
+  .cs-sub {
+    font-size: 12px;
+    color: var(--kp-text-3);
+    margin-top: 2px;
+  }
+}
+
+.cs-badge {
+  padding: 4px 10px;
+  border-radius: t.$radius-pill;
+  background: var(--kp-surface-2);
+  border: 1px solid var(--kp-border);
+  font-family: var(--kp-font-mono);
+  font-size: 10px;
+  color: var(--kp-text-3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

@@ -1,0 +1,68 @@
+// styles/_typography.scss — classes utilitaires typographiques Kupanga
+
+.kp-text-display {
+  font-family: var(--kp-font-display);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--kp-text-1);
+}
+
+.kp-text-h1 {
+  font-family: var(--kp-font-display);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--kp-text-1);
+}
+
+.kp-text-h2 {
+  font-family: var(--kp-font-display);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--kp-text-1);
+}
+
+.kp-text-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.kp-text-caption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--kp-text-3);
+}
+
+.kp-text-mono {
+  font-family: var(--kp-font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--kp-primary-hover);
+}
+
+// ── Labels externes au-dessus des mat-form-field ──────────────────────────────
+.kp-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.kp-label {
+  display: block;
+  font-family: var(--kp-font);
+  font-size: 13px;
+  font-weight: 500;
+  color: #EFFBDB;
+  margin-bottom: 6px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.kp-req {
+  color: #8FA464;
+  margin-left: 3px;
+}

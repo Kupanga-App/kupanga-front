@@ -1,0 +1,28 @@
+@use 'tokens' as t;
+
+:host { display: block; }
+
+.add-card {
+  width: 100%;
+  background: transparent;
+  border: 1.5px dashed t.$border-2;
+  border-radius: t.$radius;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  color: t.$mint-mute;
+  font-family: t.$font-sans;
+  font-size: t.$text-small;
+  font-weight: 500;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+
+  &:hover {
+    border-color: t.$olive;
+    color: t.$olive;
+    background: t.$olive-bg;
+  }
+}

@@ -1,37 +1,34 @@
 import { Injectable, signal } from '@angular/core';
 
+export type KupangaTheme = 'light' | 'dark';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  isDark = signal<boolean>(false);
+  private readonly STORAGE_KEY = 'kp_theme';
+
+  theme = signal<KupangaTheme>(this.getStoredTheme());
 
   constructor() {
-    // Optional: check for saved preference in localStorage or system preference
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedTheme = localStorage.getItem('isDarkMode');
-
-    if (savedTheme !== null) {
-      this.setTheme(savedTheme === 'true');
-    } else {
-      this.setTheme(prefersDark);
-    }
+    this.setTheme(this.theme());
   }
 
   toggleTheme(): void {
-    this.setTheme(!this.isDark());
+    const next: KupangaTheme = this.theme() === 'light' ? 'dark' : 'light';
+    this.setTheme(next);
   }
 
-  private setTheme(dark: boolean): void {
-    this.isDark.set(dark);
-    const element = document.querySelector('html');
-    if (element) {
-        if (dark) {
-            element.classList.add('p-dark');
-        } else {
-            element.classList.remove('p-dark');
-        }
-    }
-    localStorage.setItem('isDarkMode', String(dark));
+  setTheme(theme: KupangaTheme): void {
+    this.theme.set(theme);
+    document.body.classList.toggle('kp-theme-dark', theme === 'dark');
+    document.body.classList.toggle('kp-theme-light', theme === 'light');
+    localStorage.setItem(this.STORAGE_KEY, theme);
+  }
+
+  private getStoredTheme(): KupangaTheme {
+    const stored = localStorage.getItem(this.STORAGE_KEY);
+    if (stored === 'dark' || stored === 'light') return stored;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 }

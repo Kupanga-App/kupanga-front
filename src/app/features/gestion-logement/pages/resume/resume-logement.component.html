@@ -1,0 +1,207 @@
+@if (bien()) {
+<div class="kp-resume">
+
+  <!-- ── Titre page ─────────────────────────────────────────────────── -->
+  <div class="manage-title">
+    <div class="manage-eyebrow">TABLEAU DE BORD — LOGEMENT</div>
+    <h1 class="manage-h1">Pilotez la <em>location.</em></h1>
+    <p class="manage-sub">
+      Suivez les performances de votre bien, gérez votre locataire et votre contrat depuis un seul endroit.
+    </p>
+  </div>
+
+  <!-- ── Alert — pas de contrat ─────────────────────────────────────── -->
+  @if (!hasContratActif()) {
+    <div class="alert-banner">
+      <div class="alert-ic">
+        <kp-icon name="alert-triangle" [size]="22" />
+      </div>
+      <div class="alert-text">
+        <div class="alert-t">Aucun contrat actif</div>
+        <div class="alert-s">Ce logement n'a pas de contrat de location signé. Créez un contrat pour commencer la location.</div>
+      </div>
+      <div class="alert-actions">
+        <button class="btn-sm btn-amber" (click)="openContratNew()">
+          <kp-icon name="file-text" [size]="13" />
+          Créer un contrat
+        </button>
+        @if (!locataire()) {
+          <a class="btn-sm" [routerLink]="['/pro/biens', bienId(), 'assigner']">
+            <kp-icon name="user-plus" [size]="13" />
+            Assigner un locataire
+          </a>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── KPI strip ──────────────────────────────────────────────────── -->
+  @if (bien()!.loyerMensuel) {
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-lbl">
+          <kp-icon name="bar-chart-2" [size]="12" />
+          Loyer théorique (12 mois)
+        </div>
+        <div class="kpi-val">
+          {{ loyerAnnuel() }}<span class="u">€</span>
+        </div>
+        <div class="kpi-foot">base : {{ bien()!.loyerMensuel }} €/mois</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-lbl">
+          <kp-icon name="circle-check" [size]="12" />
+          Encaissé
+        </div>
+        <div class="kpi-val">
+          —
+        </div>
+        <div class="kpi-foot">données non disponibles</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-lbl" style="color:var(--kp-danger-text)">
+          <kp-icon name="alert-triangle" [size]="12" />
+          Manque-à-gagner
+        </div>
+        <div class="kpi-val kpi-danger">—</div>
+        <div class="kpi-foot kpi-danger">données non disponibles</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-lbl">
+          <kp-icon name="percent" [size]="12" />
+          Taux d'occupation
+        </div>
+        <div class="kpi-val">—</div>
+        <div class="kpi-foot">données non disponibles</div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Grille 2-col ───────────────────────────────────────────────── -->
+  <div class="resume-grid">
+
+    <!-- Main ───────────────────────────────────────────────────────── -->
+    <div class="resume-main">
+
+      <!-- Locataire actuel -->
+      <div class="mcard">
+        <div class="mcard-h">
+          <span class="mcard-t">Locataire actuel</span>
+          @if (!locataire()) {
+            <span class="badge-count">0</span>
+          }
+        </div>
+        @if (locataire()) {
+          <div class="user-card">
+            <div class="user-av">
+              @if (locataire()!.urlProfile) {
+                <img [src]="locataire()!.urlProfile" [alt]="locataire()!.firstName" />
+              } @else {
+                <span class="user-initials">{{ locataire()!.firstName[0] }}{{ locataire()!.lastName[0] }}</span>
+              }
+            </div>
+            <div class="user-info">
+              <div class="user-name">{{ locataire()!.firstName }} {{ locataire()!.lastName }}</div>
+              <div class="user-mail">{{ locataire()!.mail }}</div>
+            </div>
+          </div>
+        } @else {
+          <div class="mc-empty">
+            <div class="mc-empty-ic"><kp-icon name="user-plus" [size]="24" /></div>
+            <div class="mc-empty-t">Aucun locataire assigné</div>
+            <div class="mc-empty-s">Recherchez un locataire compatible pour ce logement.</div>
+            <a class="btn-primary" [routerLink]="['/pro/biens', bienId(), 'assigner']">
+              <kp-icon name="user-plus" [size]="14" />
+              Assigner un locataire
+            </a>
+          </div>
+        }
+      </div>
+
+      <!-- Contrat en cours -->
+      <div class="mcard">
+        <div class="mcard-h">
+          <span class="mcard-t">Contrat en cours</span>
+          @if (!hasContratActif()) {
+            <span class="badge-count">0</span>
+          }
+        </div>
+        @if (hasContratActif()) {
+          <div class="contrat-active">
+            <kp-icon name="circle-check" [size]="20" style="color: var(--kp-success)" />
+            <span>Contrat actif — {{ contratStatut() }}</span>
+          </div>
+        } @else {
+          <div class="mc-empty">
+            <div class="mc-empty-ic"><kp-icon name="file-text" [size]="24" /></div>
+            <div class="mc-empty-t">Aucun contrat actif</div>
+            <div class="mc-empty-s">Créez un contrat de location pour formaliser la location.</div>
+            <button class="btn-primary" (click)="openContratNew()">
+              <kp-icon name="plus" [size]="14"/>
+              Créer un contrat
+            </button>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Side ─────────────────────────────────────────────────────── -->
+    <div class="resume-side">
+
+      <!-- Actions -->
+      <div class="mcard">
+        <div class="mcard-h"><span class="mcard-t">Actions rapides</span></div>
+        <div class="action-stack">
+          <a class="action-btn action-btn-primary" [routerLink]="['/pro/biens', bienId(), 'assigner']">
+            <div class="action-ic"><kp-icon name="user-plus" [size]="16" /></div>
+            Assigner un locataire
+          </a>
+          <button class="action-btn" (click)="openContratNew()">
+            <div class="action-ic"><kp-icon name="file-text" [size]="16" /></div>
+            Créer un contrat
+          </button>
+          <a class="action-btn" [routerLink]="['/pro/messagerie']">
+            <div class="action-ic"><kp-icon name="message-square" [size]="16" /></div>
+            Messagerie
+          </a>
+          <a class="action-btn" [routerLink]="['/pro/biens', bienId(), 'modifier']">
+            <div class="action-ic"><kp-icon name="edit-3" [size]="16" /></div>
+            Modifier le bien
+          </a>
+        </div>
+      </div>
+
+      <!-- Performance DPE/GES -->
+      @if (bien()!.classeEnergie || bien()!.classeGes) {
+        <div class="mcard">
+          <div class="mcard-h"><span class="mcard-t">Performance énergétique</span></div>
+          <div class="perf-grid">
+            @if (bien()!.classeEnergie) {
+              <div class="perf-card">
+                <div class="perf-lbl">DPE</div>
+                <div class="perf-val perf-{{ bien()!.classeEnergie!.toLowerCase() }}">
+                  {{ bien()!.classeEnergie }}
+                </div>
+                <div class="perf-sublbl">Classe énergie</div>
+              </div>
+            }
+            @if (bien()!.classeGes) {
+              <div class="perf-card">
+                <div class="perf-lbl">GES</div>
+                <div class="perf-val perf-{{ bien()!.classeGes!.toLowerCase() }}">
+                  {{ bien()!.classeGes }}
+                </div>
+                <div class="perf-sublbl">Émissions</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+</div>
+}

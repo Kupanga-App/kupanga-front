@@ -1,0 +1,254 @@
+﻿@if (loading()) {
+  <div class="qn-loading">
+    <div class="kp-skel" style="height:44px;border-radius:8px;margin-bottom:8px;"></div>
+    <div class="kp-skel" style="height:24px;border-radius:8px;width:300px;"></div>
+  </div>
+}
+
+@if (!loading() && bien()) {
+  <div class="qn-page">
+
+    <!-- Back -->
+    <button class="qn-back" type="button" (click)="cancel()">
+      <kp-icon name="arrow-left" [size]="15" />
+      {{ bien()!.titre }}
+    </button>
+
+    <!-- Flow heading -->
+    <div class="flow-heading">
+      <div>
+        <div class="flow-eyebrow">ÉMISSION · QUITTANCE DE LOYER</div>
+        <h1 class="flow-h1">Nouvelle <em>quittance</em></h1>
+        <p class="flow-sub">
+          Générez une quittance de loyer pour le bien
+          <strong>{{ bien()!.titre }}</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Grid 2 col -->
+    <div class="wizard" [formGroup]="form">
+
+      <!-- Main -->
+      <div class="wizard-main">
+        <div class="wcard">
+          <div class="wcard-h">
+            <div class="eyebrow">QUITTANCE DE LOYER</div>
+            <div class="t">Paramètres <em>de la quittance</em></div>
+          </div>
+
+          <!-- Section 1: Période -->
+          <div class="wsection">
+            <div class="wsection-h">Période</div>
+            <kp-chips-group
+              [options]="monthChips"
+              [value]="selectedMonth()"
+              (change)="onMonthChange($event)"
+            />
+            <div class="form-row col2 mt16">
+                            <div class="kp-field">
+                            <label class="kp-label">Année <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <mat-select formControlName="annee">
+                  @for (y of years; track y) {
+                    <mat-option [value]="y">{{ y }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              </div>
+                            <div class="kp-field">
+                            <label class="kp-label">Date d'échéance <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput formControlName="dateEcheance" type="date" />
+                @if (form.get('dateEcheance')?.invalid && form.get('dateEcheance')?.touched) {
+                  <mat-error>Date requise</mat-error>
+                }
+              </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Locataire -->
+          <div class="wsection">
+            <div class="wsection-h">Locataire concerné</div>
+            @if (bien()?.locataire) {
+              <div class="tenant-card">
+                <div class="tenant-av">
+                  {{ bien()!.locataire!.firstName.charAt(0) }}{{ bien()!.locataire!.lastName.charAt(0) }}
+                </div>
+                <div class="tenant-info">
+                  <span class="tenant-name">
+                    {{ bien()!.locataire!.firstName }} {{ bien()!.locataire!.lastName }}
+                  </span>
+                  <span class="tenant-meta">{{ bien()!.locataire!.mail }}</span>
+                  @if (contrat()?.statut === 'SIGNE') {
+                    <span class="tag-pill">
+                      <span class="dot"></span>Contrat actif
+                    </span>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="tenant-empty">
+                <kp-icon name="user" [size]="20" />
+                <span>Aucun locataire associé</span>
+              </div>
+            }
+          </div>
+
+          <!-- Section 3: Montants -->
+          <div class="wsection">
+            <div class="wsection-h">Montants</div>
+            <div class="form-row col3">
+                            <div class="kp-field">
+                            <label class="kp-label">Loyer (€) <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput type="number" formControlName="loyerMensuel" min="0" />
+                <span matSuffix>€</span>
+              </mat-form-field>
+              </div>
+                            <div class="kp-field">
+                            <label class="kp-label">Charges (€) <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput type="number" formControlName="chargesMensuelles" min="0" />
+                <span matSuffix>€</span>
+              </mat-form-field>
+              </div>
+              <div class="total-field">
+                <span class="total-lbl">Total</span>
+                <span class="total-val">{{ total() | number:'1.2-2' }} €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Statut paiement -->
+          <div class="wsection">
+            <div class="wsection-h">Statut du paiement</div>
+            <div class="opt-cards col3">
+              <kp-opt-card
+                icon="circle-check"
+                title="Encaissé"
+                subtitle="Paiement reçu"
+                [selected]="paymentStatus() === 'ENCAISSE'"
+                (select)="setPaymentStatus('ENCAISSE')"
+              />
+              <kp-opt-card
+                icon="clock"
+                title="Partiel"
+                subtitle="Versement incomplet"
+                [selected]="paymentStatus() === 'PARTIEL'"
+                (select)="setPaymentStatus('PARTIEL')"
+              />
+              <kp-opt-card
+                icon="alert-triangle"
+                title="Impayé"
+                subtitle="Relance à prévoir"
+                [selected]="paymentStatus() === 'IMPAYE'"
+                (select)="setPaymentStatus('IMPAYE')"
+              />
+            </div>
+          </div>
+
+          <!-- Section 5: Envoi -->
+          <div class="wsection">
+            <div class="wsection-h">Envoi & archivage</div>
+            <div class="send-options">
+              <button type="button" class="send-opt" [class.on]="sendOptions().email" (click)="toggleSend('email')">
+                <span class="send-check"><kp-icon name="check" [size]="12" [strokeWidth]="2.5" /></span>
+                <div class="send-body">
+                  <span class="send-lbl">Envoyer par email au locataire</span>
+                  <span class="send-sub">{{ bien()?.locataire?.mail }}</span>
+                </div>
+              </button>
+              <button type="button" class="send-opt" [class.on]="sendOptions().archive" (click)="toggleSend('archive')">
+                <span class="send-check"><kp-icon name="check" [size]="12" [strokeWidth]="2.5" /></span>
+                <div class="send-body">
+                  <span class="send-lbl">Archiver dans les documents du bien</span>
+                </div>
+              </button>
+              <button type="button" class="send-opt" [class.on]="sendOptions().copy" (click)="toggleSend('copy')">
+                <span class="send-check"><kp-icon name="check" [size]="12" [strokeWidth]="2.5" /></span>
+                <div class="send-body">
+                  <span class="send-lbl">Envoyer une copie au bailleur</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="wfoot">
+          <button type="button" class="btn" (click)="cancel()">Annuler</button>
+          <div class="wfoot-right">
+            <button type="button" class="btn">
+              <kp-icon name="save" [size]="14" />
+              Enregistrer brouillon
+            </button>
+            <button type="button" class="btn primary" [disabled]="submitting()" (click)="submit()">
+              @if (submitting()) {
+                <kp-icon name="refresh-cw" [size]="14" />
+              } @else {
+                <kp-icon name="send" [size]="14" />
+              }
+              Générer &amp; envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aside: Paper preview -->
+      <div class="wizard-aside">
+        <kp-paper>
+          <div class="paper-h">
+            <div class="paper-stamp">Quittance · {{ refTag() }}</div>
+            <div class="paper-title">Quittance <em>de loyer</em></div>
+            <div class="paper-meta">{{ monthLabel() }}</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Bailleur</div>
+            <div class="paper-body">
+              <strong>{{ bien()?.proprietaire?.firstName }} {{ bien()?.proprietaire?.lastName }}</strong>
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Locataire</div>
+            <div class="paper-body">
+              @if (bien()?.locataire) {
+                <strong>{{ bien()!.locataire!.firstName }} {{ bien()!.locataire!.lastName }}</strong>
+              } @else {
+                <span class="blank">— Non renseigné</span>
+              }
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Objet</div>
+            <div class="paper-body">{{ bien()?.titre }}</div>
+          </div>
+
+          <div class="paper-amount">
+            <span class="paper-amount-lbl">Total dû</span>
+            <span class="paper-amount-val">{{ total() | number:'1.2-2' }} €</span>
+          </div>
+
+          <div class="paper-kv">
+            <span class="k">Loyer</span>
+            <span class="v">{{ form.get('loyerMensuel')?.value ?? 0 | number:'1.2-2' }} €</span>
+            <span class="k">Charges</span>
+            <span class="v">{{ form.get('chargesMensuelles')?.value ?? 0 | number:'1.2-2' }} €</span>
+            <span class="k">Période</span>
+            <span class="v">{{ monthLabel() }}</span>
+          </div>
+
+          <div class="paper-sig">Signature du bailleur</div>
+        </kp-paper>
+      </div>
+
+    </div>
+  </div>
+}
+
+
+

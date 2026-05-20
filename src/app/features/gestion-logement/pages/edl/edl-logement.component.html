@@ -1,0 +1,92 @@
+<!-- Chargement -->
+@if (loading()) {
+  <div class="kp-edl-loading">
+    <mat-spinner diameter="32" />
+    <span>Chargement…</span>
+  </div>
+}
+
+@if (!loading()) {
+  <div class="kp-edl">
+
+    <!-- ── Bouton créer (proprio uniquement) ────────────────────────────── -->
+    @if (isProprietaire()) {
+      <div class="kp-edl-toolbar">
+        <button mat-flat-button color="primary" (click)="navigateToNew()">
+          <mat-icon>add</mat-icon> Créer un état des lieux
+        </button>
+      </div>
+    }
+
+    <!-- ── Liste vide ────────────────────────────────────────────────────── -->
+    @if (edls().length === 0) {
+      <div class="kp-empty-state">
+        <mat-icon>checklist</mat-icon>
+        <span>Aucun état des lieux enregistré.</span>
+      </div>
+    }
+
+    <!-- ── Liste des EDL ─────────────────────────────────────────────────── -->
+    @for (edl of edls(); track edl.id) {
+      <div class="kp-edl-card">
+        <div class="kp-edl-card-header">
+          <div class="kp-edl-card-info">
+            <span class="kp-edl-type-badge" [class.kp-edl-type--entree]="edl.type === 'ENTREE'">
+              {{ edl.type === 'ENTREE' ? 'Entrée' : 'Sortie' }}
+            </span>
+            <span class="kp-kv-val">{{ edl.dateRealisation | date:'dd MMM yyyy' }}</span>
+            @if (edl.heureRealisation) {
+              <span class="kp-text-caption">à {{ edl.heureRealisation }}</span>
+            }
+          </div>
+          <span class="kp-statut-badge" [class]="statutClass(edl.statut)">
+            {{ statutLabel(edl.statut) }}
+          </span>
+        </div>
+
+        @if (edl.observations) {
+          <p class="kp-edl-obs">{{ edl.observations }}</p>
+        }
+
+        <div class="kp-edl-card-actions">
+          @if (edl.urlPdf) {
+            <a mat-stroked-button [href]="edl.urlPdf" target="_blank" rel="noopener">
+              <mat-icon>picture_as_pdf</mat-icon> PDF
+            </a>
+          }
+
+          <!-- Signer (proprio) -->
+          @if (isProprietaire() && edl.statut === 'EN_ATTENTE_SIGNATURE_PROPRIO') {
+            @if (signingEdlId() === edl.id) {
+              <div class="kp-sign-inline">
+                <kp-signature-pad [required]="true" (signatureChange)="onSignatureChange($event)" />
+                <div class="kp-sign-inline-actions">
+                  <button mat-flat-button color="primary"
+                    [disabled]="!signatureBase64() || signing()"
+                    (click)="signerProprietaire(edl.id)">
+                    @if (signing()) { <mat-spinner diameter="16" /> } @else { <mat-icon>draw</mat-icon> }
+                    Signer
+                  </button>
+                  <button mat-button (click)="cancelSigning()">Annuler</button>
+                </div>
+              </div>
+            } @else {
+              <button mat-flat-button color="primary" (click)="startSigning(edl.id)">
+                <mat-icon>draw</mat-icon> Signer
+              </button>
+            }
+          }
+
+          <!-- Locataire : signature via email uniquement -->
+          @if (!isProprietaire() && edl.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE') {
+            <div class="kp-info-banner kp-info-banner--info">
+              <mat-icon>mail</mat-icon>
+              <span>Un lien de signature vous a été envoyé par email.</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+}

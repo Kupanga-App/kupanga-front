@@ -1,194 +1,96 @@
-// Variables locales
-$border-radius: 6px;
-$primary-color: var(--primary-color, #3B82F6);
-$text-color: var(--text-color, #1f2937);
-$text-secondary-color: var(--text-color-secondary, #4b5563);
-$bg-surface: var(--surface-50, #f9fafb);
-$card-bg: var(--surface-card, #ffffff);
-$error-color: var(--red-500, #ef4444);
-
-.auth-container {
-  display: flex;
-  min-height: 100vh;
-}
-
-.auth-left {
-  width: 60%;
-  background-color: #1a202c; // Fond sombre
-  color: white;
+form {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 3rem;
-
-  &__content {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-  }
+  gap: 16px;
 }
 
-.auth-logo img {
-  height: 40px;
-}
-
-.auth-value-prop {
-  h2 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.125rem;
-    opacity: 0.8;
-  }
-}
-
-.auth-carousel {
-  background-color: #2d3748; // Un peu plus clair que le fond
-  border-radius: 16px;
-  height: 300px; // Hauteur de la carte du carrousel
+.login-row {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
 
-  &__pagination {
-    display: flex;
-    gap: 0.5rem;
+.remember-check {
+  ::ng-deep .mdc-form-field {
+    color: var(--mint-80);
+    font-family: var(--font-sans);
+    font-size: 13px;
+  }
 
-    span {
-      display: block;
-      width: 8px;
-      height: 8px;
-      background-color: rgba(255, 255, 255, 0.4);
-      border-radius: 50%;
+  ::ng-deep .mdc-checkbox__background {
+    border-color: var(--olive-40) !important;
+    border-radius: 4px;
+  }
 
-      &.active {
-        background-color: white;
-      }
-    }
+  ::ng-deep .mdc-checkbox--selected .mdc-checkbox__background {
+    background-color: var(--olive) !important;
+    border-color: var(--olive) !important;
   }
 }
 
-.auth-right {
-  width: 40%;
-  background-color: $card-bg;
+.forgot-link {
+  font-size: 12px;
+  color: var(--olive-light);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+
+  &:hover { color: var(--mint); }
+}
+
+.server-error {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--danger);
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(192, 97, 74, 0.3);
+  border-radius: 6px;
+  background: rgba(192, 97, 74, 0.08);
+}
+
+.btn-primary {
+  height: 48px;
+  border-radius: 8px;
+  background: var(--olive);
+  color: var(--night);
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
-  border-top-left-radius: 32px;
-  border-bottom-left-radius: 32px;
-  margin-left: -32px; // Superposition
+  gap: 8px;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) { background: var(--olive-light); }
+  &:active:not(:disabled) { background: var(--olive-dark); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
-.login-page {
-  width: 100%;
+.btn-full { width: 100%; }
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(16, 33, 43, 0.3);
+  border-top-color: var(--night);
+  animation: spin 0.6s linear infinite;
 }
 
-.login-card {
-  max-width: 450px;
-  margin: auto;
-  box-shadow: none; // L'ombre n'est plus nécessaire
-  padding: 0; // Le padding est maintenant sur .auth-right
-
-  &__header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  &__title {
-    color: $text-color;
-    font-size: 1.875rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-  }
-
-  &__subtitle {
-    color: $text-secondary-color;
-    font-weight: 500;
-    line-height: 1.5;
-  }
-
-  &__actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-  }
-
-  &__footer {
-    margin-top: 1rem;
-    text-align: center;
-    color: $text-secondary-color;
-    font-weight: 500;
-    line-height: 1.5;
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.form-group {
-  margin-bottom: 1rem;
-
-  &__label {
-    display: block;
-    color: $text-color;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-  }
-
-  &__input {
-    width: 100%;
-    border-radius: $border-radius;
-  }
-
-  &__error {
-    color: $error-color;
-    display: block;
-    margin-top: 0.25rem;
-  }
-}
-
-.actions {
-  &__remember-me {
-    display: flex;
-    align-items: center;
-
-    label {
-      color: $text-color;
-      margin-left: 0.5rem;
-    }
-  }
-
-  &__link {
-    font-weight: 500;
-    text-decoration: none;
-    margin-left: 0.5rem;
-    color: $primary-color;
-    text-align: right;
-    cursor: pointer;
-  }
-}
-
-.footer__link {
+.footer-link {
+  color: var(--olive-light);
   font-weight: 500;
   text-decoration: none;
-  margin-left: 0.5rem;
-  color: $primary-color;
-  cursor: pointer;
-}
+  transition: color 0.2s;
 
-// Surcharges et styles pour les composants PrimeNG
-:host ::ng-deep {
-  .p-password-full,
-  .p-password-full .p-password-input {
-    width: 100%;
-    border-radius: $border-radius;
-  }
-
-  .p-button-full {
-    width: 100%;
-    border-radius: $border-radius;
-  }
+  &:hover { color: var(--mint); }
 }

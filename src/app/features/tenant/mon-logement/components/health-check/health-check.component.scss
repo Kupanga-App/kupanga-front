@@ -1,0 +1,62 @@
+@use 'tokens' as t;
+
+.health-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: t.$space-5;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+  border-radius: t.$radius;
+  padding: t.$space-4 t.$space-6;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &--warning {
+    border-color: var(--kp-warning-subtle);
+    background: var(--kp-warning-subtle);
+  }
+
+  &--critical {
+    border-color: var(--kp-danger-subtle);
+    background: var(--kp-danger-subtle);
+  }
+}
+
+.health-ic {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--kp-primary-on);
+
+  &--ok { background: var(--kp-primary); }
+  &--warning { background: var(--kp-warning); }
+  &--critical { background: var(--kp-danger); }
+}
+
+.health-body {
+  .health-title {
+    font-family: var(--kp-font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--kp-text-1);
+    letter-spacing: -0.01em;
+    em { font-style: italic; color: var(--kp-primary); }
+  }
+
+  .health-sub {
+    font-size: 13.5px;
+    color: var(--kp-text-3);
+    margin-top: 2px;
+  }
+}
+
+.health-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+  justify-content: flex-end;
+}

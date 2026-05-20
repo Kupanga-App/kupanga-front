@@ -1,0 +1,82 @@
+<div class="kp-conv-list">
+  <!-- Barre de recherche -->
+  <div class="kp-conv-search">
+    <div class="kp-search-input">
+      <mat-icon>search</mat-icon>
+      <input
+        [formControl]="searchControl"
+        placeholder="Rechercher un bien…"
+        class="kp-search-field"
+      />
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="kp-conv-filters">
+    <button
+      class="kp-conv-filter-btn"
+      [class.active]="filter() === 'all'"
+      (click)="setFilter('all')"
+    >
+      Tous
+    </button>
+    <button
+      class="kp-conv-filter-btn"
+      [class.active]="filter() === 'unread'"
+      (click)="setFilter('unread')"
+    >
+      Non lus
+    </button>
+  </div>
+
+  <!-- Liste -->
+  <div class="kp-conv-items">
+    @if (store.isLoadingConversations() && store.conversations().length === 0) {
+      <div class="kp-conv-loading">
+        <mat-spinner diameter="32" />
+      </div>
+    } @else if (store.conversations().length === 0) {
+      <div class="kp-conv-empty">
+        <mat-icon>inbox</mat-icon>
+        <p>Aucune conversation</p>
+      </div>
+    } @else {
+      @for (conv of store.conversations(); track conv.id) {
+        <div
+          class="kp-conv-item"
+          [class.active]="conv.id === selectedConvId"
+          (click)="select(conv)"
+          role="button"
+          [attr.aria-label]="'Conversation : ' + conv.bienTitre"
+        >
+          <div class="kp-conv-avatar">{{ interlocuteurInitiale(conv) }}</div>
+          <div class="kp-conv-body">
+            <div class="kp-conv-header">
+              <span class="kp-conv-name">{{ conv.bienTitre }}</span>
+              <span class="kp-conv-time">
+                {{ conv.lastMessageAt | date: 'HH:mm' }}
+              </span>
+            </div>
+            <div class="kp-conv-preview">
+              <span class="kp-conv-last">{{ conv.lastMessage }}</span>
+              @if (conv.nonLuCount > 0) {
+                <span class="kp-badge-count">{{ conv.nonLuCount }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (store.hasMorePages()) {
+        <div class="kp-conv-more">
+          <button mat-stroked-button (click)="loadMore()" [disabled]="store.isLoadingConversations()">
+            @if (store.isLoadingConversations()) {
+              <mat-spinner diameter="16" />
+            }
+            Voir plus
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>

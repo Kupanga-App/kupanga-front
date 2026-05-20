@@ -1,5 +1,10 @@
 <div class="db-layout">
-  <app-principal-nav-header [navItems]="navItems"></app-principal-nav-header>
+  @if (showNav()) {
+    <app-principal-nav-header></app-principal-nav-header>
+  }
+
+  <!-- Notifications WebSocket globales -->
+  <kp-chat-notification />
 
   <!-- Main Content Area -->
   <main class="db-container">

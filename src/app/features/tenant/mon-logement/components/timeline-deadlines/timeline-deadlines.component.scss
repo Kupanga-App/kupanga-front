@@ -1,0 +1,111 @@
+@use 'tokens' as t;
+
+.card {
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+  border-radius: t.$radius;
+  padding: t.$space-4 t.$space-5;
+}
+
+.card-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: t.$space-4;
+
+  .t {
+    font-family: var(--kp-font-display);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--kp-text-1);
+    em { font-style: italic; color: var(--kp-primary); }
+  }
+}
+
+.card-link {
+  font-family: var(--kp-font-mono);
+  font-size: 11.5px;
+  color: var(--kp-primary);
+  text-decoration: none;
+  &:hover { color: var(--kp-primary-hover); }
+}
+
+.timeline {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 27px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--kp-border);
+  }
+}
+
+.tl-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: t.$space-4;
+  align-items: center;
+  padding: 14px 0;
+
+  & + & { border-top: 1px solid var(--kp-border); }
+
+  .tl-marker {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    background: var(--kp-surface-2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+
+    .d {
+      font-family: var(--kp-font-display);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--kp-text-1);
+      line-height: 1;
+    }
+
+    .m {
+      font-family: var(--kp-font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--kp-text-3);
+    }
+  }
+
+  .tl-body {
+    .t { font-size: 14px; font-weight: 500; color: var(--kp-text-1); }
+    .s { font-size: 12.5px; color: var(--kp-text-3); margin-top: 2px; }
+  }
+
+  .tl-amount {
+    font-family: var(--kp-font-mono);
+    font-size: 14px;
+    color: var(--kp-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &--active {
+    .tl-marker {
+      background: var(--kp-primary);
+      .d, .m { color: var(--kp-primary-on); }
+    }
+  }
+
+  &--future {
+    .tl-marker {
+      background: transparent;
+      border: 1px dashed var(--kp-border-strong);
+      .d, .m { color: var(--kp-text-3); }
+    }
+  }
+}

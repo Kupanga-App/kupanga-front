@@ -1,0 +1,37 @@
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.step-counter,
+.step-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--olive-dark);
+}
+
+.step-label {
+  color: var(--olive);
+}
+
+.step-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 22px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--olive-25);
+  transition: background 0.2s;
+
+  &.active {
+    background: var(--olive);
+  }
+}

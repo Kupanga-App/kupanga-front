@@ -1,0 +1,21 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Mes compteurs</span>
+  </div>
+
+  @if (compteurs().length === 0) {
+    <p class="empty-hint">Aucun relevé disponible.</p>
+  }
+
+  <div class="meters-grid">
+    @for (c of compteurs(); track c.type) {
+      <div class="meter-tile">
+        <div class="meter-label">{{ c.libelle }}</div>
+        <div class="meter-value">
+          {{ c.valeur | number:'1.0-2':'fr' }}
+          <span class="meter-unit">{{ c.unite }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>

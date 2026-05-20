@@ -6,17 +6,25 @@ import { AuthService } from '../services/auth.service';
 import { AuthResponse } from '../models/auth-response.model';
 
 let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+let refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
-  const accessToken = authService.getAccessToken();
 
+  if (req.url.includes('/auth/refresh')) {
+    return next(req.clone({ withCredentials: true }));
+  }
+
+  const accessToken = authService.getAccessToken();
   if (accessToken && !req.url.endsWith('/register')) {
     req = addTokenToRequest(req, accessToken);
+  }
+
+  if (req.url.includes('/auth/login') || req.url.includes('/auth/logout')) {
+    return next(req.clone({ withCredentials: true }));
   }
 
   return next(req).pipe(
@@ -29,7 +37,7 @@ export const authInterceptor: HttpInterceptorFn = (
   );
 };
 
-function addTokenToRequest(request: HttpRequest<any>, token: string): HttpRequest<any> {
+function addTokenToRequest(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   return request.clone({
     setHeaders: {
       Authorization: `Bearer ${token}`
@@ -38,10 +46,10 @@ function addTokenToRequest(request: HttpRequest<any>, token: string): HttpReques
 }
 
 function handle401Error(
-  request: HttpRequest<any>,
+  request: HttpRequest<unknown>,
   next: HttpHandlerFn,
   authService: AuthService
-): Observable<HttpEvent<any>> {
+): Observable<HttpEvent<unknown>> {
   if (!isRefreshing) {
     isRefreshing = true;
     refreshTokenSubject.next(null);
@@ -54,18 +62,20 @@ function handle401Error(
       }),
       catchError((err) => {
         isRefreshing = false;
-        // Si le refresh token échoue (ex: 403), on déconnecte
-        authService.logout();
+        refreshTokenSubject.error(err);
+        refreshTokenSubject = new BehaviorSubject<string | null>(null);
+        authService.clearClientState();
         return throwError(() => err);
       })
     );
   } else {
-    // Si le rafraîchissement est déjà en cours, on attend le nouveau token
     return refreshTokenSubject.pipe(
-      filter(token => token != null),
+      filter((token): token is string => token !== null),
       take(1),
-      switchMap(jwt => {
-        return next(addTokenToRequest(request, jwt!));
+      switchMap(token => next(addTokenToRequest(request, token))),
+      catchError(err => {
+        authService.clearClientState();
+        return throwError(() => err);
       })
     );
   }

@@ -1,0 +1,19 @@
+// styles/_dark-theme.scss — overrides Material supplémentaires pour .kp-theme-dark
+
+.kp-theme-dark {
+  .mat-mdc-card {
+    --mdc-elevated-card-container-color: var(--kp-surface);
+    border-color: var(--kp-border);
+  }
+
+.mat-mdc-table {
+    --mat-table-background-color: var(--kp-surface);
+    --mat-table-row-item-label-text-color: var(--kp-text-1);
+    --mat-table-header-headline-color: var(--kp-text-2);
+    --mat-table-row-item-outline-color: var(--kp-border);
+  }
+
+  .mat-mdc-header-row {
+    background: var(--kp-surface-2);
+  }
+}

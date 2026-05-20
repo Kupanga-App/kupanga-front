@@ -1,0 +1,504 @@
+// styles/_material-theme.scss — Angular Material theming Kupanga (Night/Olive)
+@use '@angular/material' as mat;
+
+// === Palette primaire — Olive (map partagé) ===
+$_olive-map: (
+  50:  #F2F5EC,
+  100: #E0E9CB,
+  200: #CDDBA8,
+  300: #B5CA8D,
+  400: #A0B578,
+  500: #8FA464,
+  600: #7B8E56,
+  700: #6B7C4B,
+  800: #5A6840,
+  900: #4A5535,
+  contrast: (
+    50:  #10212B,
+    100: #10212B,
+    200: #10212B,
+    300: #10212B,
+    400: #10212B,
+    500: #10212B,
+    600: #EFFBDB,
+    700: #EFFBDB,
+    800: #EFFBDB,
+    900: #EFFBDB,
+  )
+);
+
+// Dark default: #8FA464 (500)
+$kupanga-primary: mat.m2-define-palette($_olive-map, 500, 700, 300);
+// Light mode: #6B7C4B (700) — meilleur contraste sur fond Mint
+$kupanga-primary-light: mat.m2-define-palette($_olive-map, 700, 900, 400);
+
+// Palette accent (Night surfaces)
+$kupanga-accent: mat.m2-define-palette((
+  50:  #E8EEF2,
+  100: #C5D4DF,
+  200: #9FBACB,
+  300: #7A9FB7,
+  400: #5A8FAF,
+  500: #3A7FA7,
+  600: #2C6A8F,
+  700: #1E5577,
+  800: #10212B,
+  900: #0A1A22,
+  A100: #7AACC8,
+  A200: #5A8FAF,
+  A400: #3A7FA7,
+  A700: #1E3545,
+  contrast: (
+    400: #EFFBDB,
+    500: #EFFBDB,
+    600: #EFFBDB,
+    700: #EFFBDB,
+    800: #EFFBDB,
+    900: #EFFBDB,
+    A700: #EFFBDB,
+  )
+), A200, A100, A400);
+
+// Palette warn (Danger #C0614A)
+$kupanga-warn: mat.m2-define-palette((
+  50:  #F9EAE7,
+  100: #F0CBC3,
+  200: #E6AA9E,
+  300: #DC8879,
+  400: #D47263,
+  500: #C0614A,
+  600: #B05542,
+  700: #9C4739,
+  800: #883A30,
+  900: #6E2822,
+  contrast: (
+    500: #EFFBDB,
+    600: #EFFBDB,
+    700: #EFFBDB,
+    800: #EFFBDB,
+    900: #EFFBDB,
+  )
+));
+
+// Thème Night (sombre par défaut)
+$kupanga-night-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: $kupanga-primary,
+    accent:  $kupanga-accent,
+    warn:    $kupanga-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'DM Sans, system-ui, sans-serif',
+  ),
+));
+
+@include mat.all-component-themes($kupanga-night-theme);
+
+// Thème clair via classe body
+$kupanga-light-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $kupanga-primary-light,
+    accent:  $kupanga-accent,
+    warn:    $kupanga-warn,
+  ),
+));
+
+.kp-theme-light {
+  @include mat.all-component-colors($kupanga-light-theme);
+}
+
+// =====================================================================
+// Angular Material 20 — tokens M3 système (--mat-sys-*)
+//
+// AM20 utilise des tokens M3 comme valeurs réelles et des --mdc-* comme
+// fallbacks. En liant --mat-sys-* à nos --kp-*, la cascade CSS propage
+// automatiquement les changements de thème (light/dark) sans redéclaration.
+// =====================================================================
+
+:root {
+  // --- Fond global ---
+  --mat-sys-background:                  var(--kp-bg);
+  --mat-sys-on-background:               var(--kp-text-1);
+
+  // --- Surfaces (cartes, dialogs, drawers, menus) ---
+  --mat-sys-surface:                     var(--kp-surface);
+  --mat-sys-surface-variant:             var(--kp-surface-2);
+  --mat-sys-surface-tint:                var(--kp-primary-subtle);
+  --mat-sys-surface-container-lowest:    var(--kp-bg);
+  --mat-sys-surface-container-low:       var(--kp-surface);
+  --mat-sys-surface-container:           var(--kp-surface-2);
+  --mat-sys-surface-container-high:      var(--kp-surface-3);
+  --mat-sys-surface-container-highest:   var(--kp-surface-3);
+  --mat-sys-on-surface:                  var(--kp-text-1);
+  --mat-sys-on-surface-variant:          var(--kp-text-2);
+
+  // --- Couleur primaire ---
+  --mat-sys-primary:                     var(--kp-primary);
+  --mat-sys-on-primary:                  var(--kp-primary-on);
+  --mat-sys-primary-container:           var(--kp-primary-subtle);
+  --mat-sys-on-primary-container:        var(--kp-text-1);
+  --mat-sys-inverse-primary:             var(--kp-primary-active);
+
+  // --- Secondaire (même valeur que primary dans Kupanga) ---
+  --mat-sys-secondary:                   var(--kp-primary);
+  --mat-sys-on-secondary:                var(--kp-primary-on);
+  --mat-sys-secondary-container:         var(--kp-primary-subtle);
+  --mat-sys-on-secondary-container:      var(--kp-text-1);
+
+  // --- Tertiaire / info ---
+  --mat-sys-tertiary:                    var(--kp-info);
+  --mat-sys-on-tertiary:                 var(--kp-text-invert);
+  --mat-sys-tertiary-container:          var(--kp-info-subtle);
+  --mat-sys-on-tertiary-container:       var(--kp-info-text);
+
+  // --- Erreur ---
+  --mat-sys-error:                       var(--kp-danger);
+  --mat-sys-on-error:                    var(--kp-text-invert);
+  --mat-sys-error-container:             var(--kp-danger-subtle);
+  --mat-sys-on-error-container:          var(--kp-danger-text);
+
+  // --- Contours / bordures ---
+  --mat-sys-outline:                     var(--kp-border-strong);
+  --mat-sys-outline-variant:             var(--kp-border);
+
+  // --- Border-radius ---
+  --mat-sys-corner-none:                 0;
+  --mat-sys-corner-extra-small:          var(--kp-radius-sm);
+  --mat-sys-corner-small:                var(--kp-radius-sm);
+  --mat-sys-corner-medium:               var(--kp-radius-md);
+  --mat-sys-corner-large:                var(--kp-radius-lg);
+  --mat-sys-corner-extra-large:          var(--kp-radius-xl);
+  --mat-sys-corner-full:                 var(--kp-radius-full);
+
+  // --- Élévation (style plat Kupanga) ---
+  --mat-sys-level0:                      none;
+  --mat-sys-level1:                      none;
+  --mat-sys-level2:                      none;
+  --mat-sys-level3:                      none;
+  --mat-sys-level4:                      none;
+  --mat-sys-level5:                      none;
+
+  // --- Shape boutons ---
+  --mdc-filled-button-container-shape:   var(--kp-radius-sm);
+  --mdc-outlined-button-container-shape: var(--kp-radius-sm);
+  --mdc-text-button-container-shape:     var(--kp-radius-sm);
+}
+
+// =====================================================================
+// Overrides composants — tokens M2/MDC (anciens) + M3/mat (nouveaux)
+// Les deux sets sont définis pour couvrir toutes les versions internes.
+// =====================================================================
+
+// --- Boutons texte primaire ---
+.mat-mdc-button.mat-primary {
+  --mdc-text-button-label-text-color: var(--kp-primary);
+  --mat-text-button-label-text-color: var(--kp-primary);
+  --mat-text-button-state-layer-color: var(--kp-primary);
+}
+
+// --- Boutons filled / raised ---
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color:  var(--kp-primary);
+  --mdc-filled-button-label-text-color: var(--kp-primary-on);
+  --mat-filled-button-container-color:  var(--kp-primary);
+  --mat-filled-button-label-text-color: var(--kp-primary-on);
+  --mat-filled-button-state-layer-color: var(--kp-primary-hover);
+  border-radius: var(--kp-radius-sm);
+}
+
+// --- Cards ---
+.mat-mdc-card {
+  // Tokens M3 (Angular Material 20)
+  --mat-card-elevated-container-color:   var(--kp-surface);
+  --mat-card-elevated-container-shape:   var(--kp-radius-md);
+  --mat-card-subtitle-text-color:        var(--kp-text-2);
+  // Tokens M2/MDC (fallback)
+  --mdc-elevated-card-container-color:   var(--kp-surface);
+  --mdc-elevated-card-container-shape:   var(--kp-radius-md);
+  border: 0.5px solid var(--kp-border);
+  box-shadow: none !important;
+}
+
+// --- Form fields (fill — Night / Olive / Mint) ────────────────────────────
+.mat-mdc-form-field {
+
+  // ── Hauteur ───────────────────────────────────────────────────────────────
+  --mat-form-field-container-height:            44px;
+
+  // ── Shape (border-radius — haut uniquement via token, bas via CSS) ────────
+  --mdc-filled-text-field-container-shape:      6px;
+
+  // ── Background ───────────────────────────────────────────────────────────
+  --mdc-filled-text-field-container-color:             #172C3A;
+  --mdc-filled-text-field-disabled-container-color:    rgba(23, 44, 58, 0.45);
+  --mat-form-field-filled-container-color:             #172C3A;
+
+  // ── Active indicator (bottom line) — supprimé ────────────────────────────
+  --mdc-filled-text-field-active-indicator-color:             transparent;
+  --mdc-filled-text-field-focus-active-indicator-color:       transparent;
+  --mdc-filled-text-field-hover-active-indicator-color:       transparent;
+  --mdc-filled-text-field-error-active-indicator-color:       transparent;
+  --mdc-filled-text-field-disabled-active-indicator-color:    transparent;
+
+  // ── Label — repos / hover / focus ────────────────────────────────────────
+  --mdc-filled-text-field-label-text-color:                #EFFBDB;
+  --mdc-filled-text-field-hover-label-text-color:          #EFFBDB;
+  --mdc-filled-text-field-focus-label-text-color:          #8FA464;
+  --mdc-filled-text-field-disabled-label-text-color:       rgba(239, 251, 219, 0.40);
+
+  // ── Label — état erreur ──────────────────────────────────────────────────
+  --mdc-filled-text-field-error-label-text-color:          #EFFBDB;
+  --mdc-filled-text-field-error-hover-label-text-color:    #EFFBDB;
+  --mdc-filled-text-field-error-focus-label-text-color:    #E48173;
+
+  // ── Typographie du label ─────────────────────────────────────────────────
+  --mdc-filled-text-field-label-text-font:                 'DM Sans', system-ui, sans-serif;
+  --mdc-filled-text-field-label-text-size:                 12px;
+  --mdc-filled-text-field-label-text-weight:               400;
+  --mdc-filled-text-field-label-text-tracking:             0.01em;
+
+  // ── Texte saisi ──────────────────────────────────────────────────────────
+  --mdc-filled-text-field-input-text-color:                #EFFBDB;
+  --mdc-filled-text-field-input-text-font:                 'DM Sans', system-ui, sans-serif;
+  --mdc-filled-text-field-input-text-size:                 15px;
+  --mdc-filled-text-field-input-text-weight:               400;
+  --mdc-filled-text-field-input-text-tracking:             0;
+  --mdc-filled-text-field-disabled-input-text-color:       rgba(239, 251, 219, 0.28);
+
+  // ── Placeholder ──────────────────────────────────────────────────────────
+  --mdc-filled-text-field-input-text-placeholder-color:    rgba(239, 251, 219, 0.28);
+
+  // ── Icônes leading / trailing ────────────────────────────────────────────
+  --mdc-filled-text-field-leading-icon-color:              rgba(239, 251, 219, 0.45);
+  --mdc-filled-text-field-focus-leading-icon-color:        #8FA464;
+  --mdc-filled-text-field-trailing-icon-color:             rgba(239, 251, 219, 0.45);
+  --mdc-filled-text-field-focus-trailing-icon-color:       #8FA464;
+  --mdc-filled-text-field-error-trailing-icon-color:       #E48173;
+  --mdc-filled-text-field-error-focus-trailing-icon-color: #E48173;
+
+  // ── Subscript (erreur / hint) ─────────────────────────────────────────────
+  --mat-form-field-error-text-color:                       #E48173;
+  --mat-form-field-hint-text-color:                        rgba(239, 251, 219, 0.35);
+  --mat-form-field-subscript-text-size:                    11px;
+  --mat-form-field-subscript-text-tracking:                0.01em;
+
+  // ── Tokens génériques hérités ─────────────────────────────────────────────
+  --mat-form-field-container-text-color:                   #EFFBDB;
+  --mat-form-field-label-text-color:                       #EFFBDB;
+  --mat-form-field-focused-label-text-color:               #8FA464;
+  --mat-form-field-disabled-input-text-placeholder-color:  rgba(239, 251, 219, 0.25);
+
+  // ── Supprime l'espace réservé subscript quand il est vide ────────────────
+  &:not(.mat-form-field-has-icon-suffix) .mat-mdc-form-field-subscript-wrapper {
+    margin-bottom: 0;
+  }
+}
+
+// Bordure visible + coins arrondis sur les 4 côtés (fill) ─────────────────────
+.mat-mdc-text-field-wrapper.mdc-text-field--filled {
+  border-radius: 10px;
+  border: 1px solid rgba(239, 251, 219, 0.14);
+  transition: border-color 150ms ease;
+
+  // Background — spécificité 0,3,0 pour surcharger la règle AM20 (0,2,0)
+  &:not(.mdc-text-field--disabled) {
+    background-color: #172C3A;
+    padding-right: 16px;
+  }
+
+  &:not(.mdc-text-field--disabled):hover {
+    border-color: rgba(239, 251, 219, 0.28);
+  }
+
+  &.mdc-text-field--focused {
+    border-color: #8FA464;
+  }
+
+  &.mdc-text-field--invalid {
+    border-color: rgba(228, 129, 115, 0.50);
+
+    &:not(.mdc-text-field--disabled):hover { border-color: rgba(228, 129, 115, 0.70); }
+    &.mdc-text-field--focused             { border-color: #E48173; }
+  }
+
+  &.mdc-text-field--disabled {
+    border-color: rgba(239, 251, 219, 0.06);
+    background-color: rgba(23, 44, 58, 0.50);
+  }
+}
+
+// Supprime la line-ripple (bottom underline) ──────────────────────────────────
+.mat-mdc-text-field-wrapper .mdc-line-ripple {
+  display: none;
+}
+
+// Astérisque requis — olive ───────────────────────────────────────────────────
+.mat-mdc-form-field-required-marker {
+  color: #8FA464;
+}
+
+// Caret & sélection de texte — olive
+.mat-mdc-form-field input,
+.mat-mdc-form-field textarea {
+  caret-color: #8FA464;
+
+  &::selection { background: rgba(143, 164, 100, 0.20); }
+}
+
+// Suffix / prefix textuels (€, mois, %)
+.mat-mdc-form-field .mat-mdc-form-field-text-suffix,
+.mat-mdc-form-field .mat-mdc-form-field-text-prefix {
+  color: rgba(239, 251, 219, 0.45);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+}
+
+// Textarea — désactive la hauteur fixe (le textarea doit s'étirer librement)
+.mat-mdc-form-field textarea.mat-mdc-input-element {
+  --mat-form-field-container-height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+// --- Dialogs ---
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color:          var(--kp-surface);
+  --mdc-dialog-container-shape:          var(--kp-radius-lg);
+  --mdc-dialog-subhead-color:            var(--kp-text-1);
+  --mdc-dialog-supporting-text-color:    var(--kp-text-2);
+  --mat-dialog-container-color:          var(--kp-surface);
+  --mat-dialog-container-shape:          var(--kp-radius-lg);
+}
+
+// --- Sidenav ---
+.mat-sidenav {
+  --mat-sidenav-container-background-color: var(--kp-surface-2);
+  --mat-sidenav-container-shape:            0;
+  border-right: 0.5px solid var(--kp-border) !important;
+}
+
+// --- Chips ---
+.mat-mdc-chip {
+  --mdc-chip-container-shape-radius:    var(--kp-radius-full);
+  --mdc-chip-elevated-container-color:  var(--kp-surface-2);
+  --mdc-chip-label-text-color:          var(--kp-text-1);
+  --mdc-chip-label-text-size:           11px;
+  --mdc-chip-label-text-weight:         500;
+}
+
+// --- Tables ---
+.mat-mdc-table {
+  --mat-table-background-color:          var(--kp-surface);
+  --mat-table-header-headline-color:     var(--kp-text-2);
+  --mat-table-header-headline-size:      12px;
+  --mat-table-header-headline-weight:    500;
+  --mat-table-row-item-label-text-color: var(--kp-text-1);
+  --mat-table-row-item-outline-color:    var(--kp-border);
+}
+
+.mat-mdc-header-row {
+  background: var(--kp-surface-2);
+}
+
+// --- Tabs ---
+.mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color:     var(--kp-primary);
+  --mat-tab-header-active-label-text-color:       var(--kp-primary);
+  --mat-tab-header-inactive-label-text-color:     var(--kp-text-2);
+  --mat-tab-header-active-focus-label-text-color: var(--kp-primary);
+  --mat-tab-header-active-hover-label-text-color: var(--kp-primary-hover);
+}
+
+// --- Select ───────────────────────────────────────────────────────────────
+.mat-mdc-select {
+  --mat-select-trigger-text-color:           #EFFBDB;
+  --mat-select-trigger-text-font:            'DM Sans', system-ui, sans-serif;
+  --mat-select-trigger-text-size:            14px;
+  --mat-select-trigger-text-weight:          400;
+  --mat-select-placeholder-text-color:       rgba(239, 251, 219, 0.32);
+  --mat-select-enabled-arrow-color:          rgba(239, 251, 219, 0.52);
+  --mat-select-focused-arrow-color:          #8FA464;
+  --mat-select-invalid-arrow-color:          #E48173;
+  --mat-select-disabled-arrow-color:         rgba(239, 251, 219, 0.28);
+  --mat-select-disabled-trigger-text-color:  rgba(239, 251, 219, 0.28);
+}
+
+// Options du panel select / autocomplete
+.mat-mdc-option {
+  --mat-option-label-text-color:                        #EFFBDB;
+  --mat-option-label-text-font:                         'DM Sans', system-ui, sans-serif;
+  --mat-option-label-text-size:                         14px;
+  --mat-option-label-text-weight:                       400;
+  --mat-option-selected-state-label-text-color:         #8FA464;
+  --mat-option-hover-state-layer-color:                 rgba(143, 164, 100, 0.10);
+  --mat-option-focus-state-layer-color:                 rgba(143, 164, 100, 0.10);
+  --mat-option-selected-state-layer-color:              rgba(143, 164, 100, 0.12);
+}
+
+// Panel déroulant
+.mat-mdc-autocomplete-panel,
+.mat-mdc-select-panel {
+  background: #1E3545 !important;
+  border: 1px solid rgba(239, 251, 219, 0.13) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6) !important;
+}
+
+// --- Datepicker toggle ────────────────────────────────────────────────────
+.mat-datepicker-toggle {
+  --mat-datepicker-toggle-icon-color: rgba(239, 251, 219, 0.52);
+
+  &:hover { --mat-datepicker-toggle-icon-color: #8FA464; }
+  .mat-mdc-icon-button:focus { --mat-datepicker-toggle-icon-color: #8FA464; }
+}
+
+// Calendrier popup
+.mat-datepicker-content {
+  background: #1E3545;
+  border: 1px solid rgba(239, 251, 219, 0.13);
+  border-radius: 14px;
+  box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.6);
+
+  --mat-datepicker-calendar-date-text-color:             #EFFBDB;
+  --mat-datepicker-calendar-date-hover-state-background-color: rgba(143, 164, 100, 0.12);
+  --mat-datepicker-calendar-date-selected-state-background-color: #8FA464;
+  --mat-datepicker-calendar-date-selected-state-text-color: #10212B;
+  --mat-datepicker-calendar-date-today-outline-color:    rgba(143, 164, 100, 0.50);
+  --mat-datepicker-calendar-date-today-selected-state-outline-color: #8FA464;
+  --mat-datepicker-calendar-header-text-color:           rgba(239, 251, 219, 0.62);
+  --mat-datepicker-calendar-navigation-button-icon-color: rgba(239, 251, 219, 0.62);
+  --mat-datepicker-calendar-period-button-text-color:    #EFFBDB;
+  --mat-datepicker-calendar-period-button-icon-color:    rgba(239, 251, 219, 0.62);
+}
+
+// --- Menu ---
+.mat-mdc-menu-panel {
+  --mat-menu-container-color:            var(--kp-surface);
+  --mat-menu-container-shape:            var(--kp-radius-md);
+  --mat-menu-item-label-text-color:      var(--kp-text-1);
+  --mat-menu-item-icon-color:            var(--kp-text-2);
+  --mat-menu-item-hover-state-layer-color: var(--kp-primary-subtle);
+  border: 0.5px solid var(--kp-border);
+  box-shadow: none !important;
+}
+
+// --- Snackbar ---
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color:        var(--kp-surface-3);
+  --mdc-snackbar-supporting-text-color:  var(--kp-text-1);
+  --mat-snack-bar-button-color:          var(--kp-primary);
+}
+
+// =====================================================================
+// Helpers formulaires globaux
+// =====================================================================
+
+.form-field-full {
+  width: 100%;
+  display: block;
+}
+
+.btn-full {
+  width: 100%;
+}

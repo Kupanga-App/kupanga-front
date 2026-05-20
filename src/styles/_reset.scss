@@ -1,0 +1,19 @@
+// styles/_reset.scss — reset minimal Kupanga
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  font-family: var(--kp-font);
+  background-color: var(--kp-bg);
+  color: var(--kp-text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

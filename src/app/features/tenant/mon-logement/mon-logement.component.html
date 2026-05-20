@@ -1,0 +1,138 @@
+<!-- État : aucun logement assigné (affiché seulement après confirmation, pas pendant le chargement) -->
+@if (!svc.loading() && !svc.aBienAssigne()) {
+  <div class="no-property">
+    <div class="no-property-icon">
+      <kp-icon name="home" [size]="40" />
+    </div>
+    <h2 class="no-property-title">Aucun logement assigné</h2>
+    <p class="no-property-sub">
+      Votre propriétaire doit vous assigner un logement pour que cette page soit disponible.
+    </p>
+  </div>
+}
+
+<!-- Logement disponible -->
+@if (svc.aBienAssigne() && svc.data(); as d) {
+  <div class="page">
+
+    <!-- Héro photos -->
+    <kp-home-hero
+      [photos]="d.bien.photos"
+      [totalCount]="d.bien.photos.length"
+    />
+
+    <!-- En-tête de bienvenue -->
+    <div class="welcome">
+      <div class="welcome-left">
+        <div class="eyebrow">
+          <kp-icon name="home" [size]="13" />
+          Mon logement
+        </div>
+        <h1 class="welcome-h1">
+          Bienvenue chez <em>vous, {{ d.locataire.prenom }}.</em>
+        </h1>
+        <p class="welcome-meta-text">
+          {{ d.bien.adresse }} · {{ d.bien.surface }} m² · {{ d.bien.nbPieces }} pièce{{ d.bien.nbPieces > 1 ? 's' : '' }} ·
+          {{ d.bien.type }} · {{ d.bien.nomProprietaire }}
+        </p>
+      </div>
+      <div class="welcome-right">
+        <div class="welcome-info">
+          <kp-icon name="calendar" [size]="13" />
+          Locataire depuis le <strong>{{ d.contrat.dateDebut | date:'d MMMM yyyy':'':'fr' }}</strong>
+        </div>
+        <div class="welcome-info">
+          <kp-icon name="clock" [size]="13" />
+          <strong>{{ d.contrat.dureeTotale - d.contrat.moisEcoules }} mois</strong> restants
+        </div>
+        <kp-tag-pill variant="olive">BAIL ACTIF</kp-tag-pill>
+      </div>
+    </div>
+
+    <!-- Bilan statuts -->
+    <kp-health-check [statuts]="d.statuts" />
+
+    <!-- KPIs -->
+    <kp-kpi-strip [kpis]="d.kpis" />
+
+    <!-- Grille principale -->
+    <div class="body-grid">
+
+      <!-- Colonne principale -->
+      <div class="body-main">
+
+        <!-- Prochain loyer -->
+        <kp-next-rent
+          [montant]="d.prochainLoyer.montant"
+          [dateEcheance]="d.prochainLoyer.dateEcheance"
+          (payerMaintenant)="onPayerMaintenant()"
+        />
+
+        <!-- Échéances — en cours de développement -->
+        <div class="coming-soon-card">
+          <div class="cs-ic"><kp-icon name="calendar-clock" [size]="18" /></div>
+          <div class="cs-body">
+            <div class="cs-title">Échéances à venir</div>
+            <div class="cs-sub">Cette fonctionnalité est en cours de développement.</div>
+          </div>
+          <span class="cs-badge">Bientôt disponible</span>
+        </div>
+
+        <!-- Quittances -->
+        <kp-receipt-list [quittances]="d.quittances" />
+
+        <!-- Incidents — en cours de développement -->
+        <div class="coming-soon-card">
+          <div class="cs-ic"><kp-icon name="alert-circle" [size]="18" /></div>
+          <div class="cs-body">
+            <div class="cs-title">Mes demandes & incidents</div>
+            <div class="cs-sub">Le suivi des incidents sera disponible prochainement.</div>
+          </div>
+          <span class="cs-badge">Bientôt disponible</span>
+        </div>
+
+        <!-- Maintenance — en cours de développement -->
+        <div class="coming-soon-card">
+          <div class="cs-ic"><kp-icon name="wrench" [size]="18" /></div>
+          <div class="cs-body">
+            <div class="cs-title">Maintenance & visites</div>
+            <div class="cs-sub">Les visites et interventions planifiées seront visibles ici.</div>
+          </div>
+          <span class="cs-badge">Bientôt disponible</span>
+        </div>
+
+      </div>
+
+      <!-- Colonne latérale -->
+      <div class="body-side">
+
+        <kp-owner-card
+          [proprietaire]="d.proprietaire"
+          (envoyerMessage)="onEnvoyerMessage()"
+        />
+
+        <!-- Alertes — en cours de développement -->
+        <div class="coming-soon-card">
+          <div class="cs-ic"><kp-icon name="bell" [size]="18" /></div>
+          <div class="cs-body">
+            <div class="cs-title">Rappels & alertes</div>
+            <div class="cs-sub">Les rappels personnalisés arrivent bientôt.</div>
+          </div>
+          <span class="cs-badge">Bientôt disponible</span>
+        </div>
+
+        <kp-quick-actions
+          [actions]="svc.actionsRapides"
+          (actionCliquee)="onAction($event)"
+        />
+
+        <kp-lease-card [contrat]="d.contrat" />
+
+        <kp-meter-card [compteurs]="d.compteurs" />
+
+      </div>
+
+    </div>
+
+  </div>
+}

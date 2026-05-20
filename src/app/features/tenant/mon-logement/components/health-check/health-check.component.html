@@ -1,0 +1,24 @@
+<div class="health-card" [class]="'health-card--' + etatGlobal()">
+  <div class="health-ic" [class]="'health-ic--' + etatGlobal()">
+    <kp-icon [name]="iconName()" [size]="24" [strokeWidth]="2" />
+  </div>
+
+  <div class="health-body">
+    <div class="health-title">
+      {{ titre().prefix }} <em>{{ titre().em }}</em>
+    </div>
+    <div class="health-sub">
+      @switch (etatGlobal()) {
+        @case ('ok') { Votre dossier est complet et à jour. }
+        @case ('warning') { Vérifiez les points en attente ci-dessous. }
+        @case ('critical') { Une action urgente est nécessaire. }
+      }
+    </div>
+  </div>
+
+  <div class="health-chips">
+    @for (item of statuts(); track item.label) {
+      <kp-status-mini [variant]="varianteStatut(item.statut)">{{ item.label }}</kp-status-mini>
+    }
+  </div>
+</div>

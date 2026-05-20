@@ -1,0 +1,79 @@
+@if (isOpen) {
+  <div class="avatar-canvas" role="dialog" aria-modal="true" aria-label="Sélecteur d'avatar">
+    <!-- TOP MASTHEAD -->
+    <div class="masthead-top">
+      <kp-auth-logo size="md" [showSub]="true" />
+      <div class="masthead-meta">
+        <span class="signature">N° 0006</span>
+        <span class="masthead-sep">·</span>
+        <span class="signature">{{ today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) }}</span>
+        <span class="masthead-sep">·</span>
+        <span class="signature">Paris · <strong>FR</strong></span>
+      </div>
+    </div>
+
+    <!-- ZONE CENTRALE -->
+    <div class="avatar-body">
+      <!-- ÉDITORIAL GAUCHE -->
+      <div class="editorial">
+        <div class="editorial-top">
+          <div class="eyebrow">Galerie · Avatars illustrés</div>
+          <h1 class="hero-serif"><em>Vous</em>,<br>en image.</h1>
+          <p class="subhero">« Choisissez l'avatar qui vous représente le mieux. Vous pourrez le modifier à tout moment depuis votre profil. »</p>
+        </div>
+        <div class="signature editorial-sig">14 portraits · style illustré · réf. KP-AVATAR-2026</div>
+      </div>
+
+      <!-- PANNEAU DROIT -->
+      <div class="panel" role="document">
+        <div class="panel-header">
+          <div>
+            <div class="eyebrow panel-eyebrow">Galerie · Avatars illustrés</div>
+            <h2>Choisissez votre portrait.</h2>
+          </div>
+          @if (picked()) {
+            <img class="preview-circle" [src]="picked()" alt="Avatar sélectionné" />
+          }
+        </div>
+
+        <div class="avatar-grid" role="radiogroup" aria-label="Avatars">
+          @for (url of avatars(); track url) {
+            <kp-avatar-tile
+              [url]="url"
+              [selected]="url === picked()"
+              [size]="66"
+              (picked)="select(url)"
+            />
+          }
+        </div>
+
+        <div class="panel-sep"></div>
+
+        <div class="panel-actions">
+          <button type="button" class="btn-ghost" (click)="cancel()" aria-label="Fermer">
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="confirm()"
+            [disabled]="!picked()"
+          >
+            Valider
+            <lucide-icon [img]="Check" [size]="14" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM MASTHEAD -->
+    <div class="masthead-bottom">
+      <div class="masthead-links">
+        <a href="#" class="signature">Aide</a>
+        <a href="#" class="signature">Confidentialité</a>
+        <a href="#" class="signature">Conditions d'usage</a>
+      </div>
+      <span class="signature"><strong>Kupanga</strong> · Gestion locative tout-en-un · <strong>v3.2</strong></span>
+    </div>
+  </div>
+}

@@ -1,0 +1,31 @@
+@use 'tokens' as t;
+
+.paper {
+  background: t.$mint;
+  color: t.$night;
+  border-radius: t.$radius-lg;
+  padding: 36px 40px;
+  box-shadow:
+    0 30px 80px -30px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(143, 164, 100, 0.2);
+  position: sticky;
+  top: 144px;
+  font-family: t.$font-serif;
+  min-height: 580px;
+  overflow: hidden;
+  //position: relative;
+}
+
+.preview-tag {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: t.$font-mono;
+  font-size: t.$text-tiny;
+  background: t.$olive-dark;
+  color: t.$mint;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

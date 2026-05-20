@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kupanga — Mon logement (vue locataire)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --night: #10212B; --night-mid: #1E3545; --night-soft: #172C3A; --night-deep: #0B181F;
+    --olive: #8FA464; --olive-light: #B5CA8D; --olive-dark: #6B7C4B;
+    --olive-bg: rgba(143,164,100,.10); --olive-bg-2: rgba(143,164,100,.18); --olive-line: rgba(143,164,100,.32);
+    --mint: #EFFBDB;
+    --mint-soft: rgba(239,251,219,.85); --mint-mute: rgba(239,251,219,.62);
+    --mint-dim: rgba(239,251,219,.40); --mint-fade: rgba(239,251,219,.20);
+    --border: rgba(239,251,219,.08); --border-2: rgba(239,251,219,.14);
+    --amber: #E8B962; --amber-bg: rgba(232,185,98,.12);
+    --red: #E48173; --red-bg: rgba(228,129,115,.12);
+    --r-sm: 8px; --r: 12px; --r-lg: 16px; --r-xl: 24px;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans:  'DM Sans', system-ui, sans-serif;
+    --mono:  'DM Mono', monospace;
+    font-family: var(--sans); font-size: 14px; color: var(--mint);
+  }
+  html, body { background: var(--night); min-height: 100vh; }
+  body { padding-bottom: 80px; }
+
+  .icon { width:18px; height:18px; flex-shrink:0; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+  .icon.sm { width:14px; height:14px; }
+  .icon.md { width:16px; height:16px; }
+  .icon.lg { width:22px; height:22px; }
+  .icon.xl { width:28px; height:28px; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .serif { font-family: var(--serif); }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    height: 64px; background: var(--night); border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 220px 1fr 220px;
+    align-items: center; padding: 0 32px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer; }
+  .logo .ku { color: var(--mint); }
+  .logo .panga { color: var(--olive); }
+  .search { max-width: 540px; width: 100%; margin: 0 auto; height: 40px;
+    background: var(--night-mid); border: 1px solid var(--border); border-radius: 100px;
+    display: flex; align-items: center; padding: 0 18px; gap: 10px; color: var(--mint-mute); }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--mint); font-family: var(--sans); font-size: 13.5px; }
+  .search input::placeholder { color: var(--mint-dim); }
+  .kbd { font-family: var(--mono); font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(239,251,219,.05); border: 1px solid var(--border); color: var(--mint-mute); }
+  .topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--mint-mute); cursor: pointer; border: none; background: transparent; position: relative; }
+  .icon-btn:hover { color: var(--mint); background: rgba(239,251,219,.05); }
+  .icon-btn .dot { position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); border: 2px solid var(--night); }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--olive-bg-2); color: var(--olive-light); display: grid; place-items: center; font-size: 12px; font-weight: 600; border: 1px solid var(--olive-line); }
+
+  /* ─── SUBNAV (tenant version) ─── */
+  .subnav {
+    height: 56px; background: var(--night); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 32px;
+    position: sticky; top: 64px; z-index: 99;
+  }
+  .subnav-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 16px; border-radius: 8px;
+    color: var(--mint-mute); font-size: 13.5px; font-weight: 500; cursor: pointer;
+  }
+  .subnav-item:hover { color: var(--mint); background: rgba(239,251,219,.04); }
+  .subnav-item.active { color: var(--olive); }
+
+  /* ─── PAGE WRAP ─── */
+  .page { max-width: 1320px; margin: 24px auto 0; padding: 0 32px; }
+
+  /* ─── HERO (Mon logement) ─── */
+  .home-hero {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    height: 360px;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    padding: 4px;
+    background: var(--night-mid);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .home-hero .ph { background: var(--night-soft); overflow: hidden; position: relative; border-radius: 4px; cursor: pointer; }
+  .home-hero .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+  .home-hero .ph:hover img { transform: scale(1.04); }
+  .home-hero .ph:nth-child(1) { grid-row: 1/3; border-radius: 20px 4px 4px 20px; }
+  .home-hero .ph:nth-child(1) img { border-radius: 20px 4px 4px 20px; }
+  .home-hero .ph:nth-child(3) { border-radius: 4px 20px 4px 4px; }
+  .home-hero .ph:nth-child(3) img { border-radius: 4px 20px 4px 4px; }
+  .home-hero .ph:nth-child(5) { border-radius: 4px 4px 20px 4px; }
+  .home-hero .ph:nth-child(5) img { border-radius: 4px 4px 20px 4px; }
+  .photos-btn {
+    position: absolute; bottom: 18px; right: 18px;
+    background: rgba(16,33,43,.85); backdrop-filter: blur(8px);
+    border: 1px solid var(--border-2); color: var(--mint);
+    padding: 9px 16px; border-radius: 100px; font-size: 13px; font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px; z-index: 2;
+  }
+
+  /* welcome bar */
+  .welcome {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: flex-end;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .welcome .eyebrow {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+    color: var(--olive); text-transform: uppercase; margin-bottom: 12px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .welcome h1 {
+    font-family: var(--serif); font-size: 48px; line-height: 1.05;
+    letter-spacing: -0.025em; color: var(--mint);
+  }
+  .welcome h1 em { font-style: italic; color: var(--olive); }
+  .welcome p {
+    color: var(--mint-mute); font-size: 15px; line-height: 1.55;
+    margin-top: 12px; max-width: 580px;
+  }
+  .welcome-meta {
+    text-align: right;
+    color: var(--mint-mute);
+    font-size: 13px; line-height: 1.7;
+  }
+  .welcome-meta b { color: var(--mint); font-weight: 500; }
+  .welcome-meta .key {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .welcome-meta .icon { color: var(--olive); }
+
+  /* tag pill (preserved) */
+  .tag-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px;
+    background: var(--olive-bg); border: 1px solid var(--olive-line); color: var(--olive-light);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--olive); }
+  .tag-pill.amber { background: var(--amber-bg); border-color: rgba(232,185,98,.32); color: var(--amber); }
+  .tag-pill.amber .dot { background: var(--amber); }
+  .tag-pill.red { background: var(--red-bg); border-color: rgba(228,129,115,.32); color: var(--red); }
+  .tag-pill.red .dot { background: var(--red); }
+  .tag-pill.mint { background: rgba(239,251,219,.06); border-color: var(--border-2); color: var(--mint); }
+  .tag-pill.mint .dot { background: var(--mint); }
+
+  /* ─── HEALTH CHECK (status bar) ─── */
+  .health {
+    margin-top: 32px;
+    background: var(--night-mid);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 22px 28px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  .health-ic {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: var(--olive); color: var(--night);
+    display: grid; place-items: center;
+  }
+  .health-body .t {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--mint);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .health-body .t em { font-style: italic; color: var(--olive); }
+  .health-body .s {
+    font-size: 13.5px; color: var(--mint-mute);
+    line-height: 1.5;
+  }
+  .health-chips {
+    display: flex; gap: 8px;
+  }
+
+  /* ─── KPI STRIP ─── */
+  .kpis {
+    margin-top: 24px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .kpi {
+    background: var(--night-mid); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 18px 20px;
+  }
+  .kpi-lbl {
+    font-size: 11.5px; color: var(--mint-mute); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .kpi-lbl .icon { color: var(--olive); }
+  .kpi-val {
+    font-family: var(--serif); font-size: 26px; line-height: 1.1;
+    letter-spacing: -0.01em; color: var(--mint);
+    display: flex; align-items: baseline; gap: 4px;
+  }
+  .kpi-val .u {
+    font-family: var(--sans); font-size: 13px; color: var(--mint-mute); font-weight: 400;
+  }
+  .kpi-foot {
+    font-family: var(--mono); font-size: 11px; color: var(--mint-mute);
+    margin-top: 6px;
+  }
+  .kpi-foot.olive { color: var(--olive); }
+  .kpi-foot.amber { color: var(--amber); }
+  .kpi-foot.red   { color: var(--red); }
+
+  /* ─── BODY GRID ─── */
+  .body-grid {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+  }
+  .body-main { min-width: 0; }
+  .body-side { position: relative; }
+
+  /* card */
+  .card {
+    background: var(--night-mid);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 26px 28px;
+    margin-bottom: 16px;
+  }
+  .card-h {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-h .t {
+    font-family: var(--serif); font-size: 22px; color: var(--mint);
+    letter-spacing: -0.01em; line-height: 1.1;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-h .t em { font-style: italic; color: var(--olive); }
+  .card-h .badge {
+    font-family: var(--mono); font-size: 11px;
+    padding: 3px 8px; border-radius: 6px;
+    background: rgba(239,251,219,.05); color: var(--mint-mute);
+    border: 1px solid var(--border);
+  }
+  .card-h .a {
+    font-size: 13px; color: var(--olive); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .card-h .a:hover { color: var(--olive-light); }
+  .body-side .card { padding: 22px 24px; }
+
+  /* ─── PROCHAIN LOYER (Hero featured) ─── */
+  .next-rent {
+    background: linear-gradient(135deg, var(--olive-bg) 0%, var(--olive-bg-2) 100%);
+    border: 1px solid var(--olive-line);
+    border-radius: var(--r-lg);
+    padding: 28px 32px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 28px; align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .next-rent::before {
+    content: ""; position: absolute; top: -40%; right: -10%;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, var(--olive) 0%, transparent 70%);
+    opacity: 0.18; pointer-events: none;
+  }
+  .next-rent .eyebrow {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+    color: var(--olive); text-transform: uppercase; margin-bottom: 10px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .next-rent .t {
+    font-family: var(--serif); font-size: 32px; line-height: 1.05;
+    color: var(--mint); letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .next-rent .s {
+    color: var(--mint-mute); font-size: 14px; line-height: 1.5;
+  }
+  .next-rent .right {
+    text-align: right;
+    z-index: 1; position: relative;
+  }
+  .next-rent .right .amount {
+    font-family: var(--serif); font-size: 44px;
+    color: var(--mint); line-height: 1;
+    letter-spacing: -0.02em;
+    display: flex; align-items: baseline; gap: 4px;
+    justify-content: flex-end;
+  }
+  .next-rent .right .amount .u { font-size: 18px; color: var(--mint-mute); }
+  .next-rent .right .ctas {
+    margin-top: 14px;
+    display: flex; gap: 8px;
+    justify-content: flex-end;
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    height: 38px; padding: 0 16px; border-radius: 9px;
+    border: 1px solid var(--border-2); background: transparent;
+    color: var(--mint); font-family: var(--sans); font-size: 13.5px; font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all .15s;
+  }
+  .btn:hover { background: rgba(239,251,219,.04); border-color: var(--mint-mute); }
+  .btn.primary {
+    background: var(--olive); border-color: var(--olive); color: var(--night); font-weight: 600;
+  }
+  .btn.primary:hover { background: var(--olive-light); border-color: var(--olive-light); }
+  .btn.ghost { border-color: transparent; color: var(--mint-mute); }
+  .btn.ghost:hover { color: var(--mint); background: rgba(239,251,219,.04); }
+  .btn.sm { height: 30px; padding: 0 12px; font-size: 12.5px; }
+  .btn.lg { height: 44px; padding: 0 22px; font-size: 14px; }
+
+  /* ─── TIMELINE — Échéances ─── */
+  .timeline {
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .timeline::before {
+    content: ""; position: absolute;
+    left: 27px; top: 24px; bottom: 24px;
+    width: 1px; background: var(--border);
+  }
+  .tl-item {
+    display: grid; grid-template-columns: 56px 1fr auto;
+    gap: 16px; align-items: flex-start;
+    padding: 14px 0;
+    position: relative;
+  }
+  .tl-marker {
+    width: 56px; flex-shrink: 0;
+    text-align: center;
+    font-family: var(--mono);
+    background: var(--night-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px 0;
+    z-index: 1;
+    position: relative;
+  }
+  .tl-marker .d {
+    font-family: var(--serif); font-size: 20px;
+    color: var(--mint); line-height: 1;
+  }
+  .tl-marker .m {
+    font-size: 10px; color: var(--mint-mute);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+  .tl-item.active .tl-marker {
+    background: var(--olive); border-color: var(--olive);
+  }
+  .tl-item.active .tl-marker .d { color: var(--night); }
+  .tl-item.active .tl-marker .m { color: rgba(16,33,43,.7); }
+  .tl-body { padding-top: 6px; }
+  .tl-body .t { font-size: 14px; font-weight: 500; color: var(--mint); }
+  .tl-body .s { font-size: 12.5px; color: var(--mint-mute); margin-top: 3px; line-height: 1.45; }
+  .tl-amount {
+    font-family: var(--mono); font-size: 14px; color: var(--mint);
+    align-self: center;
+    font-weight: 500;
+  }
+  .tl-item.future .tl-marker {
+    border-style: dashed; background: transparent;
+  }
+  .tl-item.future .tl-marker .d { color: var(--mint-mute); }
+  .tl-item.future .tl-body .t { color: var(--mint-mute); }
+
+  /* ─── QUITTANCE ROWS ─── */
+  .receipts { display: flex; flex-direction: column; gap: 8px; }
+  .receipt-row {
+    display: grid;
+    grid-template-columns: 52px 1fr auto auto;
+    gap: 16px; align-items: center;
+    padding: 12px 14px;
+    background: var(--night-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .receipt-row:hover { border-color: var(--olive-line); background: var(--night-mid); }
+  .receipt-row .month-tag {
+    width: 52px;
+    background: var(--olive-bg);
+    border: 1px solid var(--olive-line);
+    border-radius: 8px;
+    padding: 6px 0;
+    text-align: center;
+  }
+  .receipt-row .month-tag .m {
+    font-family: var(--serif); font-size: 16px; color: var(--mint); line-height: 1;
+  }
+  .receipt-row .month-tag .y {
+    font-family: var(--mono); font-size: 10px; color: var(--mint-mute); margin-top: 2px;
+  }
+  .receipt-row .body .t {
+    font-size: 13.5px; color: var(--mint); font-weight: 500;
+  }
+  .receipt-row .body .s {
+    font-size: 11.5px; color: var(--mint-mute); font-family: var(--mono); margin-top: 2px;
+  }
+  .receipt-row .amt {
+    font-family: var(--mono); font-size: 14px; color: var(--mint); font-weight: 500;
+  }
+  .receipt-row .dl {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--mint-mute); cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .receipt-row:hover .dl { color: var(--olive); border-color: var(--olive-line); }
+
+  /* ─── INCIDENTS ─── */
+  .incidents { display: flex; flex-direction: column; gap: 10px; }
+  .incident {
+    background: var(--night-soft); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px;
+    display: grid; grid-template-columns: 40px 1fr auto;
+    gap: 16px; align-items: center;
+    cursor: pointer;
+  }
+  .incident:hover { border-color: var(--border-2); background: var(--night-mid); }
+  .incident .ic {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--olive-bg); color: var(--olive);
+    display: grid; place-items: center;
+  }
+  .incident.amber .ic { background: var(--amber-bg); color: var(--amber); }
+  .incident .body .t { font-size: 14px; color: var(--mint); font-weight: 500; }
+  .incident .body .s { font-size: 12px; color: var(--mint-mute); margin-top: 3px; line-height: 1.45; }
+  .incident .body .meta {
+    margin-top: 6px;
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 10.5px; color: var(--mint-mute);
+  }
+  .incident .body .meta .dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--mint-fade);
+  }
+  .status-mini {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 10.5px;
+    padding: 4px 9px; border-radius: 100px;
+    background: var(--olive-bg); color: var(--olive-light);
+    border: 1px solid var(--olive-line);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .status-mini .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--olive); }
+  .status-mini.amber { background: var(--amber-bg); color: var(--amber); border-color: rgba(232,185,98,.32); }
+  .status-mini.amber .dot { background: var(--amber); }
+
+  /* ─── COLOC ─── */
+  .coloc-list { display: flex; flex-direction: column; gap: 10px; }
+  .coloc-row {
+    display: grid; grid-template-columns: 44px 1fr auto;
+    gap: 14px; align-items: center;
+    padding: 12px 14px;
+    background: var(--night-soft); border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .coloc-row .av {
+    width: 44px; height: 44px; border-radius: 50%;
+    overflow: hidden; background: var(--olive-bg);
+  }
+  .coloc-row .av img { width: 100%; height: 100%; object-fit: cover; }
+  .coloc-row .body .t { font-family: var(--serif); font-size: 16px; color: var(--mint); line-height: 1.1; }
+  .coloc-row .body .s { font-size: 12px; color: var(--mint-mute); margin-top: 3px; }
+  .coloc-row .part {
+    font-family: var(--mono); font-size: 14px; color: var(--mint);
+    text-align: right;
+  }
+  .coloc-row .part .lbl { font-size: 10.5px; color: var(--mint-mute); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+  /* ─── SIDE — Owner mini ─── */
+  .owner-mini {
+    display: grid; grid-template-columns: 48px 1fr auto;
+    gap: 12px; align-items: center;
+    padding: 14px;
+    background: var(--night-soft); border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .owner-mini .av { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: var(--olive-bg-2); border: 1px solid var(--olive-line); display: grid; place-items: center; color: var(--olive-light); font-size: 14px; font-weight: 600; }
+  .owner-mini .role { font-family: var(--mono); font-size: 10.5px; color: var(--mint-mute); text-transform: uppercase; letter-spacing: 0.08em; }
+  .owner-mini .name { font-family: var(--serif); font-size: 16px; color: var(--mint); margin-top: 1px; line-height: 1.1; }
+  .owner-mini .badge { font-family: var(--mono); font-size: 10px; padding: 3px 8px; background: var(--olive-bg); color: var(--olive-light); border-radius: 4px; border: 1px solid var(--olive-line); }
+
+  /* ─── ACTIONS STACK ─── */
+  .action-stack { display: flex; flex-direction: column; gap: 8px; }
+  .action-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--night-soft); border: 1px solid var(--border);
+    border-radius: 10px; cursor: pointer;
+    text-align: left; font-family: inherit; color: var(--mint);
+    transition: all .15s;
+  }
+  .action-row:hover { border-color: var(--olive-line); background: var(--night-mid); }
+  .action-row .ic { width: 34px; height: 34px; border-radius: 9px; background: var(--olive-bg); color: var(--olive); display: grid; place-items: center; flex-shrink: 0; }
+  .action-row .body { flex: 1; min-width: 0; }
+  .action-row .t { font-size: 13px; font-weight: 500; color: var(--mint); }
+  .action-row .s { font-size: 11.5px; color: var(--mint-mute); margin-top: 2px; }
+  .action-row .chev { color: var(--mint-mute); transition: transform .15s; }
+  .action-row:hover .chev { color: var(--olive); transform: translateX(2px); }
+  .action-row.danger .ic { background: var(--red-bg); color: var(--red); }
+
+  /* ─── ALERT ─── */
+  .alert {
+    display: grid; grid-template-columns: 38px 1fr auto;
+    gap: 14px; align-items: center;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--amber-bg);
+    border: 1px solid rgba(232,185,98,.32);
+    margin-bottom: 10px;
+  }
+  .alert .ic {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--amber); color: var(--night);
+    display: grid; place-items: center;
+  }
+  .alert.red { background: var(--red-bg); border-color: rgba(228,129,115,.32); }
+  .alert.red .ic { background: var(--red); }
+  .alert .body .t { font-size: 13px; font-weight: 500; color: var(--mint); line-height: 1.3; }
+  .alert .body .s { font-size: 11.5px; color: var(--mint-mute); margin-top: 3px; }
+
+  /* ─── DOCS ─── */
+  .docs { display: flex; flex-direction: column; gap: 6px; }
+  .doc-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .doc-row:hover { background: rgba(239,251,219,.04); }
+  .doc-row .ic { width: 30px; height: 38px; border-radius: 5px; background: var(--olive-bg); color: var(--olive); display: grid; place-items: center; font-family: var(--mono); font-size: 9px; font-weight: 600; flex-shrink: 0; }
+  .doc-row .body { flex: 1; min-width: 0; }
+  .doc-row .name { font-size: 13px; font-weight: 500; color: var(--mint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-row .meta { font-family: var(--mono); font-size: 10.5px; color: var(--mint-mute); margin-top: 1px; }
+  .doc-row .arr { color: var(--mint-mute); }
+  .doc-row:hover .arr { color: var(--olive); }
+
+  /* ─── LEASE PROGRESS ─── */
+  .lease-progress { margin-top: 4px; }
+  .lease-bar {
+    height: 6px; background: rgba(239,251,219,.05);
+    border-radius: 3px; overflow: hidden;
+    margin: 8px 0 12px;
+  }
+  .lease-bar .fill {
+    height: 100%; background: var(--olive); border-radius: 3px;
+  }
+  .lease-dates {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 11px; color: var(--mint-mute);
+  }
+  .lease-dates .start { color: var(--mint); }
+
+  /* ─── INDEX IRL ─── */
+  .irl-card {
+    background: var(--night-soft); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    margin-top: 12px;
+  }
+  .irl-row { display: flex; justify-content: space-between; align-items: center; }
+  .irl-row + .irl-row { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .irl-row .lbl { font-size: 12px; color: var(--mint-mute); }
+  .irl-row .val { font-family: var(--mono); font-size: 13px; color: var(--mint); font-weight: 500; }
+  .irl-row .val.olive { color: var(--olive); }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo"><span class="ku">ku</span><span class="panga">panga</span></div>
+  <div class="search">
+    <svg class="icon md" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Rechercher dans mon espace..."><span class="kbd">⌘K</span>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
+    <button class="icon-btn"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+    <div class="avatar">LB</div>
+  </div>
+</header>
+
+<!-- SUBNAV (tenant) -->
+<nav class="subnav">
+  <a class="subnav-item">
+    <svg class="icon md" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Accueil
+  </a>
+  <a class="subnav-item active">
+    <svg class="icon md" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="14" r="2"/></svg>
+    Mon logement
+  </a>
+  <a class="subnav-item">
+    <svg class="icon md" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    Mes quittances <span class="kbd" style="margin-left:6px;">12</span>
+  </a>
+  <a class="subnav-item">
+    <svg class="icon md" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+    Documents
+  </a>
+  <a class="subnav-item">
+    <svg class="icon md" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Messagerie
+  </a>
+  <a class="subnav-item">
+    <svg class="icon md" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1M5.05 6.05l.707.707M2 12h1M22 12h-1M18.243 6.05l-.707.707M16 18a4 4 0 0 0-8 0"/></svg>
+    Aide
+  </a>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="home-hero">
+    <div class="ph"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80" alt=""></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=600&q=80" alt=""></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=600&q=80" alt=""></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80" alt=""></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=80" alt=""></div>
+    <button class="photos-btn">
+      <svg class="icon md" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Voir les 7 photos
+    </button>
+  </div>
+
+  <!-- WELCOME -->
+  <div class="welcome">
+    <div>
+      <div class="eyebrow">
+        <svg class="icon sm" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Mon logement
+      </div>
+      <h1>Bienvenue chez <em>vous, Léa.</em></h1>
+      <p>13 Rue Bougainville, 44100 Nantes · 50 m² · 5 pièces · Maison louée à Gedeon Mutikanga</p>
+    </div>
+    <div class="welcome-meta">
+      <div><span class="key">
+        <svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Locataire depuis le <b>1ᵉʳ avr. 2026</b>
+      </span></div>
+      <div><span class="key">
+        <svg class="icon sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <b>35 mois</b> restants
+      </span></div>
+      <div style="margin-top:8px;"><span class="tag-pill"><span class="dot"></span> BAIL ACTIF</span></div>
+    </div>
+  </div>
+
+  <!-- HEALTH CHECK -->
+  <div class="health">
+    <div class="health-ic">
+      <svg class="icon xl" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="health-body">
+      <div class="t">Tout est <em>à jour.</em></div>
+      <div class="s">Vos loyers sont payés, votre assurance est en cours de validité, vos documents sont à jour.</div>
+    </div>
+    <div class="health-chips">
+      <span class="status-mini"><span class="dot"></span> Loyer · payé</span>
+      <span class="status-mini"><span class="dot"></span> Bail · actif</span>
+      <span class="status-mini amber"><span class="dot"></span> Assurance · expire dans 47j</span>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-lbl">
+        <svg class="icon sm" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Prochain loyer
+      </div>
+      <div class="kpi-val">500<span class="u">€</span></div>
+      <div class="kpi-foot olive">dans 14 jours · 5 mai</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">
+        <svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Fin du bail
+      </div>
+      <div class="kpi-val">31 mars<span class="u">2029</span></div>
+      <div class="kpi-foot">Préavis : 3 mois</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">
+        <svg class="icon sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Loyers payés
+      </div>
+      <div class="kpi-val">1<span class="u">/ 36</span></div>
+      <div class="kpi-foot">soit 500 € versés</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">
+        <svg class="icon sm" viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8a8 8 0 0 1 16 0c0 7.3-8 11.8-8 11.8z"/><path d="M12 2v6M9 5l3-3 3 3"/></svg>
+        Dépôt versé
+      </div>
+      <div class="kpi-val">500<span class="u">€</span></div>
+      <div class="kpi-foot">Restitution prévue 2029</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body-grid">
+
+    <!-- MAIN -->
+    <div class="body-main">
+
+      <!-- PROCHAIN LOYER (featured) -->
+      <div class="next-rent" style="margin-bottom: 16px;">
+        <div>
+          <div class="eyebrow">
+            <svg class="icon sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prochaine échéance · 5 mai 2026
+          </div>
+          <div class="t">Votre loyer de <em>mai</em></div>
+          <div class="s">Réglez votre loyer en un clic, ou activez le prélèvement automatique pour ne plus y penser.</div>
+        </div>
+        <div class="right">
+          <div class="amount">500<span class="u">€</span></div>
+          <!--
+            <div class="ctas">
+              <button class="btn">Programmer auto.</button>
+              <button class="btn primary lg">
+                <svg class="icon sm" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                Payer maintenant
+              </button>
+            </div>
+            -->
+        </div>
+      </div>
+
+      <!-- ÉCHÉANCES -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Échéances à <em>venir</em></div>
+          <span class="a">Voir tout
+            <svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+        <div class="timeline">
+          <div class="tl-item active">
+            <div class="tl-marker"><div class="d">05</div><div class="m">mai</div></div>
+            <div class="tl-body">
+              <div class="t">Loyer de mai 2026</div>
+              <div class="s">Échéance à payer · virement automatique possible</div>
+            </div>
+            <div class="tl-amount">500 €</div>
+          </div>
+          <div class="tl-item future">
+            <div class="tl-marker"><div class="d">15</div><div class="m">mai</div></div>
+            <div class="tl-body">
+              <div class="t">Renouvellement assurance habitation</div>
+              <div class="s">Téléversez votre attestation 2026-2027 avant cette date</div>
+            </div>
+            <div class="tl-amount" style="color:var(--amber);">Action</div>
+          </div>
+          <div class="tl-item future">
+            <div class="tl-marker"><div class="d">05</div><div class="m">juin</div></div>
+            <div class="tl-body">
+              <div class="t">Loyer de juin 2026</div>
+              <div class="s">Sera prélevé automatiquement si activé</div>
+            </div>
+            <div class="tl-amount">500 €</div>
+          </div>
+          <div class="tl-item future">
+            <div class="tl-marker"><div class="d">31</div><div class="m">oct.</div></div>
+            <div class="tl-body">
+              <div class="t">Régularisation annuelle des charges</div>
+              <div class="s">Comparaison entre provision et charges réelles · solde &lt;&gt; provision</div>
+            </div>
+            <div class="tl-amount" style="color:var(--mint-mute);">— €</div>
+          </div>
+          <div class="tl-item future">
+            <div class="tl-marker"><div class="d">01</div><div class="m">avr.</div></div>
+            <div class="tl-body">
+              <div class="t">Révision IRL du loyer</div>
+              <div class="s">Indice 2ᵉ trim. 2025 · estimation +0,9 % soit ~4,50 €</div>
+            </div>
+            <div class="tl-amount" style="color:var(--mint-mute);">+4,50 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUITTANCES -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Mes <em>quittances</em></div>
+          <span class="a">Tout télécharger
+            <svg class="icon sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </span>
+        </div>
+        <div class="receipts">
+          <div class="receipt-row">
+            <div class="month-tag"><div class="m">Avr.</div><div class="y">2026</div></div>
+            <div class="body">
+              <div class="t">Loyer + charges</div>
+              <div class="s">Reçu le 4 avr. · Virement</div>
+            </div>
+            <div class="amt">500 €</div>
+            <button class="dl"><svg class="icon sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--mono); font-size: 11.5px; color: var(--mint-mute);">1 quittance reçue depuis l'entrée · prochaine attendue le 5 mai</span>
+          <button class="btn sm">Demander une attestation</button>
+        </div>
+      </div>
+
+      <!-- DEMANDES / INCIDENTS -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Mes <em>demandes</em></div>
+          <button class="btn sm primary">
+            <svg class="icon sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Signaler un incident
+          </button>
+        </div>
+        <div class="incidents">
+          <div class="incident amber">
+            <div class="ic">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M2.5 8L12 2l9.5 6M5 21V11l7-4 7 4v10"/></svg>
+            </div>
+            <div class="body">
+              <div class="t">Volet roulant chambre — coincé</div>
+              <div class="s">Lame inférieure tordue, ne descend plus complètement. Photo jointe.</div>
+              <div class="meta">
+                <span>Signalé il y a 3 j</span>
+                <span class="dot"></span>
+                <span>Photo · 1</span>
+                <span class="dot"></span>
+                <span>2 messages</span>
+              </div>
+            </div>
+            <span class="status-mini amber"><span class="dot"></span> En cours</span>
+          </div>
+          <div class="incident">
+            <div class="ic">
+              <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="body">
+              <div class="t">Demande d'attestation de loyer pour la CAF</div>
+              <div class="s">Document généré et envoyé par email le 12 avr.</div>
+              <div class="meta">
+                <span>Résolu</span>
+                <span class="dot"></span>
+                <span>Délai 1j</span>
+              </div>
+            </div>
+            <span class="status-mini"><span class="dot"></span> Résolu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLOC (only shown if colocation) -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Mes <em>colocataires</em></div>
+          <span class="badge">2 personnes</span>
+        </div>
+        <div class="coloc-list">
+          <div class="coloc-row">
+            <div class="av"><img src="https://i.pravatar.cc/120?img=20" alt=""></div>
+            <div class="body">
+              <div class="t">Sarah Cohen</div>
+              <div class="s">Chambre 2 · entrée 1ᵉʳ avril 2026</div>
+            </div>
+            <div class="part">
+              200 €
+              <div class="lbl">Sa part</div>
+            </div>
+          </div>
+          <div class="coloc-row">
+            <div class="av"><img src="https://i.pravatar.cc/120?img=33" alt=""></div>
+            <div class="body">
+              <div class="t">Marc Dubois</div>
+              <div class="s">Chambre 3 · entrée 1ᵉʳ avril 2026</div>
+            </div>
+            <div class="part">
+              150 €
+              <div class="lbl">Sa part</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 14px; font-family: var(--mono); font-size: 11.5px; color: var(--mint-mute); text-align: center; padding-top: 14px; border-top: 1px solid var(--border);">
+          Régime <b style="color:var(--mint);">Solidaire</b> · vous êtes co-responsables du loyer total
+        </div>
+      </div>
+
+      <!-- ENTRETIEN PLANIFIÉ (potential future events) -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Maintenance &amp; <em>visites</em></div>
+          <span class="a">Historique →</span>
+        </div>
+        <div style="text-align:center; padding: 24px 0 12px;">
+          <div style="width:48px; height:48px; border-radius:12px; background: var(--olive-bg); color: var(--olive); display: grid; place-items: center; margin: 0 auto 14px;">
+            <svg class="icon lg" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div style="font-family: var(--serif); font-size: 17px; color: var(--mint); margin-bottom: 4px;">Aucune intervention planifiée</div>
+          <div style="font-size: 12.5px; color: var(--mint-mute); max-width: 360px; margin: 0 auto;">Les interventions d'entretien programmées par le propriétaire (chaudière, VMC, ramonage) s'afficheront ici.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDE -->
+    <div class="body-side">
+
+      <!-- PROPRIÉTAIRE -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Propriétaire</div>
+        </div>
+        <div class="owner-mini">
+          <div class="av">GM</div>
+          <div>
+            <div class="role">Bailleur</div>
+            <div class="name">Gedeon Mutikanga</div>
+          </div>
+          <span class="badge">Vérifié</span>
+        </div>
+        <button class="btn primary" style="width:100%; justify-content:center;">
+          <svg class="icon sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Envoyer un message
+        </button>
+        <button class="btn ghost" style="width: 100%; justify-content: center; margin-top: 6px;">
+          <svg class="icon sm" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Appeler en cas d'urgence
+        </button>
+      </div>
+
+      <!-- ALERTES -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">À ne pas <em>oublier</em></div>
+          <span class="badge">2</span>
+        </div>
+        <div class="alert amber">
+          <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8a8 8 0 0 1 16 0c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="body">
+            <div class="t">Assurance habitation à renouveler</div>
+            <div class="s">Expire le 15 mai · téléversez votre nouvelle attestation</div>
+          </div>
+          <svg class="icon sm" viewBox="0 0 24 24" style="color:var(--amber);"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="alert">
+          <div class="ic" style="background:var(--olive); color:var(--night);"><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="body">
+            <div class="t">Activez le prélèvement automatique</div>
+            <div class="s">Ne plus penser à payer son loyer chaque mois</div>
+          </div>
+          <svg class="icon sm" viewBox="0 0 24 24" style="color:var(--olive);"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <!-- ACTIONS RAPIDES -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Actions <em>rapides</em></div>
+        </div>
+        <div class="action-stack">
+          <button class="action-row">
+            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M2.5 8L12 2l9.5 6M5 21V11l7-4 7 4v10"/><line x1="9" y1="12" x2="15" y2="12"/></svg></div>
+            <div class="body">
+              <div class="t">Signaler un incident</div>
+              <div class="s">Plomberie, électricité, chauffage…</div>
+            </div>
+            <span class="chev"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </button>
+          <button class="action-row">
+            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="body">
+              <div class="t">Demander une attestation</div>
+              <div class="s">CAF, employeur, garant…</div>
+            </div>
+            <span class="chev"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </button>
+          <button class="action-row">
+            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8a8 8 0 0 1 16 0c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div class="body">
+              <div class="t">Mettre à jour mon assurance</div>
+              <div class="s">Téléversez votre nouveau certificat</div>
+            </div>
+            <span class="chev"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </button>
+          <button class="action-row">
+            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div class="body">
+              <div class="t">Consulter l'EDL d'entrée</div>
+              <div class="s">Référence pour la sortie</div>
+            </div>
+            <span class="chev"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </button>
+          <button class="action-row danger">
+            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+            <div class="body">
+              <div class="t">Donner mon préavis</div>
+              <div class="s">Quitter le logement · 3 mois</div>
+            </div>
+            <span class="chev"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MON BAIL -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Mon <em>bail</em></div>
+          <span class="a">Voir →</span>
+        </div>
+        <div class="lease-progress">
+          <div style="font-family: var(--mono); font-size: 11.5px; color: var(--mint-mute); display: flex; justify-content: space-between;">
+            <span>1 mois sur 36</span>
+            <span style="color:var(--olive);">3 %</span>
+          </div>
+          <div class="lease-bar"><div class="fill" style="width: 3%;"></div></div>
+          <div class="lease-dates">
+            <span class="start">1 avr. 2026</span>
+            <span>31 mars 2029</span>
+          </div>
+        </div>
+
+        <!-- IRL info -->
+        <div class="irl-card">
+          <div class="irl-row">
+            <span class="lbl">Type de bail</span>
+            <span class="val">Nu · Loi 89-462</span>
+          </div>
+          <div class="irl-row">
+            <span class="lbl">Loyer hors charges</span>
+            <span class="val">400 €</span>
+          </div>
+          <div class="irl-row">
+            <span class="lbl">Charges récupérables</span>
+            <span class="val">100 €</span>
+          </div>
+          <div class="irl-row">
+            <span class="lbl">Indexation IRL</span>
+            <span class="val olive">IRL T2 · prochaine 1 avr. 2027</span>
+          </div>
+          <div class="irl-row">
+            <span class="lbl">Préavis</span>
+            <span class="val">3 mois</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCS -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Mes <em>documents</em></div>
+          <span class="badge">5</span>
+        </div>
+        <div class="docs">
+          <div class="doc-row">
+            <div class="ic">PDF</div>
+            <div class="body">
+              <div class="name">Contrat de bail signé</div>
+              <div class="meta">1 avr. 2026 · 312 Ko</div>
+            </div>
+            <svg class="icon sm arr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="doc-row">
+            <div class="ic">PDF</div>
+            <div class="body">
+              <div class="name">État des lieux d'entrée</div>
+              <div class="meta">31 mars 2026 · 1.4 Mo</div>
+            </div>
+            <svg class="icon sm arr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="doc-row">
+            <div class="ic">PDF</div>
+            <div class="body">
+              <div class="name">Attestation assurance hab.</div>
+              <div class="meta">15 mai 2025 · 218 Ko · expire bientôt</div>
+            </div>
+            <svg class="icon sm arr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="doc-row">
+            <div class="ic">PDF</div>
+            <div class="body">
+              <div class="name">DPE du logement</div>
+              <div class="meta">2026 · classe C · 142 kWh/m²</div>
+            </div>
+            <svg class="icon sm arr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="doc-row">
+            <div class="ic">PDF</div>
+            <div class="body">
+              <div class="name">Quittance avril 2026</div>
+              <div class="meta">4 avr. 2026 · 120 Ko</div>
+            </div>
+            <svg class="icon sm arr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+        <button class="btn" style="width: 100%; justify-content: center; margin-top: 14px;">
+          <svg class="icon sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Téléverser un document
+        </button>
+      </div>
+
+      <!-- Énergie -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Mes <em>compteurs</em></div>
+          <span class="a">Relever →</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div style="background: var(--night-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;">
+            <div style="font-size: 11px; color: var(--mint-mute); text-transform: uppercase; letter-spacing: 0.06em;">Électricité</div>
+            <div style="font-family: var(--mono); font-size: 18px; color: var(--mint); margin-top: 4px;">12 480 <span style="font-size:11px; color: var(--mint-mute);">kWh</span></div>
+            <div style="font-family: var(--mono); font-size: 10.5px; color: var(--olive); margin-top: 2px;">+ 124 ce mois</div>
+          </div>
+          <div style="background: var(--night-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;">
+            <div style="font-size: 11px; color: var(--mint-mute); text-transform: uppercase; letter-spacing: 0.06em;">Eau</div>
+            <div style="font-family: var(--mono); font-size: 18px; color: var(--mint); margin-top: 4px;">86 <span style="font-size:11px; color: var(--mint-mute);">m³</span></div>
+            <div style="font-family: var(--mono); font-size: 10.5px; color: var(--olive); margin-top: 2px;">+ 4 ce mois</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

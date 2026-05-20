@@ -1,0 +1,44 @@
+<div class="auth-field" [class.has-error]="hasError">
+  <label class="field-label" [for]="fieldId">
+    {{ label }}
+    @if (required) {
+      <span class="req-star">*</span>
+    }
+  </label>
+
+  <div class="field-wrapper">
+    <input
+      [id]="fieldId"
+      class="field-input"
+      [type]="inputType"
+      [placeholder]="placeholder"
+      [formControl]="control"
+      [attr.aria-required]="required || null"
+      [attr.aria-invalid]="hasError || null"
+    />
+
+    @if (type === 'password') {
+      <button
+        type="button"
+        class="eye-btn"
+        [attr.aria-label]="eyeLabel"
+        (click)="togglePassword()"
+        tabindex="-1"
+      >
+        @if (showPassword()) {
+          <lucide-icon [img]="EyeOff" [size]="16" />
+        } @else {
+          <lucide-icon [img]="Eye" [size]="16" />
+        }
+      </button>
+    }
+  </div>
+
+  @if (hint && !hasError) {
+    <p class="field-hint">{{ hint }}</p>
+  }
+
+  @if (hasError) {
+    <p class="field-error" role="alert">{{ errorMessage }}</p>
+  }
+</div>

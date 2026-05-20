@@ -1,0 +1,289 @@
+.kp-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.kp-page-header {
+  margin-bottom: 24px;
+
+  h1 {
+    margin-bottom: 4px;
+  }
+}
+
+// === Stepper header ===
+
+.kp-stepper-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.kp-step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kp-step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &.done {
+    background: var(--kp-primary);
+    color: var(--kp-text-invert);
+  }
+
+  &.active {
+    background: var(--kp-primary);
+    color: var(--kp-text-invert);
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.15);
+  }
+
+  &.pending {
+    background: var(--kp-surface-2);
+    color: var(--kp-text-3);
+    border: 0.5px solid var(--kp-border-strong);
+  }
+}
+
+.kp-step-label {
+  font-size: 12px;
+  color: var(--kp-text-3);
+  white-space: nowrap;
+
+  &.active {
+    color: var(--kp-text-1);
+    font-weight: 500;
+  }
+}
+
+.kp-step-connector {
+  flex: 1;
+  height: 0.5px;
+  margin: 0 12px;
+  background: var(--kp-border-strong);
+
+  &.done {
+    background: var(--kp-primary);
+  }
+}
+
+// === Card ===
+
+.kp-card {
+  background: var(--kp-surface);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  padding: 24px;
+
+  mat-form-field {
+    margin-bottom: 4px;
+  }
+}
+
+// === Type de bien ===
+
+.kp-field-group {
+  margin-bottom: 16px;
+}
+
+.kp-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kp-text-2);
+  margin-bottom: 8px;
+}
+
+.kp-field-error {
+  display: block;
+  font-size: 12px;
+  color: var(--kp-danger);
+  margin-top: 4px;
+}
+
+.kp-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 8px 0 4px;
+}
+
+.kp-type-card {
+  border: 0.5px solid var(--kp-border-strong);
+  border-radius: 10px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color var(--kp-transition), background var(--kp-transition);
+
+  mat-icon,
+  span {
+    color: var(--kp-text-2);
+    font-size: 13px;
+  }
+
+  &.selected {
+    border: 1.5px solid var(--kp-primary);
+    background: var(--kp-primary-subtle);
+
+    mat-icon,
+    span {
+      color: var(--kp-primary);
+    }
+  }
+}
+
+// === Ligne 2 colonnes ===
+
+.kp-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// === Zone photos ===
+
+.kp-photo-drop {
+  border: 1.5px dashed var(--kp-border-strong);
+  border-radius: 10px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color var(--kp-transition), background var(--kp-transition);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--kp-text-3);
+  }
+
+  span {
+    font-size: 14px;
+    color: var(--kp-text-2);
+  }
+
+  &:hover {
+    border-color: var(--kp-primary);
+    background: var(--kp-primary-subtle);
+
+    mat-icon,
+    span {
+      color: var(--kp-primary);
+    }
+  }
+}
+
+.kp-files-info {
+  font-size: 12px;
+  color: var(--kp-text-3);
+  text-align: center;
+  margin-top: 8px;
+}
+
+.kp-photos-error {
+  display: block;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.kp-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.kp-photo-thumb {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.kp-photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--kp-text-invert);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// === Toggles (checkboxes) ===
+
+.kp-toggles-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 16px;
+  margin-top: 4px;
+}
+
+// === Footer de l'étape ===
+
+.kp-step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--kp-border);
+}
+
+.kp-step-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kp-step-hint {
+  font-size: 12px;
+  color: var(--kp-text-3);
+}

@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Mes quittances</span>
+    <button class="card-action" (click)="toutTelecharger.emit()">
+      <kp-icon name="download" [size]="13" />
+      Tout télécharger
+    </button>
+  </div>
+
+  @for (q of quittances(); track q.libelle) {
+    <div class="receipt-row">
+      <div class="month-tag">
+        <span class="month-abbr">{{ q.moisAbr }}</span>
+        <span class="month-year">{{ q.annee }}</span>
+      </div>
+      <div class="receipt-body">
+        <div class="t">{{ q.libelle }}</div>
+        <div class="s">{{ q.meta }}</div>
+      </div>
+      <div class="receipt-amount">{{ q.montant | number:'1.0-0':'fr' }} €</div>
+      <button class="dl-btn" (click)="telecharger(q)" title="Télécharger">
+        <kp-icon name="download" [size]="14" />
+      </button>
+    </div>
+  }
+
+  <div class="receipt-footer">
+    <span class="receipt-count">{{ quittances().length }} quittance{{ quittances().length > 1 ? 's' : '' }}</span>
+    <button class="btn-sm" (click)="demanderAttestation.emit()">
+      Demander une attestation
+    </button>
+  </div>
+</div>

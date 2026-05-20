@@ -1,0 +1,90 @@
+@use 'tokens' as t;
+
+.card {
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+  border-radius: t.$radius;
+  padding: t.$space-4 t.$space-5;
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-3;
+}
+
+.card-h .t {
+  font-family: var(--kp-font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+}
+
+.coloc-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: t.$space-3;
+  padding: t.$space-2;
+  border-radius: t.$radius-sm;
+
+  &:hover { background: var(--kp-surface-2); }
+}
+
+.coloc-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--kp-primary-subtle);
+  border: 1px solid var(--kp-primary-subtle-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kp-primary-hover);
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.coloc-name {
+  font-family: var(--kp-font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+}
+
+.coloc-meta {
+  font-size: 12px;
+  color: var(--kp-text-3);
+  margin-top: 2px;
+}
+
+.coloc-share {
+  text-align: right;
+
+  .share-amount {
+    font-family: var(--kp-font-mono);
+    font-size: 14px;
+    color: var(--kp-text-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .share-label {
+    font-family: var(--kp-font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--kp-text-3);
+  }
+}
+
+.coloc-footer {
+  font-family: var(--kp-font-mono);
+  font-size: 11.5px;
+  color: var(--kp-text-3);
+  text-align: center;
+  padding-top: t.$space-2;
+  border-top: 1px solid var(--kp-border);
+
+  strong { color: var(--kp-text-2); font-weight: 500; }
+}

@@ -1,0 +1,440 @@
+# ╔══════════════════════════════════════════════════════════╗
+# ║          DESIGN SYSTEM — Application Gestion Locative   ║
+# ║          Version: 1.0 · Date: 2026                      ║
+# ╚══════════════════════════════════════════════════════════╝
+
+meta:
+  name: "Gestion Locative — Design System"
+  version: "1.0.0"
+  description: "Charte graphique officielle pour l'application de gestion locative tout-en-un"
+  last_updated: "2026-05-17"
+
+# ──────────────────────────────────────────────
+# 1. PALETTE DE COULEURS
+# ──────────────────────────────────────────────
+colors:
+
+  # Couleurs primaires
+  primary:
+    night:
+      name: "Night"
+      role: "Couleur principale — fonds, textes autoritaires, header"
+      hex: "#10212B"
+      rgb: { r: 16, g: 33, b: 43 }
+      cmjn: { c: 63, m: 23, j: 0, n: 83 }
+      usage:
+        - "Fond principal de l'application"
+        - "Textes sur fonds clairs"
+        - "Navbar, sidebar"
+        - "Éléments d'autorité et de confiance"
+
+    olive:
+      name: "Olive"
+      role: "Couleur d'accent — actions, interactions, focus"
+      hex: "#8FA464"
+      rgb: { r: 143, g: 164, b: 100 }
+      cmjn: { c: 13, m: 0, j: 39, n: 36 }
+      usage:
+        - "Boutons CTA (Call-To-Action) primaires"
+        - "Liens et éléments cliquables"
+        - "Icônes actives et états focus"
+        - "Bordures d'accentuation"
+        - "Indicateurs de progression"
+
+    mint:
+      name: "Mint"
+      role: "Couleur lumière — textes sur fond sombre, surfaces légères"
+      hex: "#EFFBDB"
+      rgb: { r: 239, g: 251, b: 219 }
+      cmjn: { c: 5, m: 0, j: 13, n: 2 }
+      usage:
+        - "Textes principaux sur fonds sombres"
+        - "Fonds de cartes légères (mode clair)"
+        - "Icônes sur fond Night"
+        - "Backgrounds secondaires doux"
+
+  # Palette étendue (dérivées)
+  extended:
+    night_mid:
+      name: "Night Mid"
+      role: "Surface secondaire — cartes, panneaux"
+      hex: "#1E3545"
+      rgb: { r: 30, g: 53, b: 69 }
+      cmjn: { c: 57, m: 23, j: 0, n: 73 }
+      usage:
+        - "Fonds de cartes et panneaux"
+        - "Surfaces de navigation secondaire"
+        - "Modales et overlays légers"
+
+    night_light:
+      name: "Night Light"
+      role: "Surface tertiaire — hover, séparateurs"
+      hex: "#2C4A5F"
+      rgb: { r: 44, g: 74, b: 95 }
+      cmjn: { c: 54, m: 22, j: 0, n: 63 }
+      usage:
+        - "États hover sur éléments Night Mid"
+        - "Séparateurs et dividers"
+        - "Fonds de tooltips"
+
+    olive_light:
+      name: "Olive Light"
+      role: "Accent secondaire — hover, badges, highlights"
+      hex: "#B5CA8D"
+      rgb: { r: 181, g: 202, b: 141 }
+      cmjn: { c: 10, m: 0, j: 30, n: 21 }
+      usage:
+        - "États hover sur éléments Olive"
+        - "Badges et tags secondaires"
+        - "Accents de texte sur fond Night"
+        - "Mise en valeur de données positives"
+
+    olive_dark:
+      name: "Olive Dark"
+      role: "Accent foncé — texte sur fond Mint, pressed states"
+      hex: "#6B7C4B"
+      rgb: { r: 107, g: 124, b: 75 }
+      cmjn: { c: 14, m: 0, j: 40, n: 51 }
+      usage:
+        - "Textes colorés sur fond Mint"
+        - "États pressed/active sur boutons Olive"
+        - "Bordures sur fonds clairs"
+
+  # Couleurs sémantiques (UI states)
+  semantic:
+    success:
+      hex: "#8FA464"       # = Olive (cohérence)
+      rgb: { r: 143, g: 164, b: 100 }
+      usage: "Loyer reçu, bail signé, action validée"
+
+    warning:
+      hex: "#D4A853"
+      rgb: { r: 212, g: 168, b: 83 }
+      usage: "Bail expirant, retard de paiement imminent"
+
+    danger:
+      hex: "#C0614A"
+      rgb: { r: 192, g: 97, b: 74 }
+      usage: "Loyer impayé, erreur critique, document manquant"
+
+    info:
+      hex: "#5A8FAF"
+      rgb: { r: 90, g: 143, b: 175 }
+      usage: "Notification informative, rappel neutre"
+
+  # Transparences et overlays
+  alpha:
+    olive_10: "rgba(143, 164, 100, 0.10)"   # fond badge
+    olive_15: "rgba(143, 164, 100, 0.15)"   # bordure card
+    olive_25: "rgba(143, 164, 100, 0.25)"   # bordure active
+    olive_40: "rgba(143, 164, 100, 0.40)"   # hover bordure
+    mint_55:  "rgba(239, 251, 219, 0.55)"   # texte muted
+    mint_80:  "rgba(239, 251, 219, 0.80)"   # texte secondaire
+    night_80: "rgba(16,  33,  43,  0.80)"   # overlay modal
+
+# ──────────────────────────────────────────────
+# 2. TYPOGRAPHIE
+# ──────────────────────────────────────────────
+typography:
+
+  source: "Google Fonts"
+  import_url: "https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+
+  families:
+    display:
+      name: "DM Serif Display"
+      css: "'DM Serif Display', Georgia, serif"
+      weights: [400]          # Regular + Italic
+      role: "Titres, accroches, éléments éditoriaux"
+      usage:
+        - "H1 : Titre de page principal"
+        - "H2 : Titre de section"
+        - "H3 : Sous-titre"
+        - "Grands chiffres mis en valeur (stats)"
+        - "Accroches marketing / onboarding"
+      do_not_use:
+        - "Corps de texte courant"
+        - "Labels d'interface"
+        - "Textes inférieurs à 16px"
+
+    sans:
+      name: "DM Sans"
+      css: "'DM Sans', system-ui, sans-serif"
+      weights:
+        light: 300
+        regular: 400
+        medium: 500
+        semibold: 600
+      role: "Corps de texte, interface utilisateur"
+      usage:
+        - "Paragraphes et contenu principal (300/400)"
+        - "Labels, boutons, navigation (500/600)"
+        - "Sous-titres de petite taille"
+        - "Formulaires et inputs"
+      do_not_use:
+        - "Grands titres (utiliser DM Serif Display)"
+        - "Codes et données chiffrées (utiliser DM Mono)"
+
+    mono:
+      name: "DM Mono"
+      css: "'DM Mono', 'Fira Code', monospace"
+      weights: [400, 500]
+      role: "Données techniques, codes, métadonnées"
+      usage:
+        - "Numéros de référence (REF-2024-001)"
+        - "Montants et données financières"
+        - "Dates et timestamps"
+        - "IBAN, codes postaux"
+        - "Tags de catégorie / labels techniques"
+        - "Badges de statut"
+      do_not_use:
+        - "Corps de texte courant"
+        - "Titres"
+
+  # Échelle typographique (rem basé sur 16px)
+  scale:
+    h1:
+      font_family: "display"
+      size: "clamp(3rem, 8vw, 6rem)"
+      line_height: 1.05
+      weight: 400
+      color: "mint"
+
+    h2:
+      font_family: "display"
+      size: "clamp(2rem, 5vw, 3.2rem)"
+      line_height: 1.1
+      weight: 400
+      color: "mint"
+
+    h3:
+      font_family: "display"
+      size: "1.4rem"
+      line_height: 1.2
+      weight: 400
+      color: "mint"
+
+    body_large:
+      font_family: "sans"
+      size: "1.05rem"
+      line_height: 1.7
+      weight: 300
+      color: "mint_80"
+
+    body:
+      font_family: "sans"
+      size: "0.95rem"
+      line_height: 1.6
+      weight: 400
+      color: "mint_80"
+
+    body_small:
+      font_family: "sans"
+      size: "0.82rem"
+      line_height: 1.5
+      weight: 400
+      color: "mint_55"
+
+    label:
+      font_family: "sans"
+      size: "0.85rem"
+      line_height: 1.4
+      weight: 500
+      letter_spacing: "0.02em"
+      color: "mint"
+
+    tag:
+      font_family: "mono"
+      size: "0.65rem"
+      line_height: 1.2
+      weight: 400
+      letter_spacing: "0.25em"
+      text_transform: "uppercase"
+      color: "olive"
+
+    data:
+      font_family: "mono"
+      size: "0.8rem"
+      line_height: 1.8
+      weight: 400
+      color: "olive_light"
+
+# ──────────────────────────────────────────────
+# 3. ICONOGRAPHIE
+# ──────────────────────────────────────────────
+iconography:
+
+  library: "Lucide Icons"
+  library_url: "https://lucide.dev"
+  license: "MIT"
+  npm_package: "lucide-react"
+
+  style:
+    type: "outline"             # Jamais filled
+    stroke_width: 1.5           # En pixels, valeur fixe
+    stroke_linecap: "round"
+    stroke_linejoin: "round"
+    grid_size: 24               # Toujours sur grille 24×24px
+    border_radius: "légèrement arrondi (rx 2–4)"
+
+  sizes:
+    xs: 12    # Inline dans le texte
+    sm: 16    # Boutons, badges, pills
+    md: 20    # Navigation, listes
+    lg: 24    # Icônes de fonctionnalité
+    xl: 32    # Illustrations légères
+    xxl: 44   # Illustrations de section
+
+  colors:
+    default: "olive (#8FA464)"
+    active: "olive_light (#B5CA8D)"
+    muted: "mint_55 (rgba 239 251 219 / 0.55)"
+    on_primary: "mint (#EFFBDB)"
+    danger: "#C0614A"
+    warning: "#D4A853"
+
+  rules:
+    - "Toujours outline, jamais filled"
+    - "stroke-width fixé à 1.5px — ne pas modifier"
+    - "Aligner les points d'ancrage sur des pixels entiers"
+    - "Ne pas mélanger avec d'autres bibliothèques d'icônes"
+    - "Taille minimale affichée : 12px"
+    - "Toujours inclure un aria-label ou aria-hidden selon le contexte"
+
+  domain_icons:
+    property:     "home"
+    tenant:       "user"
+    rent:         "credit-card"
+    contract:     "file-text"
+    maintenance:  "wrench"
+    dashboard:    "bar-chart-2"
+    messages:     "message-square"
+    calendar:     "calendar"
+    settings:     "settings"
+    notification: "bell"
+    document:     "file"
+    search:       "search"
+    add:          "plus-circle"
+    delete:       "trash-2"
+    edit:         "pencil"
+    success:      "check-circle"
+    warning:      "alert-triangle"
+    info:         "info"
+    error:        "x-circle"
+
+# ──────────────────────────────────────────────
+# 4. ESPACEMENT & MISE EN PAGE
+# ──────────────────────────────────────────────
+spacing:
+  base: 4         # 4px = unité de base
+  scale:
+    xs:   "4px"
+    sm:   "8px"
+    md:   "16px"
+    lg:   "24px"
+    xl:   "32px"
+    "2xl": "48px"
+    "3xl": "64px"
+    "4xl": "96px"
+
+border_radius:
+  sm:   "6px"
+  md:   "8px"
+  lg:   "12px"
+  xl:   "16px"
+  pill: "100px"
+  full: "9999px"
+
+# ──────────────────────────────────────────────
+# 5. COMPOSANTS UI
+# ──────────────────────────────────────────────
+components:
+
+  button:
+    primary:
+      background: "#8FA464"
+      color: "#10212B"
+      font: "DM Sans 600"
+      font_size: "0.85rem"
+      padding: "0.65rem 1.4rem"
+      border_radius: "8px"
+      hover_background: "#B5CA8D"
+      active_background: "#6B7C4B"
+      transition: "background 0.2s ease"
+
+    ghost:
+      background: "transparent"
+      color: "#EFFBDB"
+      border: "1px solid rgba(239,251,219,0.2)"
+      font: "DM Sans 500"
+      font_size: "0.85rem"
+      padding: "0.65rem 1.4rem"
+      border_radius: "8px"
+      hover_border: "#8FA464"
+      transition: "border-color 0.2s ease"
+
+    danger:
+      background: "#C0614A"
+      color: "#EFFBDB"
+      font: "DM Sans 600"
+      font_size: "0.85rem"
+      padding: "0.65rem 1.4rem"
+      border_radius: "8px"
+
+  badge:
+    success:
+      background: "rgba(143,164,100,0.15)"
+      color: "#B5CA8D"
+      font: "DM Mono 400"
+      font_size: "0.65rem"
+      padding: "0.25rem 0.75rem"
+      border_radius: "100px"
+      dot_color: "#8FA464"
+
+  card:
+    background: "#1E3545"
+    border: "1px solid rgba(143,164,100,0.15)"
+    border_radius: "12px"
+    padding: "1.25rem"
+    hover_shadow: "0 20px 40px rgba(0,0,0,0.3)"
+    hover_transform: "translateY(-4px)"
+    transition: "transform 0.3s ease, box-shadow 0.3s ease"
+
+  input:
+    background: "#1E3545"
+    border: "1px solid rgba(143,164,100,0.2)"
+    border_focus: "1px solid #8FA464"
+    color: "#EFFBDB"
+    placeholder_color: "rgba(239,251,219,0.35)"
+    font: "DM Sans 400"
+    font_size: "0.9rem"
+    padding: "0.65rem 1rem"
+    border_radius: "8px"
+
+# ──────────────────────────────────────────────
+# 6. EFFETS VISUELS
+# ──────────────────────────────────────────────
+effects:
+
+  shadows:
+    card:    "0 4px 24px rgba(0,0,0,0.2)"
+    card_hover: "0 20px 40px rgba(0,0,0,0.3)"
+    modal:   "0 32px 64px rgba(0,0,0,0.5)"
+
+  gradients:
+    accent_glow: "radial-gradient(circle, rgba(143,164,100,0.12) 0%, transparent 70%)"
+    card_shine:  "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%)"
+
+  animations:
+    fade_up:
+      keyframes: "opacity 0→1, translateY 24px→0"
+      duration: "0.8s"
+      easing: "ease"
+    fade_in_scroll:
+      trigger: "IntersectionObserver threshold 0.1"
+      duration: "0.7s"
+      easing: "ease"
+    hover_lift:
+      transform: "translateY(-4px)"
+      duration: "0.3s"
+      easing: "ease"

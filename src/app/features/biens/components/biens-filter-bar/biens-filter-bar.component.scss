@@ -1,0 +1,408 @@
+@use 'tokens' as t;
+
+// ── Panel container ───────────────────────────────────────────────────────────
+
+.filter-panel {
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+// ── Barre rapide ──────────────────────────────────────────────────────────────
+
+.quick-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 680px) {
+  .quick-actions { margin-left: 0; width: 100%; flex-wrap: wrap; }
+  .filter-panel  { padding: 12px 14px; }
+  .adv-grid      { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .adv-grid { grid-template-columns: 1fr; }
+}
+
+// Champ recherche
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--kp-bg);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: 8px;
+  height: 36px;
+  padding: 0 12px;
+  flex: 1;
+  min-width: 180px;
+
+  .search-icon { color: var(--kp-text-3); flex-shrink: 0; }
+
+  input {
+    border: none;
+    background: transparent;
+    font-family: t.$font-sans;
+    font-size: 13px;
+    color: var(--kp-text-1);
+    outline: none;
+    width: 100%;
+
+    &::placeholder { color: var(--kp-text-3); }
+  }
+}
+
+// Type chips
+
+.type-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.type-chip {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 100px;
+  border: 1px solid var(--kp-border-strong);
+  background: var(--kp-bg);
+  font-family: t.$font-mono;
+  font-size: 11.5px;
+  color: var(--kp-text-2);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+  &.active {
+    border-color: var(--kp-primary-subtle-border);
+    background: var(--kp-primary-subtle);
+    color: var(--kp-primary-hover);
+  }
+
+  &:hover:not(.active) {
+    border-color: var(--kp-border-strong);
+    color: var(--kp-text-1);
+  }
+}
+
+// Actions rapides (tri + toggle)
+
+.quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.sort-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--kp-border-strong);
+  background: var(--kp-bg);
+  color: var(--kp-text-2);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: var(--kp-primary-subtle-border); }
+
+  .sort-label {
+    font-family: t.$font-mono;
+    font-size: 11.5px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+}
+
+.sort-select {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: transparent;
+}
+
+// Bouton reset rapide (toujours visible dans la barre)
+
+.quick-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--kp-border-strong);
+  background: transparent;
+  color: var(--kp-text-3);
+  font-family: t.$font-mono;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+
+  &.active {
+    border-color: rgba(217, 83, 79, 0.40);
+    background: rgba(217, 83, 79, 0.08);
+    color: #D95353;
+  }
+
+  &:hover.active {
+    background: rgba(217, 83, 79, 0.14);
+  }
+}
+
+.adv-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--kp-primary-subtle-border);
+  background: var(--kp-primary-subtle);
+  color: var(--kp-primary-hover);
+  font-family: t.$font-mono;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &.open {
+    background: var(--kp-primary-subtle-md);
+  }
+
+  &:hover { background: var(--kp-primary-subtle-md); }
+}
+
+.adv-chevron {
+  transition: transform 0.2s;
+  &.rotated { transform: rotate(180deg); }
+}
+
+// ── Panel avancé ──────────────────────────────────────────────────────────────
+
+.adv-sep {
+  border-top: 1px solid var(--kp-border);
+  margin: 14px 0;
+}
+
+.adv-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: end;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+.section-label {
+  font-family: t.$font-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--kp-text-3);
+  grid-column: 1 / -1;
+  margin-bottom: 2px;
+
+  &--block { display: block; margin-bottom: 8px; }
+}
+
+.adv-section { display: block; }
+
+.adv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.adv-label {
+  font-family: t.$font-mono;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--kp-primary-active);
+}
+
+.adv-field input,
+.adv-field select {
+  height: 34px;
+  padding: 0 10px;
+  background: var(--kp-bg);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: 7px;
+  font-family: t.$font-sans;
+  font-size: 13px;
+  color: var(--kp-text-1);
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+
+  &::placeholder { color: var(--kp-text-3); }
+  &:focus { border-color: var(--kp-primary-subtle-border); }
+}
+
+// ── Checkboxes Options (meublé, colocation, ascenseur) ────────────────────────
+
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--kp-bg);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: 7px;
+  padding: 5px 12px;
+  font-family: t.$font-mono;
+  font-size: 11.5px;
+  color: var(--kp-text-2);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+
+  &.checked {
+    border-color: var(--kp-primary-subtle-border);
+    background: var(--kp-primary-subtle);
+    color: var(--kp-primary-hover);
+  }
+}
+
+.cb-native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.cb-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--kp-border-strong);
+  background: var(--kp-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--kp-primary-on);
+  transition: background 0.15s, border-color 0.15s;
+
+  .cb-item.checked & {
+    background: var(--kp-primary);
+    border-color: var(--kp-primary);
+  }
+}
+
+// ── POI filter chips — miroir exact du kp-poi-chip ────────────────────────────
+
+.poi-filter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.poi-filter-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--kp-border-strong);
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-family: t.$font-mono;
+  font-size: 11px;
+  color: var(--kp-text-3);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+  line-height: 1.4;
+
+  // ── Couleurs par type — identiques à kp-poi-chip ──────────────────────────
+
+  &.poi-school {
+    &:hover       { border-color: rgba(91, 155, 213, 0.30); color: rgba(91, 155, 213, 0.70); }
+    &.checked     { border-color: rgba(91, 155, 213, 0.40); background: rgba(91, 155, 213, 0.10); color: #5B9BD5; }
+  }
+  &.poi-hospital {
+    &:hover       { border-color: rgba(217, 83, 79, 0.30); color: rgba(217, 83, 79, 0.70); }
+    &.checked     { border-color: rgba(217, 83, 79, 0.40); background: rgba(217, 83, 79, 0.10); color: #D95353; }
+  }
+  &.poi-pharmacy {
+    &:hover       { border-color: rgba(78, 173, 130, 0.30); color: rgba(78, 173, 130, 0.70); }
+    &.checked     { border-color: rgba(78, 173, 130, 0.40); background: rgba(78, 173, 130, 0.10); color: #3EA882; }
+  }
+  &.poi-transport {
+    &:hover       { border-color: rgba(155, 114, 207, 0.30); color: rgba(155, 114, 207, 0.70); }
+    &.checked     { border-color: rgba(155, 114, 207, 0.40); background: rgba(155, 114, 207, 0.10); color: #9B72CF; }
+  }
+  &.poi-commerce {
+    &:hover       { border-color: rgba(201, 162, 39, 0.30); color: rgba(201, 162, 39, 0.70); }
+    &.checked     { border-color: rgba(201, 162, 39, 0.40); background: rgba(201, 162, 39, 0.10); color: #B8962B; }
+  }
+  &.poi-nursery {
+    &:hover       { border-color: rgba(232, 162, 86, 0.30); color: rgba(232, 162, 86, 0.70); }
+    &.checked     { border-color: rgba(232, 162, 86, 0.40); background: rgba(232, 162, 86, 0.10); color: #C88844; }
+  }
+}
+
+// ── Footer filtres avancés ────────────────────────────────────────────────────
+
+.adv-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.btn-reset {
+  font-family: t.$font-mono;
+  font-size: 11.5px;
+  color: var(--kp-text-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+  transition: color 0.15s;
+
+  &:hover { color: var(--kp-text-2); }
+}
+
+.btn-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 16px;
+  background: var(--kp-primary);
+  color: var(--kp-primary-on);
+  border: none;
+  border-radius: 8px;
+  font-family: t.$font-mono;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--kp-primary-hover); }
+}

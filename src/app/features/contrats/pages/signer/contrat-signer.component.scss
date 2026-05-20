@@ -1,0 +1,93 @@
+.kp-signer-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--kp-bg);
+  padding: var(--kp-space-6);
+}
+
+.kp-signer-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--kp-surface);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-xl);
+  padding: var(--kp-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-6);
+}
+
+.kp-signer-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--kp-text-1);
+
+  mat-icon {
+    color: var(--kp-primary);
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.kp-signer-loading,
+.kp-signer-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kp-space-3);
+  color: var(--kp-text-2);
+  text-align: center;
+}
+
+.kp-signer-error {
+  color: var(--kp-danger);
+  mat-icon { font-size: 36px; width: 36px; height: 36px; }
+}
+
+.kp-signer-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kp-space-3);
+  text-align: center;
+  color: var(--kp-success-text);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  p { color: var(--kp-text-2); }
+}
+
+.kp-signer-recap {
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  padding: var(--kp-space-4) var(--kp-space-5);
+}
+
+.kp-kv-list { display: flex; flex-direction: column; gap: var(--kp-space-3); }
+.kp-kv-row  { display: flex; justify-content: space-between; gap: var(--kp-space-3); }
+.kp-kv-key  { font-size: 13px; color: var(--kp-text-3); }
+.kp-kv-val  { font-size: 13px; font-weight: 500; color: var(--kp-text-1); }
+
+.kp-signer-signature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+}
+
+.kp-signer-btn {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+}

@@ -1,0 +1,29 @@
+<div class="next-rent">
+  <div class="rent-left">
+    <div class="rent-eyebrow">
+      <kp-icon name="clock" [size]="13" />
+      Prochaine échéance · {{ dateEcheance() | date:'d MMMM yyyy':'':'fr' }}
+    </div>
+    <div class="rent-title">Loyer + charges</div>
+    <div class="rent-sub">Paiement mensuel · virement bancaire</div>
+  </div>
+
+  <div class="rent-right">
+    <div class="rent-amount">
+      {{ montant() | number:'1.0-0':'fr' }}
+      <span class="rent-unit">€</span>
+    </div>
+    <!--
+    <div class="rent-actions">
+      <button class="btn btn--ghost" (click)="programmerAuto.emit()">
+        <kp-icon name="repeat" [size]="14" />
+        Programmer auto.
+      </button>
+      <button class="btn btn--primary" (click)="payerMaintenant.emit()">
+        <kp-icon name="credit-card" [size]="14" />
+        Payer maintenant
+      </button>
+    </div>
+    -->
+  </div>
+</div>

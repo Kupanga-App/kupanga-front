@@ -1,0 +1,109 @@
+<div class="kp-signer-page">
+  <div class="kp-signer-card">
+
+    <div class="kp-signer-logo">
+      <mat-icon>home_work</mat-icon>
+      <span>Kupanga</span>
+    </div>
+
+    @if (loading()) {
+      <div class="kp-signer-loading">
+        <mat-spinner diameter="32" />
+        <span>Chargement…</span>
+      </div>
+    }
+
+    @if (!loading() && error()) {
+      <div class="kp-signer-error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error() }}</p>
+      </div>
+    }
+
+    @if (!loading() && signed()) {
+      <div class="kp-signer-success">
+        <mat-icon>check_circle</mat-icon>
+        <h2 class="kp-text-h2">État des lieux signé !</h2>
+        <p class="kp-text-body">Un récapitulatif vous a été envoyé par email.</p>
+      </div>
+    }
+
+    @if (!loading() && !error() && !signed() && edl()) {
+      <h1 class="kp-text-h1">
+        État des lieux d'{{ edl()!.type === 'ENTREE' ? 'entrée' : 'sortie' }}
+      </h1>
+      <p class="kp-text-caption">{{ edl()!.dateRealisation | date:'dd MMMM yyyy' }}
+        @if (edl()!.heureRealisation) { à {{ edl()!.heureRealisation }} }
+      </p>
+
+      @if (edl()!.observations) {
+        <div class="kp-edl-obs">
+          <strong>Observations générales :</strong>
+          <p>{{ edl()!.observations }}</p>
+        </div>
+      }
+
+      <!-- Pièces -->
+      @if (edl()!.pieces.length > 0) {
+        <div class="kp-edl-section">
+          <h3 class="kp-text-h2">Pièces</h3>
+          @for (piece of edl()!.pieces; track piece.nomPiece) {
+            <div class="kp-piece-block">
+              <h4 class="kp-piece-name">{{ piece.nomPiece }}</h4>
+              @if (piece.observations) {
+                <p class="kp-text-caption">{{ piece.observations }}</p>
+              }
+              @for (elem of piece.elements; track elem.typeElement) {
+                <div class="kp-element-row">
+                  <span class="kp-elem-type">{{ elem.typeElement }}</span>
+                  <span class="kp-etat-badge kp-etat-{{ elem.etatElement.toLowerCase() }}">
+                    {{ etatLabel(elem.etatElement) }}
+                  </span>
+                  @if (elem.description) { <span class="kp-text-caption">{{ elem.description }}</span> }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Compteurs -->
+      @if (edl()!.compteurs.length > 0) {
+        <div class="kp-edl-section">
+          <h3 class="kp-text-h2">Compteurs</h3>
+          @for (c of edl()!.compteurs; track c.typeCompteur) {
+            <div class="kp-kv-row">
+              <span class="kp-kv-key">{{ c.typeCompteur }} ({{ c.unite }})</span>
+              <span class="kp-kv-val">{{ c.index }} — N° {{ c.numeroCompteur }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Clés -->
+      @if (edl()!.cles.length > 0) {
+        <div class="kp-edl-section">
+          <h3 class="kp-text-h2">Clés remises</h3>
+          @for (cle of edl()!.cles; track cle.typeCle) {
+            <div class="kp-kv-row">
+              <span class="kp-kv-key">{{ cle.typeCle }}</span>
+              <span class="kp-kv-val">× {{ cle.quantite }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Signature -->
+      <div class="kp-signer-signature">
+        <kp-signature-pad [required]="true" (signatureChange)="onSignatureChange($event)" />
+        <button mat-flat-button color="primary" class="kp-signer-btn"
+          [disabled]="!signatureBase64() || signing()"
+          (click)="signer()">
+          @if (signing()) { <mat-spinner diameter="16" /> } @else { <mat-icon>draw</mat-icon> }
+          Signer l'état des lieux
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

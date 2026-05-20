@@ -1,0 +1,384 @@
+@use 'tokens' as t;
+
+.kp-assign {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 t.$space-8 t.$space-12;
+}
+
+// ── Back ──────────────────────────────────────────────────────────────────────
+.kp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  padding: t.$space-2 t.$space-4;
+  margin: t.$space-7 0 t.$space-5;
+  border-radius: t.$radius-sm;
+  border: none;
+  background: transparent;
+  color: t.$mint;
+  font-family: t.$font-sans;
+  font-size: t.$text-body;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+
+  &:hover { background: t.$olive-bg; color: t.$olive-light; }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.assign-loading { display: flex; flex-direction: column; gap: t.$space-3; padding-top: t.$space-7; }
+
+.kp-skel {
+  background: linear-gradient(90deg, t.$night-mid 25%, t.$night-soft 50%, t.$night-mid 75%);
+  background-size: 200% 100%;
+  animation: skel 1.6s ease-in-out infinite;
+  display: block;
+}
+@keyframes skel { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.assign-h {
+  margin-bottom: t.$space-8;
+}
+
+.eyebrow {
+  font-family: t.$font-mono;
+  font-size: t.$text-tiny;
+  letter-spacing: 0.1em;
+  color: t.$olive;
+  text-transform: uppercase;
+  margin-bottom: t.$space-3;
+}
+
+.assign-h h1 {
+  font-family: t.$font-serif;
+  font-size: t.$text-display;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: t.$mint;
+  margin-bottom: t.$space-3;
+
+  em { font-style: italic; color: t.$olive; }
+}
+
+.assign-h p {
+  color: t.$mint-mute;
+  font-size: t.$text-large;
+  max-width: 640px;
+  line-height: 1.55;
+}
+
+// ── Récap bien ────────────────────────────────────────────────────────────────
+.assign-summary {
+  background: t.$night-mid;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-lg;
+  padding: 18px 22px;
+  margin-bottom: t.$space-7;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: t.$space-4;
+  align-items: center;
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: t.$radius;
+  overflow: hidden;
+  background: t.$night-soft;
+  flex-shrink: 0;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  &-ph {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: t.$mint-dim;
+  }
+}
+
+.summary-title {
+  font-family: t.$font-serif;
+  font-size: t.$text-h5;
+  color: t.$mint;
+  margin-bottom: 4px;
+}
+
+.summary-meta {
+  font-size: t.$text-small;
+  color: t.$mint-mute;
+  display: flex;
+  align-items: center;
+  gap: t.$space-4;
+  flex-wrap: wrap;
+
+  span { display: inline-flex; align-items: center; gap: 6px; }
+  kp-icon { color: t.$olive; }
+}
+
+// Status pill
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: t.$radius-pill;
+  font-family: t.$font-mono;
+  font-size: t.$text-tiny;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  &-amber {
+    background: t.$amber-bg;
+    border: 1px solid rgba(#E8B962, 0.32);
+    color: t.$amber;
+    .dot { background: t.$amber; }
+  }
+}
+
+// ── Filtre ────────────────────────────────────────────────────────────────────
+.filter-bar {
+  margin-bottom: t.$space-6;
+}
+
+.search-input {
+  height: 44px;
+  background: t.$night-mid;
+  border: 1px solid t.$border;
+  border-radius: t.$radius;
+  padding: 0 t.$space-4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: t.$mint-mute;
+  max-width: 480px;
+  transition: border-color 150ms ease;
+
+  &:focus-within { border-color: t.$olive; }
+
+  input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: t.$mint;
+    font-family: t.$font-sans;
+    font-size: t.$text-body;
+
+    &::placeholder { color: t.$mint-dim; }
+  }
+}
+
+// ── Compteur ──────────────────────────────────────────────────────────────────
+.results-count {
+  margin-bottom: t.$space-4;
+  font-size: t.$text-small;
+  color: t.$mint-mute;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: t.$space-12 0;
+  color: t.$mint-mute;
+  gap: t.$space-3;
+
+  .empty-t { font-size: t.$text-large; font-weight: 500; color: t.$mint; }
+  .empty-s { font-size: t.$text-small; }
+}
+
+// ── Liste candidats ───────────────────────────────────────────────────────────
+.tenant-list {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-3;
+}
+
+.tenant-card {
+  background: t.$night-mid;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-lg;
+  padding: t.$space-5 t.$space-6;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: t.$space-5;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &:hover {
+    border-color: t.$olive-line;
+    background: t.$night-soft;
+  }
+}
+
+// Avatar
+.av {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: visible;
+  background: t.$olive-bg-2;
+  border: 1px solid t.$olive-line;
+  position: relative;
+  flex-shrink: 0;
+
+  img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .av-initials {
+    display: block;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: t.$olive-light;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .v-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: t.$olive;
+    color: t.$night;
+    display: grid;
+    place-items: center;
+    border: 2px solid t.$night-mid;
+  }
+}
+
+// Info candidat
+.tenant-info { min-width: 0; }
+
+.tenant-name {
+  font-family: t.$font-serif;
+  font-size: t.$text-h5;
+  color: t.$mint;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+}
+
+.tenant-mail {
+  font-family: t.$font-mono;
+  font-size: t.$text-tiny;
+  color: t.$mint-mute;
+  font-weight: 400;
+}
+
+.tenant-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-3 18px;
+  font-size: t.$text-small;
+  color: t.$mint-mute;
+  margin-bottom: t.$space-3;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  kp-icon { color: t.$olive; }
+
+  &.meta-match { color: t.$olive-light; }
+}
+
+.tenant-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tt {
+  font-family: t.$font-mono;
+  font-size: t.$text-tiny;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: t.$night;
+  border: 1px solid t.$border;
+  color: t.$mint-mute;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  &-match {
+    background: t.$olive-bg;
+    border-color: t.$olive-line;
+    color: t.$olive-light;
+  }
+}
+
+// Score / Actions
+.tenant-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: t.$space-2;
+}
+
+.tenant-actions {
+  display: flex;
+  gap: t.$space-2;
+}
+
+.btn-sm {
+  height: 32px;
+  padding: 0 t.$space-3;
+  border-radius: 7px;
+  font-size: t.$text-mini;
+  font-weight: 500;
+  border: 1px solid t.$border-2;
+  background: transparent;
+  color: t.$mint;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: t.$font-sans;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &:hover { background: rgba(#EFFBDB, 0.05); }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &-primary {
+    background: t.$olive;
+    border-color: t.$olive;
+    color: t.$night;
+    font-weight: 600;
+
+    &:hover:not(:disabled) { background: t.$olive-light; border-color: t.$olive-light; }
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(t.$night, 0.3);
+  border-top-color: t.$night;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

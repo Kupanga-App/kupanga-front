@@ -1,0 +1,153 @@
+<div class="kp-assign">
+
+  <!-- Back -->
+  <button class="kp-back-btn" (click)="goBack()">
+    <kp-icon name="arrow-left" [size]="16" />
+    Retour au bien
+  </button>
+
+  @if (loading()) {
+    <div class="assign-loading">
+      <div class="kp-skel" style="height:32px;width:200px;border-radius:8px;"></div>
+      <div class="kp-skel" style="height:56px;width:50%;border-radius:12px;margin-top:12px;"></div>
+    </div>
+  } @else {
+
+    <!-- Header -->
+    <div class="assign-h">
+      <div class="eyebrow">ÉTAPE 1 / 2 — SÉLECTION DU CANDIDAT</div>
+      <h1>Assigner un <em>locataire</em></h1>
+      <p>
+        Sélectionnez un candidat parmi les utilisateurs inscrits.
+        Cliquez sur la carte ou sur le bouton "Assigner" pour confirmer.
+      </p>
+    </div>
+
+    <!-- Récap du bien -->
+    @if (bien()) {
+      <div class="assign-summary">
+        <div class="thumb">
+          @if (bien()!.images?.length) {
+            <img [src]="bien()!.images![0]" [alt]="bien()!.titre" />
+          } @else {
+            <div class="thumb-ph"><kp-icon name="home" [size]="22" /></div>
+          }
+        </div>
+        <div>
+          <div class="summary-title">{{ bien()!.titre }}</div>
+          <div class="summary-meta">
+            <span><kp-icon name="map-pin" [size]="13" /> {{ bien()!.ville }}</span>
+            @if (totalMensuel() > 0) {
+              <span><kp-icon name="dollar-sign" [size]="13" /> {{ totalMensuel() }} €/mois</span>
+            }
+            @if (bien()!.surfaceHabitable) {
+              <span><kp-icon name="maximize-2" [size]="13" /> {{ bien()!.surfaceHabitable }} m²</span>
+            }
+          </div>
+        </div>
+        <span class="tag-pill tag-pill-amber">
+          <span class="dot"></span>
+          Vacant
+        </span>
+      </div>
+    }
+
+    <!-- Barre de recherche -->
+    <div class="filter-bar">
+      <div class="search-input">
+        <kp-icon name="search" [size]="16" />
+        <input
+          type="text"
+          [formControl]="searchCtrl"
+          placeholder="Rechercher par prénom, nom…"
+        />
+      </div>
+    </div>
+
+    <!-- Compteur -->
+    <div class="results-count">
+      <span>
+        @if (searching()) { Recherche… }
+        @else if (searchDone()) { {{ candidates().length }} candidat{{ candidates().length > 1 ? 's' : '' }} trouvé{{ candidates().length > 1 ? 's' : '' }} }
+      </span>
+    </div>
+
+    <!-- Liste des candidats -->
+    <div class="tenant-list">
+      @if (searchDone() && candidates().length === 0 && !searching()) {
+        <div class="empty-state">
+          <kp-icon name="users" [size]="32" />
+          <div class="empty-t">Aucun candidat trouvé</div>
+          <div class="empty-s">Essayez d'élargir votre recherche.</div>
+        </div>
+      }
+
+      @for (candidate of candidates(); track candidate.id) {
+        <div class="tenant-card" (click)="assign(candidate, $event)">
+
+          <!-- Avatar -->
+          <div class="av">
+            @if (candidate.urlProfile) {
+              <img [src]="candidate.urlProfile" [alt]="candidate.firstName" />
+            } @else {
+              <span class="av-initials">{{ initials(candidate) }}</span>
+            }
+            <div class="v-badge"><kp-icon name="check" [size]="10" [strokeWidth]="3" /></div>
+          </div>
+
+          <!-- Info -->
+          <div class="tenant-info">
+            <div class="tenant-name">
+              {{ candidate.firstName }} {{ candidate.lastName }}
+              <span class="tenant-mail">{{ candidate.mail }}</span>
+            </div>
+            <div class="tenant-meta">
+              <span class="meta-item">
+                <kp-icon name="briefcase" [size]="13" />
+                Locataire
+              </span>
+              @if (candidate.hasCompleteProfil) {
+                <span class="meta-item meta-match">
+                  <kp-icon name="circle-check" [size]="13" />
+                  Profil complet
+                </span>
+              }
+            </div>
+            <div class="tenant-tags">
+              @if (candidate.hasCompleteProfil) {
+                <span class="tt tt-match">Profil complet</span>
+              } @else {
+                <span class="tt">Profil incomplet</span>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="tenant-score">
+            <div class="tenant-actions">
+              <button class="btn-sm" (click)="$event.stopPropagation()">
+                <kp-icon name="eye" [size]="13" />
+                Voir profil
+              </button>
+              <button
+                class="btn-sm btn-sm-primary"
+                [disabled]="assigningId() === candidate.id"
+                (click)="assign(candidate, $event)"
+              >
+                @if (assigningId() === candidate.id) {
+                  <span class="spinner"></span>
+                } @else {
+                  <kp-icon name="user-plus" [size]="13" />
+                }
+                Assigner
+              </button>
+            </div>
+          </div>
+
+        </div>
+      }
+    </div>
+
+  }
+
+</div>

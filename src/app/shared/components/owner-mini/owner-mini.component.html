@@ -1,0 +1,20 @@
+<div class="owner-mini">
+  <div class="owner-avatar">
+    @if (owner.urlProfile) {
+      <img [src]="owner.urlProfile" [alt]="owner.firstName + ' ' + owner.lastName" />
+    } @else {
+      <span class="initials">{{ initials }}</span>
+    }
+  </div>
+  <div class="owner-info">
+    <span class="owner-role">Propriétaire</span>
+    <span class="owner-name">{{ owner.firstName }} {{ owner.lastName }}</span>
+  </div>
+  <div class="owner-status">
+    @if (isVacant) {
+      <span class="status-badge vacant">Vacant</span>
+    } @else {
+      <span class="status-badge occupied">Occupé</span>
+    }
+  </div>
+</div>

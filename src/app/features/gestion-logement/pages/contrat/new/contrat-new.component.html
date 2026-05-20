@@ -1,0 +1,401 @@
+﻿@if (loading()) {
+  <div class="cn-loading">
+    <div class="kp-skel" style="height:44px;border-radius:8px;margin-bottom:8px;"></div>
+    <div class="kp-skel" style="height:24px;border-radius:8px;width:300px;"></div>
+  </div>
+}
+
+@if (!loading() && bien()) {
+  <div class="cn-page">
+
+    <!-- Back -->
+    <button class="cn-back" type="button" (click)="cancel()">
+      <kp-icon name="arrow-left" [size]="15" />
+      {{ bien()!.titre }}
+    </button>
+
+    <!-- Flow heading -->
+    <div class="flow-heading">
+      <div class="flow-eyebrow">CRÉATION · CONTRAT DE BAIL</div>
+      <h1 class="flow-h1">Nouveau <em>contrat</em></h1>
+      <p class="flow-sub">
+        Renseignez les informations du bail pour
+        <strong>{{ bien()!.titre }}</strong>.
+        Le contrat sera à signer par les deux parties.
+      </p>
+    </div>
+
+    <!-- Stepper -->
+    <kp-wizard-stepper [steps]="steps" [currentStep]="currentStep()" />
+
+    <!-- Grid 2 col -->
+    <div class="wizard">
+
+      <!-- Main -->
+      <div class="wizard-main">
+
+        <!-- ══ Step 1 — Locataire ══ -->
+        @if (currentStep() === 0) {
+          <div class="wcard">
+            <div class="wcard-h">
+              <div class="eyebrow">ÉTAPE 01</div>
+              <div class="t">Sélectionner le <em>locataire</em></div>
+              <div class="s">Indiquez l'email du locataire ou créez le contrat en brouillon.</div>
+            </div>
+
+            <div class="wsection" [formGroup]="step1">
+              <div class="wsection-h">Email du locataire</div>
+                            <div class="kp-field">
+                            <label class="kp-label">Email <span class="kp-req">*</span></label>
+                            <mat-form-field class="full-width">
+                <input matInput type="email" formControlName="emailLocataire"
+                  placeholder="locataire@email.com" [disabled]="sansBail()" />
+                @if (step1.get('emailLocataire')?.hasError('required') && step1.get('emailLocataire')?.touched) {
+                  <mat-error>Email requis</mat-error>
+                }
+                @if (step1.get('emailLocataire')?.hasError('email') && step1.get('emailLocataire')?.touched) {
+                  <mat-error>Email invalide</mat-error>
+                }
+              </mat-form-field>
+              </div>
+            </div>
+
+            <div class="divider-or"><span>OU</span></div>
+
+            <button type="button" class="sans-bail-btn" [class.on]="sansBail()" (click)="toggleSansBail()">
+              <span class="sans-bail-check">
+                @if (sansBail()) { <kp-icon name="check" [size]="12" [strokeWidth]="2.5" /> }
+              </span>
+              <span class="sans-bail-label">Sans locataire (enregistrer comme brouillon)</span>
+            </button>
+          </div>
+        }
+
+        <!-- ══ Step 2 — Bail ══ -->
+        @if (currentStep() === 1) {
+          <div class="wcard">
+            <div class="wcard-h">
+              <div class="eyebrow">ÉTAPE 02</div>
+              <div class="t">Type de <em>bail</em></div>
+              <div class="s">Définissez le type de bail, les dates et la durée.</div>
+            </div>
+
+            <div class="wsection">
+              <div class="wsection-h">Type de bail</div>
+              <div class="opt-cards col3">
+                <kp-opt-card
+                  icon="home"
+                  title="Nue propriété"
+                  subtitle="Bail classique vide · 3 ans"
+                  [selected]="typeBail() === 'NUE'"
+                  (select)="setTypeBail('NUE')"
+                />
+                <kp-opt-card
+                  icon="layers"
+                  title="Meublée"
+                  subtitle="Logement équipé · 1 an"
+                  [selected]="typeBail() === 'MEUBLEE'"
+                  (select)="setTypeBail('MEUBLEE')"
+                />
+                <kp-opt-card
+                  icon="users"
+                  title="Colocation"
+                  subtitle="Plusieurs locataires"
+                  [selected]="typeBail() === 'COLOC'"
+                  (select)="setTypeBail('COLOC')"
+                />
+              </div>
+            </div>
+
+            <div class="wsection" [formGroup]="step2">
+              <div class="wsection-h">Période</div>
+              <div class="form-row col2">
+                                <div class="kp-field">
+                                <label class="kp-label">Date de début <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebut" />
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerDebut" />
+                  <mat-datepicker #pickerDebut />
+                  @if (step2.get('dateDebut')?.invalid && step2.get('dateDebut')?.touched) {
+                    <mat-error>Date de début requise</mat-error>
+                  }
+                </mat-form-field>
+                </div>
+                                <div class="kp-field">
+                                <label class="kp-label">Date de fin (optionnel) <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput [matDatepicker]="pickerFin" formControlName="dateFin" />
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerFin" />
+                  <mat-datepicker #pickerFin />
+                </mat-form-field>
+                </div>
+              </div>
+
+              <div class="wsection-h mt16">Durée du bail</div>
+              <kp-chips-group
+                [options]="dureChips"
+                [value]="selectedDuree()"
+                (change)="onDureeChange($event)"
+              />
+
+              <div class="form-row col2 mt16">
+                                <div class="kp-field">
+                                <label class="kp-label">Durée (mois) <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput type="number" formControlName="dureeBailMois" min="1" />
+                  <span matSuffix>mois</span>
+                  @if (step2.get('dureeBailMois')?.invalid && step2.get('dureeBailMois')?.touched) {
+                    <mat-error>Durée requise</mat-error>
+                  }
+                </mat-form-field>
+                </div>
+                                <div class="kp-field">
+                                <label class="kp-label">Préavis <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput type="number" formControlName="preavisMois" min="0" />
+                  <span matSuffix>mois</span>
+                </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ══ Step 3 — Loyer ══ -->
+        @if (currentStep() === 2) {
+          <div class="wcard" [formGroup]="step3">
+            <div class="wcard-h">
+              <div class="eyebrow">ÉTAPE 03</div>
+              <div class="t">Loyer &amp; <em>garanties</em></div>
+              <div class="s">Définissez les montants financiers du bail.</div>
+            </div>
+
+            <div class="wsection">
+              <div class="wsection-h">Montants mensuels</div>
+              <div class="form-row col3">
+                                <div class="kp-field">
+                                <label class="kp-label">Loyer (€) <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput type="number" formControlName="loyerMensuel" min="0" />
+                  <span matSuffix>€</span>
+                  @if (step3.get('loyerMensuel')?.invalid && step3.get('loyerMensuel')?.touched) {
+                    <mat-error>Loyer requis</mat-error>
+                  }
+                </mat-form-field>
+                </div>
+                                <div class="kp-field">
+                                <label class="kp-label">Charges (€) <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput type="number" formControlName="chargesMensuelles" min="0" />
+                  <span matSuffix>€</span>
+                </mat-form-field>
+                </div>
+                <div class="total-field">
+                  <span class="total-lbl">Total / mois</span>
+                  <span class="total-val">{{ totalMensuel() }} €</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="wsection">
+              <div class="wsection-h">Garanties</div>
+              <div class="form-row col2">
+                                <div class="kp-field">
+                                <label class="kp-label">Dépôt de garantie (€) <span class="kp-req">*</span></label>
+                                <mat-form-field>
+                  <input matInput type="number" formControlName="depotGarantie" min="0" />
+                  <span matSuffix>€</span>
+                  @if (step3.get('depotGarantie')?.invalid && step3.get('depotGarantie')?.touched) {
+                    <mat-error>Dépôt requis</mat-error>
+                  }
+                </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ══ Step 4 — Récap ══ -->
+        @if (currentStep() === 3) {
+          <div class="wcard">
+            <div class="wcard-h">
+              <div class="eyebrow">ÉTAPE 04</div>
+              <div class="t"><em>Récapitulatif</em> du contrat</div>
+              <div class="s">Vérifiez les informations avant de générer le contrat.</div>
+            </div>
+
+            <div class="wsection">
+              <div class="wsection-h">Informations</div>
+              <div class="recap-list">
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Locataire</span>
+                  <span class="recap-v">
+                    @if (sansBail()) { Brouillon (sans locataire) }
+                    @else { {{ step1.get('emailLocataire')?.value }} }
+                  </span>
+                </div>
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Type de bail</span>
+                  <span class="recap-v">{{ typeBailLabel() }}</span>
+                </div>
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Début</span>
+                  <span class="recap-v">{{ formatDate(step2.get('dateDebut')?.value) }}</span>
+                </div>
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Durée</span>
+                  <span class="recap-v">{{ step2.get('dureeBailMois')?.value }} mois</span>
+                </div>
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Loyer</span>
+                  <span class="recap-v">{{ step3.get('loyerMensuel')?.value }} €/mois</span>
+                </div>
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Charges</span>
+                  <span class="recap-v">{{ step3.get('chargesMensuelles')?.value }} €/mois</span>
+                </div>
+                <div class="recap-row">
+                  <kp-icon name="check" [size]="14" class="recap-check" />
+                  <span class="recap-k">Dépôt de garantie</span>
+                  <span class="recap-v">{{ step3.get('depotGarantie')?.value }} €</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="wsection">
+              <div class="wsection-h">Options</div>
+              <div class="send-options">
+                <div class="send-opt on">
+                  <span class="send-check"><kp-icon name="check" [size]="12" [strokeWidth]="2.5" /></span>
+                  <span class="send-lbl">Envoyer pour signature électronique</span>
+                </div>
+                <div class="send-opt on">
+                  <span class="send-check"><kp-icon name="check" [size]="12" [strokeWidth]="2.5" /></span>
+                  <span class="send-lbl">Notifier le locataire par email</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Footer -->
+        <div class="wfoot">
+          <button type="button" class="btn" (click)="currentStep() === 0 ? cancel() : prev()">
+            @if (currentStep() > 0) {
+              <kp-icon name="arrow-left" [size]="14" />
+              Précédent
+            } @else {
+              Annuler
+            }
+          </button>
+          <div class="wfoot-right">
+            <span class="wfoot-hint">
+              <kp-icon name="check" [size]="12" />
+              Auto-sauvegardé
+            </span>
+            @if (currentStep() < 3) {
+              <button type="button" class="btn primary" (click)="next()">
+                Suivant
+                <kp-icon name="arrow-right" [size]="14" />
+              </button>
+            } @else {
+              <button type="button" class="btn primary" [disabled]="submitting()" (click)="submit()">
+                @if (submitting()) {
+                  <kp-icon name="refresh-cw" [size]="14" />
+                } @else {
+                  <kp-icon name="file-check" [size]="14" />
+                }
+                Générer le contrat
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Aside: Paper preview -->
+      <div class="wizard-aside">
+        <kp-paper>
+          <div class="paper-h">
+            <div class="paper-stamp">Loi N° 89-462 du 6 juillet 1989</div>
+            <div class="paper-title">Contrat de bail <em>d'habitation</em></div>
+            <div class="paper-meta">{{ refTag() }} · Aperçu en cours de saisie</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Entre les soussignés — Bailleur</div>
+            <div class="paper-body">
+              <strong>{{ bien()?.proprietaire?.firstName }} {{ bien()?.proprietaire?.lastName }}</strong>
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Et — Preneur</div>
+            <div class="paper-body">
+              @if (sansBail()) {
+                <em>Brouillon — sans locataire</em>
+              } @else if (step1.get('emailLocataire')?.value) {
+                {{ step1.get('emailLocataire')!.value }}
+              } @else {
+                <span class="blank">Non renseigné</span>
+              }
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Article 1 — Objet</div>
+            <div class="paper-body">{{ bien()?.adresse }}, {{ bien()?.ville }}</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Article 2 — Durée</div>
+            <div class="paper-kv">
+              <span class="k">Type</span>
+              <span class="v">{{ typeBailLabel() }}</span>
+              <span class="k">Durée</span>
+              <span class="v">{{ step2.get('dureeBailMois')?.value || '—' }} mois</span>
+              <span class="k">Début</span>
+              <span class="v">{{ formatDate(step2.get('dateDebut')?.value) }}</span>
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Article 3 — Loyer</div>
+            <div class="paper-amount">
+              <span class="paper-amount-lbl">Total mensuel</span>
+              <span class="paper-amount-val">{{ totalMensuel() }} €</span>
+            </div>
+            <div class="paper-kv mt8">
+              <span class="k">Loyer</span>
+              <span class="v">{{ step3.get('loyerMensuel')?.value || '—' }} €</span>
+              <span class="k">Charges</span>
+              <span class="v">{{ step3.get('chargesMensuelles')?.value || '—' }} €</span>
+              <span class="k">Dépôt</span>
+              <span class="v">{{ step3.get('depotGarantie')?.value || '—' }} €</span>
+            </div>
+          </div>
+
+          <div class="paper-foot">
+            <div>
+              <div class="paper-sig-lbl">Fait à</div>
+              <div class="paper-sig-val">{{ bien()?.ville }}</div>
+            </div>
+            <div>
+              <div class="paper-sig-lbl">Aperçu généré le</div>
+              <div class="paper-sig-val">{{ today | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+        </kp-paper>
+      </div>
+
+    </div>
+  </div>
+}
+
+
+

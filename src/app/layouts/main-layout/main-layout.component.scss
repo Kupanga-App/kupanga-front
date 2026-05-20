@@ -6,8 +6,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--p-surface-ground);
-  color: var(--p-text-color);
+  background-color: var(--kp-bg);
+  color: var(--kp-text-1);
 }
 
 .container {
@@ -33,7 +33,7 @@
   top: 0;
   z-index: 20;
   padding: 1rem;
-  background-color: var(--p-surface-0);
+  background-color: var(--kp-surface);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -46,7 +46,7 @@
 .ml-logo {
   font-weight: 700;
   font-size: 1.5rem;
-  color: var(--p-primary-color);
+  color: var(--kp-primary);
 }
 
 .ml-main {
@@ -65,8 +65,8 @@
   margin-top: 1rem;
   margin-bottom: 1rem;
   border-radius: 0.5rem;
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-900);
+  background-color: var(--kp-primary-subtle);
+  color: var(--kp-primary-active);
 
   @media (min-width: 768px) {
     height: 25rem;
@@ -81,12 +81,12 @@
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 1rem;
-  color: var(--p-text-color);
+  color: var(--kp-text-1);
 }
 
 .ml-subtitle {
   font-size: 1.25rem;
-  color: var(--p-text-muted-color);
+  color: var(--kp-text-2);
   margin-bottom: 2rem;
 }
 
@@ -98,8 +98,8 @@
   justify-content: center;
   border-radius: 0.5rem;
   height: 10rem;
-  background-color: var(--p-surface-50);
-  border: 1px solid var(--p-surface-200);
+  background-color: var(--kp-surface-2);
+  border: 1px solid var(--kp-border-strong);
 }
 
 .ml-cta-content {
@@ -114,13 +114,14 @@
 .ml-cta-text {
   font-size: 1.875rem;
   font-weight: 700;
-  color: var(--p-text-color);
+  color: var(--kp-text-1);
   margin: 0;
 }
 
 .ml-footer {
-  background-color: var(--p-surface-900);
-  color: var(--p-surface-0);
+  background-color: var(--kp-bg);
+  color: var(--kp-text-2);
   padding: 1rem;
   text-align: center;
+  border-top: 0.5px solid var(--kp-border);
 }
