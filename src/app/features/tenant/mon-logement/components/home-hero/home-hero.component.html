@@ -1,0 +1,20 @@
+<div class="home-hero">
+  @for (i of placeholders; track i) {
+    <div class="ph" [class]="'ph--' + i">
+      @if (photos()[i - 1]) {
+        <img [src]="photos()[i - 1]" [alt]="'Photo ' + i" loading="lazy" />
+      } @else {
+        <div class="ph-placeholder">
+          <kp-icon name="image" [size]="24" />
+        </div>
+      }
+    </div>
+  }
+
+  @if (totalCount() > 0 || photos().length > 0) {
+    <button class="photo-btn" (click)="openGallery.emit()">
+      <kp-icon name="image" [size]="14" />
+      Voir les {{ totalCount() || photos().length }} photos
+    </button>
+  }
+</div>

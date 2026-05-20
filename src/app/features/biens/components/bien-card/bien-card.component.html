@@ -1,0 +1,153 @@
+<div
+  class="card"
+  role="article"
+  [attr.aria-label]="bien.titre + ', ' + bien.ville + ', ' + (bien.loyerMensuel ?? 0) + ' € par mois'"
+  (click)="onCardClick()"
+>
+  <!-- ── MOSAÏQUE PHOTOS ──────────────────────────────────────────────────── -->
+  <div class="mosaic">
+    <!-- Photo principale -->
+    <div class="mp-main" [class.img-error]="!photo1">
+      @if (photo1) {
+        <img [src]="photo1" [alt]="bien.titre + ' — photo 1'" (error)="onImgError($event)" />
+      } @else {
+        <div class="photo-placeholder">
+          <lucide-icon name="building" [size]="28" [strokeWidth]="1.2" />
+        </div>
+      }
+      <!-- Badges type + options -->
+      <div class="badges-overlay">
+        <span class="badge" [class]="'badge-' + bien.typeBien.toLowerCase()">
+          {{ typeBienLabel(bien.typeBien) }}
+        </span>
+        @if (bien.meuble) {
+          <span class="badge badge-meuble">Meublé</span>
+        }
+        @if (bien.colocation) {
+          <span class="badge badge-coloc">Coloc.</span>
+        }
+      </div>
+      <!-- Compteur photos -->
+      @if (totalPhotos > 1) {
+        <span class="photo-counter">1 / {{ totalPhotos }}</span>
+      }
+    </div>
+
+    <!-- Vignette 2 -->
+    <div class="mp-sm">
+      @if (photo2) {
+        <img [src]="photo2" [alt]="bien.titre + ' — photo 2'" (error)="onImgError($event)" />
+      } @else {
+        <div class="photo-placeholder"></div>
+      }
+    </div>
+
+    <!-- Vignette 3 + overflow -->
+    <div class="mp-sm mp-sm-last">
+      @if (photo3) {
+        <img [src]="photo3" [alt]="bien.titre + ' — photo 3'" (error)="onImgError($event)" />
+        @if (photosRestantes > 0) {
+          <div class="photos-overflow">+{{ photosRestantes }}</div>
+        }
+      } @else {
+        <div class="photo-placeholder"></div>
+      }
+    </div>
+  </div>
+
+  <!-- ── CORPS ───────────────────────────────────────────────────────────── -->
+  <div class="card-body">
+    <!-- Titre + Prix -->
+    <div class="title-price-row">
+      <div class="title-addr">
+        <span class="card-title">{{ bien.titre }}</span>
+        <span class="card-addr">{{ bien.adresse }}, {{ bien.ville }}</span>
+      </div>
+      <div class="price-block">
+        <span class="price-value">
+          {{ bien.loyerMensuel | number:'1.0-0' }}&nbsp;<span class="price-unit">€/mois</span>
+        </span>
+        @if (hasCharges) {
+          <span class="price-charges">+{{ bien.chargesMensuelles }} € charges</span>
+        }
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Specs -->
+    <div class="specs-row">
+      @if (bien.surfaceHabitable) {
+        <span class="spec-item">
+          <lucide-icon name="ruler" [size]="11" [strokeWidth]="1.5" />
+          {{ bien.surfaceHabitable }} m²
+        </span>
+      }
+      @if (bien.nombrePieces) {
+        <span class="spec-item">
+          <lucide-icon name="layout-dashboard" [size]="11" [strokeWidth]="1.5" />
+          {{ bien.nombrePieces }} p.
+        </span>
+      }
+      @if (bien.nombreChambres) {
+        <span class="spec-item">
+          <lucide-icon name="bed" [size]="11" [strokeWidth]="1.5" />
+          {{ bien.nombreChambres }} ch.
+        </span>
+      }
+      @if (bien.etage && bien.etage > 0) {
+        <span class="spec-item">
+          <lucide-icon name="building-2" [size]="11" [strokeWidth]="1.5" />
+          Ét. {{ bien.etage }}
+        </span>
+      }
+      @if (bien.ascenseur) {
+        <span class="spec-item spec-asc">
+          <lucide-icon name="arrow-up-down" [size]="11" [strokeWidth]="1.5" />
+          Asc.
+        </span>
+      }
+      @if (bien.classeEnergie) {
+        <span class="spec-dpe">
+          <kp-dpe-badge [classe]="bien.classeEnergie" />
+        </span>
+      }
+    </div>
+
+    <!-- POIs -->
+    @if (pois.length > 0) {
+      <div class="sep"></div>
+      <div class="pois-row">
+        <lucide-icon name="map-pin" [size]="11" [strokeWidth]="1.5" class="pois-prefix" />
+        @for (poi of pois; track poi) {
+          <kp-poi-chip [poi]="poi" />
+        }
+      </div>
+    }
+
+    <div class="sep"></div>
+
+    <!-- Propriétaire -->
+    <kp-owner-mini [owner]="bien.proprietaire" [isVacant]="isVacant" />
+  </div>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────────────── -->
+  <div class="card-footer" (click)="$event.stopPropagation()">
+    <span class="dispo-label">
+      <lucide-icon name="calendar" [size]="12" [strokeWidth]="1.5" />
+      @if (bien.disponibleDe) {
+        Dispo. {{ bien.disponibleDe | date:'d MMMM yyyy' }}
+      } @else {
+        Disponible
+      }
+    </span>
+    <button
+      class="btn-voir"
+      type="button"
+      (click)="onView($event)"
+      [attr.aria-label]="'Voir le détail de ' + bien.titre"
+    >
+      Voir <lucide-icon name="arrow-right" [size]="12" [strokeWidth]="1.5" />
+    </button>
+  </div>
+</div>

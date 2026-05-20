@@ -1,0 +1,108 @@
+@use 'tokens' as t;
+
+.card {
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+  border-radius: t.$radius;
+  padding: t.$space-4 t.$space-5;
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+}
+
+.card-h {
+  .t {
+    font-family: var(--kp-font-display);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--kp-text-1);
+  }
+}
+
+.owner-mini {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: t.$space-3;
+}
+
+.owner-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--kp-primary-subtle);
+  border: 1px solid var(--kp-primary-subtle-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--kp-font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--kp-primary-hover);
+  flex-shrink: 0;
+}
+
+.owner-role {
+  font-family: var(--kp-font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--kp-text-3);
+  margin-bottom: 2px;
+}
+
+.owner-name {
+  font-family: var(--kp-font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+}
+
+.verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--kp-primary-subtle);
+  border-radius: t.$radius-pill;
+  font-family: var(--kp-font-mono);
+  font-size: 10px;
+  color: var(--kp-primary-hover);
+  white-space: nowrap;
+}
+
+.owner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-2;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  padding: 9px t.$space-4;
+  border-radius: t.$radius-sm;
+  font-family: var(--kp-font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 150ms ease;
+
+  &--primary {
+    background: var(--kp-primary);
+    color: var(--kp-primary-on);
+    &:hover { background: var(--kp-primary-hover); }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--kp-text-2);
+    border-color: var(--kp-border);
+    &:hover { background: var(--kp-surface-2); color: var(--kp-text-1); }
+  }
+
+  &--full { width: 100%; }
+}

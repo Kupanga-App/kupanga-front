@@ -1,0 +1,84 @@
+@use 'tokens' as t;
+
+.stepper {
+  display: flex;
+  align-items: center;
+  padding: 20px t.$space-7;
+  background: t.$night-mid;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-lg;
+  margin-bottom: t.$space-7;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.step-link {
+  flex: 1;
+  height: 1px;
+  background: t.$border;
+  margin: 0 t.$space-4;
+
+  &.done {
+    background: t.$olive;
+  }
+}
+
+.step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid t.$border-2;
+  display: grid;
+  place-items: center;
+  color: t.$mint-mute;
+  font-family: t.$font-mono;
+  font-size: t.$text-small;
+  font-weight: 500;
+  flex-shrink: 0;
+  transition: all 200ms ease;
+
+  .step.active & {
+    background: t.$olive;
+    border-color: t.$olive;
+    color: t.$night;
+    font-weight: 600;
+    box-shadow: 0 0 0 4px t.$olive-bg;
+  }
+
+  .step.done & {
+    background: t.$olive;
+    border-color: t.$olive;
+    color: t.$night;
+  }
+}
+
+.step-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.step-lbl1 {
+  font-family: t.$font-mono;
+  font-size: t.$text-tiny;
+  color: t.$mint-mute;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  .step.active & { color: t.$olive; }
+}
+
+.step-lbl2 {
+  font-size: t.$text-body;
+  font-weight: 500;
+  color: t.$mint-mute;
+  margin-top: 2px;
+  white-space: nowrap;
+
+  .step.active & { color: t.$mint; font-weight: 600; }
+  .step.done &   { color: t.$mint; }
+}

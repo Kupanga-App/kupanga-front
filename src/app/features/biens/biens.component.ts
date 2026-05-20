@@ -1,129 +1,125 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatMenuModule } from '@angular/material/menu';
+import { LucideAngularModule } from 'lucide-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BienService } from './services/bien.service';
-import { BienDTO, BienSearchDTO, BienType } from './models/bien.model';
+import { BienDTO, BienFilters, BienSearchDTO, BienType } from './models/bien.model';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { BiensFilterBarComponent } from './components/biens-filter-bar/biens-filter-bar.component';
+import { BienCardComponent } from './components/bien-card/bien-card.component';
+import { BienCardSkeletonComponent } from './components/bien-card-skeleton/bien-card-skeleton.component';
 
 @Component({
   selector: 'app-biens',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatChipsModule,
-    MatMenuModule,
-    DatePipe,
+    LucideAngularModule,
+    BiensFilterBarComponent,
+    BienCardComponent,
+    BienCardSkeletonComponent,
   ],
   templateUrl: './biens.component.html',
   styleUrls: ['./biens.component.scss'],
 })
 export class BiensComponent implements OnInit {
   private bienService = inject(BienService);
-  private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private router      = inject(Router);
+  private snackBar    = inject(MatSnackBar);
   private authService = inject(AuthService);
 
-  readonly searchSubject = new Subject<string>();
+  filters      = signal<BienFilters>({ sortBy: 'date_desc' });
+  viewMode     = signal<'grid' | 'list' | 'map'>('grid');
+  isLoading    = signal(false);
+  totalPages   = signal(0);
+  pageActuelle = signal(0);
 
-  // State signals
-  biens = signal<BienDTO[]>([]);
-  loading = signal<boolean>(false);
-  totalElements = signal<number>(0);
-  totalPages = signal<number>(0);
-  pageActuelle = signal<number>(0);
-  searchQuery = signal<string>('');
-  selectedTypes = signal<BienType[]>([]);
-  selectedVille = signal<string>('');
-  sortBy = signal<string>('createdAt');
-  sortDirection = signal<'ASC' | 'DESC'>('DESC');
+  private rawBiens = signal<BienDTO[]>([]);
 
-  // Computed
-  hasResults = computed(() => this.biens().length > 0);
-  pages = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i));
-  isProRoute = computed(() => {
-    const url = this.router.url;
-    return url.startsWith('/pro') || url.startsWith('/loc');
+  // /pro/biens → "Mes biens" (getMesBiens), /pro → "Explorer les biens" (search public)
+  isProBiensRoute = computed(() => this.router.url.startsWith('/pro/biens'));
+  isProHomeRoute  = computed(() => /^\/pro\/?$/.test(this.router.url));
+  isProRoute      = computed(() => this.router.url.startsWith('/pro'));
+  isProprietaire  = computed(() => this.authService.currentUser()?.role === 'ROLE_PROPRIETAIRE');
+
+  biens = computed(() => {
+    const f = this.filters();
+    let result = this.rawBiens();
+
+    if (f.pois?.length) {
+      result = result.filter(b => f.pois!.every(p => (b.pois ?? []).includes(p)));
+    }
+    if (f.nbChambresMin) {
+      result = result.filter(b => (b.nombreChambres ?? 0) >= f.nbChambresMin!);
+    }
+    if (f.classeEnergieMax) {
+      const classes = ['A','B','C','D','E','F','G'];
+      const maxIdx = classes.indexOf(f.classeEnergieMax);
+      result = result.filter(b =>
+        b.classeEnergie ? classes.indexOf(b.classeEnergie) <= maxIdx : true
+      );
+    }
+    return result;
   });
-  isProprietaire = computed(() =>
-    this.authService.currentUser()?.role === 'ROLE_PROPRIETAIRE'
-  );
 
-  sortLabel = computed(() => {
-    const map: Record<string, string> = {
-      'createdAt_DESC': 'Date ↓',
-      'createdAt_ASC':  'Date ↑',
-      'ville_ASC':      'Ville A→Z',
-      'titre_ASC':      'Titre A→Z',
-    };
-    return map[`${this.sortBy()}_${this.sortDirection()}`] ?? 'Date ↓';
-  });
-
-  readonly bienTypes: { value: BienType; label: string }[] = [
-    { value: 'APPARTEMENT', label: 'Appartement' },
-    { value: 'MAISON',      label: 'Maison' },
-    { value: 'STUDIO',      label: 'Studio' },
-  ];
-
-  constructor() {
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntilDestroyed(),
-    ).subscribe((query: string) => this.onSearch(query));
-  }
+  totalCount  = computed(() => this.biens().length);
+  vacantCount = computed(() => this.biens().filter(b => b.locataire == null).length);
+  hasResults  = computed(() => this.biens().length > 0);
+  pages       = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i));
+  skeletons = [1, 2, 3, 4, 5, 6];
 
   ngOnInit(): void {
-    this.loadBiens();
+    if (this.isProBiensRoute()) {
+      this.loadMesBiens();
+    } else {
+      this.loadBiens();
+    }
+  }
+
+  private loadMesBiens(): void {
+    this.isLoading.set(true);
+    this.bienService.getMesBiens().subscribe({
+      next: data => { this.rawBiens.set(data); this.isLoading.set(false); },
+      error: () => {
+        this.isLoading.set(false);
+        this.snackBar.open('Erreur lors du chargement de vos biens', 'Fermer', { duration: 3000 });
+      },
+    });
   }
 
   loadBiens(): void {
-    this.loading.set(true);
+    this.isLoading.set(true);
+    const f   = this.filters();
+    const dto: BienSearchDTO = { page: this.pageActuelle(), size: 20 };
 
-    const dto: BienSearchDTO = {
-      page:          this.pageActuelle(),
-      size:          10,
-      sortBy:        this.sortBy(),
-      sortDirection: this.sortDirection(),
-    };
+    if (f.q)        dto.titre     = f.q;
+    if (f.typeBien) dto.typesBien  = [f.typeBien as BienType];
+    if (f.ville)    dto.villes     = [f.ville];
+    if (f.loyerMax)  dto.loyerMax  = f.loyerMax;
+    if (f.surfaceMin) dto.surfaceMin = f.surfaceMin;
+    if (f.nbPiecesMin) dto.piecesMin = f.nbPiecesMin;
+    if (f.meuble    != null) dto.meuble    = f.meuble;
+    if (f.colocation != null) dto.colocation = f.colocation;
+    if (f.ascenseur  != null) dto.ascenseur  = f.ascenseur;
 
-    const query = this.searchQuery().trim();
-    if (query) dto.titre = query;
-
-    const types = this.selectedTypes();
-    if (types.length > 0) dto.typesBien = types;
-
-    const ville = this.selectedVille().trim();
-    if (ville) dto.villes = [ville];
+    switch (f.sortBy) {
+      case 'date_desc':    dto.sortBy = 'createdAt';      dto.sortDirection = 'DESC'; break;
+      case 'date_asc':     dto.sortBy = 'createdAt';      dto.sortDirection = 'ASC';  break;
+      case 'prix_asc':     dto.sortBy = 'loyerMensuel';   dto.sortDirection = 'ASC';  break;
+      case 'prix_desc':    dto.sortBy = 'loyerMensuel';   dto.sortDirection = 'DESC'; break;
+      case 'surface_desc': dto.sortBy = 'surfaceHabitable'; dto.sortDirection = 'DESC'; break;
+      default:             dto.sortBy = 'createdAt';      dto.sortDirection = 'DESC';
+    }
 
     this.bienService.search(dto).subscribe({
-      next: (page) => {
-        this.biens.set(page.contenu);
-        this.totalElements.set(page.totalElements);
+      next: page => {
+        this.rawBiens.set(page.contenu);
         this.totalPages.set(page.totalPages);
         this.pageActuelle.set(page.pageActuelle);
-        this.loading.set(false);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.loading.set(false);
+        this.isLoading.set(false);
         this.snackBar.open('Impossible de charger les biens.', 'Fermer', {
           duration: 5000,
           panelClass: ['snack-error'],
@@ -132,49 +128,21 @@ export class BiensComponent implements OnInit {
     });
   }
 
-  onSearch(query: string): void {
-    this.searchQuery.set(query);
+  onFiltersChange(f: BienFilters): void {
+    this.filters.set(f);
     this.pageActuelle.set(0);
-    this.loadBiens();
+    if (!this.isProBiensRoute()) this.loadBiens();
   }
 
-  toggleType(type: BienType): void {
-    const current = this.selectedTypes();
-    if (current.includes(type)) {
-      this.selectedTypes.set(current.filter(t => t !== type));
-    } else {
-      this.selectedTypes.set([...current, type]);
-    }
-    this.pageActuelle.set(0);
-    this.loadBiens();
-  }
+  onViewModeChange(m: 'grid' | 'list' | 'map'): void { this.viewMode.set(m); }
 
-  onVilleChange(ville: string): void {
-    this.selectedVille.set(ville);
-    this.pageActuelle.set(0);
-    this.loadBiens();
-  }
-
-  onSortChange(field: string, direction: 'ASC' | 'DESC'): void {
-    this.sortBy.set(field);
-    this.sortDirection.set(direction);
-    this.loadBiens();
+  navigateToBien(id: number): void {
+    const base = this.isProBiensRoute() ? '/pro/biens' : '/biens';
+    this.router.navigate([base, id]);
   }
 
   goToPage(page: number): void {
     this.pageActuelle.set(page);
     this.loadBiens();
-  }
-
-  navigateToBien(id: number): void {
-    if (this.isProprietaire()) {
-      this.router.navigate(['/pro/biens', id]);
-    } else {
-      this.router.navigate(['/biens', id]);
-    }
-  }
-
-  typeBienLabel(type: BienType): string {
-    return this.bienTypes.find(t => t.value === type)?.label ?? type;
   }
 }

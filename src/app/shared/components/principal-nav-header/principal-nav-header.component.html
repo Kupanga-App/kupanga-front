@@ -69,18 +69,21 @@
 
 <!-- Niveau 2 — 40px -->
 <mat-toolbar class="kp-nav-l2">
+
   @if (!isConnected()) {
+    <!-- Non connecté -->
     <a class="kp-nav-link" routerLink="/" routerLinkActive="active"
-       [routerLinkActiveOptions]="{exact: true}">Immobilier</a>
-    <a class="kp-nav-link" routerLink="/louer" routerLinkActive="active">Louer</a>
-    <a class="kp-nav-link" routerLink="/acheter" routerLinkActive="active">Acheter</a>
-    <a class="kp-nav-link" routerLink="/estimer" routerLinkActive="active">Estimer</a>
-    <a class="kp-nav-link" routerLink="/bons-plans" routerLinkActive="active">Bons plans</a>
+       [routerLinkActiveOptions]="{exact: true}">Louer</a>
+    <span class="kp-nav-link kp-nav-link--soon">Mes recherches</span>
+    <span class="kp-nav-link kp-nav-link--soon">Comment ça marche</span>
+    <span class="kp-nav-link kp-nav-link--soon">Aide</span>
+
   } @else if (isAdmin()) {
+    <!-- Propriétaire -->
     <a class="kp-nav-link" routerLink="/pro" routerLinkActive="active"
        [routerLinkActiveOptions]="{exact: true}">
-      <mat-icon>home</mat-icon>
-      Accueil
+      <mat-icon>explore</mat-icon>
+      Explorer
     </a>
     <a class="kp-nav-link" routerLink="/pro/biens" routerLinkActive="active">
       <mat-icon>house</mat-icon>
@@ -99,30 +102,75 @@
       Quittances
     </a>
     <a class="kp-nav-link" routerLink="/pro/messagerie" routerLinkActive="active">
-      <mat-icon>chat_bubble_outline</mat-icon>
+      <mat-icon
+        [matBadge]="chatStore.unreadTotal()"
+        [matBadgeHidden]="chatStore.unreadTotal() === 0"
+        matBadgeColor="warn"
+        matBadgeSize="small">
+        chat_bubble_outline
+      </mat-icon>
       Messagerie
     </a>
-  } @else {
+
+  } @else if (!hasLogement()) {
+    <!-- Locataire en recherche (aucun logement assigné) -->
     <a class="kp-nav-link" routerLink="/loc" routerLinkActive="active"
        [routerLinkActiveOptions]="{exact: true}">
-      <mat-icon>home</mat-icon>
-      Accueil
+      <mat-icon>search</mat-icon>
+      Rechercher
     </a>
-    <a class="kp-nav-link" routerLink="/loc/contrats" routerLinkActive="active">
-      <mat-icon>description</mat-icon>
-      Contrats
+    <span class="kp-nav-link kp-nav-link--soon">
+      <mat-icon>help_outline</mat-icon>
+      Comment ça marche
+    </span>
+    <a class="kp-nav-link" routerLink="/loc/messagerie" routerLinkActive="active">
+      <mat-icon
+        [matBadge]="chatStore.unreadTotal()"
+        [matBadgeHidden]="chatStore.unreadTotal() === 0"
+        matBadgeColor="warn"
+        matBadgeSize="small">
+        chat_bubble_outline
+      </mat-icon>
+      Messagerie
     </a>
-    <a class="kp-nav-link" routerLink="/loc/etats-des-lieux" routerLinkActive="active">
-      <mat-icon>task_alt</mat-icon>
-      États des lieux
+    <span class="kp-nav-link kp-nav-link--soon">
+      <mat-icon>lightbulb_outline</mat-icon>
+      Aide
+    </span>
+
+  } @else {
+    <!-- Locataire avec logement assigné -->
+    <a class="kp-nav-link" routerLink="/loc" routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: true}">
+      <mat-icon>explore</mat-icon>
+      Explorer
+    </a>
+    <a class="kp-nav-link" routerLink="/loc/mon-logement" routerLinkActive="active">
+      <mat-icon>home_work</mat-icon>
+      Mon logement
     </a>
     <a class="kp-nav-link" routerLink="/loc/quittances" routerLinkActive="active">
       <mat-icon>credit_card</mat-icon>
       Quittances
     </a>
+    <a class="kp-nav-link" routerLink="/loc/documents" routerLinkActive="active">
+      <mat-icon>folder_open</mat-icon>
+      Documents
+    </a>
     <a class="kp-nav-link" routerLink="/loc/messagerie" routerLinkActive="active">
-      <mat-icon>chat_bubble_outline</mat-icon>
+      <mat-icon
+        [matBadge]="chatStore.unreadTotal()"
+        [matBadgeHidden]="chatStore.unreadTotal() === 0"
+        matBadgeColor="warn"
+        matBadgeSize="small">
+        chat_bubble_outline
+      </mat-icon>
       Messagerie
     </a>
+    <span class="kp-nav-link kp-nav-link--soon">
+      <mat-icon>lightbulb_outline</mat-icon>
+      Aide
+    </span>
   }
+
 </mat-toolbar>

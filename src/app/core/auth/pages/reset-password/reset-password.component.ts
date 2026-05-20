@@ -1,27 +1,24 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { LucideAngularModule, Check } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
+import { AuthLayoutCComponent } from '../../shared/auth-layout-c/auth-layout-c.component';
+import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
+import { PasswordStrengthComponent } from '../../shared/password-strength/password-strength.component';
 
-const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
-
-  if (password && confirmPassword && password.value !== confirmPassword.value) {
-    confirmPassword.setErrors({ passwordMismatch: true });
+const mustMatch: ValidatorFn = (ctrl: AbstractControl): ValidationErrors | null => {
+  const pw = ctrl.get('password');
+  const confirm = ctrl.get('confirmPassword');
+  if (pw && confirm && pw.value !== confirm.value) {
+    confirm.setErrors({ passwordMismatch: true });
     return { passwordMismatch: true };
-  } else {
-    if (confirmPassword?.hasError('passwordMismatch')) {
-      confirmPassword.setErrors(null);
-    }
-    return null;
   }
+  if (confirm?.hasError('passwordMismatch')) {
+    confirm.setErrors(null);
+  }
+  return null;
 };
 
 @Component({
@@ -31,10 +28,10 @@ const passwordMatchValidator: ValidatorFn = (control: AbstractControl): Validati
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
+    LucideAngularModule,
+    AuthLayoutCComponent,
+    AuthFieldComponent,
+    PasswordStrengthComponent,
   ],
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss']
@@ -44,39 +41,46 @@ export class ResetPasswordComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
 
-  isLoading = false;
-  token: string | null = null;
-  hidePassword = true;
-  hideConfirmPassword = true;
+  readonly Check = Check;
 
-  resetForm = this.fb.group({
-    password: ['', [Validators.required, Validators.minLength(8)]],
+  token = signal<string | null>(null);
+  isSubmitting = signal(false);
+  isSuccess = signal(false);
+  serverError = signal<string | null>(null);
+
+  form = this.fb.group({
+    password:        ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [Validators.required]]
-  }, { validators: passwordMatchValidator });
+  }, { validators: mustMatch });
+
+  get passwordCtrl()        { return this.form.get('password') as any; }
+  get confirmPasswordCtrl() { return this.form.get('confirmPassword') as any; }
+  get passwordValue()       { return this.form.get('password')?.value ?? ''; }
 
   ngOnInit(): void {
-    this.token = this.route.snapshot.queryParamMap.get('token');
-    if (!this.token) {
-      this.snackBar.open('Le jeton de réinitialisation est manquant ou invalide.', 'Fermer', { duration: 6000, panelClass: ['snack-error'] });
+    const t = this.route.snapshot.queryParamMap.get('token');
+    if (!t) {
+      this.router.navigate(['/auth/forgot']);
+      return;
     }
+    this.token.set(t);
   }
 
-  onResetPassword(): void {
-    if (this.resetForm.invalid || !this.token) return;
-    this.isLoading = true;
-    const { password } = this.resetForm.value;
-    this.authService.resetPassword(this.token, password!).subscribe({
+  onSubmit(): void {
+    if (this.form.invalid || !this.token()) return;
+    this.isSubmitting.set(true);
+    this.serverError.set(null);
+
+    this.authService.resetPassword(this.token()!, this.form.value.password!).subscribe({
       next: () => {
-        this.isLoading = false;
-        this.snackBar.open('Votre mot de passe a été réinitialisé avec succès.', 'Fermer', { duration: 4000 });
-        setTimeout(() => { this.router.navigate(['/auth/login']); }, 3000);
+        this.isSubmitting.set(false);
+        this.isSuccess.set(true);
+        setTimeout(() => this.router.navigate(['/auth/login']), 3000);
       },
-      error: (err) => {
-        this.isLoading = false;
-        this.snackBar.open("Une erreur s'est produite lors de la réinitialisation.", 'Fermer', { duration: 4000, panelClass: ['snack-error'] });
-        console.error('Reset password error', err);
+      error: () => {
+        this.isSubmitting.set(false);
+        this.serverError.set("Une erreur s'est produite lors de la réinitialisation.");
       }
     });
   }

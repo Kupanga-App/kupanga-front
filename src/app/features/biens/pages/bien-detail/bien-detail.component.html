@@ -1,210 +1,356 @@
-<div class="kp-page">
+<div class="kp-detail">
 
-  <!-- Bouton retour contextuel -->
-  @if (isProRoute()) {
-    <button mat-button [routerLink]="['/pro/biens']">
-      <mat-icon>arrow_back</mat-icon> Mes biens
+  <!-- ── Navigation ──────────────────────────────────────────────────── -->
+  <div class="kp-detail-topnav">
+    <button class="kp-back-btn" (click)="goBack()">
+      <kp-icon name="arrow-left" [size]="16" />
+      Retour
     </button>
-  } @else {
-    <button mat-button [routerLink]="['/']">
-      <mat-icon>arrow_back</mat-icon> Retour
-    </button>
-  }
+  </div>
 
-  <!-- État chargement -->
+  <!-- ── Loading ─────────────────────────────────────────────────────── -->
   @if (loading()) {
     <div class="kp-detail-loading">
-      <div class="kp-skeleton" style="height:260px;border-radius:12px;"></div>
-      <div class="kp-skeleton" style="height:24px;width:50%;border-radius:6px;margin-top:20px;"></div>
-      <div class="kp-skeleton" style="height:16px;width:35%;border-radius:6px;margin-top:10px;"></div>
+      <div class="kp-skel" style="height:460px;border-radius:24px;"></div>
+      <div class="kp-skel" style="height:32px;width:45%;border-radius:8px;margin-top:28px;"></div>
+      <div class="kp-skel" style="height:20px;width:30%;border-radius:6px;margin-top:12px;"></div>
     </div>
   }
 
-  <!-- État erreur -->
+  <!-- ── Erreur ───────────────────────────────────────────────────────── -->
   @if (!loading() && error()) {
     <div class="kp-detail-error">
-      <mat-icon>error_outline</mat-icon>
-      <span class="kp-text-h2">{{ error() }}</span>
+      <kp-icon name="alert-triangle" [size]="32" />
+      <span>{{ error() }}</span>
     </div>
   }
 
-  <!-- Contenu -->
+  <!-- ── Contenu ──────────────────────────────────────────────────────── -->
   @if (!loading() && bien()) {
-    <!-- Galerie photos -->
-    @if (bien()!.images.length > 0) {
-      <div class="kp-detail-gallery">
-        <img class="kp-detail-img-main"
-             [src]="bien()!.images[0]"
-             [alt]="bien()!.titre" />
-        @if (bien()!.images.length > 1) {
-          <div class="kp-detail-img-thumbs">
-            @for (img of bien()!.images.slice(1, 4); track img) {
+
+    <!-- Hero galerie ─────────────────────────────────────────────────── -->
+    <div class="hero-wrap">
+      <div class="hero-grid">
+        @for (img of galleryImages(); track $index; let i = $index) {
+          <div class="ph ph-{{ i + 1 }}">
+            @if (img) {
               <img [src]="img" [alt]="bien()!.titre" />
-            }
-          </div>
-        }
-      </div>
-    } @else {
-      <div class="kp-detail-img-placeholder">
-        <mat-icon>image_not_supported</mat-icon>
-      </div>
-    }
-
-    <!-- En-tête du bien -->
-    <div class="kp-detail-header">
-      <div>
-        <h1 class="kp-text-h1">{{ bien()!.titre }}</h1>
-        <div class="kp-detail-location">
-          <mat-icon>place</mat-icon>
-          {{ bien()!.adresse }} — {{ bien()!.ville }}, {{ bien()!.codePostal }}, {{ bien()!.pays }}
-        </div>
-      </div>
-      <span class="kp-bien-badge kp-badge-{{ bien()!.typeBien.toLowerCase() }}">
-        {{ bien()!.typeBien }}
-      </span>
-    </div>
-
-    <!-- Description -->
-    @if (bien()!.description) {
-      <div class="kp-detail-section">
-        <h2 class="kp-text-h2">Description</h2>
-        <p class="kp-text-body">{{ bien()!.description }}</p>
-      </div>
-    }
-
-    <!-- Informations -->
-    <div class="kp-detail-section">
-      <h2 class="kp-text-h2">Informations</h2>
-      <div class="kp-kv-list">
-        @if (bien()!.surfaceHabitable) {
-          <div class="kp-kv-row">
-            <span class="kp-kv-key">Surface</span>
-            <span class="kp-kv-val">{{ bien()!.surfaceHabitable }} m²</span>
-          </div>
-        }
-        @if (bien()!.nombrePieces) {
-          <div class="kp-kv-row">
-            <span class="kp-kv-key">Pièces</span>
-            <span class="kp-kv-val">{{ bien()!.nombrePieces }}</span>
-          </div>
-        }
-        @if (bien()!.loyerMensuel) {
-          <div class="kp-kv-row">
-            <span class="kp-kv-key">Loyer</span>
-            <span class="kp-kv-val">
-              {{ bien()!.loyerMensuel }} €/mois
-              @if (bien()!.chargesMensuelles) {
-                + {{ bien()!.chargesMensuelles }} € charges
-              }
-            </span>
-          </div>
-        }
-        @if (bien()!.depotGarantie) {
-          <div class="kp-kv-row">
-            <span class="kp-kv-key">Dépôt de garantie</span>
-            <span class="kp-kv-val">{{ bien()!.depotGarantie }} €</span>
-          </div>
-        }
-        @if (bien()!.disponibleDe) {
-          <div class="kp-kv-row">
-            <span class="kp-kv-key">Disponible dès</span>
-            <span class="kp-kv-val">{{ bien()!.disponibleDe | date:'dd MMM yyyy' }}</span>
-          </div>
-        }
-        <div class="kp-kv-row">
-          <span class="kp-kv-key">Type location</span>
-          <span class="kp-kv-val kp-kv-val-badges">
-            @if (bien()!.meuble) {
-              <span class="kp-bien-badge kp-badge-info">Meublé</span>
             } @else {
-              <span class="kp-bien-badge kp-badge-inactive">Non meublé</span>
+              <div class="ph-placeholder">
+                <kp-icon name="image" [size]="28" />
+              </div>
             }
-            @if (bien()!.colocation) {
-              <span class="kp-bien-badge kp-badge-info">Colocation</span>
-            }
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Points d'intérêt -->
-    @if (bien()!.pois.length) {
-      <div class="kp-info-card">
-        <div class="kp-info-card-title">Points d'intérêt à proximité</div>
-        <div class="kp-badge-wrap">
-          @for (poi of bien()!.pois; track poi) {
-            <span class="kp-bien-badge kp-badge-info">{{ poi }}</span>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Diagnostic énergétique -->
-    @if (bien()!.classeEnergie) {
-      <div class="kp-info-card">
-        <div class="kp-info-card-title">Diagnostic énergétique</div>
-        <div class="kp-kv-list">
-          <div class="kp-kv-row">
-            <span class="kp-kv-key">Classe énergie</span>
-            <span class="kp-kv-val kp-energie-badge kp-energie-{{ bien()!.classeEnergie!.toLowerCase() }}">
-              {{ bien()!.classeEnergie }}
-            </span>
           </div>
-          @if (bien()!.classeGes) {
-            <div class="kp-kv-row">
-              <span class="kp-kv-key">Classe GES</span>
-              <span class="kp-kv-val">{{ bien()!.classeGes }}</span>
-            </div>
-          }
-          @if (bien()!.modeChauffage) {
-            <div class="kp-kv-row">
-              <span class="kp-kv-key">Chauffage</span>
-              <span class="kp-kv-val">{{ chauffageLabel(bien()!.modeChauffage!) }}</span>
-            </div>
+        }
+      </div>
+      @if (bien()!.images?.length) {
+        <button class="hero-photos-btn">
+          <kp-icon name="maximize-2" [size]="14" />
+          Voir toutes les photos ({{ bien()!.images!.length }})
+        </button>
+      }
+    </div>
+
+    <!-- Bandeau d'identité ───────────────────────────────────────────── -->
+    <div class="identity">
+      <div class="identity-left">
+        <div class="id-title">
+          {{ bien()!.titre }}
+          <span class="ref-tag">{{ refTag() }}</span>
+        </div>
+        <div class="id-meta">
+          <span class="id-meta-i">
+            <kp-icon name="map-pin" [size]="14" />
+            {{ bien()!.adresse }}, {{ bien()!.ville }} {{ bien()!.codePostal }}
+          </span>
+          <span class="sep">·</span>
+          <span class="id-meta-i">
+            <kp-icon name="building" [size]="14" />
+            {{ typeBienLabel() }}
+          </span>
+          @if (bien()!.surfaceHabitable) {
+            <span class="sep">·</span>
+            <span class="id-meta-i">
+              <kp-icon name="maximize-2" [size]="14" />
+              {{ bien()!.surfaceHabitable }} m²
+            </span>
           }
         </div>
       </div>
-    }
-
-    <!-- Méta -->
-    <div class="kp-detail-meta">
-      <span class="kp-meta-item">
-        <mat-icon>calendar_today</mat-icon>
-        Ajouté le {{ bien()!.createdAt | date:'dd MMM yyyy' }}
-      </span>
-      <span class="kp-meta-item">
-        <mat-icon>person</mat-icon>
-        @if (bien()!.locataire) {
-          Locataire assigné
-        } @else {
-          Vacant
-        }
+      <span class="tag-pill tag-pill-{{ statutVariant() }}">
+        <span class="dot"></span>
+        {{ statutText() }}
       </span>
     </div>
 
-    <!-- Actions contextuelles -->
-    @if (isProprietaire()) {
-      <div class="kp-detail-actions">
-        <button mat-flat-button color="primary"
-                [routerLink]="['/pro/contrats']">
-          <mat-icon>description</mat-icon>
-          Créer un contrat
-        </button>
-        <button mat-stroked-button
-                [routerLink]="['/pro/messagerie']">
-          <mat-icon>chat</mat-icon>
-          Messagerie
-        </button>
+    <!-- Grille body 2-col ────────────────────────────────────────────── -->
+    <div class="body-grid">
+
+      <!-- ── Main ─────────────────────────────────────────────────── -->
+      <div class="body-main">
+
+        <!-- Facts (4 cartes) -->
+        <div class="facts">
+          @if (bien()!.surfaceHabitable) {
+            <div class="fact">
+              <div class="fact-ic"><kp-icon name="maximize-2" [size]="18" /></div>
+              <div class="fact-lbl">Surface</div>
+              <div class="fact-val">{{ bien()!.surfaceHabitable }}<span class="u">m²</span></div>
+            </div>
+          }
+          @if (bien()!.nombrePieces) {
+            <div class="fact">
+              <div class="fact-ic"><kp-icon name="layers" [size]="18" /></div>
+              <div class="fact-lbl">Pièces</div>
+              <div class="fact-val">{{ bien()!.nombrePieces }}</div>
+            </div>
+          }
+          @if (bien()!.loyerMensuel) {
+            <div class="fact">
+              <div class="fact-ic"><kp-icon name="dollar-sign" [size]="18" /></div>
+              <div class="fact-lbl">Loyer mensuel</div>
+              <div class="fact-val">{{ bien()!.loyerMensuel }}<span class="u">€/mois</span></div>
+            </div>
+          }
+          @if (bien()!.depotGarantie) {
+            <div class="fact">
+              <div class="fact-ic"><kp-icon name="shield" [size]="18" /></div>
+              <div class="fact-lbl">Dépôt garantie</div>
+              <div class="fact-val">{{ bien()!.depotGarantie }}<span class="u">€</span></div>
+            </div>
+          }
+        </div>
+
+        <!-- Description -->
+        @if (bien()!.description) {
+          <div class="section">
+            <div class="section-h">
+              <span class="section-t">Description</span>
+            </div>
+            <p class="description">{{ bien()!.description }}</p>
+          </div>
+        }
+
+        <!-- Caractéristiques -->
+        <div class="section">
+          <div class="section-h">
+            <span class="section-t">Détail du logement</span>
+          </div>
+          <div class="char-grid">
+            @if (bien()!.nombrePieces) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="layers" [size]="14" />Pièces</span>
+                <span class="char-v">{{ bien()!.nombrePieces }}</span>
+              </div>
+            }
+            @if (bien()!.nombreChambres) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="home" [size]="14" />Chambres</span>
+                <span class="char-v">{{ bien()!.nombreChambres }}</span>
+              </div>
+            }
+            @if (bien()!.surfaceHabitable) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="maximize-2" [size]="14" />Surface</span>
+                <span class="char-v char-v-mono">{{ bien()!.surfaceHabitable }} m²</span>
+              </div>
+            }
+            @if (bien()!.etage != null) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="building-2" [size]="14" />Étage</span>
+                <span class="char-v">{{ bien()!.etage }}</span>
+              </div>
+            }
+            @if (bien()!.anneeConstruction) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="calendar" [size]="14" />Année</span>
+                <span class="char-v char-v-mono">{{ bien()!.anneeConstruction }}</span>
+              </div>
+            }
+            @if (bien()!.ascenseur != null) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="chevron-down" [size]="14" />Ascenseur</span>
+                <span class="char-v">{{ bien()!.ascenseur ? 'Oui' : 'Non' }}</span>
+              </div>
+            }
+            @if (bien()!.meuble != null) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="home" [size]="14" />Meublé</span>
+                <span class="char-v">{{ bien()!.meuble ? 'Oui' : 'Non' }}</span>
+              </div>
+            }
+            @if (bien()!.colocation != null && bien()!.colocation) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="users" [size]="14" />Colocation</span>
+                <span class="char-v">Oui</span>
+              </div>
+            }
+            @if (bien()!.modeChauffage) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="zap" [size]="14" />Chauffage</span>
+                <span class="char-v">{{ chauffageLabel(bien()!.modeChauffage!) }}</span>
+              </div>
+            }
+            @if (bien()!.classeEnergie) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="bar-chart-2" [size]="14" />Classe énergie</span>
+                <span class="char-v char-energie char-energie-{{ bien()!.classeEnergie!.toLowerCase() }}">
+                  {{ bien()!.classeEnergie }}
+                </span>
+              </div>
+            }
+            @if (bien()!.classeGes) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="wind" [size]="14" />Classe GES</span>
+                <span class="char-v char-energie char-energie-{{ bien()!.classeGes!.toLowerCase() }}">
+                  {{ bien()!.classeGes }}
+                </span>
+              </div>
+            }
+            @if (bien()!.disponibleDe) {
+              <div class="char-row">
+                <span class="char-k"><kp-icon name="calendar" [size]="14" />Disponible dès</span>
+                <span class="char-v char-v-mono">{{ bien()!.disponibleDe | date:'dd MMM yyyy' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Points d'intérêt -->
+        @if (bien()!.pois?.length) {
+          <div class="section">
+            <div class="section-h">
+              <span class="section-t">Quartier & proximité</span>
+            </div>
+            <div class="poi-strip">
+              @for (poi of bien()!.pois; track poi) {
+                <div class="poi-cell">
+                  <kp-icon name="map-pin" [size]="16" />
+                  <div class="poi-name">{{ poi }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
       </div>
-    } @else {
-      <div class="kp-detail-actions">
-        <button mat-stroked-button
-                [routerLink]="['/loc/messagerie']">
-          <mat-icon>chat</mat-icon>
-          Contacter le propriétaire
-        </button>
+
+      <!-- ── Side sticky ───────────────────────────────────────────── -->
+      <div class="body-side">
+        <div class="side-card">
+
+          <!-- Prix principal -->
+          @if (bien()!.loyerMensuel) {
+            <div class="price-row">
+              <span class="price">{{ bien()!.loyerMensuel }}</span>
+              <span class="price-per">€/mois</span>
+            </div>
+            <div class="price-note">Loyer hors charges</div>
+          }
+
+          <!-- Détail financier -->
+          <div class="breakdown">
+            @if (bien()!.loyerMensuel) {
+              <div class="breakdown-row">
+                <span class="k">Loyer nu</span>
+                <span class="v">{{ bien()!.loyerMensuel }} €</span>
+              </div>
+            }
+            @if (bien()!.chargesMensuelles) {
+              <div class="breakdown-row">
+                <span class="k">Charges mensuelles</span>
+                <span class="v">{{ bien()!.chargesMensuelles }} €</span>
+              </div>
+            }
+            @if (bien()!.depotGarantie) {
+              <div class="breakdown-row">
+                <span class="k">Dépôt de garantie</span>
+                <span class="v">{{ bien()!.depotGarantie }} €</span>
+              </div>
+            }
+            @if (totalMensuel() > 0) {
+              <div class="breakdown-row breakdown-total">
+                <span class="k">Total mensuel</span>
+                <span class="v">{{ totalMensuel() }} €</span>
+              </div>
+            }
+          </div>
+
+          <!-- Actions par rôle -->
+          <div class="side-actions">
+
+            <!-- Propriétaire -->
+            @if (isOwner()) {
+              @if (gestionLink()) {
+                <a class="btn-l btn-primary" [routerLink]="[gestionLink()]">
+                  <kp-icon name="settings" [size]="16" />
+                  Gérer le logement
+                </a>
+              }
+              <a class="btn-l" [routerLink]="[messagerieLink()]" [queryParams]="messagerieQueryParams()">
+                <kp-icon name="message-square" [size]="16" />
+                @if (hasLocataire()) { Contacter le locataire } @else { Voir la messagerie }
+              </a>
+              @if (!hasLocataire()) {
+                <a class="btn-l" [routerLink]="[assignerLink()]">
+                  <kp-icon name="user-plus" [size]="16" />
+                  Assigner un locataire
+                </a>
+              }
+              <a class="btn-l btn-ghost" [routerLink]="['/pro/biens', bien()!.id, 'modifier']">
+                <kp-icon name="edit-3" [size]="16" />
+                Modifier le bien
+              </a>
+            }
+
+            <!-- Locataire (tout utilisateur avec rôle ROLE_LOCATAIRE) -->
+            @if (isLocataireRole()) {
+              <a class="btn-l btn-primary" [routerLink]="[messagerieLink()]" [queryParams]="messagerieQueryParams()">
+                <kp-icon name="message-square" [size]="16" />
+                Contacter le propriétaire
+              </a>
+              @if (isLocataire() && gestionLink()) {
+                <a class="btn-l" [routerLink]="[gestionLink()]">
+                  <kp-icon name="home" [size]="16" />
+                  Mon espace locataire
+                </a>
+              }
+            }
+
+            <!-- Visiteur non connecté -->
+            @if (!isConnected()) {
+              <a class="btn-l btn-primary" [routerLink]="['/auth/login']">
+                <kp-icon name="user-plus" [size]="16" />
+                Se connecter pour contacter
+              </a>
+            }
+
+          </div>
+
+          <!-- Carte propriétaire (vue locataire) -->
+          @if (isLocataireRole()) {
+            <div class="owner-mini">
+              <div class="owner-av">
+                @if (bien()!.proprietaire.urlProfile) {
+                  <img [src]="bien()!.proprietaire.urlProfile" [alt]="bien()!.proprietaire.firstName" />
+                } @else {
+                  <kp-icon name="user-plus" [size]="18" />
+                }
+              </div>
+              <div>
+                <div class="owner-role">Propriétaire</div>
+                <div class="owner-name">
+                  {{ bien()!.proprietaire.firstName }} {{ bien()!.proprietaire.lastName }}
+                </div>
+              </div>
+              <span class="owner-badge">Vérifié</span>
+            </div>
+          }
+
+        </div>
       </div>
-    }
+
+    </div>
   }
 
 </div>

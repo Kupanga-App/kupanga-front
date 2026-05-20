@@ -80,11 +80,11 @@ export interface BienDTO {
   disponibleDe?: string;
   proprietaire: UserDTO;
   locataire?: UserDTO;
-  contrats: string[];
-  quittances: string[];
-  documents: string[];
-  images: string[];
-  pois: string[];
+  contrats: string[] | null;
+  quittances: string[] | null;
+  documents: string[] | null;
+  images: string[] | null;
+  pois: string[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -113,6 +113,25 @@ export interface BienSearchDTO {
   modesChauffage?: ModeChauffage[];
 }
 
+export interface LocataireSearchDTO {
+  firstName?: string;
+  lastName?: string;
+  mail?: string;
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
+}
+
+export interface LocatairePageDTO {
+  contenu: UserDTO[];
+  pageActuelle: number;
+  totalPages: number;
+  totalElements: number;
+  dernierePage: boolean;
+  premierePage: boolean;
+}
+
 export interface BienPageDTO {
   contenu: BienDTO[];
   pageActuelle: number;
@@ -120,4 +139,21 @@ export interface BienPageDTO {
   totalElements: number;
   dernierePage: boolean;
   premierePage: boolean;
+}
+
+export interface BienFilters {
+  q?: string;
+  typeBien?: string;
+  ville?: string;
+  codePostal?: string;
+  loyerMax?: number;
+  surfaceMin?: number;
+  nbPiecesMin?: number;
+  nbChambresMin?: number;
+  classeEnergieMax?: string;
+  pois?: string[];
+  meuble?: boolean;
+  colocation?: boolean;
+  ascenseur?: boolean;
+  sortBy?: 'date_desc' | 'date_asc' | 'prix_asc' | 'prix_desc' | 'surface_desc';
 }

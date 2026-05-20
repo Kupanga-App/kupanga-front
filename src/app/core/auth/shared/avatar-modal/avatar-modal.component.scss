@@ -1,0 +1,235 @@
+.avatar-canvas {
+  position: fixed;
+  inset: 0;
+  background: var(--night);
+  color: var(--mint);
+  font-family: var(--font-sans);
+  z-index: 1000;
+  overflow: hidden;
+  animation: fade-in 0.4s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    width: 1000px;
+    height: 1000px;
+    left: -200px;
+    bottom: -300px;
+    background: radial-gradient(circle, rgba(143, 164, 100, 0.18) 0%, transparent 65%);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Masthead ──────────────────────────────────────────────────────────────────
+.masthead-top,
+.masthead-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 26px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+
+.masthead-top {
+  top: 0;
+  border-bottom: 1px solid var(--olive-15);
+}
+
+.masthead-bottom {
+  bottom: 0;
+  border-top: 1px solid var(--olive-15);
+  background: rgba(16, 33, 43, 0.4);
+  padding: 18px 56px;
+}
+
+.masthead-meta,
+.masthead-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.masthead-sep {
+  color: var(--olive-40);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.avatar-body {
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  top: 130px;
+  bottom: 80px;
+  display: flex;
+  gap: 40px;
+}
+
+// ── Éditorial gauche ─────────────────────────────────────────────────────────
+.editorial {
+  flex: 1;
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hero-serif {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 10vw, 140px);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  color: var(--mint);
+  margin: 8px 0 0;
+
+  em { font-style: italic; color: var(--olive-light); }
+}
+
+.subhero {
+  margin-top: 28px;
+  max-width: 520px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--olive-light);
+  line-height: 1.45;
+}
+
+.editorial-sig {
+  color: var(--olive-dark);
+  margin-top: auto;
+}
+
+// ── Panneau droit ─────────────────────────────────────────────────────────────
+.panel {
+  width: 460px;
+  background: var(--night-mid);
+  border: 1px solid var(--olive-15);
+  border-radius: 14px;
+  padding: 28px 32px;
+  align-self: flex-start;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;          // Firefox
+  &::-webkit-scrollbar { display: none; } // Chrome / Safari
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.025) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: 14px;
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 16px;
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.12;
+    color: var(--mint);
+    margin: 4px 0 0;
+  }
+}
+
+.preview-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--olive);
+  flex-shrink: 0;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.panel-sep {
+  height: 1px;
+  border-top: 1px dashed var(--olive-25);
+  margin-bottom: 16px;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+.btn-primary,
+.btn-ghost {
+  height: 44px;
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-primary {
+  flex: 1;
+  background: var(--olive);
+  color: var(--night);
+
+  &:hover:not(:disabled) { background: var(--olive-light); }
+  &:active:not(:disabled) { background: var(--olive-dark); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn-ghost {
+  padding: 0 20px;
+  background: transparent;
+  border: 1px solid var(--olive-25);
+  color: var(--mint-55);
+
+  &:hover { border-color: var(--olive-40); color: var(--mint); }
+}
+
+// ── Signature / eyebrow ───────────────────────────────────────────────────────
+.signature {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--mint-55);
+  text-decoration: none;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+.panel-eyebrow {
+  margin-bottom: 4px;
+}

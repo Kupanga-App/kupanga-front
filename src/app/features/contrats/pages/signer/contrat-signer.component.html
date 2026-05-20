@@ -1,0 +1,71 @@
+<div class="kp-signer-page">
+  <div class="kp-signer-card">
+
+    <div class="kp-signer-logo">
+      <mat-icon>home_work</mat-icon>
+      <span>Kupanga</span>
+    </div>
+
+    @if (loading()) {
+      <div class="kp-signer-loading">
+        <mat-spinner diameter="32" />
+        <span>Chargement du contrat…</span>
+      </div>
+    }
+
+    @if (!loading() && error()) {
+      <div class="kp-signer-error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error() }}</p>
+      </div>
+    }
+
+    @if (!loading() && signed()) {
+      <div class="kp-signer-success">
+        <mat-icon>check_circle</mat-icon>
+        <h2 class="kp-text-h2">Contrat signé avec succès !</h2>
+        <p class="kp-text-body">Vous recevrez une copie du contrat signé par email.</p>
+      </div>
+    }
+
+    @if (!loading() && !error() && !signed() && contrat()) {
+      <h1 class="kp-text-h1">Signature du contrat de location</h1>
+
+      <div class="kp-signer-recap">
+        <div class="kp-kv-list">
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Début</span>
+            <span class="kp-kv-val">{{ contrat()!.dateDebut | date:'dd MMM yyyy' }}</span>
+          </div>
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Fin</span>
+            <span class="kp-kv-val">{{ contrat()!.dateFin | date:'dd MMM yyyy' }}</span>
+          </div>
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Durée</span>
+            <span class="kp-kv-val">{{ contrat()!.dureeBailMois }} mois</span>
+          </div>
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Loyer</span>
+            <span class="kp-kv-val">{{ contrat()!.loyerMensuel }} € + {{ contrat()!.chargesMensuelles }} € charges</span>
+          </div>
+          <div class="kp-kv-row">
+            <span class="kp-kv-key">Dépôt de garantie</span>
+            <span class="kp-kv-val">{{ contrat()!.depotGarantie }} €</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kp-signer-signature">
+        <kp-signature-pad [required]="true" (signatureChange)="onSignatureChange($event)" />
+        <button mat-flat-button color="primary" class="kp-signer-btn"
+          [disabled]="!signatureBase64() || signing()"
+          (click)="signer()">
+          @if (signing()) { <mat-spinner diameter="16" /> } @else { <mat-icon>draw</mat-icon> }
+          Signer le contrat
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

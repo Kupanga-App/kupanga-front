@@ -1,0 +1,7 @@
+<div class="chips">
+  @for (opt of options(); track opt.value) {
+    <button type="button" class="chip" [class.on]="isSelected(opt.value)" (click)="toggle(opt.value)">
+      {{ opt.label }}
+    </button>
+  }
+</div>

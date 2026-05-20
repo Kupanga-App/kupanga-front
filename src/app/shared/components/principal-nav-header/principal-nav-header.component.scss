@@ -135,6 +135,12 @@
     font-weight: 500;
     border-bottom-color: var(--kp-primary);
   }
+
+  &--soon {
+    color: var(--kp-text-3);
+    cursor: default;
+    pointer-events: none;
+  }
 }
 
 .kp-avatar {

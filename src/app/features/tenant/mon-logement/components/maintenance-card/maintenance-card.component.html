@@ -1,0 +1,26 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Maintenance & visites</span>
+  </div>
+
+  @if (!interventions().length) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <kp-icon name="tool" [size]="28" />
+      </div>
+      <div class="empty-title">Aucune intervention planifiée</div>
+      <div class="empty-sub">Les visites et travaux planifiés apparaîtront ici.</div>
+    </div>
+  } @else {
+    @for (item of interventions(); track item.title) {
+      <div class="intervention-row" [class.done]="item.status === 'done'">
+        <kp-icon name="wrench" [size]="16" />
+        <div class="int-body">
+          <div class="t">{{ item.title }}</div>
+          <div class="s">{{ item.date | date:'d MMM yyyy':'':'fr' }} · {{ item.description }}</div>
+        </div>
+        <span class="int-status">{{ item.status === 'done' ? 'Terminé' : 'Planifié' }}</span>
+      </div>
+    }
+  }
+</div>

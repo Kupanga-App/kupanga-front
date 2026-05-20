@@ -1,0 +1,66 @@
+<div class="auth-c">
+
+  <!-- TOP MASTHEAD -->
+  <div class="masthead-top">
+    <kp-auth-logo size="md" [showSub]="true" />
+    <div class="masthead-meta">
+      <span class="signature">{{ badge }}</span>
+      <span class="masthead-sep">·</span>
+      <span class="signature">{{ formattedDate }}</span>
+      <span class="masthead-sep">·</span>
+      <span class="signature">Paris · <strong>FR</strong></span>
+    </div>
+  </div>
+
+  <!-- ZONE CENTRALE -->
+  <div class="auth-c-body">
+
+    <!-- COLONNE GAUCHE — éditorial -->
+    <div class="auth-c-editorial">
+      <div class="editorial-top">
+        <div class="eyebrow kicker">{{ kicker }}</div>
+        <h1 class="hero-serif" [innerHTML]="safeHero"></h1>
+        @if (subhero) {
+          <p class="subhero" [innerHTML]="safeSubhero"></p>
+        }
+      </div>
+      @if (rubrics.length > 0) {
+        <div class="editorial-rubrics">
+          @for (r of rubrics; track r.page) {
+            <div class="rubric">
+              <div class="rubric-label signature">{{ r.page }}</div>
+              <div class="rubric-text">{{ r.text }}</div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- COLONNE DROITE — panneau formulaire -->
+    <div class="auth-c-panel">
+      <div class="eyebrow panel-eyebrow">{{ eyebrow }}</div>
+      <h2>{{ title }}</h2>
+      <p class="sub">{{ sub }}</p>
+      <div class="panel-form">
+        <ng-content />
+      </div>
+      @if (footer) {
+        <div class="panel-footer">
+          <ng-container [ngTemplateOutlet]="footer" />
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- BOTTOM MASTHEAD -->
+  <div class="masthead-bottom">
+    <div class="masthead-links">
+      <a href="#" class="signature">Aide</a>
+      <a href="#" class="signature">Confidentialité</a>
+      <a href="#" class="signature">Conditions d'usage</a>
+    </div>
+    <span class="signature"><strong>Kupanga</strong> · Gestion locative tout-en-un · <strong>v3.2</strong></span>
+  </div>
+
+</div>

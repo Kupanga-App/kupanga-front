@@ -1,4 +1,85 @@
-<div class="p-4">
-  <h2 class="text-2xl font-bold mb-4 text-slate-800">Gestion des Contrats</h2>
-  <p>Liste des contrats de location...</p>
+<div class="kp-page">
+
+  <div class="kp-page-header">
+    <h1 class="kp-text-h1">Contrats</h1>
+    @if (isProprietaire()) {
+      <p class="kp-page-subtitle">Tous les contrats de bail de vos biens</p>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="kp-loading">
+      <mat-spinner diameter="28" />
+      <span>Chargement…</span>
+    </div>
+  }
+
+  @if (!loading() && error()) {
+    <div class="kp-error">
+      <kp-icon name="alert-triangle" [size]="18" />
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !error() && contrats().length === 0) {
+    <div class="kp-empty-state">
+      <div class="kp-empty-state-icon">
+        <kp-icon name="file-text" [size]="36" />
+      </div>
+      <p class="kp-empty-state-title">Aucun contrat</p>
+      <p class="kp-empty-state-sub">
+        @if (isProprietaire()) {
+          Créez un contrat depuis la fiche d'un de vos biens.
+        } @else {
+          Votre contrat de bail apparaîtra ici une fois établi par votre propriétaire.
+        }
+      </p>
+    </div>
+  }
+
+  @if (!loading() && !error() && contrats().length > 0) {
+    <div class="kp-list">
+      @for (c of contrats(); track c.id) {
+        <div class="kp-card">
+
+          <div class="kp-card-left">
+            <div class="kp-card-icon">
+              <mat-icon>description</mat-icon>
+            </div>
+            <div class="kp-card-info">
+              @if (c.adresseBien) {
+                <span class="kp-card-title">{{ c.adresseBien }}</span>
+              }
+              <div class="kp-card-meta">
+                @if (isProprietaire() && c.locataire?.mail) {
+                  <span class="kp-text-meta">{{ c.locataire!.mail }}</span>
+                  <span class="kp-meta-sep">·</span>
+                }
+                <span class="kp-text-meta">
+                  Du {{ c.dateDebut | date:'dd MMM yyyy':'':'fr' }}
+                  @if (c.dateFin) { au {{ c.dateFin | date:'dd MMM yyyy':'':'fr' }} }
+                </span>
+                <span class="kp-meta-sep">·</span>
+                <span class="kp-text-meta">{{ c.loyerMensuel }} €/mois</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kp-card-right">
+            <span class="kp-statut-badge" [class]="statutClass(c.statut)">
+              {{ statutLabel(c.statut) }}
+            </span>
+            @if (c.urlPdf) {
+              <a class="btn-pdf" [href]="c.urlPdf" target="_blank" rel="noopener" download>
+                <kp-icon name="download" [size]="13" />
+                PDF
+              </a>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
 </div>

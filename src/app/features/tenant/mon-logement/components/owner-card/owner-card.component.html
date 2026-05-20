@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Votre propriétaire</span>
+  </div>
+
+  <div class="owner-mini">
+    <div class="owner-avatar">{{ proprietaire().initiales }}</div>
+    <div class="owner-info">
+      <div class="owner-role">{{ proprietaire().role }}</div>
+      <div class="owner-name">{{ proprietaire().nom }}</div>
+    </div>
+    @if (proprietaire().verifie) {
+      <div class="verified-badge">
+        <kp-icon name="check" [size]="10" />
+        Vérifié
+      </div>
+    }
+  </div>
+
+  <div class="owner-actions">
+    <button class="btn btn--primary btn--full" (click)="envoyerMessage.emit()">
+      <kp-icon name="message-circle" [size]="15" />
+      Envoyer un message
+    </button>
+    <button class="btn btn--ghost btn--full" (click)="appelerUrgence.emit()">
+      <kp-icon name="phone" [size]="15" />
+      Appeler en cas d'urgence
+    </button>
+  </div>
+</div>

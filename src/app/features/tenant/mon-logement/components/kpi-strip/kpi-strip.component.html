@@ -1,0 +1,19 @@
+<div class="kpi-strip">
+  @for (kpi of kpis(); track kpi.label) {
+    <div class="kpi">
+      <div class="kpi-lbl">
+        <kp-icon [name]="kpi.icon" [size]="13" />
+        {{ kpi.label }}
+      </div>
+      <div class="kpi-val">
+        {{ kpi.valeur }}
+        @if (kpi.unite) {
+          <span class="u">{{ kpi.unite }}</span>
+        }
+      </div>
+      <div class="kpi-foot" [class]="kpi.noteColor ? 'kpi-foot--' + kpi.noteColor : ''">
+        {{ kpi.note }}
+      </div>
+    </div>
+  }
+</div>

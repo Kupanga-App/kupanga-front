@@ -22,6 +22,7 @@ export class ThemeService {
   setTheme(theme: KupangaTheme): void {
     this.theme.set(theme);
     document.body.classList.toggle('kp-theme-dark', theme === 'dark');
+    document.body.classList.toggle('kp-theme-light', theme === 'light');
     localStorage.setItem(this.STORAGE_KEY, theme);
   }
 

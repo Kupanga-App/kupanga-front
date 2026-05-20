@@ -1,0 +1,64 @@
+@use 'tokens' as t;
+
+.opt-card {
+  position: relative;
+  background: t.$night-soft;
+  border: 1.5px solid t.$border;
+  border-radius: 14px;
+  padding: 20px 22px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-2;
+  text-align: left;
+  font-family: t.$font-sans;
+  color: t.$mint;
+  width: 100%;
+
+  &:hover {
+    border-color: t.$border-2;
+  }
+
+  &.selected {
+    border-color: t.$olive;
+    background: t.$olive-bg;
+  }
+}
+
+.opt-card-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: t.$olive-bg;
+  color: t.$olive;
+  display: grid;
+  place-items: center;
+  transition: all 150ms ease;
+
+  .selected & {
+    background: t.$olive;
+    color: t.$night;
+  }
+}
+
+.opt-card-title {
+  font-family: t.$font-serif;
+  font-size: t.$text-h5;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: t.$mint;
+}
+
+.opt-card-sub {
+  font-size: t.$text-mini;
+  color: t.$mint-mute;
+  line-height: 1.45;
+}
+
+.opt-card-check {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  color: t.$olive;
+}

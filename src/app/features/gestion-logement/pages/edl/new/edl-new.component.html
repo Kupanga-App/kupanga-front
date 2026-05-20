@@ -1,0 +1,357 @@
+﻿@if (loading()) {
+  <div class="en-loading">
+    <div class="kp-skel" style="height:44px;border-radius:8px;margin-bottom:8px;"></div>
+    <div class="kp-skel" style="height:24px;border-radius:8px;width:300px;"></div>
+  </div>
+}
+
+@if (!loading() && bien()) {
+  <div class="en-page">
+
+    <!-- Back -->
+    <button class="en-back" type="button" (click)="cancel()">
+      <kp-icon name="arrow-left" [size]="15" />
+      {{ bien()!.titre }}
+    </button>
+
+    <!-- Flow heading -->
+    <div class="flow-heading">
+      <div class="flow-eyebrow">CRÉATION · ÉTAT DES LIEUX</div>
+      <h1 class="flow-h1">Nouvel <em>état des lieux</em></h1>
+      <p class="flow-sub">
+        Documentez l'état du bien <strong>{{ bien()!.titre }}</strong> pièce par pièce.
+      </p>
+    </div>
+
+    <!-- Stepper -->
+    <kp-wizard-stepper [steps]="steps" [currentStep]="currentStep()" />
+
+    <!-- Wizard main (full width for EDL) -->
+    <div class="wcard">
+
+      <!-- ══ Step 1 — Informations ══ -->
+      @if (currentStep() === 0) {
+        <div class="wcard-h">
+          <div class="eyebrow">ÉTAPE 01</div>
+          <div class="t">Informations <em>générales</em></div>
+          <div class="s">Type d'EDL, date, météo et participants.</div>
+        </div>
+
+        <!-- Locataire pré-sélectionné -->
+        <div class="wsection">
+          <div class="wsection-h">Locataire</div>
+          @if (locataireEmail()) {
+            <div class="kp-info-row">
+              <kp-icon name="user" [size]="16" />
+              <span class="kp-text-body">{{ bien()!.locataire?.firstName }} {{ bien()!.locataire?.lastName }}</span>
+              <span class="kp-text-caption kp-muted">· {{ locataireEmail() }}</span>
+            </div>
+          } @else {
+            <div class="kp-warn-row">
+              <kp-icon name="alert-triangle" [size]="16" />
+              <span class="kp-text-caption">Aucun locataire assigné à ce bien. Assignez un locataire avant de créer un état des lieux.</span>
+            </div>
+          }
+        </div>
+
+        <div class="wsection">
+          <div class="wsection-h">Type d'état des lieux</div>
+          <div class="opt-cards col2">
+            <kp-opt-card
+              icon="arrow-right"
+              title="Entrée"
+              subtitle="Début de location"
+              [selected]="selectedType() === 'ENTREE'"
+              (select)="onTypeChange('ENTREE')"
+            />
+            <kp-opt-card
+              icon="arrow-left"
+              title="Sortie"
+              subtitle="Fin de location"
+              [selected]="selectedType() === 'SORTIE'"
+              (select)="onTypeChange('SORTIE')"
+            />
+          </div>
+        </div>
+
+        <div class="wsection" [formGroup]="step1">
+          <div class="wsection-h">Date &amp; heure</div>
+          <div class="form-row col2">
+                        <div class="kp-field">
+                        <label class="kp-label">Date de réalisation <span class="kp-req">*</span></label>
+                        <mat-form-field>
+              <input matInput type="date" formControlName="date" />
+              @if (step1.get('date')?.invalid && step1.get('date')?.touched) {
+                <mat-error>Date requise</mat-error>
+              }
+            </mat-form-field>
+            </div>
+                        <div class="kp-field">
+                        <label class="kp-label">Heure <span class="kp-req">*</span></label>
+                        <mat-form-field>
+              <input matInput type="time" formControlName="heure" />
+            </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <div class="wsection">
+          <div class="wsection-h">Météo</div>
+          <kp-chips-group
+            [options]="meteoChips"
+            [value]="selectedMeteo()"
+            (change)="onMeteoChange($event)"
+          />
+        </div>
+
+        <div class="wsection">
+          <div class="wsection-h">Personnes présentes</div>
+          <kp-chips-group
+            [options]="presentsChips"
+            [multi]="true"
+            [multiValue]="selectedPresents()"
+            (multiChange)="onPresentsChange($event)"
+          />
+        </div>
+
+        <div class="wsection" [formGroup]="step1">
+          <div class="wsection-h">Observations générales</div>
+                    <div class="kp-field">
+                    <label class="kp-label">Observations <span class="kp-req">*</span></label>
+                    <mat-form-field class="full-width">
+            <textarea matInput formControlName="observationsGenerales" rows="3"
+              placeholder="Remarques générales sur l'état global du bien..."></textarea>
+          </mat-form-field>
+          </div>
+        </div>
+      }
+
+      <!-- ══ Step 2 — Compteurs ══ -->
+      @if (currentStep() === 1) {
+        <div class="wcard-h">
+          <div class="eyebrow">ÉTAPE 02</div>
+          <div class="t"><em>Compteurs</em> &amp; relevés</div>
+          <div class="s">Saisissez les index de chaque compteur.</div>
+        </div>
+
+        @for (ctrl of compteurs.controls; track $index) {
+          <div class="item-card" [formGroup]="ctrl">
+            <div class="item-ic">
+              <kp-icon [name]="meterIcon(ctrl.get('typeCompteur')!.value)" [size]="20" />
+            </div>
+            <div class="item-info">
+              <div class="kp-field">
+                <label class="kp-label">Type de compteur <span class="kp-req">*</span></label>
+                <mat-form-field class="item-name-field">
+                  <mat-select formControlName="typeCompteur"
+                    (selectionChange)="onTypeCompteurChange($index, $event.value)">
+                    @for (opt of typeCompteurOptions; track opt.value) {
+                      <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="item-fields">
+                            <div class="kp-field">
+                            <label class="kp-label">N° compteur <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput formControlName="numeroCompteur" />
+              </mat-form-field>
+              </div>
+                            <div class="kp-field">
+                            <label class="kp-label">Index <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput type="number" formControlName="index" />
+              </mat-form-field>
+              </div>
+                            <div class="kp-field">
+                            <label class="kp-label">Unité <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput formControlName="unite" />
+              </mat-form-field>
+              </div>
+              <button type="button" class="icon-trash" (click)="removeCompteur($index)">
+                <kp-icon name="trash-2" [size]="15" />
+              </button>
+            </div>
+          </div>
+        }
+
+        <kp-add-card label="Ajouter un compteur" (add)="addCompteur()" />
+      }
+
+      <!-- ══ Step 3 — Clés ══ -->
+      @if (currentStep() === 2) {
+        <div class="wcard-h">
+          <div class="eyebrow">ÉTAPE 03</div>
+          <div class="t"><em>Clés</em> remises</div>
+          <div class="s">Recensez les clés remises au locataire.</div>
+        </div>
+
+        @for (ctrl of cles.controls; track $index) {
+          <div class="key-card" [formGroup]="ctrl">
+            <div class="item-ic">
+              <kp-icon name="key" [size]="20" />
+            </div>
+                        <div class="kp-field">
+                        <label class="kp-label">Type de clé <span class="kp-req">*</span></label>
+                        <mat-form-field class="key-name-field">
+              <input matInput formControlName="typeCle" />
+            </mat-form-field>
+            </div>
+            <div class="qty-stepper">
+              <button type="button" class="qty-btn" (click)="decrementCle($index)">
+                <kp-icon name="minus" [size]="14" />
+              </button>
+              <span class="qty-val">{{ ctrl.get('quantite')!.value }}</span>
+              <button type="button" class="qty-btn" (click)="incrementCle($index)">
+                <kp-icon name="plus" [size]="14" />
+              </button>
+            </div>
+            <button type="button" class="icon-trash" (click)="removeCle($index)">
+              <kp-icon name="trash-2" [size]="15" />
+            </button>
+          </div>
+        }
+
+        <kp-add-card label="Ajouter un type de clé" (add)="addCle()" />
+      }
+
+      <!-- ══ Step 4 — Pièces ══ -->
+      @if (currentStep() === 3) {
+        <div class="wcard-h">
+          <div class="eyebrow">ÉTAPE 04</div>
+          <div class="t">Pièces &amp; <em>éléments</em></div>
+          <div class="s">Décrivez chaque pièce et l'état de ses éléments.</div>
+        </div>
+
+        @for (piece of pieces.controls; track $index; let pieceIdx = $index) {
+          <div class="room-block" [formGroup]="piece">
+            <!-- Room header -->
+            <div class="room-h">
+              <div class="room-ic">
+                <kp-icon [name]="roomIcon(piece.get('nomPiece')!.value)" [size]="20" />
+              </div>
+              <div class="room-h-body">
+                <input class="room-name-input" formControlName="nomPiece" placeholder="Nom de la pièce" />
+                <span class="room-meta">{{ getElements(pieceIdx).length }} élément(s)</span>
+              </div>
+              <button type="button" class="icon-trash" (click)="removePiece(pieceIdx)">
+                <kp-icon name="trash-2" [size]="15" />
+              </button>
+            </div>
+
+            <!-- Room body -->
+            <div class="room-body">
+              <!-- Observations -->
+                            <div class="kp-field">
+                            <label class="kp-label">Observations de la pièce <span class="kp-req">*</span></label>
+                            <mat-form-field class="full-width mb16">
+                <textarea matInput formControlName="observations" rows="2"
+                  placeholder="État général, remarques..."></textarea>
+              </mat-form-field>
+              </div>
+
+              <!-- Elements -->
+              <div class="wsection-h">Éléments</div>
+              @for (elem of getElements(pieceIdx).controls; track $index; let elemIdx = $index) {
+                <div class="element-row" [formGroup]="elem">
+                  <div class="kp-field">
+                    <label class="kp-label">Élément <span class="kp-req">*</span></label>
+                    <mat-form-field class="elem-name">
+                      <mat-select formControlName="typeElement">
+                        @for (opt of typeElementOptions; track opt.value) {
+                          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="etat-picker">
+                    @for (opt of etatOptions; track opt.value) {
+                      <button type="button"
+                        [class]="'etat-btn ' + etatClass(opt.value) + (elem.get('etatElement')!.value === opt.value ? ' active' : '')"
+                        (click)="setElementEtat(pieceIdx, elemIdx, opt.value)"
+                        [title]="opt.label">
+                        <kp-icon [name]="opt.icon" [size]="13" />
+                        {{ opt.label }}
+                      </button>
+                    }
+                  </div>
+
+                  
+                  <div class="kp-field">
+                  <label class="kp-label">Description <span class="kp-req">*</span></label>
+
+                  
+                  <mat-form-field class="elem-desc">
+                    <input matInput formControlName="description" />
+                  </mat-form-field>
+                  </div>
+
+                  <button type="button" class="icon-trash" (click)="removeElement(pieceIdx, elemIdx)">
+                    <kp-icon name="trash-2" [size]="15" />
+                  </button>
+                </div>
+              }
+
+              <kp-add-card label="Ajouter un élément" (add)="addElement(pieceIdx)" />
+            </div>
+          </div>
+        }
+
+        <div class="room-presets">
+          <span class="room-presets-lbl">Ajouter une pièce :</span>
+          @for (preset of roomPresets; track preset.type) {
+            <button type="button" class="chip" (click)="addPiece(preset.type)">
+              <kp-icon [name]="preset.icon" [size]="13" />
+              {{ preset.type }}
+            </button>
+          }
+          <button type="button" class="chip" (click)="addPiece()">
+            <kp-icon name="plus" [size]="13" />
+            Autre
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="wfoot">
+      <button type="button" class="btn" (click)="currentStep() === 0 ? cancel() : prev()">
+        @if (currentStep() > 0) {
+          <kp-icon name="arrow-left" [size]="14" />
+          Précédent
+        } @else {
+          Annuler
+        }
+      </button>
+      <div class="wfoot-right">
+        <span class="wfoot-hint">
+          <kp-icon name="check" [size]="12" />
+          Auto-sauvegardé
+        </span>
+        @if (currentStep() < 3) {
+          <button type="button" class="btn primary" (click)="next()">
+            Suivant
+            <kp-icon name="arrow-right" [size]="14" />
+          </button>
+        } @else {
+          <button type="button" class="btn primary" [disabled]="submitting()" (click)="submit()">
+            @if (submitting()) {
+              <kp-icon name="refresh-cw" [size]="14" />
+            } @else {
+              <kp-icon name="file-check" [size]="14" />
+            }
+            Créer l'état des lieux
+          </button>
+        }
+      </div>
+    </div>
+
+  </div>
+}
+
+
+

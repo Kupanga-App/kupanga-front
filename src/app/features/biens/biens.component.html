@@ -1,172 +1,131 @@
-<div class="kp-page">
+<div class="biens-page">
 
-  <!-- En-tête -->
-  <div class="kp-page-header">
-    <h1 class="kp-text-h1">
-      @if (isProRoute()) { Mes biens } @else { Biens disponibles }
-    </h1>
-    @if (isProRoute()) {
-      <a mat-flat-button color="primary" routerLink="/pro/biens/nouveau">
-        <mat-icon>add</mat-icon>
-        Ajouter un bien
-      </a>
-    }
-  </div>
-
-  <!-- Filtres -->
-  <div class="kp-filters-bar">
-
-    <!-- Recherche texte -->
-    <div class="kp-filter-search">
-      <mat-icon>search</mat-icon>
-      <input placeholder="Rechercher par titre..."
-             (input)="searchSubject.next($any($event.target).value)" />
+  <!-- ── PAGE HEADER ──────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-left">
+      @if (isProBiensRoute()) {
+        <div class="eyebrow">Propriétaire · Portefeuille</div>
+        <h1>Mes <em>biens</em></h1>
+      } @else if (isProHomeRoute()) {
+        <div class="eyebrow">Explorer · Parc locatif</div>
+        <h1>Explorer les <em>biens</em></h1>
+      } @else {
+        <div class="eyebrow">Explorer · Parc locatif</div>
+        <h1>Biens <em>disponibles</em></h1>
+      }
     </div>
-
-    <!-- Type de bien — chips cliquables -->
-    @for (type of bienTypes; track type.value) {
-      <div class="kp-filter-chip"
-           [class.active]="selectedTypes().includes(type.value)"
-           (click)="toggleType(type.value)">
-        {{ type.label }}
-        @if (selectedTypes().includes(type.value)) {
-          <mat-icon class="kp-chip-close">close</mat-icon>
-        }
-      </div>
-    }
-
-    <!-- Ville — input simple -->
-    <div class="kp-filter-chip" [class.active]="selectedVille()">
-      <mat-icon class="kp-chip-close">location_on</mat-icon>
-      <input class="kp-ville-input"
-             placeholder="Ville"
-             [value]="selectedVille()"
-             (input)="onVilleChange($any($event.target).value)" />
-    </div>
-
-    <!-- Tri — mat-menu -->
-    <button class="kp-sort-btn" [matMenuTriggerFor]="sortMenu" type="button">
-      <mat-icon>sort</mat-icon>
-      Tri : {{ sortLabel() }}
-      <mat-icon>expand_more</mat-icon>
-    </button>
-    <mat-menu #sortMenu="matMenu">
-      <button mat-menu-item (click)="onSortChange('createdAt', 'DESC')">
-        Date (récent → ancien)
-      </button>
-      <button mat-menu-item (click)="onSortChange('createdAt', 'ASC')">
-        Date (ancien → récent)
-      </button>
-      <button mat-menu-item (click)="onSortChange('ville', 'ASC')">
-        Ville (A → Z)
-      </button>
-      <button mat-menu-item (click)="onSortChange('titre', 'ASC')">
-        Titre (A → Z)
-      </button>
-    </mat-menu>
-
-  </div>
-
-  <!-- Compteur résultats -->
-  <div class="kp-results-count">
-    @if (!loading()) {
-      <strong>{{ totalElements() }} bien(s)</strong> trouvé(s)
-    }
-  </div>
-
-  <!-- Liste -->
-  @if (loading()) {
-    @for (i of [1, 2, 3]; track i) {
-      <div class="kp-bien-card kp-skeleton-card">
-        <div class="kp-card-img kp-skeleton"></div>
-        <div class="kp-card-body">
-          <div class="kp-skeleton" style="height:18px;width:60%;border-radius:4px;"></div>
-          <div class="kp-skeleton" style="height:13px;width:35%;border-radius:4px;margin-top:8px;"></div>
-        </div>
-      </div>
-    }
-  } @else if (!hasResults()) {
-    <div class="kp-empty-state">
-      <mat-icon>home_work</mat-icon>
-      <span class="kp-text-h2">Aucun bien trouvé</span>
-      <span class="kp-text-caption">Modifiez vos filtres ou ajoutez votre premier bien</span>
-      <button mat-flat-button color="primary" routerLink="/pro/biens/nouveau">
-        + Ajouter un bien
-      </button>
-    </div>
-  } @else {
-    @for (bien of biens(); track bien.id) {
-      <div class="kp-bien-card" (click)="navigateToBien(bien.id)">
-
-        <!-- Image -->
-        <div class="kp-card-img">
-          @if (bien.images.length > 0) {
-            <img [src]="bien.images[0]" [alt]="bien.titre" />
-          } @else {
-            <div class="kp-card-img-placeholder">
-              <mat-icon>image_not_supported</mat-icon>
-            </div>
-          }
-        </div>
-
-        <!-- Contenu -->
-        <div class="kp-card-body">
-          <div class="kp-card-header">
-            <span class="kp-card-title">{{ bien.titre }}</span>
-            <span class="kp-bien-badge kp-badge-{{ bien.typeBien.toLowerCase() }}">
-              {{ typeBienLabel(bien.typeBien) }}
-            </span>
-          </div>
-          <div class="kp-card-address">
-            <mat-icon>place</mat-icon>
-            {{ bien.adresse }} — {{ bien.ville }}, {{ bien.codePostal }}
-          </div>
-          <div class="kp-card-meta">
-            <span class="kp-meta-item">
-              <mat-icon>calendar_today</mat-icon>
-              {{ bien.createdAt | date:'dd MMM yyyy' }}
-            </span>
-            <span class="kp-meta-item">
-              <mat-icon>person</mat-icon>
-              @if (bien.locataire) {
-                Locataire assigné
-              } @else {
-                Vacant
-              }
-            </span>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="kp-card-actions" (click)="$event.stopPropagation()">
-          <button mat-flat-button color="primary" (click)="navigateToBien(bien.id)">
-            Voir
-          </button>
-        </div>
-
-      </div>
-    }
-  }
-
-  <!-- Pagination -->
-  @if (totalPages() > 1) {
-    <div class="kp-pagination">
-      <button class="kp-page-btn"
-              [disabled]="pageActuelle() === 0"
-              (click)="goToPage(pageActuelle() - 1)">
-        <mat-icon>chevron_left</mat-icon>
-      </button>
-      @for (p of pages(); track p) {
-        <button class="kp-page-btn"
-                [class.active]="p === pageActuelle()"
-                (click)="goToPage(p)">
-          {{ p + 1 }}
+    <div class="header-right">
+      @if (isProBiensRoute() || isProprietaire()) {
+        <button class="btn-new" type="button" routerLink="/pro/biens/nouveau">
+          <lucide-icon name="plus" [size]="14" [strokeWidth]="2" />
+          Nouveau bien
         </button>
       }
-      <button class="kp-page-btn"
-              [disabled]="pageActuelle() === totalPages() - 1"
-              (click)="goToPage(pageActuelle() + 1)">
-        <mat-icon>chevron_right</mat-icon>
+    </div>
+  </div>
+
+  <!-- ── BARRE DE FILTRES (hors route /pro/biens) ──────────────────────────── -->
+  @if (!isProBiensRoute()) {
+    <kp-biens-filter-bar (filtersChange)="onFiltersChange($event)" />
+  }
+
+  <!-- ── RÉSULTAT + TOGGLE VUE ────────────────────────────────────────────── -->
+  <div class="result-bar">
+    <span class="rcount">
+      {{ totalCount() }} bien{{ totalCount() > 1 ? 's' : '' }}
+      @if (!isProBiensRoute()) {
+        &nbsp;·&nbsp;{{ vacantCount() }} vacant{{ vacantCount() > 1 ? 's' : '' }}
+      }
+    </span>
+    <div class="view-toggle" role="group" aria-label="Mode d'affichage">
+      <button
+        class="vbtn"
+        type="button"
+        [class.active]="viewMode() === 'grid'"
+        (click)="onViewModeChange('grid')"
+        title="Vue grille"
+      >
+        <lucide-icon name="layout-grid" [size]="15" [strokeWidth]="1.5" />
+      </button>
+      <button
+        class="vbtn"
+        type="button"
+        [class.active]="viewMode() === 'list'"
+        (click)="onViewModeChange('list')"
+        title="Vue liste"
+      >
+        <lucide-icon name="layout-list" [size]="15" [strokeWidth]="1.5" />
+      </button>
+      <button
+        class="vbtn"
+        type="button"
+        disabled
+        title="Vue carte — bientôt disponible"
+      >
+        <lucide-icon name="map" [size]="15" [strokeWidth]="1.5" />
+      </button>
+    </div>
+  </div>
+
+  <!-- ── GRILLE / LISTE ────────────────────────────────────────────────────── -->
+  @if (isLoading()) {
+    <div class="grid">
+      @for (s of skeletons; track s) {
+        <kp-bien-card-skeleton />
+      }
+    </div>
+  } @else if (!hasResults()) {
+    <div class="empty-state">
+      <lucide-icon name="building" [size]="40" [strokeWidth]="1.2" class="empty-icon" />
+      <span class="empty-title">Aucun bien trouvé</span>
+      <span class="empty-sub">
+        @if (isProBiensRoute()) {
+          Ajoutez votre premier bien pour commencer
+        } @else {
+          Modifiez vos filtres ou revenez plus tard
+        }
+      </span>
+      @if (isProBiensRoute() || isProprietaire()) {
+        <button class="btn-new" type="button" routerLink="/pro/biens/nouveau">
+          <lucide-icon name="plus" [size]="14" [strokeWidth]="2" />
+          Nouveau bien
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="grid" [class.list-mode]="viewMode() === 'list'">
+      @for (bien of biens(); track bien.id) {
+        <kp-bien-card [bien]="bien" (viewDetail)="navigateToBien($event)" />
+      }
+    </div>
+  }
+
+  <!-- ── PAGINATION ────────────────────────────────────────────────────────── -->
+  @if (!isProBiensRoute() && totalPages() > 1) {
+    <div class="pagination">
+      <button
+        class="page-btn"
+        type="button"
+        [disabled]="pageActuelle() === 0"
+        (click)="goToPage(pageActuelle() - 1)"
+      >
+        <lucide-icon name="chevron-left" [size]="16" [strokeWidth]="1.5" />
+      </button>
+      @for (p of pages(); track p) {
+        <button
+          class="page-btn"
+          type="button"
+          [class.active]="p === pageActuelle()"
+          (click)="goToPage(p)"
+        >{{ p + 1 }}</button>
+      }
+      <button
+        class="page-btn"
+        type="button"
+        [disabled]="pageActuelle() === totalPages() - 1"
+        (click)="goToPage(pageActuelle() + 1)"
+      >
+        <lucide-icon name="chevron-right" [size]="16" [strokeWidth]="1.5" />
       </button>
     </div>
   }

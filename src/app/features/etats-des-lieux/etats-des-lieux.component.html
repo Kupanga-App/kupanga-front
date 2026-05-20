@@ -1,0 +1,90 @@
+<div class="kp-page">
+
+  <div class="kp-page-header">
+    <h1 class="kp-text-h1">États des lieux</h1>
+    @if (isProprietaire()) {
+      <p class="kp-page-subtitle">Tous les états des lieux de vos biens</p>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="kp-loading">
+      <mat-spinner diameter="28" />
+      <span>Chargement…</span>
+    </div>
+  }
+
+  @if (!loading() && error()) {
+    <div class="kp-error">
+      <kp-icon name="alert-triangle" [size]="18" />
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (!loading() && !error() && edls().length === 0) {
+    <div class="kp-empty-state">
+      <div class="kp-empty-state-icon">
+        <mat-icon>checklist</mat-icon>
+      </div>
+      <p class="kp-empty-state-title">Aucun état des lieux</p>
+      <p class="kp-empty-state-sub">
+        @if (isProprietaire()) {
+          Créez un état des lieux depuis la fiche d'un de vos biens.
+        } @else {
+          Votre état des lieux apparaîtra ici une fois réalisé par votre propriétaire.
+        }
+      </p>
+    </div>
+  }
+
+  @if (!loading() && !error() && edls().length > 0) {
+    <div class="kp-list">
+      @for (edl of edls(); track edl.id) {
+        <div class="kp-card">
+
+          <div class="kp-card-left">
+            <div class="kp-card-icon">
+              <mat-icon>task_alt</mat-icon>
+            </div>
+            <div class="kp-card-info">
+              <div class="kp-card-title-row">
+                <span class="kp-edl-type-badge" [class]="typeClass(edl.type)">
+                  {{ typeLabel(edl.type) }}
+                </span>
+                @if (edl.adresseBien) {
+                  <span class="kp-card-title">{{ edl.adresseBien }}</span>
+                }
+              </div>
+              <div class="kp-card-meta">
+                @if (isProprietaire() && edl.emailLocataire) {
+                  <span class="kp-text-meta">{{ edl.emailLocataire }}</span>
+                  <span class="kp-meta-sep">·</span>
+                }
+                <span class="kp-text-meta">
+                  {{ edl.dateRealisation | date:'dd MMM yyyy':'':'fr' }}
+                </span>
+                @if (edl.heureRealisation) {
+                  <span class="kp-text-meta">à {{ edl.heureRealisation }}</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="kp-card-right">
+            <span class="kp-statut-badge" [class]="statutClass(edl.statut)">
+              {{ statutLabel(edl.statut) }}
+            </span>
+            @if (edl.urlPdf) {
+              <a class="btn-pdf" [href]="edl.urlPdf" target="_blank" rel="noopener" download>
+                <kp-icon name="download" [size]="13" />
+                PDF
+              </a>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

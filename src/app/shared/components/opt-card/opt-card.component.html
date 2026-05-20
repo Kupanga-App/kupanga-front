@@ -1,0 +1,14 @@
+<button type="button" class="opt-card" [class.selected]="selected()" (click)="select.emit()">
+  <div class="opt-card-ic">
+    <kp-icon [name]="icon()" [size]="18" />
+  </div>
+  <span class="opt-card-title">{{ title() }}</span>
+  @if (subtitle()) {
+    <span class="opt-card-sub">{{ subtitle() }}</span>
+  }
+  @if (selected()) {
+    <span class="opt-card-check">
+      <kp-icon name="check" [size]="14" [strokeWidth]="2.5" />
+    </span>
+  }
+</button>

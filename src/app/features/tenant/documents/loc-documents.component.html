@@ -1,0 +1,44 @@
+<div class="kp-page">
+
+  <div class="kp-page-header">
+    <h1 class="kp-text-h1">Documents</h1>
+  </div>
+
+  <!-- Chargement -->
+  @if (gestion.loading()) {
+    <div class="kp-docs-loading">
+      <div class="kp-skel" style="height:48px; border-radius:10px;"></div>
+      <div class="kp-skel" style="height:48px; border-radius:10px;"></div>
+      <div class="kp-skel" style="height:48px; border-radius:10px;"></div>
+    </div>
+  }
+
+  <!-- Erreur -->
+  @if (!gestion.loading() && gestion.error()) {
+    <div class="kp-docs-error">
+      <kp-icon name="alert-triangle" [size]="18" />
+      <span>{{ gestion.error() }}</span>
+    </div>
+  }
+
+  <!-- Aucun logement assigné -->
+  @if (noLogement()) {
+    <div class="kp-empty-state">
+      <div class="kp-empty-state-icon">
+        <kp-icon name="folder" [size]="36" />
+      </div>
+      <p class="kp-empty-state-title">Aucun document disponible</p>
+      <p class="kp-empty-state-sub">
+        Vos documents apparaîtront ici une fois qu'un logement vous aura été assigné.
+      </p>
+    </div>
+  }
+
+  <!-- Documents — montés seulement quand le bien est prêt -->
+  @if (bienReady()) {
+    <div class="kp-docs-content">
+      <kp-documents-logement />
+    </div>
+  }
+
+</div>

@@ -1,0 +1,16 @@
+// styles/_auth.scss — Auth Direction C specific tokens
+// Ne pas dupliquer les tokens globaux — uniquement ce qui est propre à l'auth shell.
+
+$auth-glow-color:        rgba(143, 164, 100, 0.18);
+$auth-panel-shadow:      0 20px 60px rgba(0, 0, 0, 0.35);
+$auth-card-shine:        linear-gradient(160deg, rgba(255, 255, 255, 0.025) 0%, transparent 50%);
+
+$auth-masthead-h-pad:    56px;
+$auth-masthead-top-v:    26px;
+$auth-masthead-bot-v:    18px;
+$auth-body-top:          130px;
+$auth-body-bottom:       80px;
+$auth-body-lr:           56px;
+$auth-panel-width:       460px;
+$auth-panel-radius:      14px;
+$auth-panel-padding:     36px 40px;

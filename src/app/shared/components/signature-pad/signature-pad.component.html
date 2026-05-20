@@ -1,0 +1,27 @@
+<div class="kp-sig-pad">
+  <p class="kp-sig-label">Signature</p>
+  <canvas
+    #canvas
+    width="480"
+    height="140"
+    class="kp-sig-canvas"
+    [class.kp-sig-canvas--required]="required && isEmpty()"
+    (mousedown)="onMouseDown($event)"
+    (mousemove)="onMouseMove($event)"
+    (mouseup)="onMouseUp()"
+    (mouseleave)="onMouseLeave()"
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd()">
+  </canvas>
+  <div class="kp-sig-footer">
+    @if (required && isEmpty()) {
+      <span class="kp-sig-hint kp-sig-hint--error">Signature requise</span>
+    } @else {
+      <span class="kp-sig-hint">Dessinez votre signature dans le cadre</span>
+    }
+    <button mat-stroked-button type="button" (click)="clear()">
+      <mat-icon>refresh</mat-icon> Effacer
+    </button>
+  </div>
+</div>

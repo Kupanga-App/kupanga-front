@@ -1,0 +1,154 @@
+<!-- Chargement -->
+@if (loading()) {
+  <div class="kp-contrat-loading">
+    <mat-spinner diameter="32" />
+    <span>Chargement du contrat…</span>
+  </div>
+}
+
+@if (!loading()) {
+
+  <!-- ────────────────────────────────────────────────────────── -->
+  <!-- VUE PROPRIÉTAIRE                                          -->
+  <!-- ────────────────────────────────────────────────────────── -->
+  @if (isProprietaire()) {
+
+    <!-- Toolbar toujours visible -->
+    <div class="kp-contrat-toolbar">
+      <button mat-flat-button color="primary" (click)="navigateToNew()">
+        <mat-icon>add</mat-icon>
+        Nouveau contrat
+      </button>
+    </div>
+
+    <!-- Pas de contrat → état vide -->
+    @if (!contrat()) {
+      <div class="kp-contrat-empty">
+        <div class="kp-empty-ic">
+          <mat-icon>description</mat-icon>
+        </div>
+        <h2 class="kp-text-h2">Aucun contrat de bail</h2>
+        <p class="kp-text-caption">Créez un contrat de bail en quelques étapes pour formaliser la location.</p>
+      </div>
+    }
+
+    <!-- Étape 2 : Contrat créé, attente signature proprio -->
+    @if (contrat() && statut() === 'EN_ATTENTE_SIGNATURE_PROPRIO') {
+      <div class="kp-contrat-section">
+        <div class="kp-contrat-recap">
+          <h2 class="kp-text-h2">Récapitulatif du contrat</h2>
+          <div class="kp-kv-list">
+            <div class="kp-kv-row"><span class="kp-kv-key">Locataire</span><span class="kp-kv-val">{{ contrat()!.locataire?.mail }}</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Début</span><span class="kp-kv-val">{{ contrat()!.dateDebut | date:'dd MMM yyyy' }}</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Fin</span><span class="kp-kv-val">{{ contrat()!.dateFin | date:'dd MMM yyyy' }}</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Durée</span><span class="kp-kv-val">{{ contrat()!.dureeBailMois }} mois</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Loyer</span><span class="kp-kv-val">{{ contrat()!.loyerMensuel }} €/mois</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Charges</span><span class="kp-kv-val">{{ contrat()!.chargesMensuelles }} €/mois</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Dépôt de garantie</span><span class="kp-kv-val">{{ contrat()!.depotGarantie }} €</span></div>
+          </div>
+        </div>
+        <div class="kp-sign-box">
+          <h3 class="kp-text-h2">Votre signature</h3>
+          <p class="kp-text-caption">Signez pour valider le contrat. Un email sera envoyé au locataire.</p>
+          <kp-signature-pad [required]="true" (signatureChange)="onSignatureChange($event)" />
+          <button mat-flat-button color="primary" class="kp-sign-btn"
+            [disabled]="!signatureBase64() || signing()"
+            (click)="signerProprio()">
+            @if (signing()) { <mat-spinner diameter="16" /> } @else { <mat-icon>draw</mat-icon> }
+            Signer le contrat
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Après signature proprio : attente locataire -->
+    @if (contrat() && statut() === 'EN_ATTENTE_SIGNATURE_LOCATAIRE') {
+      <div class="kp-contrat-section">
+        <div class="kp-info-banner kp-info-banner--pending">
+          <mat-icon>hourglass_empty</mat-icon>
+          <div>
+            <strong>En attente de la signature du locataire</strong>
+            <p>Un email a été envoyé à <strong>{{ contrat()!.locataire?.mail }}</strong>.</p>
+          </div>
+        </div>
+        <div class="kp-kv-list">
+          <div class="kp-kv-row"><span class="kp-kv-key">Début</span><span class="kp-kv-val">{{ contrat()!.dateDebut | date:'dd MMM yyyy' }}</span></div>
+          <div class="kp-kv-row"><span class="kp-kv-key">Fin</span><span class="kp-kv-val">{{ contrat()!.dateFin | date:'dd MMM yyyy' }}</span></div>
+          <div class="kp-kv-row"><span class="kp-kv-key">Loyer</span><span class="kp-kv-val">{{ contrat()!.loyerMensuel }} €/mois + {{ contrat()!.chargesMensuelles }} € charges</span></div>
+        </div>
+      </div>
+    }
+
+    <!-- Contrat signé -->
+    @if (contrat() && statut() === 'SIGNE') {
+      <div class="kp-contrat-section">
+        <div class="kp-info-banner kp-info-banner--success">
+          <mat-icon>check_circle</mat-icon>
+          <div>
+            <strong>Contrat signé par les deux parties</strong>
+            <p>Signé le {{ contrat()!.dateSignatureProprietaire | date:'dd MMM yyyy' }} (proprio) · {{ contrat()!.dateSignatureLocataire | date:'dd MMM yyyy' }} (locataire)</p>
+          </div>
+        </div>
+        @if (contrat()!.urlPdf) {
+          <div class="kp-pdf-actions">
+            <a mat-stroked-button [href]="contrat()!.urlPdf" target="_blank" rel="noopener">
+              <mat-icon>picture_as_pdf</mat-icon> Télécharger le contrat PDF
+            </a>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ────────────────────────────────────────────────────────── -->
+  <!-- VUE LOCATAIRE                                             -->
+  <!-- ────────────────────────────────────────────────────────── -->
+  @if (!isProprietaire()) {
+
+    @if (!contrat()) {
+      <div class="kp-empty-state">
+        <mat-icon>description</mat-icon>
+        <span>Aucun contrat n'a encore été créé par le propriétaire.</span>
+      </div>
+    }
+
+    @if (contrat() && statut() === 'EN_ATTENTE_SIGNATURE_PROPRIO') {
+      <div class="kp-info-banner kp-info-banner--pending">
+        <mat-icon>hourglass_empty</mat-icon>
+        <div><strong>En attente de la signature du propriétaire</strong></div>
+      </div>
+    }
+
+    @if (contrat() && statut() === 'EN_ATTENTE_SIGNATURE_LOCATAIRE') {
+      <div class="kp-contrat-section">
+        <div class="kp-info-banner kp-info-banner--info">
+          <mat-icon>mail</mat-icon>
+          <div>
+            <strong>Un lien de signature vous a été envoyé par email</strong>
+            <p>Consultez votre boîte mail pour signer le contrat.</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (contrat() && statut() === 'SIGNE') {
+      <div class="kp-contrat-section">
+        <div class="kp-info-banner kp-info-banner--success">
+          <mat-icon>check_circle</mat-icon>
+          <div>
+            <strong>Contrat signé par les deux parties</strong>
+            <p>Signé le {{ contrat()!.dateSignatureLocataire | date:'dd MMM yyyy' }}</p>
+          </div>
+        </div>
+        @if (contrat()!.urlPdf) {
+          <div class="kp-pdf-actions">
+            <a mat-stroked-button [href]="contrat()!.urlPdf" target="_blank" rel="noopener">
+              <mat-icon>picture_as_pdf</mat-icon> Télécharger le contrat PDF
+            </a>
+          </div>
+        }
+      </div>
+    }
+  }
+
+}

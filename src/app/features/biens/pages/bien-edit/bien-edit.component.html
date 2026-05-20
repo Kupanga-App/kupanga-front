@@ -1,0 +1,331 @@
+﻿<div class="kp-edit">
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="edit-loading">
+      <div class="kp-skel" style="height:60px;width:60%;border-radius:10px;"></div>
+      <div class="kp-skel" style="height:40px;width:40%;border-radius:8px;margin-top:16px;"></div>
+    </div>
+  }
+
+  @if (!loading() && bien()) {
+
+    <!-- Header ──────────────────────────────────────────────────────── -->
+    <div class="edit-h">
+      <div>
+        <div class="edit-eyebrow">ÉDITION DU BIEN · {{ refTag() }}</div>
+        <h1 class="edit-title">Modifier <em>{{ bien()!.titre }}</em></h1>
+      </div>
+      <div class="save-bar-top">
+        <button class="btn-cancel" type="button" (click)="goBack()">Annuler</button>
+        <button class="btn-save" type="button" [disabled]="isSubmitting()" (click)="onSubmit()">
+          @if (isSubmitting()) {
+            <span class="spinner"></span>
+          } @else {
+            <kp-icon name="check" [size]="14" />
+          }
+          Enregistrer
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout form ─────────────────────────────────────────────────── -->
+    <div class="edit-layout">
+
+      <!-- Sidebar nav ──────────────────────────────────────────────── -->
+      <nav class="edit-nav">
+        <div class="edit-nav-h">Sections</div>
+        @for (section of navSections; track section.label; let i = $index) {
+          <button
+            class="edit-nav-item"
+            [class.active]="activeSection() === i"
+            type="button"
+            (click)="scrollToSection(i)"
+          >
+            <kp-icon [name]="section.icon" [size]="14" />
+            {{ section.label }}
+            <span class="step">0{{ i + 1 }}</span>
+          </button>
+        }
+      </nav>
+
+      <!-- Formulaire ───────────────────────────────────────────────── -->
+      <div class="edit-form">
+
+        <!-- Section Général -->
+        <div class="form-section" id="section-general">
+          <div class="form-section-h">
+            <div class="form-section-t">Informations <em>générales</em></div>
+            <div class="form-section-s">Titre, type de bien, description.</div>
+          </div>
+
+          <form [formGroup]="step1Form">
+            <div class="form-row">
+              <div class="form-field">
+                <label>Titre du bien</label>
+                <mat-form-field class="w-full">
+                  <input matInput formControlName="titre" placeholder="Ex. Appartement centre-ville" />
+                  @if (step1Form.get('titre')?.invalid && step1Form.get('titre')?.touched) {
+                    <mat-error>Titre requis (3-150 caractères)</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Type de bien</label>
+                <mat-form-field class="w-full">
+                  <mat-select formControlName="typeBien">
+                    @for (t of bienTypes; track t.value) {
+                      <mat-option [value]="t.value">{{ t.label }}</mat-option>
+                    }
+                  </mat-select>
+                  @if (step1Form.get('typeBien')?.invalid && step1Form.get('typeBien')?.touched) {
+                    <mat-error>Type requis</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="form-row form-row-col1">
+              <div class="form-field">
+                <label>Description</label>
+                <mat-form-field class="w-full">
+                  <textarea matInput formControlName="description" rows="4"
+                    placeholder="Décrivez votre bien…"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label>Disponible dès</label>
+                <mat-form-field class="w-full">
+                  <input matInput [matDatepicker]="dp" formControlName="disponibleDe" [min]="today" />
+                  <mat-datepicker-toggle matIconSuffix [for]="dp" />
+                  <mat-datepicker #dp />
+                  @if (step1Form.get('disponibleDe')?.invalid && step1Form.get('disponibleDe')?.touched) {
+                    <mat-error>Date requise</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="form-field type-toggles">
+                <label>Options de location</label>
+                <div class="toggle-group">
+                  <button type="button" class="toggle-opt"
+                    [class.active]="step1Form.get('meuble')?.value"
+                    (click)="step1Form.patchValue({meuble: !step1Form.get('meuble')?.value})">
+                    <kp-icon name="home" [size]="14" />
+                    Meublé
+                  </button>
+                  <button type="button" class="toggle-opt"
+                    [class.active]="step1Form.get('colocation')?.value"
+                    (click)="step1Form.patchValue({colocation: !step1Form.get('colocation')?.value})">
+                    <kp-icon name="users" [size]="14" />
+                    Colocation
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Section Caractéristiques -->
+        <div class="form-section" id="section-caracteristiques">
+          <div class="form-section-h">
+            <div class="form-section-t">Caractéristiques <em>du logement</em></div>
+            <div class="form-section-s">Surface, pièces, étage, énergie.</div>
+          </div>
+
+          <form [formGroup]="step2Form">
+            <div class="form-row">
+              <div class="form-field">
+                <label>Surface habitable</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="surfaceHabitable" placeholder="Ex. 65" />
+                  <span matSuffix class="suffix-mono">m²</span>
+                  @if (step2Form.get('surfaceHabitable')?.invalid && step2Form.get('surfaceHabitable')?.touched) {
+                    <mat-error>Surface requise (min 9 m²)</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Nombre de pièces</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="nombrePieces" placeholder="Ex. 3" />
+                  @if (step2Form.get('nombrePieces')?.invalid && step2Form.get('nombrePieces')?.touched) {
+                    <mat-error>Nombre de pièces requis</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="form-row form-row-col3">
+              <div class="form-field">
+                <label>Chambres</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="nombreChambres" />
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Étage</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="etage" />
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Année de construction</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="anneeConstruction" placeholder="Ex. 1995" />
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label>Mode de chauffage</label>
+                <mat-form-field class="w-full">
+                  <mat-select formControlName="modeChauffage">
+                    @for (m of modeChauffageOptions; track m.value) {
+                      <mat-option [value]="m.value">{{ m.label }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Classe énergie (DPE)</label>
+                <mat-form-field class="w-full">
+                  <mat-select formControlName="classeEnergie">
+                    @for (c of energieClasses; track c) {
+                      <mat-option [value]="c">{{ c }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label>Classe GES</label>
+                <mat-form-field class="w-full">
+                  <mat-select formControlName="classeGes">
+                    @for (c of energieClasses; track c) {
+                      <mat-option [value]="c">{{ c }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="form-field type-toggles">
+                <label>Ascenseur</label>
+                <div class="toggle-group">
+                  <button type="button" class="toggle-opt"
+                    [class.active]="step2Form.get('ascenseur')?.value"
+                    (click)="step2Form.patchValue({ascenseur: !step2Form.get('ascenseur')?.value})">
+                    <kp-icon name="chevron-down" [size]="14" />
+                    Oui
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Section Loyer -->
+        <div class="form-section" id="section-loyer">
+          <div class="form-section-h">
+            <div class="form-section-t">Loyer & <em>finances</em></div>
+            <div class="form-section-s">Loyer mensuel, charges, dépôt de garantie.</div>
+          </div>
+
+          <form [formGroup]="step1Form">
+            <div class="form-row form-row-col3">
+              <div class="form-field">
+                <label>Loyer mensuel</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="loyerMensuel" placeholder="Ex. 800" />
+                  <span matSuffix class="suffix-mono">€</span>
+                  @if (step1Form.get('loyerMensuel')?.invalid && step1Form.get('loyerMensuel')?.touched) {
+                    <mat-error>Loyer requis</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Charges mensuelles</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="chargesMensuelles" placeholder="Ex. 80" />
+                  <span matSuffix class="suffix-mono">€</span>
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Dépôt de garantie</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" formControlName="depotGarantie" placeholder="Ex. 1600" />
+                  <span matSuffix class="suffix-mono">€</span>
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Section Localisation -->
+        <div class="form-section" id="section-localisation">
+          <div class="form-section-h">
+            <div class="form-section-t">Localisation</div>
+            <div class="form-section-s">Adresse complète du bien.</div>
+          </div>
+
+          <form [formGroup]="step3Form">
+            <div class="form-row form-row-col1">
+              <div class="form-field">
+                <label>Adresse</label>
+                <mat-form-field class="w-full">
+                  <input matInput formControlName="adresse" placeholder="Ex. 12 rue de la Paix" />
+                  @if (step3Form.get('adresse')?.invalid && step3Form.get('adresse')?.touched) {
+                    <mat-error>Adresse requise</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="form-row form-row-col3">
+              <div class="form-field">
+                <label>Ville</label>
+                <mat-form-field class="w-full">
+                  <input matInput formControlName="ville" placeholder="Ex. Paris" />
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Code postal</label>
+                <mat-form-field class="w-full">
+                  <input matInput formControlName="codePostal" placeholder="Ex. 75001" />
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Pays</label>
+                <mat-form-field class="w-full">
+                  <input matInput formControlName="pays" />
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sticky save bar ──────────────────────────────────────────────── -->
+    <div class="save-bar-sticky">
+      <div class="save-bar-info">
+        <kp-icon name="info" [size]="14" />
+        Modifications non publiées
+      </div>
+      <div class="save-bar-actions">
+        <button class="btn-cancel" type="button" (click)="goBack()">Annuler</button>
+        <button class="btn-save" type="button" [disabled]="isSubmitting()" (click)="onSubmit()">
+          @if (isSubmitting()) { <span class="spinner"></span> } @else { <kp-icon name="check" [size]="14" /> }
+          Enregistrer & publier
+        </button>
+      </div>
+    </div>
+
+  }
+
+</div>
+

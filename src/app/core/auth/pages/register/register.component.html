@@ -1,168 +1,149 @@
-<div class="auth-container">
-  <!-- Colonne de Gauche -->
-  <div class="auth-left">
-    <div class="auth-left__content">
-      <div class="auth-logo">
-        <img src="assets/logos/logo.e2d1b831.svg" alt="Kupanga Logo">
+<!-- ÉTAPE 1 — Identifiants -->
+@if (step() === 1) {
+  <kp-auth-layout-c
+    kicker="Bienvenue · Première édition"
+    hero="Rejoindre·&lt;br&gt;Kup&lt;em&gt;anga&lt;/em&gt;."
+    subhero="Quelques minutes pour créer votre espace, et vous gérez vos premiers biens dans la foulée."
+    badge="N° 0004"
+    eyebrow="04 · Inscription · 1/2"
+    title="Vos identifiants."
+    sub="Étape 1 sur 2 — on s'occupe du profil ensuite."
+    [footer]="footerStep1"
+  >
+    <form [formGroup]="form" novalidate>
+      <kp-steps [current]="1" [total]="2" [labels]="['Identifiants', 'Profil']" />
+
+      <kp-auth-field
+        label="Adresse email"
+        [required]="true"
+        type="email"
+        placeholder="vous@exemple.fr"
+        [control]="emailCtrl"
+        fieldId="signup-email"
+      />
+
+      <kp-auth-field
+        label="Mot de passe"
+        [required]="true"
+        type="password"
+        placeholder="••••••••"
+        hint="Min. 8 caractères, une majuscule, un chiffre."
+        [control]="passwordCtrl"
+        fieldId="signup-password"
+      />
+
+      <kp-password-strength [password]="passwordValue" />
+
+      <kp-auth-field
+        label="Confirmer le mot de passe"
+        [required]="true"
+        type="password"
+        placeholder="••••••••"
+        [control]="confirmPasswordCtrl"
+        fieldId="signup-confirm"
+      />
+
+      <button type="button" class="btn-primary btn-full" (click)="nextStep()">
+        Continuer
+        <lucide-icon [img]="ArrowRight" [size]="16" />
+      </button>
+    </form>
+  </kp-auth-layout-c>
+}
+
+<!-- ÉTAPE 2 — Profil -->
+@if (step() === 2) {
+  <kp-auth-layout-c
+    kicker="Bienvenue · Première édition"
+    hero="Votre·&lt;em&gt;profil&lt;/em&gt;."
+    subhero="Le minimum pour personnaliser votre espace — vous pourrez tout modifier ensuite."
+    badge="N° 0005"
+    eyebrow="04 · Inscription · 2/2"
+    title="Complétez votre profil."
+    sub="Étape 2 sur 2 — presque fini."
+  >
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <kp-steps [current]="2" [total]="2" [labels]="['Identifiants', 'Profil']" />
+
+      <div class="name-grid">
+        <kp-auth-field
+          label="Prénom"
+          [required]="true"
+          type="text"
+          placeholder="Marie"
+          [control]="firstNameCtrl"
+          fieldId="signup-firstname"
+        />
+        <kp-auth-field
+          label="Nom"
+          [required]="true"
+          type="text"
+          placeholder="Dupont"
+          [control]="lastNameCtrl"
+          fieldId="signup-lastname"
+        />
       </div>
-      <div class="auth-value-prop">
-        <h2>Gérez vos biens en toute simplicité</h2>
-        <p>Kupanga vous aide à optimiser la gestion de votre patrimoine immobilier.</p>
-      </div>
-      <div class="auth-carousel">
-        <div class="auth-carousel__pagination">
-          <span></span>
-          <span class="active"></span>
-          <span></span>
+
+      <kp-role-picker [control]="roleCtrl" />
+
+      <div class="avatar-field">
+        <div class="avatar-field-label">
+          <span>Photo de profil</span>
+          <span class="opt-tag">optionnel</span>
+        </div>
+        <div class="avatar-section">
+          <div class="avatar-preview-wrap">
+            @if (avatarPreview) {
+              <img class="avatar-preview" [src]="avatarPreview" alt="Avatar sélectionné" />
+            } @else {
+              <div class="avatar-placeholder">
+                <lucide-icon [img]="Smile" [size]="20" />
+              </div>
+            }
+          </div>
+          <div class="avatar-btns">
+            <button type="button" class="btn-ghost btn-half" (click)="openAvatarModal()">
+              <lucide-icon [img]="Smile" [size]="14" />
+              Choisir
+            </button>
+            <label class="btn-ghost btn-half" tabindex="0">
+              <lucide-icon [img]="Upload" [size]="14" />
+              Importer
+              <input type="file" accept="image/*" class="file-input-hidden" (change)="onFileUpload($event)" />
+            </label>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Colonne de Droite -->
-  <div class="auth-right">
-    <div class="register-page">
-      <div class="register-card">
-        <header class="register-card__header">
-          <h1 class="register-card__title">Créer un compte</h1>
-          <p class="register-card__subtitle">
-            @if (step() === 1) { Rejoignez Kupanga }
-            @else { Complétez votre profil }
-          </p>
-        </header>
+      @if (serverError()) {
+        <p class="server-error" role="alert" aria-live="polite">{{ serverError() }}</p>
+      }
 
-        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-
-          <!-- ÉTAPE 1 -->
-          @if (step() === 1) {
-            <mat-form-field appearance="outline" class="form-field-full">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="Votre adresse email">
-              @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-                <mat-error>Email invalide ou requis.</mat-error>
-              }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field-full">
-              <mat-label>Mot de passe</mat-label>
-              <input matInput [type]="hidePassword ? 'password' : 'text'"
-                     formControlName="password" placeholder="Mot de passe (min 8 caractères)">
-              <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-                <mat-error>Mot de passe requis (min 8 caractères).</mat-error>
-              }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field-full">
-              <mat-label>Confirmer le mot de passe</mat-label>
-              <input matInput [type]="hideConfirmPassword ? 'password' : 'text'"
-                     formControlName="confirmPassword" placeholder="Confirmez votre mot de passe">
-              <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword">
-                <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (registerForm.get('confirmPassword')?.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched) {
-                <mat-error>Les mots de passe ne correspondent pas.</mat-error>
-              }
-            </mat-form-field>
-
-            <button mat-raised-button color="primary" type="button" (click)="nextStep()" class="btn-full">
-              Suivant
-            </button>
+      <div class="wizard-footer">
+        <button type="button" class="btn-ghost" (click)="prevStep()">← Retour</button>
+        <button type="submit" class="btn-primary" style="flex:1" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner"></span>
+          } @else {
+            S'inscrire
+            <lucide-icon [img]="Check" [size]="16" />
           }
-
-          <!-- ÉTAPE 2 -->
-          @if (step() === 2) {
-            <div class="form-grid">
-              <mat-form-field appearance="outline" class="form-field-full">
-                <mat-label>Prénom</mat-label>
-                <input matInput formControlName="firstName" placeholder="Votre prénom">
-                @if (registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched) {
-                  <mat-error>Prénom requis.</mat-error>
-                }
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="form-field-full">
-                <mat-label>Nom</mat-label>
-                <input matInput formControlName="lastName" placeholder="Votre nom">
-                @if (registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched) {
-                  <mat-error>Nom requis.</mat-error>
-                }
-              </mat-form-field>
-            </div>
-
-            <div class="form-group">
-              <label class="form-group__label">Je suis un…</label>
-              <mat-radio-group formControlName="role" class="radio-group">
-                @for (r of roles; track r.value) {
-                  <mat-radio-button [value]="r.value">{{ r.label }}</mat-radio-button>
-                }
-              </mat-radio-group>
-            </div>
-
-            <div class="form-group">
-              <label class="form-group__label">Photo de profil</label>
-              <div class="avatar-selection">
-                @if (selectedAvatar || uploadedFilePreview) {
-                  <div class="avatar-preview">
-                    <img [src]="selectedAvatar || uploadedFilePreview" alt="Avatar" class="avatar-img">
-                  </div>
-                }
-                <div class="avatar-actions">
-                  <button mat-stroked-button type="button" (click)="openAvatarDialog()">
-                    <mat-icon>person</mat-icon>
-                    Choisir un avatar
-                  </button>
-                  <span class="separator">ou</span>
-                  <input type="file" accept="image/*" (change)="onFileUpload($event)"
-                         class="file-input" #fileInput>
-                  <button mat-stroked-button type="button" (click)="fileInput.click()">
-                    <mat-icon>upload</mat-icon>
-                    Uploader une photo
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button mat-stroked-button type="button" (click)="previousStep()">Retour</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
-                S'inscrire
-              </button>
-            </div>
-          }
-
-          <footer class="register-card__footer">
-            <span>Déjà un compte ? </span>
-            <a routerLink="/auth/login" class="footer__link">Se connecter</a>
-          </footer>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Dialog sélection d'avatar -->
-@if (showAvatarDialog) {
-  <div class="dialog-overlay" (click)="showAvatarDialog = false">
-    <div class="dialog-container" (click)="$event.stopPropagation()">
-      <div class="dialog-header">
-        <h2>Choisir un avatar</h2>
-        <button mat-icon-button type="button" (click)="showAvatarDialog = false">
-          <mat-icon>close</mat-icon>
         </button>
       </div>
-      <div class="avatars-grid">
-        @for (avatar of avatars; track avatar) {
-          <div class="avatar-item" (click)="selectAvatar(avatar)">
-            <img [src]="avatar" alt="Avatar" class="avatar-img-dialog">
-          </div>
-        }
-        @if (avatars.length === 0) {
-          <p>Aucun avatar disponible.</p>
-        }
-      </div>
-    </div>
-  </div>
+    </form>
+  </kp-auth-layout-c>
 }
+
+<!-- Modal avatar -->
+<kp-avatar-modal
+  [isOpen]="showAvatarModal()"
+  [initialUrl]="selectedAvatarUrl()"
+  (confirmed)="onAvatarConfirmed($event)"
+  (cancelled)="onAvatarCancelled()"
+/>
+
+<!-- Footer étape 1 -->
+<ng-template #footerStep1>
+  Déjà un compte ?&nbsp;
+  <a routerLink="/auth/login" class="footer-link">Se connecter</a>
+</ng-template>

@@ -1,4 +1,4 @@
-<div class="account-settings" *ngIf="user">
+﻿<div class="account-settings" *ngIf="user">
   <div class="settings-header">
     <button mat-icon-button type="button" (click)="goToProfileHome()">
       <mat-icon>arrow_back</mat-icon>
@@ -26,35 +26,48 @@
         </div>
 
         <!-- Nom & Prénom -->
-        <mat-form-field appearance="outline" class="form-field-full">
-          <mat-label>Nom *</mat-label>
+                <div class="kp-field">
+                <label class="kp-label">Nom * <span class="kp-req">*</span></label>
+                <mat-form-field class="form-field-full">
           <input matInput [(ngModel)]="user.lastName" name="lastName" required>
         </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline" class="form-field-full">
-          <mat-label>Prénom *</mat-label>
+        
+        <div class="kp-field">
+        <label class="kp-label">Prénom * <span class="kp-req">*</span></label>
+
+        
+        <mat-form-field class="form-field-full">
           <input matInput [(ngModel)]="user.firstName" name="firstName" required>
         </mat-form-field>
+        </div>
 
         <!-- Date de naissance -->
-        <mat-form-field appearance="outline" class="form-field-full">
-          <mat-label>Date de naissance *</mat-label>
+                <div class="kp-field">
+                <label class="kp-label">Date de naissance * <span class="kp-req">*</span></label>
+                <mat-form-field class="form-field-full">
           <input matInput [matDatepicker]="birthPicker" [(ngModel)]="birthdate" name="birthdate" required>
           <mat-datepicker-toggle matIconSuffix [for]="birthPicker"></mat-datepicker-toggle>
           <mat-datepicker #birthPicker></mat-datepicker>
         </mat-form-field>
+        </div>
 
         <!-- Adresse -->
-        <mat-form-field appearance="outline" class="form-field-full">
-          <mat-label>Adresse *</mat-label>
+                <div class="kp-field">
+                <label class="kp-label">Adresse * <span class="kp-req">*</span></label>
+                <mat-form-field class="form-field-full">
           <input matInput [(ngModel)]="address" name="address" required>
         </mat-form-field>
+        </div>
 
         <!-- Email (lecture seule) -->
-        <mat-form-field appearance="outline" class="form-field-full">
-          <mat-label>E-mail</mat-label>
+                <div class="kp-field">
+                <label class="kp-label">E-mail <span class="kp-req">*</span></label>
+                <mat-form-field class="form-field-full">
           <input matInput [value]="user.email" name="email" readonly disabled>
         </mat-form-field>
+        </div>
 
       </mat-card-content>
       <mat-card-actions align="end">
@@ -80,3 +93,6 @@
 
   </form>
 </div>
+
+
+

@@ -1,0 +1,180 @@
+.kp-q-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  color: var(--kp-text-2);
+  font-size: 14px;
+}
+
+.kp-quittances {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+}
+
+.kp-q-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// ─── Formulaire ──────────────────────────────────────────────────────────────
+
+.kp-q-form-wrapper {
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  padding: var(--kp-space-5);
+}
+
+.kp-q-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--kp-space-4);
+
+  h2 { margin: 0; }
+}
+
+.kp-q-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+  max-width: 540px;
+}
+
+.kp-form-row {
+  display: flex;
+  gap: var(--kp-space-3);
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+.kp-form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+}
+
+// ─── Cards quittances ────────────────────────────────────────────────────────
+
+.kp-q-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-4) var(--kp-space-5);
+  background: var(--kp-surface);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+}
+
+.kp-q-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+}
+
+.kp-q-card-title {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-4);
+}
+
+.kp-q-mois {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--kp-text-1);
+  text-transform: capitalize;
+}
+
+.kp-q-montant {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--kp-primary);
+}
+
+.kp-q-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-5);
+  flex-wrap: wrap;
+}
+
+.kp-text-caption {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-1);
+  font-size: 12px;
+  color: var(--kp-text-3);
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.kp-q-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--kp-space-3);
+  flex-wrap: wrap;
+}
+
+// ─── Statuts ─────────────────────────────────────────────────────────────────
+
+.kp-statut-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--kp-radius-full);
+}
+
+.kp-badge-success  { background: var(--kp-success-subtle); color: var(--kp-success-text); }
+.kp-badge-pending  { background: var(--kp-warning-subtle); color: var(--kp-warning-text); }
+.kp-badge-danger   { background: var(--kp-danger-subtle);  color: var(--kp-danger-text); }
+.kp-badge-inactive { background: var(--kp-surface-2);      color: var(--kp-text-3); }
+
+// ─── Signature inline ────────────────────────────────────────────────────────
+
+.kp-sign-inline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-4);
+  background: var(--kp-surface-2);
+  border-radius: var(--kp-radius-md);
+}
+
+.kp-sign-inline-actions {
+  display: flex;
+  gap: var(--kp-space-3);
+  align-items: center;
+}
+
+// ─── Empty ───────────────────────────────────────────────────────────────────
+
+.kp-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-12) var(--kp-space-6);
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  text-align: center;
+  color: var(--kp-text-2);
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--kp-text-3);
+  }
+}

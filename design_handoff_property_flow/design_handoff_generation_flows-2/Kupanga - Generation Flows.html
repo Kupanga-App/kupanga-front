@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kupanga — Génération · Contrat · EDL · Quittance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --night:       #10212B;
+    --night-mid:   #1E3545;
+    --night-soft:  #172C3A;
+    --night-deep:  #0B181F;
+    --olive:       #8FA464;
+    --olive-light: #B5CA8D;
+    --olive-dark:  #6B7C4B;
+    --olive-bg:    rgba(143, 164, 100, 0.10);
+    --olive-bg-2:  rgba(143, 164, 100, 0.18);
+    --olive-line:  rgba(143, 164, 100, 0.32);
+    --mint:        #EFFBDB;
+    --mint-soft:   rgba(239, 251, 219, 0.85);
+    --mint-mute:   rgba(239, 251, 219, 0.62);
+    --mint-dim:    rgba(239, 251, 219, 0.40);
+    --mint-fade:   rgba(239, 251, 219, 0.20);
+    --border:      rgba(239, 251, 219, 0.08);
+    --border-2:    rgba(239, 251, 219, 0.14);
+    --amber:       #E8B962;
+    --amber-bg:    rgba(232, 185, 98, 0.12);
+    --red:         #E48173;
+    --red-bg:      rgba(228, 129, 115, 0.12);
+    --r-sm: 8px; --r: 12px; --r-lg: 16px; --r-xl: 24px;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans:  'DM Sans', system-ui, sans-serif;
+    --mono:  'DM Mono', monospace;
+
+    font-family: var(--sans); font-size: 14px; color: var(--mint);
+  }
+  html, body { background: var(--night); min-height: 100vh; }
+  body { padding-bottom: 80px; }
+
+  .icon {
+    width: 18px; height: 18px; flex-shrink: 0;
+    stroke: currentColor; stroke-width: 1.5;
+    stroke-linecap: round; stroke-linejoin: round;
+    fill: none;
+  }
+  .icon.sm { width: 14px; height: 14px; }
+  .icon.md { width: 16px; height: 16px; }
+  .icon.lg { width: 22px; height: 22px; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ─── TOPBAR (reuse pattern from main app) ─── */
+  .topbar {
+    height: 64px; background: var(--night);
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 220px 1fr 220px;
+    align-items: center; padding: 0 32px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; display: inline-flex; cursor: pointer; }
+  .logo .ku { color: var(--mint); }
+  .logo .panga { color: var(--olive); }
+  .search {
+    max-width: 540px; width: 100%; margin: 0 auto; height: 40px;
+    background: var(--night-mid); border: 1px solid var(--border);
+    border-radius: 100px; display: flex; align-items: center;
+    padding: 0 18px; gap: 10px; color: var(--mint-mute);
+  }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--mint); font-family: var(--sans); font-size: 13.5px; }
+  .search input::placeholder { color: var(--mint-dim); }
+  .kbd { font-family: var(--mono); font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(239,251,219,.05); border: 1px solid var(--border); color: var(--mint-mute); }
+  .topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+  .new-btn {
+    height: 38px; padding: 0 16px; border-radius: 8px;
+    border: 1px solid var(--olive); background: transparent; color: var(--olive);
+    font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .new-btn:hover { background: var(--olive-bg); }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--mint-mute); cursor: pointer; border: none; background: transparent; position: relative; }
+  .icon-btn:hover { color: var(--mint); background: rgba(239,251,219,.05); }
+  .icon-btn .dot { position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--olive); border: 2px solid var(--night); }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--olive-bg-2); color: var(--olive-light); display: grid; place-items: center; font-size: 12px; font-weight: 600; border: 1px solid var(--olive-line); }
+
+  /* subnav */
+  .subnav {
+    height: 56px; background: var(--night); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 0 32px;
+    position: sticky; top: 64px; z-index: 99;
+  }
+  .subnav-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 16px; border-radius: 8px;
+    color: var(--mint-mute); font-size: 13.5px; font-weight: 500; cursor: pointer;
+  }
+  .subnav-item:hover { color: var(--mint); background: rgba(239,251,219,.04); }
+  .subnav-item.active { color: var(--olive); }
+
+  /* page */
+  .page { max-width: 1320px; margin: 24px auto 0; padding: 0 32px; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--mint); cursor: pointer; font-size: 14px; font-weight: 500;
+    background: none; border: none; font-family: inherit;
+    margin-bottom: 20px;
+  }
+  .back-link:hover .icon { transform: translateX(-2px); }
+  .back-link .icon { transition: transform .15s; }
+
+  /* manage-hero — compact identity strip (reused) */
+  .manage-hero {
+    background: var(--night-mid); border: 1px solid var(--border);
+    border-radius: var(--r-lg); padding: 22px 28px;
+    display: grid; grid-template-columns: 84px 1fr auto;
+    gap: 22px; align-items: center;
+  }
+  .m-thumb { width: 84px; height: 84px; border-radius: 14px; overflow: hidden; background: var(--night-soft); position: relative; }
+  .m-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .m-thumb .ph-count { position: absolute; bottom: 6px; right: 6px; background: rgba(16,33,43,.85); color: var(--mint); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-family: var(--mono); }
+  .m-crumb { font-size: 12.5px; color: var(--mint-mute); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .m-crumb b { color: var(--mint); font-weight: 500; }
+  .m-title { font-family: var(--serif); font-size: 28px; color: var(--mint); line-height: 1.05; letter-spacing: -0.01em; display: flex; align-items: center; gap: 14px; }
+  .ref-tag { font-family: var(--mono); font-size: 11px; color: var(--olive-light); background: var(--olive-bg); border: 1px solid var(--olive-line); padding: 3px 8px; border-radius: 5px; }
+  .m-meta { margin-top: 8px; color: var(--mint-mute); font-size: 13.5px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .m-meta .icon { color: var(--olive); }
+  .m-meta .sep { color: var(--mint-fade); }
+  .m-status-col { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .tag-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 100px; background: var(--olive-bg); border: 1px solid var(--olive-line); color: var(--olive-light); font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tag-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--olive); }
+  .tag-pill.amber { background: var(--amber-bg); border-color: rgba(232,185,98,.32); color: var(--amber); }
+  .tag-pill.amber .dot { background: var(--amber); }
+
+  /* manage-tabs (Contrat · EDL · Quittances etc.) */
+  .manage-tabs {
+    margin-top: 28px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 2px;
+  }
+  .m-tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 18px; font-size: 14px; font-weight: 500;
+    color: var(--mint-mute); cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    background: none; border-left: none; border-right: none; border-top: none;
+    font-family: inherit; transition: color .15s;
+  }
+  .m-tab:hover { color: var(--mint); }
+  .m-tab.active { color: var(--olive); border-bottom-color: var(--olive); }
+  .m-tab .count {
+    font-family: var(--mono); font-size: 10.5px;
+    padding: 2px 7px; border-radius: 100px;
+    background: rgba(239,251,219,.05); color: var(--mint-mute);
+  }
+  .m-tab.active .count { background: var(--olive-bg); color: var(--olive-light); }
+
+  /* flow heading */
+  .flow-heading {
+    margin: 36px 0 28px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px;
+  }
+  .flow-eyebrow {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em;
+    color: var(--olive); text-transform: uppercase; margin-bottom: 12px;
+  }
+  .flow-h1 {
+    font-family: var(--serif); font-size: 44px; line-height: 1.05;
+    letter-spacing: -0.02em; color: var(--mint); margin-bottom: 10px;
+  }
+  .flow-h1 em { font-style: italic; color: var(--olive); }
+  .flow-sub {
+    color: var(--mint-mute); font-size: 15px; line-height: 1.55;
+    max-width: 600px;
+  }
+  .flow-actions { display: flex; gap: 10px; }
+
+  /* screen switch */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ─── STEPPER ─── */
+  .stepper {
+    display: flex; align-items: center;
+    padding: 20px 28px;
+    background: var(--night-mid);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    margin-bottom: 28px;
+  }
+  .step {
+    display: flex; align-items: center; gap: 12px; flex: 1;
+  }
+  .step .link {
+    flex: 1; height: 1px; background: var(--border);
+    margin: 0 16px;
+  }
+  .step.done .link, .step.active ~ .step .link { background: var(--border); }
+  .step.done + .step .link, .step.done .link { background: var(--olive); }
+
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1.5px solid var(--border-2);
+    display: grid; place-items: center;
+    color: var(--mint-mute);
+    font-family: var(--mono); font-size: 13px; font-weight: 500;
+    flex-shrink: 0; transition: all .2s;
+  }
+  .step.active .step-num {
+    background: var(--olive); border-color: var(--olive);
+    color: var(--night); font-weight: 600;
+    box-shadow: 0 0 0 4px var(--olive-bg);
+  }
+  .step.done .step-num {
+    background: var(--olive); border-color: var(--olive);
+    color: var(--night);
+  }
+  .step-body { display: flex; flex-direction: column; min-width: 0; }
+  .step-lbl-1 {
+    font-family: var(--mono); font-size: 10.5px;
+    color: var(--mint-mute); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .step.active .step-lbl-1 { color: var(--olive); }
+  .step-lbl-2 {
+    font-size: 14px; font-weight: 500; color: var(--mint-mute);
+    margin-top: 2px;
+  }
+  .step.active .step-lbl-2 { color: var(--mint); font-weight: 600; }
+  .step.done .step-lbl-2 { color: var(--mint); }
+
+  /* ─── WIZARD CONTAINER ─── */
+  .wizard {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 28px;
+  }
+  .wizard-main { min-width: 0; }
+  .wizard-aside { position: relative; }
+
+  .wcard {
+    background: var(--night-mid);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 32px 36px;
+  }
+  .wcard-h {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .wcard-h .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+    color: var(--mint-mute); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .wcard-h .t {
+    font-family: var(--serif); font-size: 28px;
+    line-height: 1.05; letter-spacing: -0.01em; color: var(--mint);
+    margin-bottom: 6px;
+  }
+  .wcard-h .t em { font-style: italic; color: var(--olive); }
+  .wcard-h .s { color: var(--mint-mute); font-size: 14px; line-height: 1.5; }
+
+  .wsection { margin-bottom: 28px; }
+  .wsection:last-child { margin-bottom: 0; }
+  .wsection-h {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+    color: var(--mint-mute); text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .wsection-h::before {
+    content: ""; width: 24px; height: 1px; background: var(--olive);
+  }
+
+  /* form fields */
+  .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .form-row.col2 { grid-template-columns: 1fr 1fr; }
+  .form-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-row.col4 { grid-template-columns: 1fr 1fr 1fr auto; }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label {
+    font-size: 12.5px; color: var(--mint-mute); font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field label .req { color: var(--olive); }
+  .field input, .field textarea, .field select {
+    background: var(--night-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--mint);
+    font-family: var(--sans); font-size: 14px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:hover, .field textarea:hover, .field select:hover { border-color: var(--border-2); }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--olive); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--mint-dim); }
+  .field textarea { min-height: 96px; resize: vertical; font-family: var(--sans); }
+  .field select { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B5CA8D' stroke-width='1.5'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 38px; }
+  .field-suf { position: relative; }
+  .field-suf input { padding-right: 56px; }
+  .field-suf .suf { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--mint-mute); font-family: var(--mono); font-size: 13px; pointer-events: none; }
+  .field-pre { position: relative; }
+  .field-pre .pre { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--olive); pointer-events: none; }
+  .field-pre input { padding-left: 40px; }
+
+  /* chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 9px 16px; border-radius: 100px;
+    background: transparent; border: 1px solid var(--border-2);
+    color: var(--mint-mute); font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all .15s;
+  }
+  .chip:hover { color: var(--mint); }
+  .chip.on {
+    background: var(--olive-bg); border-color: var(--olive);
+    color: var(--olive-light);
+  }
+  .chip.on .icon { color: var(--olive-light); }
+
+  /* big option cards (e.g. Entrée / Sortie) */
+  .opt-cards { display: grid; gap: 12px; }
+  .opt-cards.col2 { grid-template-columns: 1fr 1fr; }
+  .opt-cards.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .opt-card {
+    background: var(--night-soft);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex; flex-direction: column; gap: 8px;
+    text-align: left;
+    font-family: inherit;
+    color: var(--mint);
+  }
+  .opt-card:hover { border-color: var(--border-2); }
+  .opt-card.on {
+    border-color: var(--olive);
+    background: var(--olive-bg);
+  }
+  .opt-card .ic {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--olive-bg);
+    color: var(--olive);
+    display: grid; place-items: center;
+  }
+  .opt-card.on .ic { background: var(--olive); color: var(--night); }
+  .opt-card .t {
+    font-family: var(--serif); font-size: 19px;
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--mint);
+  }
+  .opt-card .s {
+    font-size: 12.5px; color: var(--mint-mute);
+    line-height: 1.45;
+  }
+  .opt-card .check {
+    position: absolute; top: 18px; right: 18px;
+    opacity: 0; color: var(--olive);
+  }
+  .opt-card { position: relative; }
+  .opt-card.on .check { opacity: 1; }
+
+  /* buttons */
+  .btn {
+    height: 38px; padding: 0 16px;
+    border-radius: 9px;
+    border: 1px solid var(--border-2);
+    background: transparent;
+    color: var(--mint); font-family: var(--sans);
+    font-size: 13.5px; font-weight: 500;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all .15s;
+  }
+  .btn:hover { background: rgba(239,251,219,.04); border-color: var(--mint-mute); }
+  .btn.primary {
+    background: var(--olive);
+    border-color: var(--olive);
+    color: var(--night);
+    font-weight: 600;
+  }
+  .btn.primary:hover { background: var(--olive-light); border-color: var(--olive-light); }
+  .btn.ghost { border-color: transparent; color: var(--mint-mute); }
+  .btn.ghost:hover { color: var(--mint); background: rgba(239,251,219,.04); }
+  .btn.danger {
+    color: var(--red);
+    border-color: rgba(228,129,115,.32);
+  }
+  .btn.danger:hover { background: var(--red-bg); }
+  .btn.lg { height: 46px; padding: 0 22px; font-size: 14px; }
+  .btn.sm { height: 30px; padding: 0 12px; font-size: 12.5px; }
+
+  /* wizard foot */
+  .wfoot {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 28px;
+  }
+  .wfoot .right { display: flex; gap: 10px; }
+  .wfoot .hint {
+    font-family: var(--mono); font-size: 11.5px;
+    color: var(--mint-mute);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .wfoot .hint .icon { color: var(--olive); }
+
+  /* ─── TENANT CANDIDATE SELECT CARDS (step 1 contrat) ─── */
+  .cand-list { display: flex; flex-direction: column; gap: 10px; }
+  .cand-card {
+    background: var(--night-soft);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: grid; grid-template-columns: 22px 44px 1fr auto;
+    gap: 14px; align-items: center;
+    cursor: pointer; transition: all .15s;
+  }
+  .cand-card:hover { border-color: var(--border-2); }
+  .cand-card.on {
+    border-color: var(--olive); background: var(--olive-bg);
+  }
+  .cand-radio {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid var(--border-2);
+    display: grid; place-items: center;
+    transition: all .15s;
+  }
+  .cand-card.on .cand-radio {
+    border-color: var(--olive); background: var(--olive);
+  }
+  .cand-card.on .cand-radio::after {
+    content: ""; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--night);
+  }
+  .cand-av {
+    width: 44px; height: 44px; border-radius: 50%;
+    overflow: hidden; background: var(--olive-bg);
+  }
+  .cand-av img { width: 100%; height: 100%; object-fit: cover; }
+  .cand-info .name {
+    font-family: var(--serif); font-size: 16px;
+    color: var(--mint); line-height: 1.2;
+  }
+  .cand-info .meta {
+    margin-top: 3px; font-size: 12.5px;
+    color: var(--mint-mute);
+    display: flex; gap: 10px; align-items: center;
+    flex-wrap: wrap;
+  }
+  .cand-info .meta b { color: var(--mint); font-weight: 500; }
+  .cand-info .meta .sep { color: var(--mint-fade); }
+  .cand-score {
+    font-family: var(--serif); font-size: 22px;
+    color: var(--olive); line-height: 1;
+    display: flex; align-items: baseline; gap: 2px;
+  }
+  .cand-score .ttl { font-family: var(--mono); font-size: 11px; color: var(--mint-mute); }
+
+  /* divider with label */
+  .divider-or {
+    display: flex; align-items: center;
+    margin: 24px 0; gap: 14px;
+  }
+  .divider-or::before,
+  .divider-or::after {
+    content: ""; flex: 1; height: 1px; background: var(--border);
+  }
+  .divider-or span {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--mint-mute); letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ─── PREVIEW PANE (mint paper) ─── */
+  .paper {
+    background: var(--mint);
+    color: var(--night);
+    border-radius: var(--r-lg);
+    padding: 36px 40px;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,.5), 0 0 0 1px rgba(143,164,100,.2);
+    position: sticky; top: 144px;
+    font-family: var(--serif);
+    min-height: 580px;
+    overflow: hidden;
+    transition: transform .2s;
+  }
+  .paper-h {
+    text-align: center;
+    border-bottom: 2px solid var(--night);
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+  }
+  .paper-stamp {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--olive-dark);
+    background: rgba(143,164,100,.12);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .paper-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--night);
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+  }
+  .paper-title em { font-style: italic; color: var(--olive-dark); }
+  .paper-meta {
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--olive-dark);
+    letter-spacing: 0.08em;
+  }
+  .paper-section { margin-bottom: 16px; }
+  .paper-art {
+    font-family: var(--mono); font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--olive-dark);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .paper-body {
+    font-family: var(--serif);
+    font-size: 12.5px;
+    color: var(--night);
+    line-height: 1.55;
+  }
+  .paper-body b { font-weight: 700; }
+  .paper-body .blank {
+    background: rgba(16,33,43,.08);
+    border-bottom: 1px dashed rgba(16,33,43,.3);
+    padding: 0 6px;
+    color: rgba(16,33,43,.4);
+  }
+  .paper-kv {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+    font-family: var(--serif);
+    font-size: 12.5px;
+    margin-top: 4px;
+  }
+  .paper-kv .k { color: rgba(16,33,43,.6); }
+  .paper-kv .v { color: var(--night); }
+  .paper-amount {
+    background: rgba(143,164,100,.15);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .paper-amount .lbl { font-size: 12px; color: var(--olive-dark); font-family: var(--mono); letter-spacing: 0.04em; }
+  .paper-amount .val { font-family: var(--serif); font-size: 22px; color: var(--night); }
+  .paper-foot {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(16,33,43,.12);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    font-family: var(--serif);
+    font-size: 11px;
+    color: var(--olive-dark);
+  }
+  .paper-sig {
+    border-top: 1px solid rgba(16,33,43,.4);
+    margin-top: 36px;
+    padding-top: 6px;
+    font-family: var(--mono); font-size: 9.5px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .preview-tag {
+    position: absolute; top: 14px; right: 14px;
+    font-family: var(--mono); font-size: 9.5px;
+    background: var(--olive-dark); color: var(--mint);
+    padding: 3px 8px; border-radius: 4px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* ─── EDL — METER & KEY CARDS ─── */
+  .item-card {
+    background: var(--night-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    display: grid; grid-template-columns: 44px 1fr auto;
+    gap: 16px; align-items: center;
+  }
+  .item-card.has-fields {
+    grid-template-columns: 44px 1fr;
+  }
+  .item-card .ic {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--olive-bg);
+    color: var(--olive);
+    display: grid; place-items: center;
+  }
+  .item-card .t {
+    font-family: var(--serif); font-size: 17px;
+    line-height: 1.15; color: var(--mint);
+  }
+  .item-card .s {
+    font-size: 12.5px; color: var(--mint-mute);
+    margin-top: 2px;
+  }
+  .item-card .fields {
+    grid-column: 1 / -1;
+    display: grid; grid-template-columns: 1fr 1fr 130px auto;
+    gap: 10px; margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .item-card .field input { background: var(--night); }
+  .item-card .actions { display: flex; gap: 6px; align-items: center; }
+  .item-card .photo-slot {
+    width: 44px; height: 44px;
+    border: 1.5px dashed var(--border-2);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: var(--mint-mute);
+    cursor: pointer;
+  }
+  .item-card .photo-slot:hover { border-color: var(--olive); color: var(--olive); }
+  .icon-trash {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid rgba(228,129,115,.2);
+    color: var(--red);
+    background: transparent;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .icon-trash:hover { background: var(--red-bg); }
+
+  /* stepper for quantity */
+  .qty-stepper {
+    display: inline-flex; align-items: center;
+    background: var(--night); border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .qty-stepper button {
+    width: 32px; height: 36px;
+    background: transparent; border: none;
+    color: var(--mint-mute); cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .qty-stepper button:hover { color: var(--mint); background: rgba(239,251,219,.05); }
+  .qty-stepper .val {
+    min-width: 36px; text-align: center;
+    font-family: var(--mono); font-size: 14px; color: var(--mint);
+    font-weight: 500;
+  }
+
+  /* add card */
+  .add-card {
+    background: transparent;
+    border: 1.5px dashed var(--border-2);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--mint-mute);
+    font-family: inherit;
+    font-size: 13px; font-weight: 500;
+    transition: all .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+  }
+  .add-card:hover {
+    border-color: var(--olive);
+    color: var(--olive);
+    background: var(--olive-bg);
+  }
+
+  /* ─── ROOM BLOCK (step 4 EDL) ─── */
+  .room-block {
+    background: var(--night-soft);
+    border: 1px solid var(--border-2);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .room-h {
+    display: grid; grid-template-columns: 44px 1fr auto;
+    gap: 14px; align-items: center;
+    padding: 18px 22px;
+    background: var(--night-mid);
+    border-bottom: 1px solid var(--border);
+  }
+  .room-h .ic {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--olive-bg);
+    color: var(--olive);
+    display: grid; place-items: center;
+  }
+  .room-h .field input {
+    background: transparent; border: none; padding: 0;
+    font-family: var(--serif); font-size: 20px;
+    color: var(--mint); width: 100%;
+  }
+  .room-h .field input:focus {
+    border-bottom: 1px solid var(--olive);
+  }
+  .room-h .meta {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--mint-mute); margin-top: 2px;
+  }
+  .room-body { padding: 22px; }
+
+  .room-photos {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 18px;
+  }
+  .room-photo {
+    aspect-ratio: 4/3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--night);
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+  }
+  .room-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .room-photo .x {
+    position: absolute; top: 6px; right: 6px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(16,33,43,.85);
+    color: var(--mint);
+    display: grid; place-items: center;
+    opacity: 0;
+  }
+  .room-photo:hover .x { opacity: 1; }
+  .room-photo.add {
+    border-style: dashed;
+    display: grid; place-items: center;
+    color: var(--mint-mute);
+    font-size: 11px;
+    text-align: center;
+    background: transparent;
+  }
+  .room-photo.add:hover { border-color: var(--olive); color: var(--olive); }
+
+  /* element row in a room */
+  .el-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .el-row {
+    display: grid;
+    grid-template-columns: 1.3fr 140px 1.4fr 80px 40px;
+    gap: 10px; align-items: center;
+    background: var(--night);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .el-row .field input {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .el-row .field input:hover { border-color: var(--border); }
+  .el-row .field input:focus { background: var(--night-soft); border-color: var(--olive); }
+  .el-row .state-pick {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+  }
+  .state-pick.bon  { background: rgba(143,164,100,.18); color: var(--olive-light); border: 1px solid var(--olive-line); }
+  .state-pick.moy  { background: rgba(232,185,98,.14); color: var(--amber); border: 1px solid rgba(232,185,98,.28); }
+  .state-pick.mau  { background: rgba(228,129,115,.14); color: var(--red); border: 1px solid rgba(228,129,115,.28); }
+  .state-pick.hs   { background: rgba(228,129,115,.2); color: var(--red); border: 1px solid rgba(228,129,115,.4); }
+  .el-row .photo-mini {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: var(--night-soft);
+    border: 1px dashed var(--border-2);
+    display: grid; place-items: center;
+    color: var(--mint-mute);
+    cursor: pointer;
+  }
+  .el-row .photo-mini:hover { color: var(--olive); border-color: var(--olive); }
+  .icon-trash-sm {
+    width: 32px; height: 32px;
+    border-radius: 6px; border: none;
+    color: var(--red);
+    background: transparent;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .icon-trash-sm:hover { background: var(--red-bg); }
+
+  /* recap card (step 4 contrat) */
+  .recap-list {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .recap-row {
+    display: grid; grid-template-columns: 22px 1fr auto;
+    gap: 12px; align-items: center;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--night-soft);
+  }
+  .recap-row .check {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--olive); color: var(--night);
+    display: grid; place-items: center;
+  }
+  .recap-row .body .t { font-size: 13.5px; color: var(--mint); font-weight: 500; }
+  .recap-row .body .s { font-size: 12px; color: var(--mint-mute); margin-top: 2px; }
+  .recap-row .val { font-family: var(--mono); font-size: 14px; color: var(--mint); font-weight: 500; }
+
+  /* checkbox option (envoi) */
+  .opt-check {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px;
+    background: var(--night-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: all .15s;
+  }
+  .opt-check:hover { border-color: var(--border-2); }
+  .opt-check.on { border-color: var(--olive); background: var(--olive-bg); }
+  .opt-check .box {
+    width: 20px; height: 20px; border-radius: 5px;
+    border: 1.5px solid var(--border-2);
+    display: grid; place-items: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .opt-check.on .box { background: var(--olive); border-color: var(--olive); color: var(--night); }
+  .opt-check .body { flex: 1; }
+  .opt-check .t { font-size: 14px; color: var(--mint); font-weight: 500; }
+  .opt-check .s { font-size: 12.5px; color: var(--mint-mute); margin-top: 2px; }
+
+  /* quittance preview specific */
+  .paper.quittance {
+    min-height: 480px;
+  }
+
+  /* status pick (quittance payment status) */
+  .status-pick {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .status-opt {
+    background: var(--night-soft);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: var(--mint);
+    display: flex; flex-direction: column; gap: 6px;
+    transition: all .15s;
+  }
+  .status-opt:hover { border-color: var(--border-2); }
+  .status-opt.on {
+    border-color: var(--olive);
+    background: var(--olive-bg);
+  }
+  .status-opt.on .dot { box-shadow: 0 0 0 4px rgba(143,164,100,.2); }
+  .status-opt .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .status-opt.paid .dot { background: var(--olive); }
+  .status-opt.partial .dot { background: var(--amber); }
+  .status-opt.unpaid .dot { background: var(--red); }
+  .status-opt .lbl { font-size: 13.5px; font-weight: 600; color: var(--mint); }
+  .status-opt .sub { font-size: 11.5px; color: var(--mint-mute); }
+
+  /* tab-flow switch for demo */
+  .demo-bar {
+    max-width: 1320px; margin: 24px auto 0; padding: 0 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .flow-switch {
+    display: inline-flex;
+    background: var(--night-mid); border: 1px solid var(--border);
+    border-radius: 100px; padding: 3px; gap: 2px;
+  }
+  .flow-opt {
+    padding: 7px 16px; border-radius: 100px;
+    color: var(--mint-mute);
+    font-size: 12.5px; font-weight: 500; cursor: pointer;
+    border: none; background: transparent; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .flow-opt:hover { color: var(--mint); }
+  .flow-opt.active {
+    background: var(--olive); color: var(--night); font-weight: 600;
+  }
+
+  .demo-note {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--mint-mute);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .demo-note .icon { color: var(--olive); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo"><span class="ku">ku</span><span class="panga">panga</span></div>
+  <div class="search">
+    <svg class="icon md" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Rechercher un bien, une ville, un code postal...">
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="topbar-right">
+    <button class="new-btn"><svg class="icon md" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nouveau bien</button>
+    <button class="icon-btn"><svg class="icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
+    <button class="icon-btn"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+    <div class="avatar">GM</div>
+  </div>
+</header>
+
+<!-- SUBNAV -->
+<nav class="subnav">
+  <a class="subnav-item"><svg class="icon md" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Accueil</a>
+  <a class="subnav-item active"><svg class="icon md" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Mes biens</a>
+  <a class="subnav-item"><svg class="icon md" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Contrats</a>
+  <a class="subnav-item"><svg class="icon md" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> États des lieux</a>
+  <a class="subnav-item"><svg class="icon md" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Quittances</a>
+  <a class="subnav-item"><svg class="icon md" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Messagerie</a>
+</nav>
+
+<!-- Demo flow switcher -->
+<div class="demo-bar">
+  <button class="back-link" style="margin-bottom:0;">
+    <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Retour à la gestion
+  </button>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <span class="demo-note"><svg class="icon sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Démo · bascule entre les 3 flux</span>
+    <div class="flow-switch">
+      <button class="flow-opt active" data-flow="contrat" onclick="setFlow('contrat')">
+        <svg class="icon sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Contrat
+      </button>
+      <button class="flow-opt" data-flow="edl" onclick="setFlow('edl')">
+        <svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        État des lieux
+      </button>
+      <button class="flow-opt" data-flow="quittance" onclick="setFlow('quittance')">
+        <svg class="icon sm" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Quittance
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- Manage hero (preserved from main app) -->
+  <div class="manage-hero">
+    <div class="m-thumb">
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&q=80" alt="">
+      <span class="ph-count">7</span>
+    </div>
+    <div>
+      <div class="m-crumb">
+        <span>Mes biens</span>
+        <svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        <span><b>Maison Bougainville</b></span>
+        <svg class="icon sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        <span style="color:var(--olive);" id="crumbCurrent">Nouveau contrat</span>
+      </div>
+      <div class="m-title">
+        Maison Bougainville
+        <span class="ref-tag">REF · KPG-0008</span>
+      </div>
+      <div class="m-meta">
+        <span style="display:inline-flex;align-items:center;gap:6px;">
+          <svg class="icon sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          13 Rue Bougainville, Nantes
+        </span>
+        <span class="sep">·</span>
+        <span class="mono">500 €/mois</span>
+        <span class="sep">·</span>
+        <span>50 m² · 5 ch.</span>
+      </div>
+    </div>
+    <div class="m-status-col">
+      <span class="tag-pill amber"><span class="dot"></span> Vacant</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--mint-mute);">Sans contrat</span>
+    </div>
+  </div>
+
+  <!-- Manage tabs (preserved) -->
+  <div class="manage-tabs">
+    <button class="m-tab">
+      <svg class="icon md" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Vue d'ensemble
+    </button>
+    <button class="m-tab">
+      <svg class="icon md" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
+      Locataire
+    </button>
+    <button class="m-tab" id="tab-contrat">
+      <svg class="icon md" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Contrat <span class="count">0</span>
+    </button>
+    <button class="m-tab" id="tab-quittance">
+      <svg class="icon md" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Quittances <span class="count">0</span>
+    </button>
+    <button class="m-tab" id="tab-edl">
+      <svg class="icon md" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      États des lieux <span class="count">0</span>
+    </button>
+    <button class="m-tab">
+      <svg class="icon md" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+      Documents <span class="count">2</span>
+    </button>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       FLOW 1 — CONTRAT (wizard + preview)
+  ════════════════════════════════════════ -->
+  <section class="screen active" id="screen-contrat">
+
+    <div class="flow-heading">
+      <div>
+        <div class="flow-eyebrow">Création · Bail d'habitation</div>
+        <h1 class="flow-h1">Nouveau <em>contrat</em></h1>
+        <p class="flow-sub">Pré-remplissage automatique depuis les données du bien. La signature électronique peut être déclenchée à la dernière étape.</p>
+      </div>
+      <div class="flow-actions">
+        <button class="btn ghost"><svg class="icon sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Enregistrer brouillon</button>
+      </div>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper">
+      <div class="step done">
+        <div class="step-num"><svg class="icon sm" viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-body">
+          <span class="step-lbl-1">Étape 01</span>
+          <span class="step-lbl-2">Locataire</span>
+        </div>
+        <div class="link"></div>
+      </div>
+      <div class="step active">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <span class="step-lbl-1">Étape 02</span>
+          <span class="step-lbl-2">Bail</span>
+        </div>
+        <div class="link"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <span class="step-lbl-1">Étape 03</span>
+          <span class="step-lbl-2">Loyer &amp; garanties</span>
+        </div>
+        <div class="link"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <span class="step-lbl-1">Étape 04</span>
+          <span class="step-lbl-2">Récapitulatif</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wizard 2col -->
+    <div class="wizard">
+
+      <!-- MAIN — Step 2 (Bail) shown by default -->
+      <div class="wizard-main">
+        <div class="wcard">
+          <div class="wcard-h">
+            <div class="eyebrow">Étape 02 / 04</div>
+            <div class="t">Définissez la <em>période</em> du bail</div>
+            <div class="s">La date de fin est calculée automatiquement à partir de la durée. Vous pourrez surcharger si besoin.</div>
+          </div>
+
+          <!-- Type de bail -->
+          <div class="wsection">
+            <div class="wsection-h">Type de bail</div>
+            <div class="opt-cards col3">
+              <button class="opt-card on">
+                <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+                <div class="t">Location nue</div>
+                <div class="s">3 ans · résidence principale</div>
+                <span class="check"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span>
+              </button>
+              <button class="opt-card">
+                <div class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M7 9V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg></div>
+                <div class="t">Meublée</div>
+                <div class="s">1 an · loi ALUR</div>
+                <span class="check"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span>
+              </button>
+              <button class="opt-card">
+                <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+                <div class="t">Colocation</div>
+                <div class="s">Solidaire ou indépendante</div>
+                <span class="check"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="wsection">
+            <div class="wsection-h">Période</div>
+            <div class="form-row col2">
+              <div class="field">
+                <label>Date de début <span class="req">*</span></label>
+                <input type="date" value="2026-04-01">
+              </div>
+              <div class="field">
+                <label>Date de fin <span class="req">*</span></label>
+                <input type="date" value="2029-03-31">
+              </div>
+            </div>
+            <div class="field">
+              <label>Durée du bail</label>
+              <div class="chips">
+                <button class="chip">1 an</button>
+                <button class="chip on">3 ans</button>
+                <button class="chip">6 ans</button>
+                <button class="chip">9 ans</button>
+                <button class="chip">Personnalisée</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Préavis -->
+          <div class="wsection">
+            <div class="wsection-h">Préavis &amp; reconduction</div>
+            <div class="form-row col2">
+              <div class="field">
+                <label>Délai de préavis</label>
+                <div class="field-suf">
+                  <input type="number" value="3">
+                  <span class="suf">mois</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Reconduction tacite</label>
+                <div class="chips">
+                  <button class="chip on"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Activée</button>
+                  <button class="chip">Désactivée</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- foot -->
+          <div class="wfoot">
+            <button class="btn ghost">
+              <svg class="icon sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Précédent
+            </button>
+            <div class="right">
+              <span class="hint">
+                <svg class="icon sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Auto-sauvegardé · il y a 4 s
+              </span>
+              <button class="btn primary lg">
+                Suivant — Loyer
+                <svg class="icon sm" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASIDE — Contract preview -->
+      <div class="wizard-aside">
+        <div class="paper">
+          <span class="preview-tag">Aperçu</span>
+          <div class="paper-h">
+            <div class="paper-stamp">Loi N° 89-462 du 6 juillet 1989</div>
+            <div class="paper-title">Contrat de bail<br><em>d'habitation</em></div>
+            <div class="paper-meta">Réf. KPG-0008 · Nantes</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Entre les soussignés</div>
+            <div class="paper-body">
+              <b>Le bailleur :</b> Gedeon Mutikanga<br>
+              demeurant 13 Rue Bougainville, 44100 Nantes
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Et</div>
+            <div class="paper-body">
+              <b>Le preneur :</b> Léa Bernard<br>
+              née le 12 mars 2002, étudiante
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Article 1 — Objet</div>
+            <div class="paper-body">Location d'une maison de <b>50 m²</b>, 5 pièces, sise 13 Rue Bougainville, 44100 Nantes.</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Article 2 — Durée</div>
+            <div class="paper-body">
+              <b>3 ans</b> à compter du <b>1<sup>er</sup> avril 2026</b>, jusqu'au <b>31 mars 2029</b>, renouvelable par tacite reconduction.
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Article 3 — Loyer</div>
+            <div class="paper-amount">
+              <span class="lbl">Loyer mensuel</span>
+              <span class="val">500 €</span>
+            </div>
+            <div class="paper-kv">
+              <span class="k">Hors charges</span><span class="v">400 €</span>
+              <span class="k">Charges récup.</span><span class="v">100 €</span>
+              <span class="k">Dépôt de garantie</span><span class="v">500 €</span>
+            </div>
+          </div>
+
+          <div class="paper-foot">
+            <div>Fait à Nantes<br>le <span class="paper-body" style="font-size:11px;">__/__/____</span></div>
+            <div style="text-align:right;">Aperçu généré le<br>18 nov. 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FLOW 2 — ÉTAT DES LIEUX (4-step wizard)
+  ════════════════════════════════════════ -->
+  <section class="screen" id="screen-edl">
+
+    <div class="flow-heading">
+      <div>
+        <div class="flow-eyebrow">Création · État des lieux</div>
+        <h1 class="flow-h1">Nouvel état <em>des lieux</em></h1>
+        <p class="flow-sub">4 étapes guidées · compteurs, clés et pièce par pièce. Vos photos sont rattachées automatiquement aux éléments concernés.</p>
+      </div>
+      <div class="flow-actions">
+        <button class="btn ghost"><svg class="icon sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Enregistrer brouillon</button>
+      </div>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper">
+      <div class="step done">
+        <div class="step-num"><svg class="icon sm" viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-body"><span class="step-lbl-1">01</span><span class="step-lbl-2">Informations</span></div>
+        <div class="link"></div>
+      </div>
+      <div class="step done">
+        <div class="step-num"><svg class="icon sm" viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-body"><span class="step-lbl-1">02</span><span class="step-lbl-2">Compteurs</span></div>
+        <div class="link"></div>
+      </div>
+      <div class="step done">
+        <div class="step-num"><svg class="icon sm" viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-body"><span class="step-lbl-1">03</span><span class="step-lbl-2">Clés</span></div>
+        <div class="link"></div>
+      </div>
+      <div class="step active">
+        <div class="step-num">04</div>
+        <div class="step-body"><span class="step-lbl-1">04</span><span class="step-lbl-2">Pièces &amp; éléments</span></div>
+      </div>
+    </div>
+
+    <!-- Step 4 shown by default (most complex) -->
+    <div class="wcard">
+      <div class="wcard-h" style="display:flex; align-items:flex-end; justify-content:space-between;">
+        <div>
+          <div class="eyebrow">Étape 04 / 04</div>
+          <div class="t">Inspection <em>pièce par pièce</em></div>
+          <div class="s">3 pièces déclarées · 8 éléments inspectés · 12 photos jointes</div>
+        </div>
+        <div style="display:flex; gap: 8px;">
+          <button class="btn sm">
+            <svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 7 5 7 9 7"/><path d="M9 7V4h6v3M9 7v13M15 7v13M5 7v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7"/></svg>
+            Tout marquer "Bon état"
+          </button>
+        </div>
+      </div>
+
+      <!-- Room 1 — Salon -->
+      <div class="room-block">
+        <div class="room-h">
+          <div class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="11" width="20" height="9" rx="1"/><path d="M5 11V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/><line x1="4" y1="20" x2="4" y2="22"/><line x1="20" y1="20" x2="20" y2="22"/></svg></div>
+          <div>
+            <div class="field"><input type="text" value="Salon"></div>
+            <div class="meta">2 photos · 3 éléments · état général Bon</div>
+          </div>
+          <button class="icon-trash"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+        <div class="room-body">
+
+          <div class="room-photos">
+            <div class="room-photo"><img src="https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=300&q=80" alt=""><div class="x"><svg class="icon sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div>
+            <div class="room-photo"><img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=300&q=80" alt=""><div class="x"><svg class="icon sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div>
+            <div class="room-photo add">
+              <div>
+                <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Ajouter
+              </div>
+            </div>
+            <div class="room-photo add" style="opacity:.5;">
+              <div>
+                <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row col1" style="margin-bottom: 18px;">
+            <div class="field">
+              <label>Observations générales</label>
+              <textarea>Pièce repeinte récemment, parquet en bon état, légère trace au plafond côté fenêtre.</textarea>
+            </div>
+          </div>
+
+          <div class="wsection-h">Éléments · 3</div>
+          <div class="el-list">
+            <div class="el-row">
+              <div class="field"><input type="text" value="Parquet"></div>
+              <span class="state-pick bon"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Bon état <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Rayure côté entrée, propre"></div>
+              <button class="photo-mini"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg></button>
+            </div>
+            <div class="el-row">
+              <div class="field"><input type="text" value="Murs"></div>
+              <span class="state-pick bon"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Bon état <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Peinture blanche, récente"></div>
+              <button class="photo-mini"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+            <div class="el-row">
+              <div class="field"><input type="text" value="Plafond"></div>
+              <span class="state-pick moy"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Moyen <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Tache d'humidité 10cm côté fenêtre"></div>
+              <button class="photo-mini" style="border-color:var(--olive); color:var(--olive);"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+          </div>
+          <button class="add-card">
+            <svg class="icon sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter un élément
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Room 2 — Cuisine -->
+      <div class="room-block">
+        <div class="room-h">
+          <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2v6a3 3 0 0 0 6 0V2M12 2v6a3 3 0 0 0 6 0V2M9 14v8M15 14v8"/></svg></div>
+          <div>
+            <div class="field"><input type="text" value="Cuisine"></div>
+            <div class="meta">3 photos · 3 éléments · état général Bon</div>
+          </div>
+          <button class="icon-trash"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+        </div>
+        <div class="room-body">
+          <div class="room-photos">
+            <div class="room-photo"><img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=300&q=80" alt=""><div class="x"><svg class="icon sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/></svg></div></div>
+            <div class="room-photo"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&q=80" alt=""><div class="x"></div></div>
+            <div class="room-photo"><img src="https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=300&q=80" alt=""><div class="x"></div></div>
+            <div class="room-photo add"><div><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter</div></div>
+          </div>
+          <div class="el-list">
+            <div class="el-row">
+              <div class="field"><input type="text" value="Plaque vitrocéramique"></div>
+              <span class="state-pick bon"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Bon état <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Fonctionnelle, 4 foyers"></div>
+              <button class="photo-mini"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+            <div class="el-row">
+              <div class="field"><input type="text" value="Hotte aspirante"></div>
+              <span class="state-pick mau"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Mauvais <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Filtre encrassé, à remplacer"></div>
+              <button class="photo-mini" style="border-color:var(--olive); color:var(--olive);"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="21 15 16 10 5 21"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+            <div class="el-row">
+              <div class="field"><input type="text" value="Évier"></div>
+              <span class="state-pick bon"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Bon état <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Inox, robinet mitigeur"></div>
+              <button class="photo-mini"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+          </div>
+          <button class="add-card">
+            <svg class="icon sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter un élément
+          </button>
+        </div>
+      </div>
+
+      <!-- Room 3 — Chambre 1 -->
+      <div class="room-block">
+        <div class="room-h">
+          <div class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11h20v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="M6 11V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg></div>
+          <div>
+            <div class="field"><input type="text" value="Chambre principale"></div>
+            <div class="meta">1 photo · 2 éléments · état général Moyen</div>
+          </div>
+          <button class="icon-trash"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+        </div>
+        <div class="room-body">
+          <div class="room-photos">
+            <div class="room-photo"><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=300&q=80" alt=""><div class="x"></div></div>
+            <div class="room-photo add"><div><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter</div></div>
+            <div class="room-photo add" style="opacity:.5;"><div><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+            <div class="room-photo add" style="opacity:.5;"><div><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          </div>
+          <div class="el-list">
+            <div class="el-row">
+              <div class="field"><input type="text" value="Volet roulant"></div>
+              <span class="state-pick moy"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Moyen <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Lame inférieure tordue, fonctionnel"></div>
+              <button class="photo-mini"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+            <div class="el-row">
+              <div class="field"><input type="text" value="Radiateur"></div>
+              <span class="state-pick hs"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span> Hors service <svg class="icon sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <div class="field"><input type="text" value="Ne chauffe plus, à remplacer"></div>
+              <button class="photo-mini" style="border-color:var(--red); color:var(--red);"><svg class="icon sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+              <button class="icon-trash-sm"><svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg></button>
+            </div>
+          </div>
+          <button class="add-card">
+            <svg class="icon sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter un élément
+          </button>
+        </div>
+      </div>
+
+      <button class="add-card" style="padding: 18px;">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter une pièce
+      </button>
+
+      <!-- Signature inline -->
+      <div class="wcard" style="margin-top: 24px; background: var(--night-soft);">
+        <div class="wsection-h">Signatures</div>
+        <div class="form-row col2">
+          <div class="field">
+            <label>Signature du bailleur</label>
+            <div style="background: var(--night); border: 1.5px dashed var(--border-2); border-radius: 10px; height: 100px; display: grid; place-items: center; color: var(--mint-mute); font-size: 12.5px; cursor: pointer; gap: 6px;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><line x1="2" y1="2" x2="7.586" y2="7.586"/><circle cx="11" cy="11" r="2"/></svg>
+              Cliquer pour signer
+            </div>
+          </div>
+          <div class="field">
+            <label>Signature du locataire</label>
+            <div style="background: var(--night); border: 1.5px dashed var(--border-2); border-radius: 10px; height: 100px; display: grid; place-items: center; color: var(--mint-mute); font-size: 12.5px; cursor: pointer; gap: 6px;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Envoyer un lien
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- foot -->
+      <div class="wfoot">
+        <button class="btn">
+          <svg class="icon sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Précédent
+        </button>
+        <div class="right">
+          <span class="hint">
+            <svg class="icon sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Auto-sauvegardé · il y a 8 s
+          </span>
+          <button class="btn primary lg">
+            <svg class="icon sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Créer l'état des lieux
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ════════════════════════════════════════
+       FLOW 3 — QUITTANCE (form + preview)
+  ════════════════════════════════════════ -->
+  <section class="screen" id="screen-quittance">
+
+    <div class="flow-heading">
+      <div>
+        <div class="flow-eyebrow">Émission · Quittance de loyer</div>
+        <h1 class="flow-h1">Nouvelle <em>quittance</em></h1>
+        <p class="flow-sub">Émettez la quittance pour la période choisie. Une copie PDF est générée et l'envoi automatique au locataire est activé par défaut.</p>
+      </div>
+      <div class="flow-actions">
+        <button class="btn ghost">
+          <svg class="icon sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/></svg>
+          Historique
+        </button>
+      </div>
+    </div>
+
+    <div class="wizard">
+      <div class="wizard-main">
+        <div class="wcard">
+
+          <!-- Période -->
+          <div class="wsection">
+            <div class="wsection-h">Période</div>
+            <div class="field" style="margin-bottom: 16px;">
+              <label>Mois concerné</label>
+              <div class="chips">
+                <button class="chip">Janv.</button>
+                <button class="chip">Févr.</button>
+                <button class="chip on">Mars</button>
+                <button class="chip">Avr.</button>
+                <button class="chip">Mai</button>
+                <button class="chip">Juin</button>
+                <button class="chip">Juil.</button>
+                <button class="chip">Août</button>
+                <button class="chip">Sept.</button>
+                <button class="chip">Oct.</button>
+                <button class="chip">Nov.</button>
+                <button class="chip">Déc.</button>
+              </div>
+            </div>
+            <div class="form-row col2">
+              <div class="field">
+                <label>Année <span class="req">*</span></label>
+                <select>
+                  <option>2026</option>
+                  <option>2025</option>
+                  <option>2024</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Date d'échéance <span class="req">*</span></label>
+                <input type="date" value="2026-03-05">
+              </div>
+            </div>
+          </div>
+
+          <!-- Locataire (auto-rempli) -->
+          <div class="wsection">
+            <div class="wsection-h">Locataire concerné</div>
+            <div style="background: var(--night-soft); border: 1px solid var(--olive-line); border-radius: 12px; padding: 14px 18px; display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;">
+              <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--olive-bg);"><img src="https://i.pravatar.cc/120?img=5" alt="" style="width:100%;height:100%;object-fit:cover;"></div>
+              <div>
+                <div style="font-family:var(--serif); font-size:17px; color:var(--mint);">Léa Bernard</div>
+                <div style="font-size:12.5px; color:var(--mint-mute); margin-top:2px;">Contrat actif depuis le 1<sup>er</sup> avril 2026 · 35 mois restants</div>
+              </div>
+              <span class="tag-pill" style="background: var(--olive-bg); color: var(--olive-light); border-color: var(--olive-line);">
+                <span class="dot"></span> Actif
+              </span>
+            </div>
+          </div>
+
+          <!-- Montants -->
+          <div class="wsection">
+            <div class="wsection-h">Montants</div>
+            <div class="form-row col3">
+              <div class="field">
+                <label>Loyer hors charges</label>
+                <div class="field-suf">
+                  <input type="number" value="400">
+                  <span class="suf">€</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Charges récupérables</label>
+                <div class="field-suf">
+                  <input type="number" value="100">
+                  <span class="suf">€</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Total</label>
+                <div class="field-suf">
+                  <input type="number" value="500" disabled style="background: var(--olive-bg); border-color: var(--olive-line); color: var(--olive-light); font-weight: 600;">
+                  <span class="suf" style="color: var(--olive);">€</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paiement -->
+          <div class="wsection">
+            <div class="wsection-h">Statut du paiement</div>
+            <div class="status-pick">
+              <button class="status-opt paid on">
+                <span class="dot"></span>
+                <div class="lbl">Encaissé</div>
+                <div class="sub">Paiement reçu</div>
+              </button>
+              <button class="status-opt partial">
+                <span class="dot"></span>
+                <div class="lbl">Partiel</div>
+                <div class="sub">Versement incomplet</div>
+              </button>
+              <button class="status-opt unpaid">
+                <span class="dot"></span>
+                <div class="lbl">Impayé</div>
+                <div class="sub">Relance à prévoir</div>
+              </button>
+            </div>
+            <div class="form-row col2" style="margin-top: 14px;">
+              <div class="field">
+                <label>Date du paiement</label>
+                <input type="date" value="2026-03-04">
+              </div>
+              <div class="field">
+                <label>Mode de paiement</label>
+                <select>
+                  <option>Virement bancaire</option>
+                  <option>Prélèvement automatique</option>
+                  <option>Chèque</option>
+                  <option>Espèces</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Envoi -->
+          <div class="wsection">
+            <div class="wsection-h">Envoi &amp; archivage</div>
+            <div class="opt-check on">
+              <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:11px;height:11px;"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="body">
+                <div class="t">Envoyer par email au locataire</div>
+                <div class="s">À <b style="color:var(--mint);">lea.bernard@gmail.com</b> dès la génération.</div>
+              </div>
+            </div>
+            <div class="opt-check on">
+              <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:11px;height:11px;"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="body">
+                <div class="t">Archiver dans les documents du bien</div>
+                <div class="s">Accessible sous l'onglet Documents · Quittance KPG-Q-024.</div>
+              </div>
+            </div>
+            <div class="opt-check">
+              <div class="box"></div>
+              <div class="body">
+                <div class="t">Envoyer une copie au bailleur</div>
+                <div class="s">Reçue à gedeon.mutikanga@gmail.com.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- foot -->
+          <div class="wfoot">
+            <button class="btn ghost">Annuler</button>
+            <div class="right">
+              <button class="btn">
+                <svg class="icon sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+                Enregistrer brouillon
+              </button>
+              <button class="btn primary lg">
+                <svg class="icon sm" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                Générer &amp; envoyer
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Preview pane -->
+      <div class="wizard-aside">
+        <div class="paper quittance">
+          <span class="preview-tag">Aperçu</span>
+          <div class="paper-h">
+            <div class="paper-stamp">Quittance · KPG-Q-024</div>
+            <div class="paper-title">Quittance<br><em>de loyer</em></div>
+            <div class="paper-meta">Mars 2026</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Bailleur</div>
+            <div class="paper-body"><b>Gedeon Mutikanga</b><br>13 Rue Bougainville, 44100 Nantes</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Locataire</div>
+            <div class="paper-body"><b>Léa Bernard</b><br>lea.bernard@gmail.com</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Objet</div>
+            <div class="paper-body">Logement situé au <b>13 Rue Bougainville, 44100 Nantes</b>.</div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Détail des sommes</div>
+            <div class="paper-kv">
+              <span class="k">Loyer hors charges</span><span class="v">400,00 €</span>
+              <span class="k">Charges récupérables</span><span class="v">100,00 €</span>
+            </div>
+            <div class="paper-amount">
+              <span class="lbl">Total quittancé</span>
+              <span class="val">500,00 €</span>
+            </div>
+          </div>
+
+          <div class="paper-section">
+            <div class="paper-art">Période</div>
+            <div class="paper-body">Du <b>1<sup>er</sup> mars 2026</b> au <b>31 mars 2026</b><br>Échéance : 5 mars 2026 · Reçu le 4 mars 2026</div>
+          </div>
+
+          <div class="paper-sig">Signature du bailleur</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  function setFlow(flow) {
+    document.querySelectorAll('.flow-opt').forEach(b => {
+      b.classList.toggle('active', b.dataset.flow === flow);
+    });
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + flow).classList.add('active');
+    // update crumb + tabs highlight
+    const crumb = document.getElementById('crumbCurrent');
+    const labels = { contrat: 'Nouveau contrat', edl: 'Nouvel état des lieux', quittance: 'Nouvelle quittance' };
+    crumb.textContent = labels[flow];
+    document.querySelectorAll('.m-tab').forEach(t => t.classList.remove('active'));
+    const tabId = { contrat: 'tab-contrat', edl: 'tab-edl', quittance: 'tab-quittance' }[flow];
+    document.getElementById(tabId).classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  // initial active tab
+  document.getElementById('tab-contrat').classList.add('active');
+
+  // chip-on toggle inside chip groups (decorative)
+  document.querySelectorAll('.chips').forEach(group => {
+    group.addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      // toggle on group if single-select feel
+      group.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+    });
+  });
+
+  // opt-card single-select inside same opt-cards group
+  document.querySelectorAll('.opt-cards').forEach(group => {
+    group.addEventListener('click', e => {
+      const card = e.target.closest('.opt-card');
+      if (!card) return;
+      group.querySelectorAll('.opt-card').forEach(c => c.classList.remove('on'));
+      card.classList.add('on');
+    });
+  });
+
+  // opt-check toggle
+  document.querySelectorAll('.opt-check').forEach(c => {
+    c.addEventListener('click', () => c.classList.toggle('on'));
+  });
+
+  // status-opt single select
+  document.querySelectorAll('.status-pick').forEach(group => {
+    group.addEventListener('click', e => {
+      const s = e.target.closest('.status-opt');
+      if (!s) return;
+      group.querySelectorAll('.status-opt').forEach(x => x.classList.remove('on'));
+      s.classList.add('on');
+    });
+  });
+
+  // cand-card single
+  document.querySelectorAll('.cand-list').forEach(group => {
+    group.addEventListener('click', e => {
+      const c = e.target.closest('.cand-card');
+      if (!c) return;
+      group.querySelectorAll('.cand-card').forEach(x => x.classList.remove('on'));
+      c.classList.add('on');
+    });
+  });
+</script>
+</body>
+</html>

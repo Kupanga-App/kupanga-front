@@ -1,0 +1,182 @@
+<div class="kp-manage">
+
+  <!-- Back -->
+  <button class="kp-back-btn" (click)="goBack()">
+    <kp-icon name="arrow-left" [size]="16" />
+    Mes biens
+  </button>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="manage-loading">
+      <div class="kp-skel" style="height:120px;border-radius:16px;"></div>
+      <div class="kp-skel" style="height:56px;border-radius:8px;margin-top:28px;"></div>
+    </div>
+  }
+
+  <!-- Erreur -->
+  @if (!loading() && error()) {
+    <div class="manage-error">
+      <kp-icon name="alert-triangle" [size]="32" />
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Contenu -->
+  @if (!loading() && bien()) {
+
+    <!-- Hero card ──────────────────────────────────────────────────── -->
+    <div class="manage-hero">
+
+      <!-- Thumbnail -->
+      <div class="m-thumb">
+        @if (bien()!.images?.length) {
+          <img [src]="bien()!.images![0]" [alt]="bien()!.titre" />
+          @if (bien()!.images!.length > 1) {
+            <div class="ph-count">+{{ bien()!.images!.length - 1 }}</div>
+          }
+        } @else {
+          <div class="m-thumb-ph"><kp-icon name="home" [size]="28" /></div>
+        }
+      </div>
+
+      <!-- Info -->
+      <div class="m-info">
+        <div class="m-crumb">
+          <kp-icon name="home" [size]="12" />
+          Mes biens
+          <kp-icon name="chevron-right" [size]="12" />
+          <b>{{ bien()!.titre }}</b>
+        </div>
+        <div class="m-title">
+          {{ bien()!.titre }}
+          <span class="ref-tag">{{ refTag() }}</span>
+        </div>
+        <div class="m-meta">
+          <span class="m-meta-i"><kp-icon name="map-pin" [size]="13" /> {{ bien()!.adresse }}, {{ bien()!.ville }}</span>
+          @if (bien()!.loyerMensuel) {
+            <span class="sep">·</span>
+            <span class="m-meta-i"><kp-icon name="dollar-sign" [size]="13" /> {{ bien()!.loyerMensuel }} €/mois</span>
+          }
+          @if (bien()!.surfaceHabitable) {
+            <span class="sep">·</span>
+            <span class="m-meta-i"><kp-icon name="maximize-2" [size]="13" /> {{ bien()!.surfaceHabitable }} m²</span>
+          }
+        </div>
+      </div>
+
+      <!-- Statut -->
+      <div class="m-status-col">
+        <span class="tag-pill" [class]="hasLocataire() ? 'tag-pill-olive' : 'tag-pill-amber'">
+          <span class="dot"></span>
+          {{ hasLocataire() ? 'Loué' : 'Vacant' }}
+        </span>
+        <span class="tag-pill tag-pill-ghost">
+          {{ statutLabel(contratStatut()) }}
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Onglets ─────────────────────────────────────────────────────── -->
+    <mat-tab-group animationDuration="150ms" [selectedIndex]="gestion.selectedTabIndex()" (selectedTabChange)="gestion.selectedTabIndex.set($event.index)">
+
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span class="tab-label">
+            <kp-icon name="home" [size]="14" />
+            Vue d'ensemble
+          </span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <kp-resume-logement />
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span class="tab-label">
+            <kp-icon name="file-text" [size]="14" />
+            Contrat
+            @if (gestion.contratCount() !== null) {
+              <span class="tab-count">{{ gestion.contratCount() }}</span>
+            }
+          </span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="tab-content">
+            @if (gestion.activeView() === 'contrat-new') {
+              <kp-contrat-new />
+            } @else {
+              <kp-contrat-logement />
+            }
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span class="tab-label">
+            <kp-icon name="clipboard-check" [size]="14" />
+            États des lieux
+            @if (gestion.edlCount() !== null) {
+              <span class="tab-count">{{ gestion.edlCount() }}</span>
+            }
+          </span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="tab-content">
+            @if (gestion.activeView() === 'edl-new') {
+              <kp-edl-new />
+            } @else {
+              <kp-edl-logement />
+            }
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span class="tab-label">
+            <kp-icon name="credit-card" [size]="14" />
+            Quittances
+            @if (gestion.quittanceCount() !== null) {
+              <span class="tab-count">{{ gestion.quittanceCount() }}</span>
+            }
+          </span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="tab-content">
+            @if (gestion.activeView() === 'quittance-new') {
+              <kp-quittance-new />
+            } @else {
+              <kp-quittances-logement />
+            }
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span class="tab-label">
+            <kp-icon name="file-text" [size]="14" />
+            Documents
+            @if (gestion.documentTotalCount() !== null) {
+              <span class="tab-count">{{ gestion.documentTotalCount() }}</span>
+            }
+          </span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <kp-documents-logement />
+          </div>
+        </ng-template>
+      </mat-tab>
+
+    </mat-tab-group>
+
+  }
+
+</div>

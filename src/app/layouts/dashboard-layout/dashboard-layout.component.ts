@@ -4,6 +4,7 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
 import { PrincipalNavHeaderComponent } from '../../shared/components/principal-nav-header/principal-nav-header.component';
+import { ChatNotificationComponent } from '../../features/messagerie/components/chat-notification/chat-notification.component';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -12,6 +13,7 @@ import { PrincipalNavHeaderComponent } from '../../shared/components/principal-n
     CommonModule,
     RouterModule,
     PrincipalNavHeaderComponent,
+    ChatNotificationComponent,
   ],
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.scss'],

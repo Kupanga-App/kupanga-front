@@ -6,13 +6,7 @@
     border-color: var(--kp-border);
   }
 
-  .mat-mdc-form-field {
-    --mdc-outlined-text-field-outline-color: var(--kp-border-strong);
-    --mdc-outlined-text-field-input-text-color: var(--kp-text-1);
-    --mdc-outlined-text-field-label-text-color: var(--kp-text-2);
-  }
-
-  .mat-mdc-table {
+.mat-mdc-table {
     --mat-table-background-color: var(--kp-surface);
     --mat-table-row-item-label-text-color: var(--kp-text-1);
     --mat-table-header-headline-color: var(--kp-text-2);

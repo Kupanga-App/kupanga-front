@@ -1,0 +1,24 @@
+<div class="stepper">
+  @for (step of steps(); track $index) {
+    <div class="step" [class.done]="isDone($index)" [class.active]="isActive($index)">
+      <div class="step-circle">
+        @if (isDone($index)) {
+          <kp-icon name="check" [size]="14" [strokeWidth]="2.5" />
+        } @else {
+          <span>{{ stepNumber($index) }}</span>
+        }
+      </div>
+      <div class="step-body">
+        <span class="step-lbl1">Étape {{ stepNumber($index) }}</span>
+        @if (step.sublabel) {
+          <span class="step-lbl2">{{ step.sublabel }}</span>
+        } @else {
+          <span class="step-lbl2">{{ step.label }}</span>
+        }
+      </div>
+    </div>
+    @if ($index < steps().length - 1) {
+      <div class="step-link" [class.done]="isDone($index)"></div>
+    }
+  }
+</div>

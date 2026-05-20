@@ -1,0 +1,26 @@
+<div class="card">
+  <div class="card-h">
+    <span class="t">Échéances à venir</span>
+    <a class="card-link" href="#">Voir tout →</a>
+  </div>
+
+  <div class="timeline">
+    @for (item of deadlines(); track item.title) {
+      <div class="tl-item" [class]="'tl-item--' + item.state">
+        <div class="tl-marker">
+          <span class="d">{{ item.day }}</span>
+          <span class="m">{{ item.month }}</span>
+        </div>
+        <div class="tl-body">
+          <div class="t">{{ item.title }}</div>
+          <div class="s">{{ item.subtitle }}</div>
+        </div>
+        @if (item.amount) {
+          <div class="tl-amount" [style.color]="item.amountColor === 'olive' ? 'var(--kp-primary)' : undefined">
+            {{ item.amount }}
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

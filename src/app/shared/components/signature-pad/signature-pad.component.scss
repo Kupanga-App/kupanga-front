@@ -1,0 +1,50 @@
+.kp-sig-pad {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-2);
+}
+
+.kp-sig-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kp-text-2);
+  margin: 0;
+}
+
+.kp-sig-canvas {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: 140px;
+  border: 0.5px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-surface-2);
+  cursor: crosshair;
+  touch-action: none;
+  transition: border-color var(--kp-transition);
+
+  &:hover {
+    border-color: var(--kp-primary);
+  }
+
+  &--required {
+    border-color: var(--kp-danger);
+  }
+}
+
+.kp-sig-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-2);
+  max-width: 480px;
+}
+
+.kp-sig-hint {
+  font-size: 12px;
+  color: var(--kp-text-3);
+
+  &--error {
+    color: var(--kp-danger);
+  }
+}

@@ -1,0 +1,272 @@
+.auth-c {
+  position: relative;
+  background: var(--night);
+  height: 100vh;
+  color: var(--mint);
+  font-family: var(--font-sans);
+  overflow: hidden;
+
+  // Glow ambient bas-gauche
+  &::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    width: 1000px;
+    height: 1000px;
+    left: -200px;
+    bottom: -300px;
+    background: radial-gradient(circle, rgba(143, 164, 100, 0.18) 0%, transparent 65%);
+  }
+}
+
+// ── Mastheads ────────────────────────────────────────────────────────────────
+.masthead-top,
+.masthead-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 26px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+
+.masthead-top {
+  top: 0;
+  border-bottom: 1px solid var(--olive-15);
+}
+
+.masthead-bottom {
+  bottom: 0;
+  border-top: 1px solid var(--olive-15);
+  background: rgba(16, 33, 43, 0.4);
+  padding: 18px 56px;
+}
+
+.masthead-meta,
+.masthead-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.masthead-sep {
+  color: var(--olive-40);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+// ── Zone centrale ─────────────────────────────────────────────────────────────
+.auth-c-body {
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  top: 130px;
+  bottom: 80px;
+  display: flex;
+  gap: 40px;
+}
+
+// ── Colonne éditoriale gauche ─────────────────────────────────────────────────
+.auth-c-editorial {
+  flex: 1;
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--olive);
+  margin-bottom: 16px;
+}
+
+.hero-serif {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 10vw, 140px);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  color: var(--mint);
+  margin: 0;
+  text-wrap: balance;
+
+  ::ng-deep em {
+    font-style: italic;
+    color: var(--olive-light);
+  }
+}
+
+.subhero {
+  margin-top: 28px;
+  max-width: 520px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--olive-light);
+  line-height: 1.45;
+}
+
+.editorial-rubrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 700px;
+}
+
+.rubric-label {
+  border-top: 1px solid var(--olive-25);
+  padding-top: 10px;
+  margin-bottom: 8px;
+}
+
+.rubric-text {
+  font-size: 13px;
+  color: var(--mint-80);
+  line-height: 1.5;
+}
+
+// ── Panneau formulaire droit ──────────────────────────────────────────────────
+.auth-c-panel {
+  width: 460px;
+  background: var(--night-mid);
+  border: 1px solid var(--olive-15);
+  border-radius: 14px;
+  padding: 36px 40px;
+  align-self: flex-start;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;       // clipping border-radius + ::before card-shine
+  overflow-y: auto;       // override y : scroll si trop haut
+  max-height: 100%;       // borné par auth-c-body (top:130 / bottom:80)
+  scrollbar-width: none;  // no scrollbar Firefox
+  &::-webkit-scrollbar { display: none; } // no scrollbar Chrome/Safari
+  flex-shrink: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.025) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: 14px;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 30px;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    color: var(--mint);
+    margin: 8px 0 6px;
+  }
+
+  .sub {
+    color: var(--mint-55);
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.55;
+    margin: 0 0 24px;
+  }
+}
+
+.panel-eyebrow {
+  margin-bottom: 0;
+}
+
+.panel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel-footer {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--olive-25);
+  font-size: 12.5px;
+  color: var(--mint-55);
+  text-align: center;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+.signature {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--mint-55);
+  text-decoration: none;
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+
+// Grand écran : légère compression
+@media (max-width: 1280px) {
+  .auth-c-body       { left: 40px; right: 40px; gap: 28px; }
+  .auth-c-panel      { width: 430px; }
+  .masthead-top      { padding: 22px 40px; }
+  .masthead-bottom   { padding: 16px 40px; }
+}
+
+// Laptop moyen : hero réduit, date masquée
+@media (max-width: 1100px) {
+  .hero-serif {
+    font-size: clamp(56px, 7vw, 96px);
+  }
+  .subhero {
+    font-size: 17px;
+    margin-top: 20px;
+  }
+  .auth-c-body     { left: 32px; right: 32px; gap: 20px; }
+  .auth-c-panel    { width: 400px; padding: 28px 32px; }
+  .masthead-top, .masthead-bottom { padding: 18px 32px; }
+  .masthead-meta   { display: none; } // date trop longue
+}
+
+// Petit laptop / tablet paysage : hero encore réduit, panel plus fin
+@media (max-width: 900px) {
+  .hero-serif {
+    font-size: clamp(44px, 6vw, 80px);
+  }
+  .auth-c-panel  { width: 340px; padding: 24px 28px; }
+  .auth-c-body   { gap: 16px; }
+}
+
+// Mobile / tablet portrait : éditorial masqué, panneau centré
+@media (max-width: 768px) {
+  .auth-c {
+    height: auto;
+    min-height: 100svh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .auth-c-body {
+    position: static;
+    flex-direction: column;
+    align-items: center;
+    padding: 90px 20px 72px;
+    height: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+  }
+
+  .auth-c-editorial { display: none; }
+
+  .auth-c-panel {
+    width: 100%;
+    max-width: 460px;
+    max-height: none;       // pas de contrainte sur mobile
+    align-self: auto;
+  }
+
+  .masthead-top, .masthead-bottom { padding: 14px 20px; }
+  .masthead-meta, .masthead-links { display: none; }
+}

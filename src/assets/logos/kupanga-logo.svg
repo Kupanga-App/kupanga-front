@@ -1,0 +1,55 @@
+<svg width="680" height="120" viewBox="0 0 680 120" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Logo Kupanga</title>
+  <desc>Logo Kupanga — application de gestion locative tout-en-un</desc>
+
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;display=swap');
+      .kupanga-wm   { font-family: 'DM Serif Display', Georgia, serif; fill: #EFFBDB; font-size: 48px; font-weight: 400; }
+      .kupanga-wm-i { font-family: 'DM Serif Display', Georgia, serif; fill: #8FA464; font-style: italic; font-size: 48px; font-weight: 400; }
+      .kupanga-tg   { font-family: 'DM Mono', 'Courier New', monospace; fill: rgba(239,251,219,0.50); font-size: 10px; letter-spacing: 0.22em; }
+    </style>
+  </defs>
+
+  <!-- Fond -->
+  <rect x="0" y="0" width="680" height="120" rx="12" fill="#10212B"/>
+
+  <!-- ── ICÔNE ── -->
+
+  <!-- Toit -->
+  <polyline points="28,66 52,42 76,66"
+    fill="none" stroke="#8FA464" stroke-width="2.2"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Corps bâtiment -->
+  <rect x="34" y="66" width="36" height="28" rx="2"
+    fill="none" stroke="#8FA464" stroke-width="2.2"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Porte -->
+  <rect x="46" y="79" width="12" height="15" rx="2"
+    fill="none" stroke="#EFFBDB" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Clé -->
+  <circle cx="78" cy="88" r="6"
+    fill="none" stroke="#B5CA8D" stroke-width="1.8"/>
+  <line x1="82" y1="91" x2="93" y2="102"
+    stroke="#B5CA8D" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="88" y1="97" x2="91" y2="94"
+    stroke="#B5CA8D" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="92" y1="101" x2="95" y2="97"
+    stroke="#B5CA8D" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Séparateur vertical -->
+  <line x1="116" y1="30" x2="116" y2="90"
+    stroke="rgba(143,164,100,0.25)" stroke-width="0.8"/>
+
+  <!-- ── WORDMARK ── -->
+  <text x="132" y="82">
+    <tspan class="kupanga-wm">kup</tspan><tspan class="kupanga-wm-i">anga</tspan>
+  </text>
+
+  <!-- ── TAGLINE ── -->
+  <text class="kupanga-tg" x="134" y="102">gestion locative tout-en-un</text>
+
+</svg>

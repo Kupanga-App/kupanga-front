@@ -1,0 +1,172 @@
+﻿@if (loading()) {
+  <div class="kp-q-loading">
+    <mat-spinner diameter="32" />
+    <span>Chargement…</span>
+  </div>
+}
+
+@if (!loading()) {
+  <div class="kp-quittances">
+
+    <!-- ── Toolbar (proprio) ───────────────────────────────── -->
+    @if (isProprietaire()) {
+      <div class="kp-q-toolbar">
+        <button mat-flat-button color="primary" (click)="navigateToNew()">
+          <mat-icon>add</mat-icon> Générer une quittance
+        </button>
+      </div>
+    }
+
+    <!-- ── Formulaire ─────────────────────────────────────── -->
+    @if (isProprietaire() && showForm()) {
+      <div class="kp-q-form-wrapper">
+        <div class="kp-q-form-header">
+          <h2 class="kp-text-h2">Nouvelle quittance</h2>
+          <button mat-icon-button (click)="showForm.set(false)"><mat-icon>close</mat-icon></button>
+        </div>
+
+        <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="kp-q-form">
+
+          <div class="kp-form-row">
+                        <div class="kp-field">
+                        <label class="kp-label">Mois <span class="kp-req">*</span></label>
+                        <mat-form-field>
+              <mat-select formControlName="mois">
+                @for (m of months; track m.value) {
+                  <mat-option [value]="m.value">{{ m.label }}</mat-option>
+                }
+              </mat-select>
+              @if (createForm.get('mois')?.invalid && createForm.get('mois')?.touched) {
+                <mat-error>Mois requis</mat-error>
+              }
+            </mat-form-field>
+            </div>
+
+            
+            <div class="kp-field">
+            <label class="kp-label">Année <span class="kp-req">*</span></label>
+
+            
+            <mat-form-field>
+              <input matInput type="number" formControlName="annee" min="2000" />
+            </mat-form-field>
+            </div>
+          </div>
+
+          
+          <div class="kp-field">
+          <label class="kp-label">Date d'échéance <span class="kp-req">*</span></label>
+
+          
+          <mat-form-field>
+            <input matInput type="date" formControlName="dateEcheance" />
+            @if (createForm.get('dateEcheance')?.invalid && createForm.get('dateEcheance')?.touched) {
+              <mat-error>Date requise</mat-error>
+            }
+          </mat-form-field>
+          </div>
+
+          <!-- Montants masqués si contrat signé -->
+          @if (!contratSigne()) {
+            <div class="kp-form-row">
+                            <div class="kp-field">
+                            <label class="kp-label">Loyer mensuel (€) <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput type="number" formControlName="loyerMensuel" min="0" />
+                <span matSuffix>€</span>
+              </mat-form-field>
+              </div>
+                            <div class="kp-field">
+                            <label class="kp-label">Charges (€/mois) <span class="kp-req">*</span></label>
+                            <mat-form-field>
+                <input matInput type="number" formControlName="chargesMensuelles" min="0" />
+                <span matSuffix>€</span>
+              </mat-form-field>
+              </div>
+            </div>
+          } @else {
+            <p class="kp-text-caption">Loyer et charges repris automatiquement depuis le contrat signé.</p>
+          }
+
+          <div class="kp-form-actions">
+            <button mat-flat-button color="primary" type="submit" [disabled]="creating()">
+              @if (creating()) { <mat-spinner diameter="16" /> } @else { <mat-icon>receipt_long</mat-icon> }
+              Générer
+            </button>
+            <button mat-button type="button" (click)="showForm.set(false)">Annuler</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- ── Liste ──────────────────────────────────────────── -->
+    @if (quittances().length === 0) {
+      <div class="kp-empty-state">
+        <mat-icon>receipt_long</mat-icon>
+        <span>Aucune quittance enregistrée.</span>
+      </div>
+    }
+
+    @for (q of quittances(); track q.id) {
+      <div class="kp-q-card">
+        <div class="kp-q-card-header">
+          <div class="kp-q-card-title">
+            <span class="kp-q-mois">{{ q.moisLabel }} {{ q.annee }}</span>
+            <span class="kp-q-montant">{{ q.montantTotal }} €</span>
+          </div>
+          <span class="kp-statut-badge" [class]="statutClass(q.statut)">
+            {{ statutLabel(q.statut) }}
+          </span>
+        </div>
+
+        <div class="kp-q-meta">
+          <span class="kp-text-caption">
+            <mat-icon>calendar_today</mat-icon>
+            Échéance : {{ q.dateEcheance | date:'dd MMM yyyy' }}
+          </span>
+          @if (q.datePaiement) {
+            <span class="kp-text-caption">
+              <mat-icon>check_circle</mat-icon>
+              Payée le {{ q.datePaiement | date:'dd MMM yyyy' }}
+            </span>
+          }
+        </div>
+
+        <div class="kp-q-actions">
+          @if (q.urlPdf) {
+            <a mat-stroked-button [href]="q.urlPdf" target="_blank" rel="noopener">
+              <mat-icon>picture_as_pdf</mat-icon> PDF
+            </a>
+          }
+
+          <!-- Marquer payée (proprio, quittance EN_ATTENTE) -->
+          @if (isProprietaire() && q.statut === 'EN_ATTENTE') {
+            @if (signingId() === q.id) {
+              <div class="kp-sign-inline">
+                <p class="kp-text-caption">Signez pour confirmer le paiement</p>
+                <kp-signature-pad [required]="true" (signatureChange)="onSignatureChange($event)" />
+                <div class="kp-sign-inline-actions">
+                  <button mat-flat-button color="primary"
+                    [disabled]="!signatureBase64() || marking()"
+                    (click)="marquerPayee(q.id)">
+                    @if (marking()) { <mat-spinner diameter="16" /> } @else { <mat-icon>check</mat-icon> }
+                    Confirmer paiement
+                  </button>
+                  <button mat-button (click)="cancelMarquer()">Annuler</button>
+                </div>
+              </div>
+            } @else {
+              <button mat-stroked-button (click)="startMarkerPayee(q.id)">
+                <mat-icon>check_circle_outline</mat-icon> Marquer comme payée
+              </button>
+            }
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+}
+
+
+

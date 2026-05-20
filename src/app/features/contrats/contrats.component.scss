@@ -1,0 +1,198 @@
+.kp-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-6);
+  padding: var(--kp-space-6) var(--kp-space-8);
+}
+
+.kp-page-header {
+  h1 { margin: 0; }
+}
+
+.kp-page-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--kp-text-3);
+}
+
+// ── Loading / Error ───────────────────────────────────────────────────────────
+
+.kp-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  color: var(--kp-text-2);
+  font-size: 14px;
+}
+
+.kp-error {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+  padding: var(--kp-space-4);
+  background: var(--kp-danger-subtle);
+  border: 0.5px solid var(--kp-danger);
+  border-radius: var(--kp-radius-md);
+  color: var(--kp-danger-text);
+  font-size: 13px;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.kp-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-12) var(--kp-space-6);
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  text-align: center;
+}
+
+.kp-empty-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--kp-surface-3);
+  color: var(--kp-text-3);
+}
+
+.kp-empty-state-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--kp-text-1);
+  margin: 0;
+}
+
+.kp-empty-state-sub {
+  font-size: 13px;
+  color: var(--kp-text-3);
+  max-width: 380px;
+  margin: 0;
+}
+
+// ── Liste ─────────────────────────────────────────────────────────────────────
+
+.kp-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-2);
+}
+
+.kp-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-4);
+  padding: var(--kp-space-4) var(--kp-space-5);
+  background: var(--kp-surface);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  transition: border-color var(--kp-transition);
+
+  &:hover { border-color: var(--kp-border-strong); }
+}
+
+.kp-card-left {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  min-width: 0;
+}
+
+.kp-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--kp-radius-sm);
+  background: color-mix(in srgb, var(--kp-primary) 12%, transparent);
+  color: var(--kp-primary);
+  flex-shrink: 0;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.kp-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kp-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--kp-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kp-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-1);
+  flex-wrap: wrap;
+}
+
+.kp-text-meta {
+  font-size: 12px;
+  color: var(--kp-text-3);
+}
+
+.kp-meta-sep {
+  font-size: 12px;
+  color: var(--kp-border-strong);
+}
+
+.kp-card-right {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  flex-shrink: 0;
+}
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+
+.kp-statut-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--kp-radius-full);
+}
+
+.kp-badge-success  { background: var(--kp-success-subtle); color: var(--kp-success-text); }
+.kp-badge-pending  { background: var(--kp-warning-subtle); color: var(--kp-warning-text); }
+.kp-badge-danger   { background: var(--kp-danger-subtle);  color: var(--kp-danger-text); }
+.kp-badge-inactive { background: var(--kp-surface-2);      color: var(--kp-text-3); }
+
+// ── Bouton PDF ────────────────────────────────────────────────────────────────
+
+.btn-pdf {
+  height: 30px;
+  padding: 0 var(--kp-space-3);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 0.5px solid var(--kp-border);
+  background: transparent;
+  color: var(--kp-text-1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  transition: background var(--kp-transition), border-color var(--kp-transition);
+
+  &:hover {
+    background: var(--kp-surface-2);
+    border-color: var(--kp-border-strong);
+  }
+}

@@ -1,0 +1,27 @@
+<div class="kp-chat-page">
+  <!-- Colonne gauche : liste des conversations -->
+  <aside class="kp-chat-sidebar" [class.kp-mobile-hidden]="showView()">
+    <kp-conversation-list
+      [selectedConvId]="selectedConvId()"
+      (conversationSelected)="onConversationSelected($event)"
+    />
+  </aside>
+
+  <!-- Colonne droite : vue conversation ou état vide -->
+  <main class="kp-chat-main" [class.kp-mobile-hidden]="!showView()">
+    @if (showView()) {
+      <kp-conversation-view
+        [bienId]="viewBienId()"
+        [emailInterlocuteur]="viewInterlocuteur()"
+        [titre]="viewTitre()"
+        (backRequested)="onBackToList()"
+        (sent)="onMessageSentInConv($event)"
+      />
+    } @else {
+      <div class="kp-chat-empty">
+        <mat-icon>chat_bubble_outline</mat-icon>
+        <p class="kp-text-body">Sélectionnez une conversation pour commencer</p>
+      </div>
+    }
+  </main>
+</div>

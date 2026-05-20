@@ -1,0 +1,150 @@
+.kp-contrat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--kp-text-2);
+
+  .kp-empty-ic mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.3;
+  }
+
+  .kp-text-h2 { font-size: 18px; font-weight: 500; }
+  .kp-text-caption { font-size: 14px; opacity: 0.7; max-width: 360px; line-height: 1.5; }
+}
+
+.kp-contrat-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--kp-space-4);
+}
+
+.kp-contrat-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  color: var(--kp-text-2);
+  font-size: 14px;
+}
+
+.kp-contrat-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-6);
+}
+
+// ─── Formulaire ──────────────────────────────────────────────────────────────
+
+.kp-contrat-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+  max-width: 600px;
+}
+
+.kp-form-row {
+  display: flex;
+  gap: var(--kp-space-3);
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 160px;
+  }
+}
+
+.kp-form-actions {
+  display: flex;
+  gap: var(--kp-space-3);
+  align-items: center;
+
+  mat-spinner {
+    margin-right: var(--kp-space-2);
+  }
+}
+
+// ─── Zone de signature ────────────────────────────────────────────────────────
+
+.kp-sign-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+  padding: var(--kp-space-5);
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  max-width: 560px;
+
+  h3 { margin: 0; }
+}
+
+.kp-sign-btn {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+}
+
+// ─── Banners ─────────────────────────────────────────────────────────────────
+
+.kp-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-4) var(--kp-space-5);
+  border-radius: var(--kp-radius-md);
+  font-size: 14px;
+
+  mat-icon { flex-shrink: 0; margin-top: 2px; }
+
+  p { margin: 4px 0 0; font-size: 13px; }
+
+  &--success {
+    background: var(--kp-success-subtle);
+    color: var(--kp-success-text);
+  }
+  &--pending {
+    background: var(--kp-warning-subtle);
+    color: var(--kp-warning-text);
+  }
+  &--info {
+    background: var(--kp-info-subtle);
+    color: var(--kp-info-text);
+  }
+}
+
+// ─── PDF ─────────────────────────────────────────────────────────────────────
+
+.kp-pdf-actions {
+  display: flex;
+  gap: var(--kp-space-3);
+  flex-wrap: wrap;
+}
+
+// ─── Empty ───────────────────────────────────────────────────────────────────
+
+.kp-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-12) var(--kp-space-6);
+  background: var(--kp-surface-2);
+  border: 0.5px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  text-align: center;
+  color: var(--kp-text-2);
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--kp-text-3);
+  }
+}

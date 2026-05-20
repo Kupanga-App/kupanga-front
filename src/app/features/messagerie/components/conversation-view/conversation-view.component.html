@@ -1,0 +1,65 @@
+<div class="kp-view">
+  <!-- En-tête -->
+  <div class="kp-view-header">
+    <button mat-icon-button class="kp-back-btn" (click)="backRequested.emit()" aria-label="Retour">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="kp-view-avatar">{{ interlocuteurInitiale }}</div>
+    <div class="kp-view-header-info">
+      <div class="kp-view-header-name">{{ titre || emailInterlocuteur }}</div>
+      <div class="kp-view-header-sub">{{ emailInterlocuteur }}</div>
+    </div>
+  </div>
+
+  <!-- Bandeau reconnexion -->
+  @if (!wsConnected()) {
+    <div class="kp-reconnect-banner">
+      <mat-icon>wifi_off</mat-icon>
+      Reconnexion en cours…
+    </div>
+  }
+
+  <!-- Messages -->
+  <div class="kp-view-messages" #messagesEl>
+    @if (loading()) {
+      <div class="kp-view-loading">
+        <mat-spinner diameter="32" />
+      </div>
+    } @else if (loadError()) {
+      <div class="kp-view-empty">
+        <mat-icon>error_outline</mat-icon>
+        <p>Impossible de charger les messages.</p>
+        <button mat-stroked-button (click)="reloadHistorique()">Réessayer</button>
+      </div>
+    } @else {
+      @for (msg of messages(); track msg.id) {
+        <div class="kp-msg-row" [class.kp-msg-mine]="isMine(msg)">
+          <div class="kp-msg-bubble">
+            <p class="kp-msg-content">{{ msg.contenu }}</p>
+            <div class="kp-msg-meta">
+              <span class="kp-msg-time">{{ msg.createdAt | date: 'HH:mm' }}</span>
+              @if (isMine(msg) && msg.lu) {
+                <mat-icon class="kp-msg-read">done_all</mat-icon>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (messages().length === 0) {
+        <div class="kp-view-empty">
+          <mat-icon>chat</mat-icon>
+          <p>Démarrez la conversation !</p>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Saisie -->
+  <kp-message-input
+    [emailDestinataire]="emailInterlocuteur"
+    [bienId]="bienId"
+    [wsConnected]="wsConnected()"
+    (messageSent)="onMessageSent($event)"
+  />
+</div>

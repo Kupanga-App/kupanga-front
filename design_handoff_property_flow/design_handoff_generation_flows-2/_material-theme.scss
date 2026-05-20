@@ -1,0 +1,198 @@
+// ─────────────────────────────────────────────────────────
+// kupanga — Angular Material theme
+// Angular 20 / Material M3 — palette personnalisée alignée
+// sur la charte (Night / Olive / Mint).
+//
+// USAGE — dans styles.scss à la racine :
+//   @use '@angular/material' as mat;
+//   @use './styles/material-theme';
+//   @include material-theme.apply();
+//
+// Cette implémentation s'appuie sur l'API M3 de Material 20
+// (mat.theme + mat.define-theme). Adaptez si vous utilisez
+// encore l'API M2 (mat.define-light-theme).
+// ─────────────────────────────────────────────────────────
+
+@use '@angular/material' as mat;
+@use 'tokens' as t;
+
+// Palettes M3 personnalisées — générées à partir de #8FA464 et #10212B
+$kupanga-primary: (
+  0:   #000000,
+  10:  #1A2410,
+  20:  #2E3E20,
+  25:  #394A28,
+  30:  #455630,
+  35:  #506338,
+  40:  #5C7041,    // primary "base"
+  50:  #75895A,
+  60:  #8FA464,    // ← olive de la charte
+  70:  #A9BD7C,
+  80:  #C3D796,
+  90:  #DEF2B0,
+  95:  #EBFCBD,
+  98:  #F6FFD8,
+  99:  #FBFFEB,
+  100: #FFFFFF,
+);
+
+$kupanga-tertiary: (
+  0:   #000000,
+  10:  #0B181F,    // night-deep
+  20:  #10212B,    // night ← surface principale
+  25:  #172C3A,    // night-soft
+  30:  #1E3545,    // night-mid
+  40:  #2A4659,
+  50:  #3D5A6E,
+  60:  #547287,
+  70:  #6E8BA1,
+  80:  #8AA6BC,
+  90:  #A8C2D8,
+  95:  #B9D3E9,
+  98:  #ECF6FF,
+  99:  #F9FCFF,
+  100: #FFFFFF,
+);
+
+$kupanga-neutral: (
+  0:   #000000,
+  4:   #0B181F,
+  6:   #10212B,
+  10:  #172C3A,
+  12:  #1E3545,
+  17:  #243E50,
+  20:  #2E4A5E,
+  22:  #34526A,
+  24:  #3A5A75,
+  87:  #C7D5E3,
+  90:  #D2DCE8,
+  92:  #DBE3ED,
+  94:  #E2EAF2,
+  95:  #E6EDF5,
+  96:  #EAF1F8,
+  98:  #F2F7FC,
+  99:  #F8FBFE,
+  100: #FFFFFF,
+);
+
+// Theme M3 — mode sombre par défaut (charte = fond Night)
+$kupanga-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: $kupanga-primary,
+    tertiary: $kupanga-tertiary,
+    use-system-variables: false,
+  ),
+  typography: (
+    plain-family: t.$font-sans,
+    brand-family: t.$font-serif,
+    bold-weight:  600,
+    medium-weight: 500,
+    regular-weight: 400,
+  ),
+  density: (
+    scale: -1,    // densité légèrement compacte (équilibre lisibilité / SaaS)
+  ),
+));
+
+@mixin apply() {
+  html {
+    @include mat.theme((
+      color: $kupanga-theme,
+      typography: t.$font-sans,
+      density: -1,
+    ));
+
+    // Surcharge des tokens CSS Material avec nos valeurs charte
+    --mat-sys-surface:           #{t.$night};
+    --mat-sys-surface-container: #{t.$night-mid};
+    --mat-sys-surface-container-low: #{t.$night-soft};
+    --mat-sys-on-surface:        #{t.$mint};
+    --mat-sys-on-surface-variant: #{t.$mint-mute};
+    --mat-sys-outline:           #{t.$border-2};
+    --mat-sys-outline-variant:   #{t.$border};
+    --mat-sys-primary:           #{t.$olive};
+    --mat-sys-on-primary:        #{t.$night};
+    --mat-sys-primary-container: #{t.$olive-bg};
+    --mat-sys-error:             #{t.$red};
+  }
+
+  // ── Surcharges ciblées des composants Material ─────────
+  // Ces overrides assurent que Mat-Button, Mat-Card, etc. respectent
+  // les radii, les fonts serifs et les emphases olive de la charte.
+
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-outlined-button,
+  .mat-mdc-flat-button {
+    --mdc-filled-button-container-shape: 10px;
+    --mdc-outlined-button-container-shape: 10px;
+    font-family: t.$font-sans;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  // Bouton "flat primary" = .btn-l.primary du proto
+  .mat-mdc-unelevated-button.mat-primary {
+    --mdc-filled-button-container-color: #{t.$olive};
+    --mdc-filled-button-label-text-color: #{t.$night};
+    font-weight: 600;
+    &:hover {
+      --mdc-filled-button-container-color: #{t.$olive-light};
+    }
+  }
+
+  // Card → night-mid + radius lg
+  .mat-mdc-card {
+    --mdc-elevated-card-container-color: #{t.$night-mid};
+    --mdc-elevated-card-container-shape: #{t.$radius-lg};
+    border: 1px solid t.$border;
+    color: t.$mint;
+  }
+
+  // Tabs underline → olive
+  .mat-mdc-tab-group {
+    --mdc-tab-indicator-active-indicator-color: #{t.$olive};
+    --mat-tab-header-active-label-text-color: #{t.$olive};
+    --mat-tab-header-active-focus-label-text-color: #{t.$olive};
+    --mat-tab-header-inactive-label-text-color: #{t.$mint-mute};
+  }
+
+  // Form fields (mat-form-field) — appearance="outline" recommandé
+  .mat-mdc-form-field.mat-form-field-appearance-outline {
+    --mdc-outlined-text-field-outline-color: #{t.$border};
+    --mdc-outlined-text-field-hover-outline-color: #{t.$border-2};
+    --mdc-outlined-text-field-focus-outline-color: #{t.$olive};
+    --mdc-outlined-text-field-input-text-color: #{t.$mint};
+    --mdc-outlined-text-field-label-text-color: #{t.$mint-mute};
+    --mdc-outlined-text-field-container-shape: 10px;
+  }
+
+  // Chip — = .tag-pill / .equip-pill / .chip
+  .mat-mdc-chip {
+    --mdc-chip-elevated-container-color: #{t.$olive-bg};
+    --mdc-chip-label-text-color: #{t.$olive-light};
+    --mdc-chip-outline-color: #{t.$olive-line};
+    border-radius: t.$radius-pill;
+    font-family: t.$font-mono;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  // Snackbar / Toast
+  .mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: #{t.$night-mid};
+    --mdc-snackbar-supporting-text-color: #{t.$mint};
+    border: 1px solid t.$olive;
+    border-radius: t.$radius;
+  }
+
+  // Slide-toggle (équipements on/off)
+  .mat-mdc-slide-toggle {
+    --mdc-switch-selected-track-color: #{t.$olive};
+    --mdc-switch-selected-handle-color: #{t.$night};
+    --mdc-switch-selected-focus-track-color: #{t.$olive};
+    --mdc-switch-selected-hover-track-color: #{t.$olive-light};
+  }
+}

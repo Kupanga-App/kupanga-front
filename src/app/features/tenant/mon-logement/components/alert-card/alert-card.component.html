@@ -1,0 +1,28 @@
+<div class="card" [class.card--warning]="hasUrgentAlert()">
+  <div class="card-h">
+    <span class="t">À ne pas oublier</span>
+    @if (alerts().length) {
+      <span class="badge">{{ alerts().length }}</span>
+    }
+  </div>
+
+  @for (alert of alerts(); track alert.title) {
+    <div class="alert-row" [class]="'alert-row--' + alert.severity">
+      <div class="alert-ic">
+        <kp-icon [name]="alert.icon" [size]="16" />
+      </div>
+      <div class="alert-body">
+        <div class="t">{{ alert.title }}</div>
+        <div class="s">{{ alert.subtitle }}</div>
+      </div>
+      <kp-icon name="chevron-right" [size]="14" class="chev" />
+    </div>
+  }
+
+  @if (!alerts().length) {
+    <div class="empty">
+      <kp-icon name="check-circle" [size]="20" />
+      <span>Aucun rappel</span>
+    </div>
+  }
+</div>

@@ -1,0 +1,169 @@
+<div class="filter-panel">
+  <!-- ── BARRE RAPIDE ──────────────────────────────────────────────────────── -->
+  <div class="quick-bar" [formGroup]="quickForm">
+    <!-- Recherche -->
+    <div class="search-field" role="search">
+      <lucide-icon name="search" [size]="14" [strokeWidth]="1.5" class="search-icon" />
+      <input
+        formControlName="q"
+        placeholder="Rechercher titre / mots-clés…"
+        aria-label="Rechercher un bien"
+        (input)="onQuickChange()"
+      />
+    </div>
+
+    <!-- Type chips -->
+    <div class="type-chips" role="radiogroup" aria-label="Type de bien">
+      @for (t of bienTypes; track t.value) {
+        <button
+          type="button"
+          class="type-chip"
+          role="radio"
+          [attr.aria-checked]="selectedType === t.value"
+          [class.active]="selectedType === t.value"
+          (click)="onTypeSelect(t.value)"
+        >{{ t.label }}</button>
+      }
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="quick-actions">
+      <div class="sort-wrap">
+        <lucide-icon name="arrow-up-down" [size]="12" [strokeWidth]="1.5" />
+        <span class="sort-label">{{ sortLabel }}</span>
+        <select formControlName="sortBy" (change)="onQuickChange()" class="sort-select">
+          @for (opt of sortOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Reset rapide — toujours visible, actif si filtres actifs -->
+      <button
+        type="button"
+        class="quick-reset"
+        [class.active]="hasActiveFilters"
+        (click)="resetAll()"
+        title="Réinitialiser tous les filtres"
+      >
+        <lucide-icon name="x" [size]="12" [strokeWidth]="2.5" />
+        @if (hasActiveFilters) { Effacer }
+      </button>
+
+      <button
+        type="button"
+        class="adv-toggle"
+        [class.open]="isAdvOpen()"
+        (click)="toggleAdv()"
+      >
+        <lucide-icon name="sliders-horizontal" [size]="13" [strokeWidth]="1.5" />
+        Filtres avancés
+        <lucide-icon
+          name="chevron-down"
+          [size]="13"
+          [strokeWidth]="1.5"
+          class="adv-chevron"
+          [class.rotated]="isAdvOpen()"
+        />
+      </button>
+    </div>
+  </div>
+
+  <!-- ── PANEL AVANCÉ ──────────────────────────────────────────────────────── -->
+  @if (isAdvOpen()) {
+    <div class="adv-panel" [formGroup]="advForm">
+      <div class="adv-sep"></div>
+
+      <!-- Localisation & Budget -->
+      <div class="adv-grid">
+        <span class="section-label">Localisation &amp; Budget</span>
+        <div class="adv-field">
+          <label class="adv-label" for="f-ville">Ville</label>
+          <input id="f-ville" formControlName="ville" placeholder="Paris, Lyon…" />
+        </div>
+        <div class="adv-field">
+          <label class="adv-label" for="f-cp">Code postal</label>
+          <input id="f-cp" formControlName="codePostal" placeholder="75001" />
+        </div>
+        <div class="adv-field">
+          <label class="adv-label" for="f-loyer">Loyer max €/mois</label>
+          <input id="f-loyer" formControlName="loyerMax" type="number" placeholder="1500" min="0" />
+        </div>
+        <div class="adv-field">
+          <label class="adv-label" for="f-sort">Trier par</label>
+          <select id="f-sort" [formControl]="sortByCtrl" (change)="onQuickChange()">
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Caractéristiques -->
+      <div class="adv-grid" style="margin-top:12px;">
+        <span class="section-label">Caractéristiques</span>
+        <div class="adv-field">
+          <label class="adv-label" for="f-surface">Surface min m²</label>
+          <input id="f-surface" formControlName="surfaceMin" type="number" placeholder="20" min="0" />
+        </div>
+        <div class="adv-field">
+          <label class="adv-label" for="f-pieces">Pièces min</label>
+          <input id="f-pieces" formControlName="nbPiecesMin" type="number" placeholder="2" min="1" />
+        </div>
+        <div class="adv-field">
+          <label class="adv-label" for="f-chambres">Chambres min</label>
+          <input id="f-chambres" formControlName="nbChambresMin" type="number" placeholder="1" min="0" />
+        </div>
+        <div class="adv-field">
+          <label class="adv-label" for="f-dpe">DPE max</label>
+          <select id="f-dpe" formControlName="classeEnergieMax">
+            @for (d of dpeOptions; track d) {
+              <option [value]="d">{{ d || 'Tous' }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- À proximité -->
+      <div class="adv-section" style="margin-top:12px;">
+        <span class="section-label section-label--block">À proximité</span>
+        <div class="poi-filter-grid">
+          @for (p of poiOptions; track p.key) {
+            <label [class]="'poi-filter-item ' + p.cls + (isPoiChecked(p.key) ? ' checked' : '')">
+              <input type="checkbox" [formControlName]="p.key" class="cb-native" />
+              <lucide-icon [name]="p.icon" [size]="11" [strokeWidth]="1.8" />
+              {{ p.label }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="adv-section" style="margin-top:10px;">
+        <span class="section-label section-label--block">Options</span>
+        <div class="checkbox-grid">
+          @for (o of optionOptions; track o.key) {
+            <label class="cb-item" [class.checked]="isOptionChecked(o.key)">
+              <input type="checkbox" [formControlName]="o.key" class="cb-native" />
+              <span class="cb-box">
+                @if (isOptionChecked(o.key)) {
+                  <lucide-icon name="check" [size]="10" [strokeWidth]="2.5" />
+                }
+              </span>
+              {{ o.label }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Footer filtres avancés -->
+      <div class="adv-footer">
+        <button type="button" class="btn-reset" (click)="resetAll()">Réinitialiser</button>
+        <button type="button" class="btn-apply" (click)="applyAdv()">
+          Appliquer
+          <lucide-icon name="check" [size]="12" [strokeWidth]="2.5" />
+        </button>
+      </div>
+    </div>
+  }
+</div>
