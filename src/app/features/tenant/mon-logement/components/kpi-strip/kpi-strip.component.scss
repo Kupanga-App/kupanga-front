@@ -4,6 +4,10 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: t.$space-3;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .kpi {
@@ -14,6 +18,10 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  @media (max-width: 640px) {
+    padding: t.$space-3 t.$space-4;
+  }
 }
 
 .kpi-lbl {
@@ -42,6 +50,8 @@
     color: var(--kp-text-3);
     margin-left: 3px;
   }
+
+  @media (max-width: 640px) { font-size: 22px; }
 }
 
 .kpi-foot {

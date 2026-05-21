@@ -35,6 +35,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: t.$space-3;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .meter-tile {

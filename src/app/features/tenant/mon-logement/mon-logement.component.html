@@ -83,67 +83,49 @@
           (payerMaintenant)="onPayerMaintenant()"
         />
 
-        <!-- Échéances — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="calendar-clock" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Échéances à venir</div>
-            <div class="cs-sub">Cette fonctionnalité est en cours de développement.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
-
         <!-- Quittances -->
         <kp-receipt-list [quittances]="d.quittances" />
-
-        <!-- Incidents — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="alert-circle" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Mes demandes & incidents</div>
-            <div class="cs-sub">Le suivi des incidents sera disponible prochainement.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
-
-        <!-- Maintenance — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="wrench" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Maintenance & visites</div>
-            <div class="cs-sub">Les visites et interventions planifiées seront visibles ici.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
-
-      </div>
-
-      <!-- Colonne latérale -->
-      <div class="body-side">
-
-        <kp-owner-card
-          [proprietaire]="d.proprietaire"
-          (envoyerMessage)="onEnvoyerMessage()"
-        />
-
-        <!-- Alertes — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="bell" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Rappels & alertes</div>
-            <div class="cs-sub">Les rappels personnalisés arrivent bientôt.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
 
         <kp-quick-actions
           [actions]="svc.actionsRapides"
           (actionCliquee)="onAction($event)"
         />
 
+      </div>
+
+      <!-- Colonne latérale -->
+      <div class="body-side">
+
         <kp-lease-card [contrat]="d.contrat" />
 
+        <kp-owner-card
+          [proprietaire]="d.proprietaire"
+          (envoyerMessage)="onEnvoyerMessage()"
+        />
+
         <kp-meter-card [compteurs]="d.compteurs" />
+
+        <!-- En cours de développement — minimisés en dernier -->
+        <div class="coming-soon-card">
+          <kp-icon name="calendar-clock" [size]="14" />
+          <span class="cs-label">Échéances à venir</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
+        <div class="coming-soon-card">
+          <kp-icon name="alert-circle" [size]="14" />
+          <span class="cs-label">Demandes &amp; incidents</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
+        <div class="coming-soon-card">
+          <kp-icon name="wrench" [size]="14" />
+          <span class="cs-label">Maintenance &amp; visites</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
+        <div class="coming-soon-card">
+          <kp-icon name="bell" [size]="14" />
+          <span class="cs-label">Rappels &amp; alertes</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
 
       </div>
 

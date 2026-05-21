@@ -54,6 +54,12 @@
   gap: t.$space-6;
   padding-bottom: t.$space-6;
   border-bottom: 1px solid var(--kp-border);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+    gap: t.$space-4;
+  }
 }
 
 .eyebrow {
@@ -78,6 +84,9 @@
   margin: 0 0 t.$space-3;
 
   em { font-style: italic; color: var(--kp-primary); }
+
+  @media (max-width: 768px) { font-size: 32px; }
+  @media (max-width: 480px) { font-size: 26px; }
 }
 
 .welcome-meta-text {
@@ -91,6 +100,13 @@
   flex-direction: column;
   align-items: flex-end;
   gap: t.$space-2;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: t.$space-3;
+  }
 }
 
 .welcome-info {
@@ -108,6 +124,10 @@
   grid-template-columns: 1fr 380px;
   gap: t.$space-6;
   align-items: flex-start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .body-main {
@@ -122,51 +142,33 @@
   gap: t.$space-4;
 }
 
-// ─── En cours de développement ────────────────────────────────────────────────
+// ─── En cours de développement (minimal) ──────────────────────────────────────
 .coming-soon-card {
   display: flex;
   align-items: center;
-  gap: t.$space-4;
-  background: var(--kp-surface);
+  gap: t.$space-2;
+  padding: 6px t.$space-3;
+  border-radius: t.$radius-sm;
   border: 1px dashed var(--kp-border);
-  border-radius: t.$radius;
-  padding: t.$space-4 t.$space-5;
-  opacity: 0.8;
-}
-
-.cs-ic {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--kp-surface-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: var(--kp-text-3);
-  flex-shrink: 0;
+  opacity: 0.55;
+  transition: opacity 150ms ease;
+
+  &:hover { opacity: 0.8; }
 }
 
-.cs-body {
+.cs-label {
   flex: 1;
-  .cs-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--kp-text-2);
-  }
-  .cs-sub {
-    font-size: 12px;
-    color: var(--kp-text-3);
-    margin-top: 2px;
-  }
+  font-size: 12px;
+  color: var(--kp-text-3);
 }
 
 .cs-badge {
-  padding: 4px 10px;
-  border-radius: t.$radius-pill;
-  background: var(--kp-surface-2);
-  border: 1px solid var(--kp-border);
   font-family: var(--kp-font-mono);
   font-size: 10px;
+  padding: 2px 6px;
+  border-radius: t.$radius-pill;
+  background: var(--kp-surface-2);
   color: var(--kp-text-3);
   white-space: nowrap;
   flex-shrink: 0;
