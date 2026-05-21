@@ -49,6 +49,7 @@ export class ConversationListComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
   ngOnInit(): void {
+    this.store.loadUnreadCount();
     this.loadConversations(0);
 
     this.subs.add(
@@ -64,8 +65,11 @@ export class ConversationListComponent implements OnInit, OnDestroy {
       this.ws.notifications$.subscribe((notif) => {
         const convs = this.store.conversations();
         const idx = convs.findIndex((c) => c.id === notif.conversationId);
+        const isViewingThisConv = this.store.activeConvEmail() === notif.expediteurEmail;
         if (idx !== -1) {
-          this.store.updateConversationUnread(notif.conversationId, 1);
+          if (!isViewingThisConv) {
+            this.store.updateConversationUnread(notif.conversationId, 1);
+          }
         } else {
           this.loadConversations(0, this.searchControl.value ?? '');
         }

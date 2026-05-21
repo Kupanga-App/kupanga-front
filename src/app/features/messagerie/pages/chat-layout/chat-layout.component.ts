@@ -1,13 +1,16 @@
 import {
   Component,
   computed,
+  effect,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
 import { MessageDTO } from '../../models/chat.models';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ChatStoreService } from '../../services/chat-store.service';
@@ -27,7 +30,7 @@ import { ConversationViewComponent } from '../../components/conversation-view/co
   templateUrl: './chat-layout.component.html',
   styleUrls: ['./chat-layout.component.scss'],
 })
-export class ChatLayoutComponent implements OnInit {
+export class ChatLayoutComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
   protected store = inject(ChatStoreService);
@@ -35,6 +38,29 @@ export class ChatLayoutComponent implements OnInit {
   selectedConv = signal<ConversationDTO | null>(null);
   directBienId = signal<number | null>(null);
   directInterlocuteur = signal<string | null>(null);
+
+  /** Email en attente de sélection automatique (toast sans bienId). */
+  private pendingEmail = signal<string | null>(null);
+
+  private subs = new Subscription();
+
+  constructor() {
+    // Auto-sélectionne la conversation quand les conversations sont chargées
+    // et qu'un email en attente est présent (navigation depuis toast).
+    effect(() => {
+      const pending = this.pendingEmail();
+      const convs = this.store.conversations();
+      if (pending && convs.length > 0 && !this.showView()) {
+        const conv = convs.find(
+          (c) => c.emailExpediteur === pending || c.emailDestinataire === pending
+        );
+        if (conv) {
+          this.pendingEmail.set(null);
+          this.onConversationSelected(conv);
+        }
+      }
+    });
+  }
 
   viewBienId = computed(() => {
     const conv = this.selectedConv();
@@ -57,25 +83,50 @@ export class ChatLayoutComponent implements OnInit {
   selectedConvId = computed(() => this.selectedConv()?.id ?? null);
 
   ngOnInit(): void {
-    const params = this.route.snapshot.queryParamMap;
-    const bienIdParam = params.get('bienId');
-    const interlocuteur = params.get('interlocuteur');
+    this.subs.add(
+      this.route.queryParamMap.subscribe((params) => {
+        const bienIdParam = params.get('bienId');
+        const interlocuteur = params.get('interlocuteur');
 
-    if (bienIdParam && interlocuteur) {
-      const bienId = Number(bienIdParam);
-      if (!isNaN(bienId)) {
-        this.directBienId.set(bienId);
-        this.directInterlocuteur.set(interlocuteur);
-      }
-    }
+        if (!interlocuteur) return;
+
+        const bienId = bienIdParam ? Number(bienIdParam) : null;
+
+        if (bienId && !isNaN(bienId)) {
+          // Navigation directe avec bienId + email (bouton "Contacter")
+          this.selectedConv.set(null);
+          this.directBienId.set(bienId);
+          this.directInterlocuteur.set(interlocuteur);
+          this.pendingEmail.set(null);
+        } else {
+          // Navigation sans bienId (clic sur toast) : cherche dans la liste chargée
+          this.selectedConv.set(null);
+          this.directBienId.set(null);
+          this.directInterlocuteur.set(null);
+
+          const existing = this.store.conversations().find(
+            (c) => c.emailExpediteur === interlocuteur || c.emailDestinataire === interlocuteur
+          );
+          if (existing) {
+            this.onConversationSelected(existing);
+          } else {
+            // Sera sélectionné automatiquement quand les conversations chargeront
+            this.pendingEmail.set(interlocuteur);
+          }
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   onConversationSelected(conv: ConversationDTO): void {
     this.selectedConv.set(conv);
     this.directBienId.set(null);
     this.directInterlocuteur.set(null);
-    console.log('[Chat] conv sélectionnée', conv);
-    console.log('[Chat] viewBienId=', this.viewBienId(), '| viewInterlocuteur=', this.viewInterlocuteur(), '| showView=', this.showView());
+    this.pendingEmail.set(null);
   }
 
   onBackToList(): void {

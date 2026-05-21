@@ -103,7 +103,15 @@ export class MonLogementComponent {
   }
 
   onEnvoyerMessage(): void {
-    this.router.navigateByUrl('/loc/messagerie');
+    const bienId = this.logementCtx.logementBienId();
+    const email = this.dashboardData()?.proprietaire.email;
+    if (bienId && email) {
+      void this.router.navigate(['/loc/messagerie'], {
+        queryParams: { bienId, interlocuteur: email },
+      });
+    } else {
+      void this.router.navigateByUrl('/loc/messagerie');
+    }
   }
 
   onDismissAssignedDialog(): void {

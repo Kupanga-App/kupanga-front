@@ -57,6 +57,7 @@ export interface QuittanceBackendDTO {
   statut: 'EN_ATTENTE' | 'PAYEE' | 'EN_RETARD' | 'IMPAYEE';
   urlPdf: string | null;
   nomProprietaire: string;
+  emailProprietaire?: string;
   adresseBien: string;
 }
 
@@ -163,6 +164,7 @@ export interface ProprietaireInfo {
   verifie: boolean;
   urlPhoto?: string;
   telephone?: string;
+  email?: string;
 }
 
 export interface QuickAction {

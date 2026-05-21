@@ -22,9 +22,10 @@ export class ChatNotificationComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
   constructor() {
-    // Charge le compteur dès que l'utilisateur est connecté (y compris après login)
     effect(() => {
-      if (this.authService.currentUser()) {
+      const user = this.authService.currentUser();
+      console.log('[ChatNotif] effect user =', user?.email ?? null);
+      if (user) {
         this.store.loadUnreadCount();
       }
     });
@@ -34,10 +35,13 @@ export class ChatNotificationComponent implements OnInit, OnDestroy {
 
     this.subs.add(
       this.ws.notifications$.subscribe((notif) => {
-        const isOnMessagingPage =
-          this.router.url.includes('/messagerie');
+        const isOnMessagingPage = this.router.url.includes('/messagerie');
+        const isViewingThisConv =
+          isOnMessagingPage && this.store.activeConvEmail() === notif.expediteurEmail;
 
-        this.store.incrementUnread(1);
+        if (!isViewingThisConv) {
+          this.store.incrementUnread(1);
+        }
 
         if (!isOnMessagingPage) {
           const role = this.authService.currentUser()?.role;

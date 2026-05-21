@@ -82,7 +82,10 @@ export class TenantHomeService {
       quittances: dto.quittances.map(q => this.mapQuittance(q)),
       documents: [],
       compteurs: this.extractCompteurs(dto),
-      proprietaire: this.mapProprietaire(dto.bien.nomProprietaire),
+      proprietaire: this.mapProprietaire(
+        dto.bien.nomProprietaire,
+        dto.quittances.find((q) => !!q.emailProprietaire)?.emailProprietaire
+      ),
     };
   }
 
@@ -253,7 +256,7 @@ export class TenantHomeService {
     return labels[typeCompteur] ?? typeCompteur;
   }
 
-  private mapProprietaire(nomProprietaire: string): ProprietaireInfo {
+  private mapProprietaire(nomProprietaire: string, email?: string): ProprietaireInfo {
     const nom = nomProprietaire ?? '';
     const parts = nom.trim().split(' ');
     const initiales = parts
@@ -261,6 +264,6 @@ export class TenantHomeService {
       .join('')
       .toUpperCase()
       .substring(0, 2);
-    return { nom, initiales, role: 'Propriétaire', verifie: false };
+    return { nom, initiales, role: 'Propriétaire', verifie: false, email };
   }
 }
