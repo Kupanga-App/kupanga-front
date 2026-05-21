@@ -128,7 +128,7 @@
   }
 }
 
-// ─── Dot de notification ──────────────────────────────────────────────────────
+// ─── Dot / badge de notification ─────────────────────────────────────────────
 
 .kp-icon-dot-wrap {
   position: relative;
@@ -149,6 +149,220 @@
 
   &--warning { background: var(--kp-warning); }
   &--danger  { background: var(--kp-danger); }
+}
+
+.kp-notif-badge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 17px;
+  height: 17px;
+  border-radius: var(--kp-radius-full);
+  background: var(--kp-warning);
+  color: var(--kp-text-invert);
+  font-family: var(--kp-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 0 0 2px var(--kp-bg);
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+// ─── Bouton cloche actif ──────────────────────────────────────────────────────
+
+.kp-chrome-btn--active {
+  background: var(--kp-primary-subtle);
+  color: var(--kp-primary-hover);
+}
+
+// ─── Panneau notifications ────────────────────────────────────────────────────
+
+.kp-notif-panel {
+  position: fixed;
+  top: 60px;
+  right: 40px;
+  width: 360px;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.32), 0 2px 8px rgba(0, 0, 0, 0.16);
+  z-index: 150;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 1024px) {
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+.kp-notif-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--kp-border);
+  flex-shrink: 0;
+}
+
+.kp-notif-panel-title {
+  font-family: var(--kp-font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kp-text-1);
+  letter-spacing: 0.01em;
+}
+
+.kp-notif-mark-all {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--kp-font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--kp-primary);
+  padding: 0;
+  transition: color var(--kp-transition);
+
+  &:hover { color: var(--kp-primary-hover); }
+  &:focus-visible {
+    outline: 2px solid var(--kp-primary);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+.kp-notif-list {
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 6px 0;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--kp-border-strong);
+    border-radius: 2px;
+  }
+}
+
+.kp-notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 16px;
+  color: var(--kp-text-3);
+  font-family: var(--kp-font);
+  font-size: 13px;
+
+  lucide-icon { opacity: 0.4; }
+}
+
+// ─── Item notification ────────────────────────────────────────────────────────
+
+.kp-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: background var(--kp-transition);
+
+  &:hover { background: var(--kp-primary-subtle); }
+
+  &:focus-visible {
+    outline: 2px solid var(--kp-primary);
+    outline-offset: -2px;
+  }
+
+  &--unread {
+    background: var(--kp-primary-subtle);
+
+    &:hover { background: var(--kp-primary-subtle-md); }
+  }
+}
+
+.kp-notif-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--kp-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+
+  &[data-color='warning'] {
+    background: var(--kp-warning-subtle);
+    color: var(--kp-warning-text);
+  }
+  &[data-color='success'] {
+    background: var(--kp-success-subtle);
+    color: var(--kp-success-text);
+  }
+  &[data-color='info'] {
+    background: var(--kp-info-subtle);
+    color: var(--kp-info-text);
+  }
+  &[data-color='primary'] {
+    background: var(--kp-primary-subtle);
+    color: var(--kp-primary);
+  }
+}
+
+.kp-notif-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.kp-notif-item-titre {
+  font-family: var(--kp-font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kp-text-1);
+  margin: 0 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .kp-notif-item--unread & { color: var(--kp-text-1); }
+}
+
+.kp-notif-item-msg {
+  font-family: var(--kp-font);
+  font-size: 12px;
+  color: var(--kp-text-2);
+  margin: 0 0 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.kp-notif-item-time {
+  font-family: var(--kp-font-mono);
+  font-size: 11px;
+  color: var(--kp-text-3);
+}
+
+.kp-notif-unread-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--kp-primary);
+  flex-shrink: 0;
+  margin-top: 6px;
 }
 
 // ─── Actions droite ───────────────────────────────────────────────────────────

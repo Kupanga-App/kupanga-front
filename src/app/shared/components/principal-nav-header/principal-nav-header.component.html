@@ -157,14 +157,58 @@
 
       } @else {
         <!-- Cloche notifications -->
-        <button class="kp-chrome-btn" aria-label="Notifications">
+        <button class="kp-chrome-btn"
+                [class.kp-chrome-btn--active]="notifPanelOpen()"
+                aria-label="Notifications"
+                (click)="toggleNotifPanel($event)">
           <span class="kp-icon-dot-wrap">
             <lucide-icon [img]="Bell" [size]="16" />
-            @if (notificationCount > 0) {
-              <span class="kp-notif-dot kp-notif-dot--warning"></span>
+            @if (appNotifService.unreadCount() > 0) {
+              <span class="kp-notif-badge">{{ appNotifService.unreadCount() > 9 ? '9+' : appNotifService.unreadCount() }}</span>
             }
           </span>
         </button>
+
+        @if (notifPanelOpen()) {
+          <div class="kp-notif-panel" (click)="$event.stopPropagation()">
+            <div class="kp-notif-panel-header">
+              <span class="kp-notif-panel-title">Notifications</span>
+              @if (appNotifService.unreadCount() > 0) {
+                <button class="kp-notif-mark-all" (click)="appNotifService.markAllRead()">
+                  Tout marquer comme lu
+                </button>
+              }
+            </div>
+
+            <div class="kp-notif-list">
+              @if (appNotifService.notifications().length === 0) {
+                <div class="kp-notif-empty">
+                  <lucide-icon [img]="Bell" [size]="22" />
+                  <span>Aucune notification</span>
+                </div>
+              } @else {
+                @for (notif of appNotifService.notifications(); track notif.id) {
+                  <button class="kp-notif-item"
+                          [class.kp-notif-item--unread]="!notif.lue"
+                          [attr.data-color]="appNotifService.iconColor(notif.type)"
+                          (click)="appNotifService.handleClick(notif); notifPanelOpen.set(false)">
+                    <span class="kp-notif-item-icon" [attr.data-color]="appNotifService.iconColor(notif.type)">
+                      <lucide-icon [img]="getNotifIcon(notif.type)" [size]="15" />
+                    </span>
+                    <div class="kp-notif-item-body">
+                      <p class="kp-notif-item-titre">{{ notif.titre }}</p>
+                      <p class="kp-notif-item-msg">{{ notif.message }}</p>
+                      <time class="kp-notif-item-time">{{ appNotifService.formatTime(notif.createdAt) }}</time>
+                    </div>
+                    @if (!notif.lue) {
+                      <span class="kp-notif-unread-dot"></span>
+                    }
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        }
 
         <!-- Toggle thème -->
         <button class="kp-chrome-btn"

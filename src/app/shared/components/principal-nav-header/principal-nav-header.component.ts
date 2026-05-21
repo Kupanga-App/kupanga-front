@@ -14,6 +14,8 @@ import { ThemeService } from '../../../core/services/theme.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { LogementContextService } from '../../../core/services/logement-context.service';
 import { ChatStoreService } from '../../../features/messagerie/services/chat-store.service';
+import { AppNotificationService } from '../../../features/notifications/services/app-notification.service';
+import { type NotificationType } from '../../../features/notifications/models/app-notification.model';
 
 @Component({
   selector: 'app-principal-nav-header',
@@ -33,6 +35,7 @@ export class PrincipalNavHeaderComponent implements OnInit, OnDestroy {
   protected authService = inject(AuthService);
   protected logementContext = inject(LogementContextService);
   protected chatStore = inject(ChatStoreService);
+  protected appNotifService = inject(AppNotificationService);
 
   // Icônes Lucide
   readonly Compass = Compass;
@@ -55,9 +58,8 @@ export class PrincipalNavHeaderComponent implements OnInit, OnDestroy {
   readonly LogOut = LogOut;
   readonly ChevronDown = ChevronDown;
 
-  readonly notificationCount = 0;
-
   drawerOpen = signal(false);
+  notifPanelOpen = signal(false);
 
   isConnected = computed(() => !!this.authService.currentUser());
 
@@ -106,6 +108,29 @@ export class PrincipalNavHeaderComponent implements OnInit, OnDestroy {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.drawerOpen()) this.closeDrawer();
+    if (this.notifPanelOpen()) this.notifPanelOpen.set(false);
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.notifPanelOpen()) this.notifPanelOpen.set(false);
+  }
+
+  toggleNotifPanel(event: MouseEvent): void {
+    event.stopPropagation();
+    this.notifPanelOpen.update(v => !v);
+  }
+
+  getNotifIcon(type: NotificationType): typeof Bell {
+    switch (type) {
+      case 'INVITATION_SIGNATURE_CONTRAT':
+      case 'CONTRAT_SIGNE': return this.FileText;
+      case 'INVITATION_SIGNATURE_EDL':
+      case 'EDL_SIGNE': return this.CheckSquare;
+      case 'QUITTANCE_DISPONIBLE': return this.CreditCard;
+      case 'BIEN_ASSIGNE':
+      case 'BIEN_ASSIGNATION_CONFIRMEE': return this.Home;
+    }
   }
 
   logout(): void {
