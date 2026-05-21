@@ -361,6 +361,33 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   padding-bottom: 10px;
 }
 
+// ── Compact density on mobile ─────────────────────────────────────────────────
+// Ciblage direct des éléments MDC internes — fiable quel que soit le mode de
+// theming (M2 compat ou M3 tokens). Les form fields de l'app utilisent tous des
+// labels externes (.kp-label) → classe .mdc-text-field--no-label appliquée.
+@media (max-width: 640px) {
+  // Sans label flottant (pattern externe .kp-label)
+  .mdc-text-field--no-label:not(.mdc-text-field--textarea) .mat-mdc-form-field-infix {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-height: 36px;
+  }
+
+  // Avec label flottant (autres composants de l'app)
+  .mdc-text-field:not(.mdc-text-field--no-label):not(.mdc-text-field--textarea) .mat-mdc-form-field-infix {
+    padding-top: 16px;
+    padding-bottom: 4px;
+    min-height: 36px;
+  }
+
+  // Réduit le bouton datepicker/toggle dans le champ
+  .mat-mdc-form-field .mat-mdc-icon-button.mat-mdc-button-base {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+}
+
 // --- Dialogs ---
 .mat-mdc-dialog-container {
   --mdc-dialog-container-color:          var(--kp-surface);

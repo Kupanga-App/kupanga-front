@@ -3,7 +3,6 @@
 .en-page {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 t.$space-8 t.$space-12;
 }
 
 .en-loading {
@@ -25,7 +24,6 @@
   align-items: center;
   gap: t.$space-2;
   padding: t.$space-2 t.$space-4;
-  margin: t.$space-7 0 t.$space-5;
   border-radius: t.$radius-sm;
   border: none;
   background: transparent;
@@ -40,7 +38,7 @@
 }
 
 // ── Flow heading ─────────────────────────────────────────────────────────────
-.flow-heading { margin: t.$space-7 0 t.$space-7; }
+.flow-heading { margin: t.$space-2 0; }
 
 .flow-eyebrow {
   font-family: t.$font-mono;
@@ -78,8 +76,8 @@
 }
 
 .wcard-h {
-  margin-bottom: t.$space-7;
-  padding-bottom: 20px;
+  margin-bottom: t.$space-2;
+  padding-bottom: t.$space-2;
   border-bottom: 1px solid t.$border;
 
   .eyebrow {
@@ -393,6 +391,96 @@
   align-items: center;
   justify-content: space-between;
   margin-top: t.$space-7;
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .en-loading { padding: 0 t.$space-4; }
+
+  .wcard { padding: t.$space-6 t.$space-5; }
+
+  .flow-h1 { font-size: 22px; }
+  .flow-sub { font-size: 13px; }
+
+  .form-row.col2 { grid-template-columns: 1fr; }
+  .opt-cards.col2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .item-card { gap: t.$space-2; }
+
+  .item-info { min-width: 0; }
+
+  // Colonne unique — évite les champs trop étroits sur mobile
+  .item-fields {
+    grid-template-columns: 1fr;
+
+    button.icon-trash {
+      grid-column: 1;
+      justify-self: end;
+    }
+  }
+
+  .wfoot {
+    flex-wrap: wrap;
+    gap: t.$space-3;
+  }
+
+  .wfoot-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .en-loading { padding: 0; }
+  .wcard { padding: t.$space-5 t.$space-4; }
+
+  .flow-h1 { font-size: 18px; }
+
+  .item-card { grid-template-columns: 36px 1fr; }
+
+  .item-ic {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .key-card {
+    grid-template-columns: 36px 1fr;
+    grid-template-rows: auto auto;
+
+    // Row 2 : stepper (gauche) + trash (droite) dans la même cellule 1fr
+    .qty-stepper {
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: start;
+      align-self: center;
+    }
+
+    .icon-trash {
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: end;
+      align-self: center;
+    }
+  }
+
+  .element-row {
+    display: flex;
+    flex-direction: column;
+    background: t.$night;
+    border: 1px solid t.$border;
+    border-radius: t.$radius;
+    padding: t.$space-3;
+    margin-bottom: t.$space-2;
+
+    .icon-trash { align-self: flex-end; }
+  }
+
+  .room-body { padding: t.$space-4; }
+
+  .room-presets { padding: t.$space-3; }
 }
 
 .wfoot-right { display: flex; align-items: center; gap: t.$space-2; }

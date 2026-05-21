@@ -3,7 +3,6 @@
 .cn-page {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 t.$space-8 t.$space-12;
 }
 
 .cn-loading {
@@ -25,7 +24,6 @@
   align-items: center;
   gap: t.$space-2;
   padding: t.$space-2 t.$space-4;
-  margin: t.$space-7 0 t.$space-5;
   border-radius: t.$radius-sm;
   border: none;
   background: transparent;
@@ -40,7 +38,7 @@
 }
 
 // ── Flow heading ─────────────────────────────────────────────────────────────
-.flow-heading { margin: t.$space-7 0 t.$space-7; }
+.flow-heading { margin: t.$space-2 0; }
 
 .flow-eyebrow {
   font-family: t.$font-mono;
@@ -88,8 +86,8 @@
 }
 
 .wcard-h {
-  margin-bottom: t.$space-7;
-  padding-bottom: 20px;
+  margin-bottom: t.$space-2;
+  padding-bottom: t.$space-2;
   border-bottom: 1px solid t.$border;
 
   .eyebrow {
@@ -368,6 +366,63 @@
 .wizard-aside {
   position: sticky;
   top: t.$space-6;
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .wizard { grid-template-columns: 1fr; }
+  .wizard-aside { display: none; }
+}
+
+@media (max-width: 768px) {
+  .wcard { padding: t.$space-6 t.$space-5; }
+
+  .flow-h1 { font-size: 22px; }
+  .flow-sub { font-size: 13px; }
+
+  .wfoot {
+    flex-wrap: wrap;
+    gap: t.$space-3;
+  }
+
+  .wfoot-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  .cn-page { padding: 0 t.$space-4; }
+  .cn-loading { padding: 0; }
+
+  .flow-h1 { font-size: 20px; }
+
+  .wcard { padding: t.$space-5 t.$space-4; }
+
+  .form-row {
+    &.col2 { grid-template-columns: 1fr; }
+    &.col3 { grid-template-columns: 1fr; }
+  }
+
+  .opt-cards {
+    &.col2 { grid-template-columns: 1fr; }
+    &.col3 { grid-template-columns: 1fr; }
+  }
+
+  .total-field { min-height: 64px; }
+
+  .recap-row {
+    grid-template-columns: 20px 1fr;
+    padding: 8px 10px;
+
+    .recap-v {
+      grid-column: 2;
+      text-align: left;
+      font-size: t.$text-tiny;
+      color: t.$olive-light;
+      margin-top: 2px;
+    }
+  }
 }
 
 // ── Paper content styles ──────────────────────────────────────────────────────

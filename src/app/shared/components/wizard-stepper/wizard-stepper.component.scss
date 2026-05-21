@@ -82,3 +82,26 @@
   .step.active & { color: t.$mint; font-weight: 600; }
   .step.done &   { color: t.$mint; }
 }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .stepper {
+    padding: 14px t.$space-4;
+  }
+
+  .step-body { display: none; }
+
+  .step-link { margin: 0 t.$space-2; }
+}
+
+@media (max-width: 480px) {
+  .stepper { padding: 12px t.$space-3; }
+
+  .step-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .step-link { margin: 0 t.$space-1; }
+}

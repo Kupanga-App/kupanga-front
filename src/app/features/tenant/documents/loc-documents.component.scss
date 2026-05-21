@@ -3,6 +3,11 @@
   flex-direction: column;
   gap: var(--kp-space-6);
   padding: var(--kp-space-6) var(--kp-space-8);
+
+  @media (max-width: 640px) {
+    padding: var(--kp-space-4);
+    gap: var(--kp-space-4);
+  }
 }
 
 .kp-page-header {

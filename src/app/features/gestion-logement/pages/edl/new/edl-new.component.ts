@@ -10,6 +10,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -60,6 +61,7 @@ interface PieceForm {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatDatepickerModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     IconComponent,
@@ -162,7 +164,7 @@ export class EdlNewComponent implements OnInit {
   ];
 
   step1 = new FormGroup({
-    date: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    date: new FormControl<Date | null>(null, [Validators.required]),
     heure: new FormControl('', { nonNullable: true }),
     observationsGenerales: new FormControl(''),
   });
@@ -310,6 +312,10 @@ export class EdlNewComponent implements OnInit {
     return this.typeElementOptions.find(o => o.value === value)?.label ?? value;
   }
 
+  private toIso(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
   onTypeChange(val: string): void { this.selectedType.set(val); }
   onMeteoChange(val: string): void { this.selectedMeteo.set(val === this.selectedMeteo() ? null : val); }
   onPresentsChange(vals: string[]): void { this.selectedPresents.set(vals); }
@@ -354,7 +360,7 @@ export class EdlNewComponent implements OnInit {
       bienId,
       emailLocataire: email,
       type: this.selectedType() as EdlType,
-      dateRealisation: s1.date,
+      dateRealisation: s1.date ? this.toIso(s1.date) : '',
       heureRealisation: s1.heure || undefined,
       observations: s1.observationsGenerales ?? undefined,
       compteurs: this.compteurs.getRawValue().map(c => ({
