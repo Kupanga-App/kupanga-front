@@ -1,176 +1,369 @@
-<!-- Niveau 1 — 56px -->
-<mat-toolbar class="kp-nav-l1">
-  <!-- Gauche : logo -->
-  <div class="kp-l1-left">
-    <a class="kp-logo" routerLink="/">
-      <span class="kp-logo-primary">ku</span><span class="kp-logo-dark">panga</span>
+<nav class="kp-nav" role="navigation" aria-label="Navigation principale">
+  <div class="kp-nav-inner">
+
+    <!-- Logo -->
+    <a class="kp-logo" routerLink="/" (click)="closeDrawer()">
+      <span class="kp-logo-ku">ku</span><em class="kp-logo-panga">panga</em>
     </a>
-  </div>
 
-  <!-- Centre : barre de recherche (présente dans les deux états) -->
-  <div class="kp-l1-center">
-    <div class="kp-search">
-      <mat-icon>search</mat-icon>
-      <input placeholder="Rechercher un bien, une ville, un code postal…" />
-    </div>
-  </div>
+    <!-- Items de navigation (desktop) -->
+    <ul class="kp-nav-items" role="list">
 
-  <!-- Droite : actions selon état d'authentification -->
-  <div class="kp-l1-right">
-    @if (!isConnected()) {
-      <a mat-stroked-button routerLink="/auth/login">Se connecter</a>
-      <a mat-raised-button color="primary" routerLink="/auth/register">
-        <mat-icon>add</mat-icon>
-        Déposer une annonce
-      </a>
-    } @else {
-      @if (isAdmin()) {
-        <a mat-raised-button color="primary" class="kp-btn-new" routerLink="/pro/biens/nouveau">
-          + Nouveau bien
-        </a>
+      @if (!isConnected()) {
+        <!-- État 1 — Public : text-only, sans icônes -->
+        <li>
+          <a class="kp-nav-item" routerLink="/" routerLinkActive="is-active"
+             [routerLinkActiveOptions]="{exact:true}" aria-current="page">
+            Louer
+          </a>
+        </li>
+        <li><span class="kp-nav-item kp-nav-item--soon">Mes recherches</span></li>
+        <li><span class="kp-nav-item kp-nav-item--soon">Comment ça marche</span></li>
+        <li><span class="kp-nav-item kp-nav-item--soon">Aide</span></li>
+
+      } @else if (isAdmin()) {
+        <!-- État 2 — Propriétaire -->
+        <li>
+          <a class="kp-nav-item" routerLink="/pro" routerLinkActive="is-active"
+             [routerLinkActiveOptions]="{exact:true}">
+            <span class="kp-icon-w"><lucide-icon [img]="Compass" [size]="16" /></span>
+            Explorer
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/pro/biens" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="Home" [size]="16" /></span>
+            Mes biens
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/pro/contrats" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="FileText" [size]="16" /></span>
+            Contrats
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/pro/etats-des-lieux" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="CheckSquare" [size]="16" /></span>
+            États des lieux
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/pro/quittances" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="CreditCard" [size]="16" /></span>
+            Quittances
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/pro/messagerie" routerLinkActive="is-active">
+            <span class="kp-icon-w kp-icon-dot-wrap">
+              <lucide-icon [img]="MessageSquare" [size]="16" />
+              @if (chatStore.unreadTotal() > 0) {
+                <span class="kp-notif-dot"></span>
+              }
+            </span>
+            Messagerie
+          </a>
+        </li>
+
+      } @else if (!hasLogement()) {
+        <!-- État 3 — Locataire sans logement -->
+        <li>
+          <a class="kp-nav-item" routerLink="/loc" routerLinkActive="is-active"
+             [routerLinkActiveOptions]="{exact:true}">
+            <span class="kp-icon-w"><lucide-icon [img]="Search" [size]="16" /></span>
+            Rechercher
+          </a>
+        </li>
+        <li>
+          <span class="kp-nav-item kp-nav-item--soon">
+            <span class="kp-icon-w"><lucide-icon [img]="HelpCircle" [size]="16" /></span>
+            Comment ça marche
+          </span>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/loc/messagerie" routerLinkActive="is-active">
+            <span class="kp-icon-w kp-icon-dot-wrap">
+              <lucide-icon [img]="MessageSquare" [size]="16" />
+              @if (chatStore.unreadTotal() > 0) {
+                <span class="kp-notif-dot"></span>
+              }
+            </span>
+            Messagerie
+          </a>
+        </li>
+        <li>
+          <span class="kp-nav-item kp-nav-item--soon">
+            <span class="kp-icon-w"><lucide-icon [img]="Lightbulb" [size]="16" /></span>
+            Aide
+          </span>
+        </li>
+
+      } @else {
+        <!-- État 4 — Locataire avec logement -->
+        <li>
+          <a class="kp-nav-item" routerLink="/loc" routerLinkActive="is-active"
+             [routerLinkActiveOptions]="{exact:true}">
+            <span class="kp-icon-w"><lucide-icon [img]="Compass" [size]="16" /></span>
+            Explorer
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/loc/mon-logement" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="Home" [size]="16" /></span>
+            Mon logement
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/loc/quittances" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="CreditCard" [size]="16" /></span>
+            Quittances
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/loc/documents" routerLinkActive="is-active">
+            <span class="kp-icon-w"><lucide-icon [img]="Folder" [size]="16" /></span>
+            Documents
+          </a>
+        </li>
+        <li>
+          <a class="kp-nav-item" routerLink="/loc/messagerie" routerLinkActive="is-active">
+            <span class="kp-icon-w kp-icon-dot-wrap">
+              <lucide-icon [img]="MessageSquare" [size]="16" />
+              @if (chatStore.unreadTotal() > 0) {
+                <span class="kp-notif-dot"></span>
+              }
+            </span>
+            Messagerie
+          </a>
+        </li>
+        <li>
+          <span class="kp-nav-item kp-nav-item--soon">
+            <span class="kp-icon-w"><lucide-icon [img]="Lightbulb" [size]="16" /></span>
+            Aide
+          </span>
+        </li>
       }
 
-      <button mat-icon-button aria-label="Notifications">
-        <mat-icon
-          [matBadge]="notificationCount"
-          [matBadgeHidden]="notificationCount === 0"
-          matBadgeColor="warn"
-          matBadgeSize="small">
-          notifications_none
-        </mat-icon>
+    </ul>
+
+    <!-- Actions droite -->
+    <div class="kp-nav-actions">
+
+      @if (!isConnected()) {
+        <!-- CTAs publics -->
+        <a class="kp-btn-ghost" routerLink="/auth/login">Se connecter</a>
+        <a class="kp-btn-primary" routerLink="/auth/register">Créer un compte</a>
+
+      } @else {
+        <!-- Cloche notifications -->
+        <button class="kp-chrome-btn" aria-label="Notifications">
+          <span class="kp-icon-dot-wrap">
+            <lucide-icon [img]="Bell" [size]="16" />
+            @if (notificationCount > 0) {
+              <span class="kp-notif-dot kp-notif-dot--warning"></span>
+            }
+          </span>
+        </button>
+
+        <!-- Toggle thème -->
+        <button class="kp-chrome-btn"
+                (click)="themeService.toggleTheme()"
+                [attr.aria-label]="'Passer en mode ' + (themeService.theme() === 'dark' ? 'clair' : 'sombre')">
+          @if (themeService.theme() === 'dark') {
+            <lucide-icon [img]="Sun" [size]="16" />
+          } @else {
+            <lucide-icon [img]="Moon" [size]="16" />
+          }
+        </button>
+
+        <!-- Pastille rôle (masquée < 1280px) -->
+        <span class="kp-role-badge" aria-hidden="true">
+          {{ isAdmin() ? 'PROPRIÉTAIRE' : 'LOCATAIRE' }}
+        </span>
+
+        <!-- Avatar pill + menu compte -->
+        <button class="kp-avatar-pill"
+                [matMenuTriggerFor]="accountMenu"
+                aria-haspopup="menu"
+                aria-label="Mon compte">
+          @if (userPhoto()) {
+            <img class="kp-avatar-img" [src]="userPhoto()!" [alt]="userName()" />
+          } @else {
+            <span class="kp-avatar-circle">{{ userInitials() }}</span>
+          }
+          <lucide-icon [img]="ChevronDown" [size]="12" class="kp-chevron" />
+        </button>
+
+        <mat-menu #accountMenu="matMenu" xPosition="before" panelClass="kp-account-menu">
+          <div class="kp-menu-header" (click)="$event.stopPropagation()">
+            @if (userPhoto()) {
+              <img class="kp-menu-avatar kp-menu-avatar--photo" [src]="userPhoto()!" [alt]="userName()" />
+            } @else {
+              <span class="kp-menu-avatar">{{ userInitials() }}</span>
+            }
+            <div class="kp-menu-user">
+              <span class="kp-menu-name">{{ userName() }}</span>
+              <span class="kp-menu-email">{{ userEmail() }}</span>
+            </div>
+          </div>
+          <mat-divider />
+          <a mat-menu-item routerLink="/account/private/home">
+            <lucide-icon [img]="User" [size]="15" />
+            <span>Mon profil</span>
+          </a>
+          <a mat-menu-item routerLink="/account/settings">
+            <lucide-icon [img]="Settings" [size]="15" />
+            <span>Paramètres</span>
+          </a>
+          <mat-divider />
+          <button mat-menu-item class="kp-menu-danger" (click)="logout()">
+            <lucide-icon [img]="LogOut" [size]="15" />
+            <span>Se déconnecter</span>
+          </button>
+        </mat-menu>
+      }
+
+      <!-- Hamburger (mobile uniquement) -->
+      <button class="kp-chrome-btn kp-hamburger"
+              (click)="toggleDrawer()"
+              [attr.aria-label]="drawerOpen() ? 'Fermer le menu' : 'Ouvrir le menu'"
+              [attr.aria-expanded]="drawerOpen()">
+        @if (drawerOpen()) {
+          <lucide-icon [img]="X" [size]="20" />
+        } @else {
+          <lucide-icon [img]="Menu" [size]="20" />
+        }
       </button>
 
-      <button mat-icon-button (click)="themeService.toggleTheme()" aria-label="Basculer le thème">
-        <mat-icon>{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
-      </button>
+    </div>
+  </div>
+</nav>
 
-      <div class="kp-avatar" [matMenuTriggerFor]="userMenu" role="button" aria-label="Mon compte">
-        {{ userInitials() }}
+<!-- Overlay mobile -->
+@if (drawerOpen()) {
+  <div class="kp-drawer-overlay" (click)="closeDrawer()" aria-hidden="true"></div>
+
+  <!-- Drawer plein écran -->
+  <div class="kp-drawer" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+
+    @if (isConnected()) {
+      <div class="kp-drawer-user">
+        @if (userPhoto()) {
+          <img class="kp-drawer-avatar kp-drawer-avatar--photo" [src]="userPhoto()!" [alt]="userName()" />
+        } @else {
+          <span class="kp-drawer-avatar">{{ userInitials() }}</span>
+        }
+        <div>
+          <p class="kp-drawer-name">{{ userName() }}</p>
+          <p class="kp-drawer-email">{{ userEmail() }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Items nav drawer -->
+    <nav class="kp-drawer-nav">
+      @if (!isConnected()) {
+        <a class="kp-drawer-item" routerLink="/" routerLinkActive="is-active"
+           [routerLinkActiveOptions]="{exact:true}" (click)="closeDrawer()">
+          Louer
+        </a>
+        <span class="kp-drawer-item kp-drawer-item--soon">Mes recherches</span>
+        <span class="kp-drawer-item kp-drawer-item--soon">Comment ça marche</span>
+        <span class="kp-drawer-item kp-drawer-item--soon">Aide</span>
+
+      } @else if (isAdmin()) {
+        <a class="kp-drawer-item" routerLink="/pro" routerLinkActive="is-active"
+           [routerLinkActiveOptions]="{exact:true}" (click)="closeDrawer()">
+          <lucide-icon [img]="Compass" [size]="18" />Explorer
+        </a>
+        <a class="kp-drawer-item" routerLink="/pro/biens" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="Home" [size]="18" />Mes biens
+        </a>
+        <a class="kp-drawer-item" routerLink="/pro/contrats" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="FileText" [size]="18" />Contrats
+        </a>
+        <a class="kp-drawer-item" routerLink="/pro/etats-des-lieux" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="CheckSquare" [size]="18" />États des lieux
+        </a>
+        <a class="kp-drawer-item" routerLink="/pro/quittances" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="CreditCard" [size]="18" />Quittances
+        </a>
+        <a class="kp-drawer-item" routerLink="/pro/messagerie" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="MessageSquare" [size]="18" />Messagerie
+        </a>
+
+      } @else if (!hasLogement()) {
+        <a class="kp-drawer-item" routerLink="/loc" routerLinkActive="is-active"
+           [routerLinkActiveOptions]="{exact:true}" (click)="closeDrawer()">
+          <lucide-icon [img]="Search" [size]="18" />Rechercher
+        </a>
+        <span class="kp-drawer-item kp-drawer-item--soon">
+          <lucide-icon [img]="HelpCircle" [size]="18" />Comment ça marche
+        </span>
+        <a class="kp-drawer-item" routerLink="/loc/messagerie" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="MessageSquare" [size]="18" />Messagerie
+        </a>
+        <span class="kp-drawer-item kp-drawer-item--soon">
+          <lucide-icon [img]="Lightbulb" [size]="18" />Aide
+        </span>
+
+      } @else {
+        <a class="kp-drawer-item" routerLink="/loc" routerLinkActive="is-active"
+           [routerLinkActiveOptions]="{exact:true}" (click)="closeDrawer()">
+          <lucide-icon [img]="Compass" [size]="18" />Explorer
+        </a>
+        <a class="kp-drawer-item" routerLink="/loc/mon-logement" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="Home" [size]="18" />Mon logement
+        </a>
+        <a class="kp-drawer-item" routerLink="/loc/quittances" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="CreditCard" [size]="18" />Quittances
+        </a>
+        <a class="kp-drawer-item" routerLink="/loc/documents" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="Folder" [size]="18" />Documents
+        </a>
+        <a class="kp-drawer-item" routerLink="/loc/messagerie" routerLinkActive="is-active" (click)="closeDrawer()">
+          <lucide-icon [img]="MessageSquare" [size]="18" />Messagerie
+        </a>
+        <span class="kp-drawer-item kp-drawer-item--soon">
+          <lucide-icon [img]="Lightbulb" [size]="18" />Aide
+        </span>
+      }
+    </nav>
+
+    <!-- Section compte (utilisateurs connectés) -->
+    @if (isConnected()) {
+      <div class="kp-drawer-sep"></div>
+      <div class="kp-drawer-account">
+        <a class="kp-drawer-item" routerLink="/account/private/home" (click)="closeDrawer()">
+          <lucide-icon [img]="User" [size]="18" />Mon profil
+        </a>
+        <a class="kp-drawer-item" routerLink="/account/settings" (click)="closeDrawer()">
+          <lucide-icon [img]="Settings" [size]="18" />Paramètres
+        </a>
+        <button class="kp-drawer-item kp-drawer-item--btn" (click)="themeService.toggleTheme()">
+          @if (themeService.theme() === 'dark') {
+            <lucide-icon [img]="Sun" [size]="18" />Mode clair
+          } @else {
+            <lucide-icon [img]="Moon" [size]="18" />Mode sombre
+          }
+        </button>
+        <button class="kp-drawer-item kp-drawer-item--btn kp-drawer-item--danger" (click)="logout()">
+          <lucide-icon [img]="LogOut" [size]="18" />Se déconnecter
+        </button>
       </div>
 
-      <mat-menu #userMenu="matMenu">
-        <a mat-menu-item routerLink="/account/private/home">
-          <mat-icon>person</mat-icon>
-          <span>Mon profil</span>
+    } @else {
+      <!-- CTAs publics en bas du drawer -->
+      <div class="kp-drawer-ctas">
+        <a class="kp-btn-primary kp-btn-block" routerLink="/auth/register" (click)="closeDrawer()">
+          Créer un compte
         </a>
-        <a mat-menu-item routerLink="/account/settings">
-          <mat-icon>settings</mat-icon>
-          <span>Paramètres</span>
+        <a class="kp-btn-ghost kp-btn-block" routerLink="/auth/login" (click)="closeDrawer()">
+          Se connecter
         </a>
-        <mat-divider></mat-divider>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Se déconnecter</span>
-        </button>
-      </mat-menu>
+      </div>
     }
+
   </div>
-</mat-toolbar>
-
-<!-- Niveau 2 — 40px -->
-<mat-toolbar class="kp-nav-l2">
-
-  @if (!isConnected()) {
-    <!-- Non connecté -->
-    <a class="kp-nav-link" routerLink="/" routerLinkActive="active"
-       [routerLinkActiveOptions]="{exact: true}">Louer</a>
-    <span class="kp-nav-link kp-nav-link--soon">Mes recherches</span>
-    <span class="kp-nav-link kp-nav-link--soon">Comment ça marche</span>
-    <span class="kp-nav-link kp-nav-link--soon">Aide</span>
-
-  } @else if (isAdmin()) {
-    <!-- Propriétaire -->
-    <a class="kp-nav-link" routerLink="/pro" routerLinkActive="active"
-       [routerLinkActiveOptions]="{exact: true}">
-      <mat-icon>explore</mat-icon>
-      Explorer
-    </a>
-    <a class="kp-nav-link" routerLink="/pro/biens" routerLinkActive="active">
-      <mat-icon>house</mat-icon>
-      Mes biens
-    </a>
-    <a class="kp-nav-link" routerLink="/pro/contrats" routerLinkActive="active">
-      <mat-icon>description</mat-icon>
-      Contrats
-    </a>
-    <a class="kp-nav-link" routerLink="/pro/etats-des-lieux" routerLinkActive="active">
-      <mat-icon>task_alt</mat-icon>
-      États des lieux
-    </a>
-    <a class="kp-nav-link" routerLink="/pro/quittances" routerLinkActive="active">
-      <mat-icon>credit_card</mat-icon>
-      Quittances
-    </a>
-    <a class="kp-nav-link" routerLink="/pro/messagerie" routerLinkActive="active">
-      <mat-icon
-        [matBadge]="chatStore.unreadTotal()"
-        [matBadgeHidden]="chatStore.unreadTotal() === 0"
-        matBadgeColor="warn"
-        matBadgeSize="small">
-        chat_bubble_outline
-      </mat-icon>
-      Messagerie
-    </a>
-
-  } @else if (!hasLogement()) {
-    <!-- Locataire en recherche (aucun logement assigné) -->
-    <a class="kp-nav-link" routerLink="/loc" routerLinkActive="active"
-       [routerLinkActiveOptions]="{exact: true}">
-      <mat-icon>search</mat-icon>
-      Rechercher
-    </a>
-    <span class="kp-nav-link kp-nav-link--soon">
-      <mat-icon>help_outline</mat-icon>
-      Comment ça marche
-    </span>
-    <a class="kp-nav-link" routerLink="/loc/messagerie" routerLinkActive="active">
-      <mat-icon
-        [matBadge]="chatStore.unreadTotal()"
-        [matBadgeHidden]="chatStore.unreadTotal() === 0"
-        matBadgeColor="warn"
-        matBadgeSize="small">
-        chat_bubble_outline
-      </mat-icon>
-      Messagerie
-    </a>
-    <span class="kp-nav-link kp-nav-link--soon">
-      <mat-icon>lightbulb_outline</mat-icon>
-      Aide
-    </span>
-
-  } @else {
-    <!-- Locataire avec logement assigné -->
-    <a class="kp-nav-link" routerLink="/loc" routerLinkActive="active"
-       [routerLinkActiveOptions]="{exact: true}">
-      <mat-icon>explore</mat-icon>
-      Explorer
-    </a>
-    <a class="kp-nav-link" routerLink="/loc/mon-logement" routerLinkActive="active">
-      <mat-icon>home_work</mat-icon>
-      Mon logement
-    </a>
-    <a class="kp-nav-link" routerLink="/loc/quittances" routerLinkActive="active">
-      <mat-icon>credit_card</mat-icon>
-      Quittances
-    </a>
-    <a class="kp-nav-link" routerLink="/loc/documents" routerLinkActive="active">
-      <mat-icon>folder_open</mat-icon>
-      Documents
-    </a>
-    <a class="kp-nav-link" routerLink="/loc/messagerie" routerLinkActive="active">
-      <mat-icon
-        [matBadge]="chatStore.unreadTotal()"
-        [matBadgeHidden]="chatStore.unreadTotal() === 0"
-        matBadgeColor="warn"
-        matBadgeSize="small">
-        chat_bubble_outline
-      </mat-icon>
-      Messagerie
-    </a>
-    <span class="kp-nav-link kp-nav-link--soon">
-      <mat-icon>lightbulb_outline</mat-icon>
-      Aide
-    </span>
-  }
-
-</mat-toolbar>
+}

@@ -483,6 +483,104 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   box-shadow: none !important;
 }
 
+// --- Menu compte navbar — styles globaux (rendus dans un CDK overlay) ---
+// Utilise uniquement les tokens --kp-* (theme-aware light/dark)
+
+// Header : avatar + nom + email
+.kp-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--kp-border);
+  cursor: default;
+  user-select: none;
+}
+
+// Avatar initiales
+.kp-menu-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--kp-primary-subtle-md);
+  color: var(--kp-text-1);
+  font-family: var(--kp-font);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--kp-primary-subtle-border);
+
+  // Variante photo
+  &--photo {
+    background: transparent;
+    object-fit: cover;
+  }
+}
+
+.kp-menu-user {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kp-menu-name {
+  font-family: var(--kp-font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--kp-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kp-menu-email {
+  font-family: var(--kp-font-mono);
+  font-size: 8px;
+  color: var(--kp-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Icônes Lucide dans les mat-menu-item : gap + couleur
+.mat-mdc-menu-item .mat-mdc-menu-item-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  lucide-icon {
+    color: var(--kp-text-3);
+    flex-shrink: 0;
+  }
+}
+
+.mat-mdc-menu-item:not(.kp-menu-danger):hover .mat-mdc-menu-item-text lucide-icon {
+  color: var(--kp-primary-hover);
+}
+
+// Item danger (Se déconnecter)
+.kp-menu-danger {
+  .mat-mdc-menu-item-text {
+    color: var(--kp-danger-text);
+
+    lucide-icon {
+      color: var(--kp-danger-text);
+    }
+  }
+
+  &:hover {
+    background: var(--kp-danger-subtle) !important;
+  }
+}
+
+// Largeur minimale du panel account
+.mat-mdc-menu-panel:has(.kp-menu-header) {
+  min-width: 240px !important;
+}
+
 // --- Snackbar ---
 .mat-mdc-snack-bar-container {
   --mdc-snackbar-container-color:        var(--kp-surface-3);
