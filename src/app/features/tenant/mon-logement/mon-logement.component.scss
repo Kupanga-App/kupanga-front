@@ -89,10 +89,25 @@
   @media (max-width: 480px) { font-size: 26px; }
 }
 
-.welcome-meta-text {
-  font-size: 15px;
+.welcome-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-3;
+  font-size: 14px;
   color: var(--kp-text-3);
-  margin: 0;
+}
+
+.wm-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  kp-icon { color: var(--kp-primary); }
+}
+
+.wm-sep {
+  color: var(--kp-border);
 }
 
 .welcome-right {
