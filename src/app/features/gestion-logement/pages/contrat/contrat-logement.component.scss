@@ -148,3 +148,10 @@
     color: var(--kp-text-3);
   }
 }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .kp-sign-box { max-width: 100%; }
+
+  .kp-info-banner { flex-wrap: wrap; }
+}

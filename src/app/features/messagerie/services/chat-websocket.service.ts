@@ -5,6 +5,7 @@ import SockJS from 'sockjs-client';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { MessageDTO, NotificationDTO, MessagePayload } from '../models/chat.models';
+import { AppNotification } from '../../notifications/models/app-notification.model';
 
 @Injectable({ providedIn: 'root' })
 export class ChatWebSocketService implements OnDestroy {
@@ -14,10 +15,12 @@ export class ChatWebSocketService implements OnDestroy {
 
   private messagesSubject = new Subject<MessageDTO>();
   private notificationsSubject = new Subject<NotificationDTO>();
+  private appNotificationsSubject = new Subject<AppNotification>();
   private connectedSubject = new Subject<boolean>();
 
   readonly messages$: Observable<MessageDTO> = this.messagesSubject.asObservable();
   readonly notifications$: Observable<NotificationDTO> = this.notificationsSubject.asObservable();
+  readonly appNotifications$: Observable<AppNotification> = this.appNotificationsSubject.asObservable();
   readonly connected$: Observable<boolean> = this.connectedSubject.asObservable();
 
   isConnected = false;
@@ -83,6 +86,9 @@ export class ChatWebSocketService implements OnDestroy {
     this.stompClient.subscribe(`/user/queue/messages`, handleMessage);
     this.stompClient.subscribe(`/user/${email}/queue/notifications`, handleNotif);
     this.stompClient.subscribe(`/user/queue/notifications`, handleNotif);
+    this.stompClient.subscribe(`/user/${email}/queue/app-notifications`, (msg: IMessage) => {
+      this.appNotificationsSubject.next(JSON.parse(msg.body) as AppNotification);
+    });
   }
 
   sendMessage(payload: MessagePayload): void {

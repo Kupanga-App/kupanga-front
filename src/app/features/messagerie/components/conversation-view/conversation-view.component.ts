@@ -60,6 +60,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
 
   private needsScroll = false;
   private subs = new Subscription();
+  private markAsReadTimer: ReturnType<typeof setTimeout> | null = null;
 
   get myEmail(): string {
     return this.authService.currentUser()?.email ?? '';
@@ -70,6 +71,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   }
 
   ngOnInit(): void {
+    this.store.setActiveConv(this.emailInterlocuteur);
     this.loadHistorique();
 
     this.subs.add(
@@ -83,6 +85,10 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
       this.ws.messages$.subscribe((msg) => {
         if (this.belongsToCurrentConv(msg)) {
           this.addMessageIfNew(msg);
+          // Message entrant visible → marquer comme lu immédiatement
+          if (msg.expediteurEmail === this.emailInterlocuteur) {
+            this.scheduleMarquerLus();
+          }
         }
       })
     );
@@ -92,12 +98,15 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
     const bienIdChanged = changes['bienId'] && !changes['bienId'].firstChange;
     const emailChanged = changes['emailInterlocuteur'] && !changes['emailInterlocuteur'].firstChange;
     if (bienIdChanged || emailChanged) {
+      this.store.setActiveConv(this.emailInterlocuteur);
       this.loadHistorique();
     }
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+    if (this.markAsReadTimer) clearTimeout(this.markAsReadTimer);
+    this.store.setActiveConv(null);
   }
 
   ngAfterViewChecked(): void {
@@ -140,10 +149,16 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   private marquerLus(): void {
     this.chatService.marquerLus(this.emailInterlocuteur).subscribe({
       next: () => {
+        this.store.markConversationAsRead(this.bienId, this.emailInterlocuteur);
         this.store.loadUnreadCount();
       },
       error: () => {},
     });
+  }
+
+  private scheduleMarquerLus(): void {
+    if (this.markAsReadTimer) clearTimeout(this.markAsReadTimer);
+    this.markAsReadTimer = setTimeout(() => this.marquerLus(), 400);
   }
 
   private belongsToCurrentConv(msg: MessageDTO): boolean {

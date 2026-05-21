@@ -9,7 +9,7 @@
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 .kp-detail-topnav {
-  padding: t.$space-7 0 t.$space-5;
+  //padding: 0;
 }
 
 .kp-back-btn {
@@ -145,11 +145,22 @@
 
 // ── Bandeau d'identité ───────────────────────────────────────────────────────
 .identity {
-  padding: t.$space-7 t.$space-4 t.$space-5;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: t.$space-8;
   align-items: start;
+
+  // Mobile : colonne unique — pill remonte au-dessus du titre
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: t.$space-4;
+    padding: t.$space-5 t.$space-4 t.$space-4;
+
+    .tag-pill {
+      order: -1;
+      align-self: start;
+    }
+  }
 }
 
 .identity-left { min-width: 0; }
@@ -251,7 +262,7 @@
   display: grid;
   grid-template-columns: 1fr 420px;
   gap: t.$space-12;
-  margin-top: t.$space-10;
+  margin-top: t.$space-5;
 }
 
 .body-main { min-width: 0; }
@@ -307,14 +318,13 @@
 
 // ── Sections ─────────────────────────────────────────────────────────────────
 .section {
-  margin-bottom: t.$space-12;
+  margin-bottom: t.$space-5;
 }
 
 .section-h {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 18px;
   padding-bottom: t.$space-4;
   border-bottom: 1px solid t.$border;
 }
@@ -334,6 +344,7 @@
   line-height: 1.65;
   color: t.$mint-soft;
   max-width: 640px;
+  padding-top: t.$space-2;
 }
 
 // ── Caractéristiques ─────────────────────────────────────────────────────────
@@ -396,6 +407,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: t.$space-3;
+  padding: t.$space-3 0;
 }
 
 .poi-cell {

@@ -36,6 +36,13 @@ export const routes: Routes = [
             m => m.ResetPasswordComponent
           )
       },
+      {
+        path: 'google-role',
+        loadComponent: () =>
+          import('./core/auth/pages/complete-profile/complete-profile.component').then(
+            m => m.CompleteProfileComponent
+          )
+      },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   },

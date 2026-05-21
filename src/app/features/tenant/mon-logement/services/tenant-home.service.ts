@@ -53,16 +53,18 @@ export class TenantHomeService {
 
   loadDashboard(bienId: number): void {
     this._loading.set(true);
-    this._data.set(null);
+    // Ne pas remettre _data à null — garder l'ancien data affiché pendant le rechargement
+    // pour éviter un flash de page vide entre deux navigations.
     this.http
       .get<LocataireDashboardDTO>(`${environment.apiUrl}/locataire/dashboard/${bienId}`)
       .subscribe({
         next: (dto) => {
-          this._aBienAssigne.set(true);
           this._data.set(this.mapToInternal(dto));
+          this._aBienAssigne.set(true);
           this._loading.set(false);
         },
         error: () => {
+          this._data.set(null);
           this._aBienAssigne.set(false);
           this._loading.set(false);
         },
@@ -80,7 +82,10 @@ export class TenantHomeService {
       quittances: dto.quittances.map(q => this.mapQuittance(q)),
       documents: [],
       compteurs: this.extractCompteurs(dto),
-      proprietaire: this.mapProprietaire(dto.bien.nomProprietaire),
+      proprietaire: this.mapProprietaire(
+        dto.bien.nomProprietaire,
+        dto.quittances.find((q) => !!q.emailProprietaire)?.emailProprietaire
+      ),
     };
   }
 
@@ -251,7 +256,7 @@ export class TenantHomeService {
     return labels[typeCompteur] ?? typeCompteur;
   }
 
-  private mapProprietaire(nomProprietaire: string): ProprietaireInfo {
+  private mapProprietaire(nomProprietaire: string, email?: string): ProprietaireInfo {
     const nom = nomProprietaire ?? '';
     const parts = nom.trim().split(' ');
     const initiales = parts
@@ -259,6 +264,6 @@ export class TenantHomeService {
       .join('')
       .toUpperCase()
       .substring(0, 2);
-    return { nom, initiales, role: 'Propriétaire', verifie: false };
+    return { nom, initiales, role: 'Propriétaire', verifie: false, email };
   }
 }

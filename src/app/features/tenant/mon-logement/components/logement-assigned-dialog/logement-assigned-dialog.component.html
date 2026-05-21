@@ -1,0 +1,53 @@
+<div class="overlay" (click)="onClose()" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+  <div class="dialog" (click)="$event.stopPropagation()">
+
+    <button class="close-btn" type="button" aria-label="Fermer" (click)="onClose()">
+      <kp-icon name="x" [size]="16" />
+    </button>
+
+    <div class="icon-badge">
+      <kp-icon name="check-circle" [size]="26" />
+    </div>
+
+    <h2 id="dialog-title" class="title">Logement assigné</h2>
+    <p class="subtitle">
+      Votre propriétaire vient de vous assigner un logement.
+      Bienvenue chez vous&nbsp;!
+    </p>
+
+    <div class="property-card">
+      <div class="property-address-row">
+        <kp-icon name="map-pin" [size]="14" />
+        <span class="property-address">{{ adresse }}</span>
+      </div>
+
+      <div class="property-meta">
+        <span class="meta-chip">{{ typeFormate }}</span>
+        <span class="meta-chip">{{ surface }} m²</span>
+        <span class="meta-chip">{{ nbPieces }} pièce{{ nbPieces > 1 ? 's' : '' }}</span>
+      </div>
+
+      @if (nomProprietaire) {
+        <div class="info-row">
+          <kp-icon name="user" [size]="13" />
+          <span>{{ nomProprietaire }}</span>
+        </div>
+      }
+
+      @if (dateDebut) {
+        <div class="info-row">
+          <kp-icon name="calendar" [size]="13" />
+          <span>Bail débutant le <strong>{{ dateDebut | date:'d MMMM yyyy':'':'fr' }}</strong></span>
+        </div>
+      }
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" type="button" (click)="onClose()">
+        <kp-icon name="home" [size]="15" />
+        Voir mon logement
+      </button>
+    </div>
+
+  </div>
+</div>

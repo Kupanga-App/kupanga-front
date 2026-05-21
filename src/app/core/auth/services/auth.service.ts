@@ -55,6 +55,29 @@ export class AuthService {
     );
   }
 
+  loginWithGoogle(idToken: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/google`, { idToken }, { withCredentials: true }).pipe(
+      tap(response => {
+        localStorage.setItem('accessToken', response.accessToken);
+      })
+    );
+  }
+
+  completeGoogleProfile(role: 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE'): Observable<User> {
+    return this.http.patch<AuthResponse>(
+      `${this.apiUrl}/complete-profile`,
+      { role },
+      { withCredentials: true }
+    ).pipe(
+      tap(response => this.handleAuthSuccess(response)),
+      switchMap(() => this.fetchCurrentUser())
+    );
+  }
+
+  loadCurrentUser(): Observable<User> {
+    return this.fetchCurrentUser();
+  }
+
   register(userData: any, profilePictureFile?: File): Observable<User> {
     const formData = new FormData();
 

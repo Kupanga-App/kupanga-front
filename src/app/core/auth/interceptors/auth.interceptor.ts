@@ -23,7 +23,7 @@ export const authInterceptor: HttpInterceptorFn = (
     req = addTokenToRequest(req, accessToken);
   }
 
-  if (req.url.includes('/auth/login') || req.url.includes('/auth/logout')) {
+  if (req.url.includes('/auth/login') || req.url.includes('/auth/logout') || req.url.includes('/auth/google')) {
     return next(req.clone({ withCredentials: true }));
   }
 

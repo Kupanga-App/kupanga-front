@@ -54,15 +54,21 @@
               <span class="kp-q-mois">{{ q.moisLabel }} {{ q.annee }}</span>
               <div class="kp-q-meta">
                 @if (isProprietaire() && q.emailLocataire) {
-                  <span class="kp-text-meta">{{ q.emailLocataire }}</span>
-                  <span class="kp-text-meta kp-meta-sep">·</span>
+                  <span class="kp-meta-item">
+                    <kp-icon name="user" [size]="12" />
+                    {{ q.emailLocataire }}
+                  </span>
+                  <span class="kp-meta-sep">·</span>
                 }
-                <span class="kp-text-meta">
+                <span class="kp-meta-item">
+                  <kp-icon name="calendar" [size]="12" />
                   Échéance : {{ q.dateEcheance | date:'dd MMM yyyy':'':'fr' }}
                 </span>
                 @if (q.datePaiement) {
-                  <span class="kp-text-meta">
-                    · Payée le {{ q.datePaiement | date:'dd MMM yyyy':'':'fr' }}
+                  <span class="kp-meta-sep">·</span>
+                  <span class="kp-meta-item">
+                    <kp-icon name="check-circle" [size]="12" />
+                    Payée le {{ q.datePaiement | date:'dd MMM yyyy':'':'fr' }}
                   </span>
                 }
               </div>

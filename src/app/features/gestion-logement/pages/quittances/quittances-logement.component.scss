@@ -178,3 +178,16 @@
     color: var(--kp-text-3);
   }
 }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .kp-q-card-header {
+    flex-wrap: wrap;
+    gap: var(--kp-space-2);
+  }
+
+  .kp-q-card-title {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

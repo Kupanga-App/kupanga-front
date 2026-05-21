@@ -244,3 +244,15 @@
   font-weight: 500;
   color: var(--kp-text-1);
 }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .kp-edl-card-header {
+    flex-wrap: wrap;
+  }
+
+  .kp-edl-card-info {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}

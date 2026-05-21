@@ -28,6 +28,8 @@ import {
   // Icônes pour la feature biens listing
   LayoutGrid, LayoutList, Map, Ruler, LayoutDashboard, ArrowUpDown,
   School, Cross, Pill, Baby, Bus, ShoppingCart,
+  // Icônes navbar
+  Compass, Folder, HelpCircle, Lightbulb, Moon, Menu,
 } from 'lucide-angular';
 
 registerLocaleData(localeFr);
@@ -60,6 +62,7 @@ export const appConfig: ApplicationConfig = {
         MessageCircle,
         LayoutGrid, LayoutList, Map, Ruler, LayoutDashboard, ArrowUpDown,
         School, Cross, Pill, Baby, Bus, ShoppingCart,
+        Compass, Folder, HelpCircle, Lightbulb, Moon, Menu,
       }),
     },
   ]

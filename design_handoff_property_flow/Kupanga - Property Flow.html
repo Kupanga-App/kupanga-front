@@ -315,7 +315,6 @@
 
   /* Identity bar (below hero) */
   .identity {
-    padding: 28px 32px 4px;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 32px;
@@ -389,15 +388,14 @@
     display: grid;
     grid-template-columns: 1fr 420px;
     gap: 48px;
-    margin-top: 36px;
+    margin-top: 20px; /* t.$space-5 */
   }
   .body-main { min-width: 0; }
   .body-side { position: relative; }
 
-  .section { margin-bottom: 48px; }
+  .section { margin-bottom:20px; }
   .section-h {
     display: flex; align-items: flex-end; justify-content: space-between;
-    margin-bottom: 18px;
     padding-bottom: 14px;
     border-bottom: 1px solid var(--border);
   }
@@ -557,6 +555,7 @@
   .poi-strip {
     display: grid; grid-template-columns: repeat(4, 1fr);
     border-top: 1px solid var(--border);
+    padding: 12px 0;
   }
   .poi-cell {
     padding: 16px 18px;
@@ -2088,7 +2087,7 @@
         <span class="dot"></span> MAISON
       </span>
       <span class="tag-pill amber" data-role-hide="tenant">
-        <span class="dot"></span> Vacant — Sans contrat
+        <span class="dot"></span> Disponible
       </span>
       <span class="tag-pill mint" data-role-show="tenant" style="display:none;">
         <span class="dot"></span> Disponible

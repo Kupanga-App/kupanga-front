@@ -48,19 +48,29 @@
             </div>
             <div class="kp-card-info">
               @if (c.adresseBien) {
-                <span class="kp-card-title">{{ c.adresseBien }}</span>
+                <span class="kp-card-title">
+                  <kp-icon name="map-pin" [size]="13" />
+                  {{ c.adresseBien }}
+                </span>
               }
               <div class="kp-card-meta">
                 @if (isProprietaire() && c.locataire?.mail) {
-                  <span class="kp-text-meta">{{ c.locataire!.mail }}</span>
+                  <span class="kp-meta-item">
+                    <kp-icon name="user" [size]="12" />
+                    {{ c.locataire!.mail }}
+                  </span>
                   <span class="kp-meta-sep">·</span>
                 }
-                <span class="kp-text-meta">
+                <span class="kp-meta-item">
+                  <kp-icon name="calendar" [size]="12" />
                   Du {{ c.dateDebut | date:'dd MMM yyyy':'':'fr' }}
                   @if (c.dateFin) { au {{ c.dateFin | date:'dd MMM yyyy':'':'fr' }} }
                 </span>
                 <span class="kp-meta-sep">·</span>
-                <span class="kp-text-meta">{{ c.loyerMensuel }} €/mois</span>
+                <span class="kp-meta-item">
+                  <kp-icon name="dollar-sign" [size]="12" />
+                  {{ c.loyerMensuel }} €/mois
+                </span>
               </div>
             </div>
           </div>

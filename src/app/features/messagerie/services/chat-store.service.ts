@@ -15,15 +15,48 @@ export class ChatStoreService {
   currentPage = signal<number>(0);
   hasMorePages = signal<boolean>(false);
 
+  /** Email de l'interlocuteur actuellement affiché dans la vue conversation. */
+  activeConvEmail = signal<string | null>(null);
+
   loadUnreadCount(): void {
+    console.log('[ChatStore] loadUnreadCount() appelé');
     this.chatService.getNonLusCount().subscribe({
-      next: (count) => this.unreadTotal.set(count),
-      error: () => {},
+      next: (count) => {
+        console.log('[ChatStore] getNonLusCount réponse API =', count, '| type =', typeof count);
+        this.unreadTotal.set(count);
+        console.log('[ChatStore] unreadTotal mis à jour =', this.unreadTotal());
+      },
+      error: (err) => {
+        console.error('[ChatStore] getNonLusCount ERREUR =', err);
+      },
     });
   }
 
   setActiveConversation(conv: ConversationDTO | null): void {
     this.activeConversation.set(conv);
+  }
+
+  /** Enregistre l'interlocuteur de la conversation en cours de lecture. */
+  setActiveConv(email: string | null): void {
+    this.activeConvEmail.set(email);
+  }
+
+  /**
+   * Réinitialise nonLuCount à 0 pour la conversation correspondant à bienId + email,
+   * sans recharger depuis le serveur.
+   */
+  markConversationAsRead(bienId: number, interlocuteurEmail: string): void {
+    this.conversations.update((list) =>
+      list.map((c) => {
+        if (
+          c.bienId === bienId &&
+          (c.emailExpediteur === interlocuteurEmail || c.emailDestinataire === interlocuteurEmail)
+        ) {
+          return { ...c, nonLuCount: 0 };
+        }
+        return c;
+      })
+    );
   }
 
   addMessage(msg: MessageDTO): void {
@@ -34,6 +67,8 @@ export class ChatStoreService {
   }
 
   setConversations(convs: ConversationDTO[]): void {
+    console.log('[ChatStore] setConversations — nb =', convs.length,
+      '| nonLuCounts =', convs.map(c => ({ bienTitre: c.bienTitre, nonLuCount: c.nonLuCount })));
     this.conversations.set(convs);
   }
 

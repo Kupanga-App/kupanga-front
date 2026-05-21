@@ -80,14 +80,16 @@
                         <div class="kp-field">
                         <label class="kp-label">Date de réalisation <span class="kp-req">*</span></label>
                         <mat-form-field>
-              <input matInput type="date" formControlName="date" />
+              <input matInput [matDatepicker]="pickerDate" formControlName="date" placeholder="jj/mm/aaaa" />
+              <mat-datepicker-toggle matIconSuffix [for]="pickerDate" />
+              <mat-datepicker #pickerDate />
               @if (step1.get('date')?.invalid && step1.get('date')?.touched) {
                 <mat-error>Date requise</mat-error>
               }
             </mat-form-field>
             </div>
                         <div class="kp-field">
-                        <label class="kp-label">Heure <span class="kp-req">*</span></label>
+                        <label class="kp-label">Heure</label>
                         <mat-form-field>
               <input matInput type="time" formControlName="heure" />
             </mat-form-field>

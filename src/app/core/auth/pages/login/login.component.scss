@@ -73,6 +73,67 @@ form {
 
 .btn-full { width: 100%; }
 
+// ── Divider "ou" ───────────────────────────────────────────────────────────────
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+
+  &__line {
+    flex: 1;
+    height: 1px;
+    background: var(--olive-15);
+  }
+
+  &__text {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--mint-35);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+}
+
+// ── Bouton Google ──────────────────────────────────────────────────────────────
+.btn-google {
+  height: 48px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--olive-25);
+  color: var(--mint-80);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--olive-40);
+    background: var(--olive-10);
+    color: var(--mint);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--olive-15);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .google-icon {
+    flex-shrink: 0;
+  }
+}
+
+// ── Spinners ───────────────────────────────────────────────────────────────────
 .spinner {
   width: 16px;
   height: 16px;
@@ -80,6 +141,11 @@ form {
   border: 2px solid rgba(16, 33, 43, 0.3);
   border-top-color: var(--night);
   animation: spin 0.6s linear infinite;
+}
+
+.btn-google .spinner {
+  border-color: var(--olive-25);
+  border-top-color: var(--olive);
 }
 
 @keyframes spin {

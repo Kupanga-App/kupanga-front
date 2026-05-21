@@ -3,6 +3,11 @@
   flex-direction: column;
   gap: var(--kp-space-6);
   padding: var(--kp-space-6) var(--kp-space-8);
+
+  @media (max-width: 640px) {
+    padding: var(--kp-space-4);
+    gap: var(--kp-space-4);
+  }
 }
 
 .kp-page-header {
@@ -98,6 +103,12 @@
   transition: border-color var(--kp-transition);
 
   &:hover { border-color: var(--kp-border-strong); }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    gap: var(--kp-space-3);
+    padding: var(--kp-space-4);
+  }
 }
 
 .kp-card-left {
@@ -105,6 +116,8 @@
   align-items: center;
   gap: var(--kp-space-3);
   min-width: 0;
+
+  @media (max-width: 640px) { width: 100%; }
 }
 
 .kp-card-icon {
@@ -135,12 +148,15 @@
 }
 
 .kp-card-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 14px;
   font-weight: 500;
   color: var(--kp-text-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+
+  kp-icon { color: var(--kp-primary); flex-shrink: 0; }
 }
 
 .kp-card-meta {
@@ -155,6 +171,16 @@
   color: var(--kp-text-3);
 }
 
+.kp-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--kp-text-3);
+
+  kp-icon { color: var(--kp-primary); flex-shrink: 0; }
+}
+
 .kp-meta-sep {
   font-size: 12px;
   color: var(--kp-border-strong);
@@ -165,6 +191,12 @@
   align-items: center;
   gap: var(--kp-space-3);
   flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    flex-shrink: 1;
+    width: 100%;
+    padding-left: calc(36px + var(--kp-space-3));
+  }
 }
 
 // ── Type badge entrée / sortie ────────────────────────────────────────────────

@@ -1,3 +1,18 @@
+<!-- [STAND-BY] Modale "logement assigné" — en attente de la gestion backend des notifications.
+     Réactiver en décommentant le bloc ci-dessous et l'effect dans mon-logement.component.ts.
+@if (showAssignedDialog() && svc.data(); as d) {
+  <kp-logement-assigned-dialog
+    [adresse]="d.bien.adresse"
+    [type]="d.bien.type"
+    [surface]="d.bien.surface"
+    [nbPieces]="d.bien.nbPieces"
+    [nomProprietaire]="d.proprietaire.nom"
+    [dateDebut]="d.contrat.dateDebut"
+    (closed)="onDismissAssignedDialog()"
+  />
+}
+-->
+
 <!-- État : aucun logement assigné (affiché seulement après confirmation, pas pendant le chargement) -->
 @if (!svc.loading() && !svc.aBienAssigne()) {
   <div class="no-property">
@@ -12,7 +27,7 @@
 }
 
 <!-- Logement disponible -->
-@if (svc.aBienAssigne() && svc.data(); as d) {
+@if (dashboardData(); as d) {
   <div class="page">
 
     <!-- Héro photos -->
@@ -31,10 +46,32 @@
         <h1 class="welcome-h1">
           Bienvenue chez <em>vous, {{ d.locataire.prenom }}.</em>
         </h1>
-        <p class="welcome-meta-text">
-          {{ d.bien.adresse }} · {{ d.bien.surface }} m² · {{ d.bien.nbPieces }} pièce{{ d.bien.nbPieces > 1 ? 's' : '' }} ·
-          {{ d.bien.type }} · {{ d.bien.nomProprietaire }}
-        </p>
+        <div class="welcome-meta">
+          <span class="wm-item">
+            <kp-icon name="map-pin" [size]="13" />
+            {{ d.bien.adresse }}
+          </span>
+          <span class="wm-sep">·</span>
+          <span class="wm-item">
+            <kp-icon name="maximize-2" [size]="13" />
+            {{ d.bien.surface }} m²
+          </span>
+          <span class="wm-sep">·</span>
+          <span class="wm-item">
+            <kp-icon name="layout-grid" [size]="13" />
+            {{ d.bien.nbPieces }} pièce{{ d.bien.nbPieces > 1 ? 's' : '' }}
+          </span>
+          <span class="wm-sep">·</span>
+          <span class="wm-item">
+            <kp-icon name="building" [size]="13" />
+            {{ d.bien.type }}
+          </span>
+          <span class="wm-sep">·</span>
+          <span class="wm-item">
+            <kp-icon name="user" [size]="13" />
+            {{ d.bien.nomProprietaire }}
+          </span>
+        </div>
       </div>
       <div class="welcome-right">
         <div class="welcome-info">
@@ -68,67 +105,49 @@
           (payerMaintenant)="onPayerMaintenant()"
         />
 
-        <!-- Échéances — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="calendar-clock" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Échéances à venir</div>
-            <div class="cs-sub">Cette fonctionnalité est en cours de développement.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
-
         <!-- Quittances -->
         <kp-receipt-list [quittances]="d.quittances" />
-
-        <!-- Incidents — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="alert-circle" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Mes demandes & incidents</div>
-            <div class="cs-sub">Le suivi des incidents sera disponible prochainement.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
-
-        <!-- Maintenance — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="wrench" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Maintenance & visites</div>
-            <div class="cs-sub">Les visites et interventions planifiées seront visibles ici.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
-
-      </div>
-
-      <!-- Colonne latérale -->
-      <div class="body-side">
-
-        <kp-owner-card
-          [proprietaire]="d.proprietaire"
-          (envoyerMessage)="onEnvoyerMessage()"
-        />
-
-        <!-- Alertes — en cours de développement -->
-        <div class="coming-soon-card">
-          <div class="cs-ic"><kp-icon name="bell" [size]="18" /></div>
-          <div class="cs-body">
-            <div class="cs-title">Rappels & alertes</div>
-            <div class="cs-sub">Les rappels personnalisés arrivent bientôt.</div>
-          </div>
-          <span class="cs-badge">Bientôt disponible</span>
-        </div>
 
         <kp-quick-actions
           [actions]="svc.actionsRapides"
           (actionCliquee)="onAction($event)"
         />
 
+      </div>
+
+      <!-- Colonne latérale -->
+      <div class="body-side">
+
         <kp-lease-card [contrat]="d.contrat" />
 
+        <kp-owner-card
+          [proprietaire]="d.proprietaire"
+          (envoyerMessage)="onEnvoyerMessage()"
+        />
+
         <kp-meter-card [compteurs]="d.compteurs" />
+
+        <!-- En cours de développement — minimisés en dernier -->
+        <div class="coming-soon-card">
+          <kp-icon name="calendar-clock" [size]="14" />
+          <span class="cs-label">Échéances à venir</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
+        <div class="coming-soon-card">
+          <kp-icon name="alert-circle" [size]="14" />
+          <span class="cs-label">Demandes &amp; incidents</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
+        <div class="coming-soon-card">
+          <kp-icon name="wrench" [size]="14" />
+          <span class="cs-label">Maintenance &amp; visites</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
+        <div class="coming-soon-card">
+          <kp-icon name="bell" [size]="14" />
+          <span class="cs-label">Rappels &amp; alertes</span>
+          <span class="cs-badge">Bientôt</span>
+        </div>
 
       </div>
 

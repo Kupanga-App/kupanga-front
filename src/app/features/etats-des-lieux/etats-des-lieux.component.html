@@ -48,29 +48,40 @@
             </div>
             <div class="kp-card-info">
               <div class="kp-card-title-row">
-                <span class="kp-edl-type-badge" [class]="typeClass(edl.type)">
-                  {{ typeLabel(edl.type) }}
-                </span>
                 @if (edl.adresseBien) {
-                  <span class="kp-card-title">{{ edl.adresseBien }}</span>
+                  <span class="kp-card-title">
+                    <kp-icon name="map-pin" [size]="13" />
+                    {{ edl.adresseBien }}
+                  </span>
                 }
               </div>
               <div class="kp-card-meta">
                 @if (isProprietaire() && edl.emailLocataire) {
-                  <span class="kp-text-meta">{{ edl.emailLocataire }}</span>
+                  <span class="kp-meta-item">
+                    <kp-icon name="user" [size]="12" />
+                    {{ edl.emailLocataire }}
+                  </span>
                   <span class="kp-meta-sep">·</span>
                 }
-                <span class="kp-text-meta">
+                <span class="kp-meta-item">
+                  <kp-icon name="calendar" [size]="12" />
                   {{ edl.dateRealisation | date:'dd MMM yyyy':'':'fr' }}
                 </span>
                 @if (edl.heureRealisation) {
-                  <span class="kp-text-meta">à {{ edl.heureRealisation }}</span>
+                  <span class="kp-meta-sep">·</span>
+                  <span class="kp-meta-item">
+                    <kp-icon name="clock" [size]="12" />
+                    {{ edl.heureRealisation }}
+                  </span>
                 }
               </div>
             </div>
           </div>
 
           <div class="kp-card-right">
+            <span class="kp-edl-type-badge" [class]="typeClass(edl.type)">
+                  {{ typeLabel(edl.type) }}
+            </span>
             <span class="kp-statut-badge" [class]="statutClass(edl.statut)">
               {{ statutLabel(edl.statut) }}
             </span>
