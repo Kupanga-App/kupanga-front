@@ -98,7 +98,7 @@ export class BienDetailComponent implements OnInit {
   });
 
   statutText = computed(() => {
-    return this.hasLocataire() ? 'Loué' : 'Vacant — Sans contrat';
+    return this.hasLocataire() ? 'Loué' : 'Disponible';
   });
 
   typeBienLabel = computed(() => {
