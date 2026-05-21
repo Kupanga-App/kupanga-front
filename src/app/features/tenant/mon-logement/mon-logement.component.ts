@@ -1,4 +1,4 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
@@ -12,6 +12,7 @@ import { OwnerCardComponent } from './components/owner-card/owner-card.component
 import { QuickActionsComponent } from './components/quick-actions/quick-actions.component';
 import { LeaseCardComponent } from './components/lease-card/lease-card.component';
 import { MeterCardComponent } from './components/meter-card/meter-card.component';
+// LogementAssignedDialogComponent importé quand la feature stand-by sera réactivée
 import { TenantHomeService } from './services/tenant-home.service';
 import { LogementContextService } from '../../../core/services/logement-context.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
@@ -33,6 +34,7 @@ import { QuickAction } from './models/tenant.models';
     QuickActionsComponent,
     LeaseCardComponent,
     MeterCardComponent,
+    // LogementAssignedDialogComponent — réactiver avec la feature stand-by
   ],
   templateUrl: './mon-logement.component.html',
   styleUrl: './mon-logement.component.scss',
@@ -44,6 +46,13 @@ export class MonLogementComponent {
   private readonly router = inject(Router);
 
   private lastLoadedBienId: number | null = null;
+  protected readonly showAssignedDialog = signal(false);
+
+  /** Composition des signaux du service dans le contexte réactif du composant.
+   *  Garantit que tout changement de `data` ou `aBienAssigne` déclenche bien le re-rendu. */
+  protected readonly dashboardData = computed(() =>
+    this.svc.aBienAssigne() ? this.svc.data() : null
+  );
 
   constructor() {
     // Déclenche la résolution du bienId si ce n'est pas encore fait
@@ -68,6 +77,19 @@ export class MonLogementComponent {
         this.svc.loadDashboard(bienId);
       }
     });
+
+    // [STAND-BY] Modale "logement assigné" — désactivée en attente de la gestion
+    // des notifications côté backend. Réactiver en décommentant le bloc ci-dessous.
+    // effect(() => {
+    //   const data = this.svc.data();
+    //   const bienId = this.logementCtx.logementBienId();
+    //   if (data && bienId && this.svc.aBienAssigne()) {
+    //     const seenKey = `kp_logement_assigned_seen_${bienId}`;
+    //     if (!localStorage.getItem(seenKey)) {
+    //       this.showAssignedDialog.set(true);
+    //     }
+    //   }
+    // });
   }
 
   onAction(action: QuickAction): void {
@@ -82,5 +104,13 @@ export class MonLogementComponent {
 
   onEnvoyerMessage(): void {
     this.router.navigateByUrl('/loc/messagerie');
+  }
+
+  onDismissAssignedDialog(): void {
+    const bienId = this.logementCtx.logementBienId();
+    if (bienId) {
+      localStorage.setItem(`kp_logement_assigned_seen_${bienId}`, '1');
+    }
+    this.showAssignedDialog.set(false);
   }
 }

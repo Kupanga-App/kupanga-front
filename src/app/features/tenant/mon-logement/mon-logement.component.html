@@ -1,3 +1,18 @@
+<!-- [STAND-BY] Modale "logement assigné" — en attente de la gestion backend des notifications.
+     Réactiver en décommentant le bloc ci-dessous et l'effect dans mon-logement.component.ts.
+@if (showAssignedDialog() && svc.data(); as d) {
+  <kp-logement-assigned-dialog
+    [adresse]="d.bien.adresse"
+    [type]="d.bien.type"
+    [surface]="d.bien.surface"
+    [nbPieces]="d.bien.nbPieces"
+    [nomProprietaire]="d.proprietaire.nom"
+    [dateDebut]="d.contrat.dateDebut"
+    (closed)="onDismissAssignedDialog()"
+  />
+}
+-->
+
 <!-- État : aucun logement assigné (affiché seulement après confirmation, pas pendant le chargement) -->
 @if (!svc.loading() && !svc.aBienAssigne()) {
   <div class="no-property">
@@ -12,7 +27,7 @@
 }
 
 <!-- Logement disponible -->
-@if (svc.aBienAssigne() && svc.data(); as d) {
+@if (dashboardData(); as d) {
   <div class="page">
 
     <!-- Héro photos -->
