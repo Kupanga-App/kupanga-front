@@ -1,55 +1,136 @@
+// La navbar occupe 96px (L1 56px + L2 40px).
+// :host hérite de la largeur du db-container et occupe la hauteur restante
+// sans position fixed — en flux normal dans le router-outlet.
+:host {
+  display: block;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
 .kp-chat-page {
-  position: fixed;
-  top: 96px; /* nav L1 56px + nav L2 40px */
-  left: 0;
-  right: 0;
-  bottom: 0;
+  height: 100%;
   display: flex;
   overflow: hidden;
   background: var(--kp-bg);
-  z-index: 1;
 }
 
-.kp-chat-sidebar {
-  width: 320px;
+.kp-chat-col-list {
+  width: 340px;
   flex-shrink: 0;
-  border-right: 0.5px solid var(--kp-border);
+  border-right: 1px solid var(--kp-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--kp-bg);
 }
 
-.kp-chat-main {
+.kp-chat-col-conv {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  background: var(--kp-bg);
 }
 
-.kp-chat-empty {
+.kp-chat-col-rail {
+  width: 340px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--kp-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ── État vide ────────────────────────────────────────────────────────────────
+
+.kp-chat-empty-state {
   flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.kp-empty-glow {
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(143, 164, 100, 0.10) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.kp-empty-content {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 20px;
+}
+
+.kp-empty-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: var(--kp-space-3);
-  color: var(--kp-text-3);
+  color: var(--kp-primary);
+}
 
-  mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
+.kp-empty-title {
+  font-family: var(--kp-font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--kp-text-1);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+
+  em {
+    font-style: italic;
+    color: var(--kp-primary-hover);
   }
+}
 
-  p {
-    font-size: 14px;
+.kp-empty-body {
+  font-family: var(--kp-font);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--kp-text-3);
+  line-height: 1.6;
+  max-width: 340px;
+  margin: 0;
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 1199px) {
+  .kp-chat-col-rail {
+    display: none;
   }
 }
 
 @media (max-width: 768px) {
-  .kp-chat-sidebar {
+  :host {
+    height: calc(100vh - 56px);
+  }
+
+  .kp-chat-col-list {
     width: 100%;
+  }
+
+  .kp-chat-col-rail {
+    display: none;
   }
 
   .kp-mobile-hidden {

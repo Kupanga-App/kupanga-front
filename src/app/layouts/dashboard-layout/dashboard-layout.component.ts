@@ -29,4 +29,13 @@ export class DashboardLayoutComponent {
     ),
     { initialValue: !this.router.url.startsWith('/auth') }
   );
+
+  isMessagerie = toSignal(
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      map(() => this.router.url.includes('/messagerie')),
+      startWith(this.router.url.includes('/messagerie')),
+    ),
+    { initialValue: this.router.url.includes('/messagerie') }
+  );
 }

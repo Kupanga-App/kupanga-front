@@ -10,8 +10,8 @@
   padding: 9px t.$space-4;
   border-radius: t.$radius-pill;
   background: transparent;
-  border: 1px solid t.$border-2;
-  color: t.$mint-mute;
+  border: 1px solid var(--kp-border-strong);
+  color: var(--kp-text-2);
   font-size: t.$text-small;
   font-weight: 500;
   cursor: pointer;
@@ -22,14 +22,14 @@
   transition: all 150ms ease;
 
   &:hover {
-    color: t.$mint;
-    border-color: t.$border-2;
-    background: rgba(#EFFBDB, 0.04);
+    color: var(--kp-text-1);
+    border-color: var(--kp-primary);
+    background: var(--kp-primary-subtle);
   }
 
   &.on {
-    background: t.$olive-bg;
-    border-color: t.$olive;
-    color: t.$olive-light;
+    background: var(--kp-primary-subtle-md);
+    border-color: var(--kp-primary);
+    color: var(--kp-primary-hover);
   }
 }

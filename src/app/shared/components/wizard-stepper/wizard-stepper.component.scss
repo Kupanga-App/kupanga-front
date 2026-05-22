@@ -4,8 +4,8 @@
   display: flex;
   align-items: center;
   padding: 20px t.$space-7;
-  background: t.$night-mid;
-  border: 1px solid t.$border;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius-lg;
   margin-bottom: t.$space-7;
 }
@@ -19,11 +19,11 @@
 .step-link {
   flex: 1;
   height: 1px;
-  background: t.$border;
+  background: var(--kp-border);
   margin: 0 t.$space-4;
 
   &.done {
-    background: t.$olive;
+    background: var(--kp-primary);
   }
 }
 
@@ -31,10 +31,10 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1.5px solid t.$border-2;
+  border: 1.5px solid var(--kp-border-strong);
   display: grid;
   place-items: center;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-family: t.$font-mono;
   font-size: t.$text-small;
   font-weight: 500;
@@ -42,17 +42,17 @@
   transition: all 200ms ease;
 
   .step.active & {
-    background: t.$olive;
-    border-color: t.$olive;
-    color: t.$night;
+    background: var(--kp-primary);
+    border-color: var(--kp-primary);
+    color: var(--kp-primary-on);
     font-weight: 600;
-    box-shadow: 0 0 0 4px t.$olive-bg;
+    box-shadow: 0 0 0 4px var(--kp-primary-subtle);
   }
 
   .step.done & {
-    background: t.$olive;
-    border-color: t.$olive;
-    color: t.$night;
+    background: var(--kp-primary);
+    border-color: var(--kp-primary);
+    color: var(--kp-primary-on);
   }
 }
 
@@ -65,22 +65,22 @@
 .step-lbl1 {
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 
-  .step.active & { color: t.$olive; }
+  .step.active & { color: var(--kp-primary); }
 }
 
 .step-lbl2 {
   font-size: t.$text-body;
   font-weight: 500;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   margin-top: 2px;
   white-space: nowrap;
 
-  .step.active & { color: t.$mint; font-weight: 600; }
-  .step.done &   { color: t.$mint; }
+  .step.active & { color: var(--kp-text-1); font-weight: 600; }
+  .step.done &   { color: var(--kp-text-1); }
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────

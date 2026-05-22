@@ -220,7 +220,7 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   box-shadow: none !important;
 }
 
-// --- Form fields (fill — Night / Olive / Mint) ────────────────────────────
+// --- Form fields (fill — thème-aware via --kp-*) ─────────────────────────
 .mat-mdc-form-field {
 
   // ── Hauteur ───────────────────────────────────────────────────────────────
@@ -230,9 +230,9 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   --mdc-filled-text-field-container-shape:      6px;
 
   // ── Background ───────────────────────────────────────────────────────────
-  --mdc-filled-text-field-container-color:             #172C3A;
-  --mdc-filled-text-field-disabled-container-color:    rgba(23, 44, 58, 0.45);
-  --mat-form-field-filled-container-color:             #172C3A;
+  --mdc-filled-text-field-container-color:             var(--kp-surface-input);
+  --mdc-filled-text-field-disabled-container-color:    var(--kp-surface-2);
+  --mat-form-field-filled-container-color:             var(--kp-surface-input);
 
   // ── Active indicator (bottom line) — supprimé ────────────────────────────
   --mdc-filled-text-field-active-indicator-color:             transparent;
@@ -242,15 +242,15 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   --mdc-filled-text-field-disabled-active-indicator-color:    transparent;
 
   // ── Label — repos / hover / focus ────────────────────────────────────────
-  --mdc-filled-text-field-label-text-color:                #EFFBDB;
-  --mdc-filled-text-field-hover-label-text-color:          #EFFBDB;
-  --mdc-filled-text-field-focus-label-text-color:          #8FA464;
-  --mdc-filled-text-field-disabled-label-text-color:       rgba(239, 251, 219, 0.40);
+  --mdc-filled-text-field-label-text-color:                var(--kp-text-2);
+  --mdc-filled-text-field-hover-label-text-color:          var(--kp-text-2);
+  --mdc-filled-text-field-focus-label-text-color:          var(--kp-primary);
+  --mdc-filled-text-field-disabled-label-text-color:       var(--kp-text-4);
 
   // ── Label — état erreur ──────────────────────────────────────────────────
-  --mdc-filled-text-field-error-label-text-color:          #EFFBDB;
-  --mdc-filled-text-field-error-hover-label-text-color:    #EFFBDB;
-  --mdc-filled-text-field-error-focus-label-text-color:    #E48173;
+  --mdc-filled-text-field-error-label-text-color:          var(--kp-text-1);
+  --mdc-filled-text-field-error-hover-label-text-color:    var(--kp-text-1);
+  --mdc-filled-text-field-error-focus-label-text-color:    var(--kp-danger-text);
 
   // ── Typographie du label ─────────────────────────────────────────────────
   --mdc-filled-text-field-label-text-font:                 'DM Sans', system-ui, sans-serif;
@@ -259,35 +259,35 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   --mdc-filled-text-field-label-text-tracking:             0.01em;
 
   // ── Texte saisi ──────────────────────────────────────────────────────────
-  --mdc-filled-text-field-input-text-color:                #EFFBDB;
+  --mdc-filled-text-field-input-text-color:                var(--kp-text-1);
   --mdc-filled-text-field-input-text-font:                 'DM Sans', system-ui, sans-serif;
   --mdc-filled-text-field-input-text-size:                 15px;
   --mdc-filled-text-field-input-text-weight:               400;
   --mdc-filled-text-field-input-text-tracking:             0;
-  --mdc-filled-text-field-disabled-input-text-color:       rgba(239, 251, 219, 0.28);
+  --mdc-filled-text-field-disabled-input-text-color:       var(--kp-text-4);
 
   // ── Placeholder ──────────────────────────────────────────────────────────
-  --mdc-filled-text-field-input-text-placeholder-color:    rgba(239, 251, 219, 0.28);
+  --mdc-filled-text-field-input-text-placeholder-color:    var(--kp-text-4);
 
   // ── Icônes leading / trailing ────────────────────────────────────────────
-  --mdc-filled-text-field-leading-icon-color:              rgba(239, 251, 219, 0.45);
-  --mdc-filled-text-field-focus-leading-icon-color:        #8FA464;
-  --mdc-filled-text-field-trailing-icon-color:             rgba(239, 251, 219, 0.45);
-  --mdc-filled-text-field-focus-trailing-icon-color:       #8FA464;
-  --mdc-filled-text-field-error-trailing-icon-color:       #E48173;
-  --mdc-filled-text-field-error-focus-trailing-icon-color: #E48173;
+  --mdc-filled-text-field-leading-icon-color:              var(--kp-text-2);
+  --mdc-filled-text-field-focus-leading-icon-color:        var(--kp-primary);
+  --mdc-filled-text-field-trailing-icon-color:             var(--kp-text-2);
+  --mdc-filled-text-field-focus-trailing-icon-color:       var(--kp-primary);
+  --mdc-filled-text-field-error-trailing-icon-color:       var(--kp-danger-text);
+  --mdc-filled-text-field-error-focus-trailing-icon-color: var(--kp-danger-text);
 
   // ── Subscript (erreur / hint) ─────────────────────────────────────────────
-  --mat-form-field-error-text-color:                       #E48173;
-  --mat-form-field-hint-text-color:                        rgba(239, 251, 219, 0.35);
+  --mat-form-field-error-text-color:                       var(--kp-danger-text);
+  --mat-form-field-hint-text-color:                        var(--kp-text-4);
   --mat-form-field-subscript-text-size:                    11px;
   --mat-form-field-subscript-text-tracking:                0.01em;
 
   // ── Tokens génériques hérités ─────────────────────────────────────────────
-  --mat-form-field-container-text-color:                   #EFFBDB;
-  --mat-form-field-label-text-color:                       #EFFBDB;
-  --mat-form-field-focused-label-text-color:               #8FA464;
-  --mat-form-field-disabled-input-text-placeholder-color:  rgba(239, 251, 219, 0.25);
+  --mat-form-field-container-text-color:                   var(--kp-text-1);
+  --mat-form-field-label-text-color:                       var(--kp-text-2);
+  --mat-form-field-focused-label-text-color:               var(--kp-primary);
+  --mat-form-field-disabled-input-text-placeholder-color:  var(--kp-text-4);
 
   // ── Supprime l'espace réservé subscript quand il est vide ────────────────
   &:not(.mat-form-field-has-icon-suffix) .mat-mdc-form-field-subscript-wrapper {
@@ -298,33 +298,33 @@ $kupanga-light-theme: mat.m2-define-light-theme((
 // Bordure visible + coins arrondis sur les 4 côtés (fill) ─────────────────────
 .mat-mdc-text-field-wrapper.mdc-text-field--filled {
   border-radius: 10px;
-  border: 1px solid rgba(239, 251, 219, 0.14);
+  border: 1px solid var(--kp-border);
   transition: border-color 150ms ease;
 
   // Background — spécificité 0,3,0 pour surcharger la règle AM20 (0,2,0)
   &:not(.mdc-text-field--disabled) {
-    background-color: #172C3A;
+    background-color: var(--kp-surface-input);
     padding-right: 16px;
   }
 
   &:not(.mdc-text-field--disabled):hover {
-    border-color: rgba(239, 251, 219, 0.28);
+    border-color: var(--kp-border-strong);
   }
 
   &.mdc-text-field--focused {
-    border-color: #8FA464;
+    border-color: var(--kp-primary);
   }
 
   &.mdc-text-field--invalid {
-    border-color: rgba(228, 129, 115, 0.50);
+    border-color: var(--kp-danger-subtle);
 
-    &:not(.mdc-text-field--disabled):hover { border-color: rgba(228, 129, 115, 0.70); }
-    &.mdc-text-field--focused             { border-color: #E48173; }
+    &:not(.mdc-text-field--disabled):hover { border-color: var(--kp-danger); }
+    &.mdc-text-field--focused             { border-color: var(--kp-danger); }
   }
 
   &.mdc-text-field--disabled {
-    border-color: rgba(239, 251, 219, 0.06);
-    background-color: rgba(23, 44, 58, 0.50);
+    border-color: var(--kp-border);
+    background-color: var(--kp-surface-2);
   }
 }
 
@@ -333,23 +333,23 @@ $kupanga-light-theme: mat.m2-define-light-theme((
   display: none;
 }
 
-// Astérisque requis — olive ───────────────────────────────────────────────────
+// Astérisque requis ───────────────────────────────────────────────────────────
 .mat-mdc-form-field-required-marker {
-  color: #8FA464;
+  color: var(--kp-primary);
 }
 
-// Caret & sélection de texte — olive
+// Caret & sélection de texte
 .mat-mdc-form-field input,
 .mat-mdc-form-field textarea {
-  caret-color: #8FA464;
+  caret-color: var(--kp-primary);
 
-  &::selection { background: rgba(143, 164, 100, 0.20); }
+  &::selection { background: color-mix(in srgb, var(--kp-primary) 20%, transparent); }
 }
 
 // Suffix / prefix textuels (€, mois, %)
 .mat-mdc-form-field .mat-mdc-form-field-text-suffix,
 .mat-mdc-form-field .mat-mdc-form-field-text-prefix {
-  color: rgba(239, 251, 219, 0.45);
+  color: var(--kp-text-2);
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 13px;
 }
@@ -439,64 +439,64 @@ $kupanga-light-theme: mat.m2-define-light-theme((
 
 // --- Select ───────────────────────────────────────────────────────────────
 .mat-mdc-select {
-  --mat-select-trigger-text-color:           #EFFBDB;
+  --mat-select-trigger-text-color:           var(--kp-text-1);
   --mat-select-trigger-text-font:            'DM Sans', system-ui, sans-serif;
   --mat-select-trigger-text-size:            14px;
   --mat-select-trigger-text-weight:          400;
-  --mat-select-placeholder-text-color:       rgba(239, 251, 219, 0.32);
-  --mat-select-enabled-arrow-color:          rgba(239, 251, 219, 0.52);
-  --mat-select-focused-arrow-color:          #8FA464;
-  --mat-select-invalid-arrow-color:          #E48173;
-  --mat-select-disabled-arrow-color:         rgba(239, 251, 219, 0.28);
-  --mat-select-disabled-trigger-text-color:  rgba(239, 251, 219, 0.28);
+  --mat-select-placeholder-text-color:       var(--kp-text-4);
+  --mat-select-enabled-arrow-color:          var(--kp-text-2);
+  --mat-select-focused-arrow-color:          var(--kp-primary);
+  --mat-select-invalid-arrow-color:          var(--kp-danger-text);
+  --mat-select-disabled-arrow-color:         var(--kp-text-4);
+  --mat-select-disabled-trigger-text-color:  var(--kp-text-4);
 }
 
 // Options du panel select / autocomplete
 .mat-mdc-option {
-  --mat-option-label-text-color:                        #EFFBDB;
+  --mat-option-label-text-color:                        var(--kp-text-1);
   --mat-option-label-text-font:                         'DM Sans', system-ui, sans-serif;
   --mat-option-label-text-size:                         14px;
   --mat-option-label-text-weight:                       400;
-  --mat-option-selected-state-label-text-color:         #8FA464;
-  --mat-option-hover-state-layer-color:                 rgba(143, 164, 100, 0.10);
-  --mat-option-focus-state-layer-color:                 rgba(143, 164, 100, 0.10);
-  --mat-option-selected-state-layer-color:              rgba(143, 164, 100, 0.12);
+  --mat-option-selected-state-label-text-color:         var(--kp-primary);
+  --mat-option-hover-state-layer-color:                 var(--kp-primary-subtle);
+  --mat-option-focus-state-layer-color:                 var(--kp-primary-subtle);
+  --mat-option-selected-state-layer-color:              var(--kp-primary-subtle-md);
 }
 
 // Panel déroulant
 .mat-mdc-autocomplete-panel,
 .mat-mdc-select-panel {
-  background: #1E3545 !important;
-  border: 1px solid rgba(239, 251, 219, 0.13) !important;
+  background: var(--kp-surface) !important;
+  border: 1px solid var(--kp-border) !important;
   border-radius: 12px !important;
   box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6) !important;
 }
 
 // --- Datepicker toggle ────────────────────────────────────────────────────
 .mat-datepicker-toggle {
-  --mat-datepicker-toggle-icon-color: rgba(239, 251, 219, 0.52);
+  --mat-datepicker-toggle-icon-color: var(--kp-text-2);
 
-  &:hover { --mat-datepicker-toggle-icon-color: #8FA464; }
-  .mat-mdc-icon-button:focus { --mat-datepicker-toggle-icon-color: #8FA464; }
+  &:hover { --mat-datepicker-toggle-icon-color: var(--kp-primary); }
+  .mat-mdc-icon-button:focus { --mat-datepicker-toggle-icon-color: var(--kp-primary); }
 }
 
 // Calendrier popup
 .mat-datepicker-content {
-  background: #1E3545;
-  border: 1px solid rgba(239, 251, 219, 0.13);
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: 14px;
   box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.6);
 
-  --mat-datepicker-calendar-date-text-color:             #EFFBDB;
-  --mat-datepicker-calendar-date-hover-state-background-color: rgba(143, 164, 100, 0.12);
-  --mat-datepicker-calendar-date-selected-state-background-color: #8FA464;
-  --mat-datepicker-calendar-date-selected-state-text-color: #10212B;
-  --mat-datepicker-calendar-date-today-outline-color:    rgba(143, 164, 100, 0.50);
-  --mat-datepicker-calendar-date-today-selected-state-outline-color: #8FA464;
-  --mat-datepicker-calendar-header-text-color:           rgba(239, 251, 219, 0.62);
-  --mat-datepicker-calendar-navigation-button-icon-color: rgba(239, 251, 219, 0.62);
-  --mat-datepicker-calendar-period-button-text-color:    #EFFBDB;
-  --mat-datepicker-calendar-period-button-icon-color:    rgba(239, 251, 219, 0.62);
+  --mat-datepicker-calendar-date-text-color:             var(--kp-text-1);
+  --mat-datepicker-calendar-date-hover-state-background-color: var(--kp-primary-subtle);
+  --mat-datepicker-calendar-date-selected-state-background-color: var(--kp-primary);
+  --mat-datepicker-calendar-date-selected-state-text-color: var(--kp-primary-on);
+  --mat-datepicker-calendar-date-today-outline-color:    color-mix(in srgb, var(--kp-primary) 50%, transparent);
+  --mat-datepicker-calendar-date-today-selected-state-outline-color: var(--kp-primary);
+  --mat-datepicker-calendar-header-text-color:           var(--kp-text-2);
+  --mat-datepicker-calendar-navigation-button-icon-color: var(--kp-text-2);
+  --mat-datepicker-calendar-period-button-text-color:    var(--kp-text-1);
+  --mat-datepicker-calendar-period-button-icon-color:    var(--kp-text-2);
 }
 
 // --- Menu ---

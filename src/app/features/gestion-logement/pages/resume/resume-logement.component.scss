@@ -13,7 +13,7 @@
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
   letter-spacing: 0.1em;
-  color: t.$olive;
+  color: var(--kp-primary);
   text-transform: uppercase;
   margin-bottom: t.$space-3;
 }
@@ -23,14 +23,14 @@
   font-size: t.$text-display;
   line-height: 1.05;
   letter-spacing: -0.02em;
-  color: t.$mint;
+  color: var(--kp-text-1);
   margin-bottom: t.$space-3;
 
-  em { font-style: italic; color: t.$olive; }
+  em { font-style: italic; color: var(--kp-primary); }
 }
 
 .manage-sub {
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-size: t.$text-large;
   line-height: 1.55;
   max-width: 540px;
@@ -43,8 +43,8 @@
   gap: 18px;
   align-items: center;
   padding: 18px 22px;
-  background: t.$amber-bg;
-  border: 1px solid rgba(#E8B962, 0.32);
+  background: var(--kp-warning-subtle);
+  border: 1px solid var(--kp-warning);
   border-radius: t.$radius-lg;
 }
 
@@ -52,8 +52,8 @@
   width: 48px;
   height: 48px;
   border-radius: t.$radius;
-  background: t.$amber;
-  color: t.$night;
+  background: var(--kp-warning);
+  color: var(--kp-primary-on);
   display: grid;
   place-items: center;
 }
@@ -61,12 +61,12 @@
 .alert-t {
   font-family: t.$font-serif;
   font-size: t.$text-h5;
-  color: t.$mint;
+  color: var(--kp-text-1);
   line-height: 1.15;
 }
 
 .alert-s {
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-size: t.$text-small;
   margin-top: 4px;
 }
@@ -82,9 +82,9 @@
   border-radius: 7px;
   font-size: t.$text-mini;
   font-weight: 500;
-  border: 1px solid t.$border-2;
+  border: 1px solid var(--kp-border-strong);
   background: transparent;
-  color: t.$mint;
+  color: var(--kp-text-1);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -93,15 +93,15 @@
   text-decoration: none;
   transition: background 150ms ease;
 
-  &:hover { background: rgba(#EFFBDB, 0.05); }
+  &:hover { background: var(--kp-primary-subtle); }
 
   &.btn-amber {
-    background: t.$amber;
-    border-color: t.$amber;
-    color: t.$night;
+    background: var(--kp-warning);
+    border-color: var(--kp-warning);
+    color: var(--kp-primary-on);
     font-weight: 600;
 
-    &:hover { background: rgba(#E8B962, 0.85); }
+    &:hover { opacity: 0.85; }
   }
 }
 
@@ -113,15 +113,15 @@
 }
 
 .kpi {
-  background: t.$night-mid;
-  border: 1px solid t.$border;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius;
   padding: 18px t.$space-5;
 }
 
 .kpi-lbl {
   font-size: t.$text-tiny;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -129,7 +129,7 @@
   align-items: center;
   gap: 6px;
 
-  kp-icon { color: t.$olive; }
+  kp-icon { color: var(--kp-primary); }
 }
 
 .kpi-val {
@@ -137,23 +137,23 @@
   font-size: t.$text-h2;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  color: t.$mint;
+  color: var(--kp-text-1);
   display: flex;
   align-items: baseline;
   gap: 4px;
 
-  .u { font-family: t.$font-sans; font-size: t.$text-small; color: t.$mint-mute; font-weight: 400; }
+  .u { font-family: t.$font-sans; font-size: t.$text-small; color: var(--kp-text-2); font-weight: 400; }
 
-  &.kpi-danger { color: t.$red; }
+  &.kpi-danger { color: var(--kp-danger); }
 }
 
 .kpi-foot {
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   margin-top: 6px;
 
-  &.kpi-danger { color: t.$red; }
+  &.kpi-danger { color: var(--kp-danger); }
 }
 
 // ── Grid 2-col ────────────────────────────────────────────────────────────────
@@ -172,8 +172,8 @@
 
 // ── Cards ─────────────────────────────────────────────────────────────────────
 .mcard {
-  background: t.$night-soft;
-  border: 1px solid t.$border;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius-lg;
   padding: 26px t.$space-7;
 }
@@ -184,13 +184,13 @@
   justify-content: space-between;
   margin-bottom: t.$space-5;
   padding-bottom: t.$space-4;
-  border-bottom: 1px solid t.$border;
+  border-bottom: 1px solid var(--kp-border);
 }
 
 .mcard-t {
   font-family: t.$font-serif;
   font-size: 22px;
-  color: t.$mint;
+  color: var(--kp-text-1);
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
@@ -199,10 +199,10 @@
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
   padding: 3px 8px;
-  background: rgba(#EFFBDB, 0.05);
-  color: t.$mint-mute;
+  background: var(--kp-surface-2);
+  color: var(--kp-text-2);
   border-radius: 6px;
-  border: 1px solid t.$border;
+  border: 1px solid var(--kp-border);
 }
 
 // ── User card ─────────────────────────────────────────────────────────────────
@@ -217,8 +217,8 @@
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background: t.$olive-bg-2;
-  border: 1px solid t.$olive-line;
+  background: var(--kp-primary-subtle-md);
+  border: 1px solid var(--kp-border-strong);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -228,20 +228,20 @@
   .user-initials {
     font-size: 16px;
     font-weight: 600;
-    color: t.$olive-light;
+    color: var(--kp-primary-hover);
   }
 }
 
 .user-name {
   font-size: t.$text-body;
   font-weight: 600;
-  color: t.$mint;
+  color: var(--kp-text-1);
 }
 
 .user-mail {
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   margin-top: 2px;
 }
 
@@ -259,8 +259,8 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: t.$olive-bg;
-  color: t.$olive;
+  background: var(--kp-primary-subtle);
+  color: var(--kp-primary);
   display: grid;
   place-items: center;
 }
@@ -268,11 +268,11 @@
 .mc-empty-t {
   font-family: t.$font-serif;
   font-size: t.$text-h5;
-  color: t.$mint;
+  color: var(--kp-text-1);
 }
 
 .mc-empty-s {
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-size: t.$text-small;
   line-height: 1.55;
   max-width: 320px;
@@ -283,7 +283,7 @@
   align-items: center;
   gap: t.$space-3;
   font-size: t.$text-body;
-  color: t.$mint;
+  color: var(--kp-text-1);
 }
 
 .btn-primary {
@@ -292,9 +292,9 @@
   gap: t.$space-2;
   padding: 9px 18px;
   border-radius: t.$radius-sm;
-  border: 1px solid t.$olive;
-  background: t.$olive;
-  color: t.$night;
+  border: 1px solid var(--kp-primary);
+  background: var(--kp-primary);
+  color: var(--kp-primary-on);
   font-family: t.$font-sans;
   font-size: t.$text-body;
   font-weight: 600;
@@ -302,7 +302,7 @@
   text-decoration: none;
   transition: background 150ms ease, border-color 150ms ease;
 
-  &:hover { background: t.$olive-light; border-color: t.$olive-light; }
+  &:hover { background: var(--kp-primary-hover); border-color: var(--kp-primary-hover); }
 }
 
 // ── Actions rapides ───────────────────────────────────────────────────────────
@@ -318,9 +318,9 @@
   gap: t.$space-3;
   padding: t.$space-3 t.$space-4;
   border-radius: t.$radius-sm;
-  border: 1px solid t.$border;
+  border: 1px solid var(--kp-border);
   background: transparent;
-  color: t.$mint;
+  color: var(--kp-text-1);
   font-family: t.$font-sans;
   font-size: t.$text-body;
   font-weight: 500;
@@ -328,14 +328,14 @@
   text-decoration: none;
   transition: background 150ms ease, border-color 150ms ease;
 
-  &:hover { background: rgba(#EFFBDB, 0.04); border-color: t.$border-2; }
+  &:hover { background: var(--kp-primary-subtle); border-color: var(--kp-border-strong); }
 
   &.action-btn-primary {
-    background: t.$olive-bg;
-    border-color: t.$olive-line;
-    color: t.$olive-light;
+    background: var(--kp-primary-subtle);
+    border-color: var(--kp-border-strong);
+    color: var(--kp-primary-hover);
 
-    &:hover { background: t.$olive-bg-2; }
+    &:hover { background: var(--kp-primary-subtle-md); }
   }
 }
 
@@ -343,8 +343,8 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: t.$olive-bg;
-  color: t.$olive;
+  background: var(--kp-primary-subtle);
+  color: var(--kp-primary);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -358,8 +358,8 @@
 }
 
 .perf-card {
-  background: t.$night-deep;
-  border: 1px solid t.$border;
+  background: var(--kp-surface-2);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius;
   padding: t.$space-4;
   text-align: center;
@@ -368,12 +368,13 @@
 .perf-lbl {
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: t.$space-2;
 }
 
+// Labels énergie — couleurs sémantiques fixes
 .perf-val {
   font-family: t.$font-serif;
   font-size: 40px;
@@ -392,7 +393,7 @@
 
 .perf-sublbl {
   font-size: t.$text-tiny;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   margin-top: t.$space-2;
 }
 

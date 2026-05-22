@@ -2,8 +2,8 @@
 
 .opt-card {
   position: relative;
-  background: t.$night-soft;
-  border: 1.5px solid t.$border;
+  background: var(--kp-surface-2);
+  border: 1.5px solid var(--kp-border);
   border-radius: 14px;
   padding: 20px 22px;
   cursor: pointer;
@@ -13,16 +13,16 @@
   gap: t.$space-2;
   text-align: left;
   font-family: t.$font-sans;
-  color: t.$mint;
+  color: var(--kp-text-1);
   width: 100%;
 
   &:hover {
-    border-color: t.$border-2;
+    border-color: var(--kp-border-strong);
   }
 
   &.selected {
-    border-color: t.$olive;
-    background: t.$olive-bg;
+    border-color: var(--kp-primary);
+    background: var(--kp-primary-subtle);
   }
 }
 
@@ -30,15 +30,15 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: t.$olive-bg;
-  color: t.$olive;
+  background: var(--kp-primary-subtle);
+  color: var(--kp-primary);
   display: grid;
   place-items: center;
   transition: all 150ms ease;
 
   .selected & {
-    background: t.$olive;
-    color: t.$night;
+    background: var(--kp-primary);
+    color: var(--kp-primary-on);
   }
 }
 
@@ -47,12 +47,12 @@
   font-size: t.$text-h5;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  color: t.$mint;
+  color: var(--kp-text-1);
 }
 
 .opt-card-sub {
   font-size: t.$text-mini;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   line-height: 1.45;
 }
 
@@ -60,7 +60,7 @@
   position: absolute;
   top: 18px;
   right: 18px;
-  color: t.$olive;
+  color: var(--kp-primary);
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────

@@ -1,0 +1,62 @@
+<div class="kp-rail">
+  <div class="kp-rail-glow" aria-hidden="true"></div>
+
+  @if (bien) {
+    <section class="kp-rail-section">
+      <p class="kp-eyebrow">Bien concerné</p>
+      <div class="kp-rail-card">
+        <div class="kp-rail-top">
+          <div class="kp-bien-thumb" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div class="kp-rail-info">
+            <p class="kp-rail-title">{{ bien.titre }}</p>
+            @if (bienSousTitre) {
+              <p class="kp-rail-sub">{{ bienSousTitre }}</p>
+            }
+            @if (bienVille) {
+              <p class="kp-rail-sub">{{ bienVille }}</p>
+            }
+          </div>
+        </div>
+        <div class="kp-rail-rows">
+          <div class="kp-prop-row">
+            <span class="kp-prop-key">Loyer mensuel</span>
+            <span class="kp-prop-val">{{ loyerFormatted }}</span>
+          </div>
+          <div class="kp-prop-row">
+            <span class="kp-prop-key">Référence</span>
+            <span class="kp-prop-val kp-ref">{{ bienRef }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    @if (bien.locataire) {
+      <section class="kp-rail-section">
+        <p class="kp-eyebrow">Locataire</p>
+        <div class="kp-rail-card">
+          <div class="kp-rail-top">
+            <div class="kp-av kp-av-lg tone-olive" aria-hidden="true">{{ locataireInitiales }}</div>
+            <div class="kp-rail-info" style="justify-content: center;">
+              <p class="kp-rail-title">{{ locataireName }}</p>
+            </div>
+          </div>
+          @if (locataireEmail) {
+            <div class="kp-sep"></div>
+            <div class="kp-rail-rows">
+              <div class="kp-prop-row">
+                <span class="kp-prop-key">Email</span>
+                <span class="kp-prop-val kp-ref">{{ locataireEmail }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

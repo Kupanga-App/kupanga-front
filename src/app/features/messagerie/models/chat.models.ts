@@ -33,6 +33,10 @@ export interface ConversationDTO {
   bienTitre: string;
   emailExpediteur: string;
   emailDestinataire: string;
+  expediteurName: string;
+  destinataireName: string;
+  expediteurPhotoUrl: string;
+  destinatairePhotoUrl: string;
   lastMessage: string;
   lastMessageAt: string;
   createdAt: string;

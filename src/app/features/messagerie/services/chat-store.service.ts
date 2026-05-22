@@ -18,6 +18,9 @@ export class ChatStoreService {
   /** Email de l'interlocuteur actuellement affiché dans la vue conversation. */
   activeConvEmail = signal<string | null>(null);
 
+  /** Noms résolus depuis l'historique des messages : email → nom complet. */
+  resolvedNames = signal<Map<string, string>>(new Map());
+
   loadUnreadCount(): void {
     console.log('[ChatStore] loadUnreadCount() appelé');
     this.chatService.getNonLusCount().subscribe({
@@ -98,5 +101,10 @@ export class ChatStoreService {
 
   resetMessages(): void {
     this.messages.set([]);
+  }
+
+  setResolvedName(email: string, nom: string): void {
+    if (!email || !nom) return;
+    this.resolvedNames.update((m) => new Map(m).set(email, nom));
   }
 }
