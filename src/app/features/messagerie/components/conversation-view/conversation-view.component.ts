@@ -147,10 +147,20 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   }
 
   private marquerLus(): void {
+    const conv = this.store.conversations().find(
+      (c) =>
+        c.bienId === this.bienId &&
+        (c.emailExpediteur === this.emailInterlocuteur ||
+          c.emailDestinataire === this.emailInterlocuteur)
+    );
+    const nonLuCount = conv?.nonLuCount ?? 0;
+
     this.chatService.marquerLus(this.emailInterlocuteur).subscribe({
       next: () => {
         this.store.markConversationAsRead(this.bienId, this.emailInterlocuteur);
-        this.store.loadUnreadCount();
+        if (nonLuCount > 0) {
+          this.store.decrementUnread(nonLuCount);
+        }
       },
       error: () => {},
     });
@@ -162,7 +172,8 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   }
 
   private belongsToCurrentConv(msg: MessageDTO): boolean {
-    if (msg.bienId !== this.bienId) return false;
+    // bienId may be absent from the WS payload — skip the check when null/undefined
+    if (msg.bienId != null && msg.bienId !== this.bienId) return false;
     const myEmail = this.myEmail;
     return (
       (msg.expediteurEmail === myEmail && msg.destinataireEmail === this.emailInterlocuteur) ||

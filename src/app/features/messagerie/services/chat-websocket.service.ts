@@ -1,5 +1,5 @@
 import { Injectable, inject, OnDestroy, effect } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, firstValueFrom } from 'rxjs';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { AuthService } from '../../../core/auth/services/auth.service';
@@ -46,6 +46,18 @@ export class ChatWebSocketService implements OnDestroy {
       webSocketFactory: () => new SockJS(`${environment.apiUrl}/ws`) as WebSocket,
       connectHeaders: { Authorization: `Bearer ${token}` },
       reconnectDelay: 5000,
+      beforeConnect: async () => {
+        try {
+          await firstValueFrom(this.authService.refreshToken());
+        } catch {
+          // Refresh failed — STOMP will attempt with the current token
+        }
+        if (this.stompClient) {
+          this.stompClient.connectHeaders = {
+            Authorization: `Bearer ${this.authService.getAccessToken() ?? token}`,
+          };
+        }
+      },
       onConnect: () => {
         this.isConnected = true;
         this.connectedSubject.next(true);
