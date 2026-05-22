@@ -56,13 +56,13 @@
   font-family: var(--kp-font);
   font-size: 13px;
   font-weight: 500;
-  color: #EFFBDB;
+  color: var(--kp-text-1);
   margin-bottom: 6px;
   line-height: 1;
   letter-spacing: 0.01em;
 }
 
 .kp-req {
-  color: #8FA464;
+  color: var(--kp-primary);
   margin-left: 3px;
 }

@@ -29,6 +29,7 @@ export class MessageInputComponent {
   @Input({ required: true }) emailDestinataire!: string;
   @Input({ required: true }) bienId!: number;
   @Input() wsConnected = false;
+  @Input() interlocuteurNom = '';
   @Output() messageSent = new EventEmitter<MessageDTO>();
 
   private authService = inject(AuthService);

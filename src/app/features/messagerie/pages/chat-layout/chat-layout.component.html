@@ -1,27 +1,51 @@
 <div class="kp-chat-page">
-  <!-- Colonne gauche : liste des conversations -->
-  <aside class="kp-chat-sidebar" [class.kp-mobile-hidden]="showView()">
+  <!-- Colonne 1 — Liste des conversations -->
+  <aside class="kp-chat-col-list" [class.kp-mobile-hidden]="showView()">
     <kp-conversation-list
       [selectedConvId]="selectedConvId()"
       (conversationSelected)="onConversationSelected($event)"
     />
   </aside>
 
-  <!-- Colonne droite : vue conversation ou état vide -->
-  <main class="kp-chat-main" [class.kp-mobile-hidden]="!showView()">
+  <!-- Colonne 2 — Fil de conversation ou état vide -->
+  <main class="kp-chat-col-conv" [class.kp-mobile-hidden]="!showView()">
     @if (showView()) {
       <kp-conversation-view
         [bienId]="viewBienId()"
         [emailInterlocuteur]="viewInterlocuteur()"
         [titre]="viewTitre()"
+        [photoUrl]="viewPhotoUrl()"
         (backRequested)="onBackToList()"
         (sent)="onMessageSentInConv($event)"
+        (nameResolved)="onNomResolved($event)"
       />
     } @else {
-      <div class="kp-chat-empty">
-        <mat-icon>chat_bubble_outline</mat-icon>
-        <p class="kp-text-body">Sélectionnez une conversation pour commencer</p>
+      <div class="kp-chat-empty-state">
+        <div class="kp-empty-glow" aria-hidden="true"></div>
+        <div class="kp-empty-content">
+          <div class="kp-empty-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <h2 class="kp-empty-title">
+            <em>Sélectionnez</em> une conversation
+          </h2>
+          <p class="kp-empty-body">
+            Choisissez un échange dans la liste à gauche pour le lire ici.
+            Le contexte du bien s'affichera à droite.
+          </p>
+        </div>
       </div>
     }
   </main>
+
+  <!-- Colonne 3 — Contexte du bien (right rail) -->
+  <aside class="kp-chat-col-rail">
+    <kp-chat-context-rail
+      [bien]="bienContext()"
+      [interlocuteurNom]="interlocuteurNom()"
+    />
+  </aside>
 </div>

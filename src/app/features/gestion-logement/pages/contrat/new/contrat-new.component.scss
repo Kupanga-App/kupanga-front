@@ -12,7 +12,7 @@
 }
 
 .kp-skel {
-  background: linear-gradient(90deg, t.$night-mid 25%, t.$night-soft 50%, t.$night-mid 75%);
+  background: linear-gradient(90deg, var(--kp-surface) 25%, var(--kp-surface-3) 50%, var(--kp-surface) 75%);
   background-size: 200% 100%;
   animation: skel 1.6s ease-in-out infinite;
   display: block;
@@ -27,14 +27,14 @@
   border-radius: t.$radius-sm;
   border: none;
   background: transparent;
-  color: t.$mint;
+  color: var(--kp-text-1);
   font-family: t.$font-sans;
   font-size: t.$text-body;
   font-weight: 500;
   cursor: pointer;
   transition: background 150ms ease, color 150ms ease;
 
-  &:hover { background: t.$olive-bg; color: t.$olive-light; }
+  &:hover { background: var(--kp-primary-subtle); color: var(--kp-primary-hover); }
 }
 
 // ── Flow heading ─────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@
   font-family: t.$font-mono;
   font-size: 11.5px;
   letter-spacing: 0.1em;
-  color: t.$olive;
+  color: var(--kp-primary);
   text-transform: uppercase;
   margin-bottom: t.$space-3;
 }
@@ -54,17 +54,17 @@
   font-size: t.$text-h1;
   line-height: 1.05;
   letter-spacing: -0.02em;
-  color: t.$mint;
+  color: var(--kp-text-1);
   margin-bottom: t.$space-2;
 
-  em { font-style: italic; color: t.$olive; }
+  em { font-style: italic; color: var(--kp-primary); }
 }
 
 .flow-sub {
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-size: 15px;
   line-height: 1.55;
-  strong { color: t.$mint; font-weight: 500; }
+  strong { color: var(--kp-text-1); font-weight: 500; }
 }
 
 // ── Wizard layout ────────────────────────────────────────────────────────────
@@ -79,8 +79,8 @@
 
 // ── Wcard ────────────────────────────────────────────────────────────────────
 .wcard {
-  background: t.$night-mid;
-  border: 1px solid t.$border;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius-lg;
   padding: t.$space-8 36px;
 }
@@ -88,13 +88,13 @@
 .wcard-h {
   margin-bottom: t.$space-2;
   padding-bottom: t.$space-2;
-  border-bottom: 1px solid t.$border;
+  border-bottom: 1px solid var(--kp-border);
 
   .eyebrow {
     font-family: t.$font-mono;
     font-size: t.$text-tiny;
     letter-spacing: 0.08em;
-    color: t.$mint-mute;
+    color: var(--kp-text-2);
     text-transform: uppercase;
     margin-bottom: t.$space-2;
   }
@@ -104,12 +104,12 @@
     font-size: t.$text-h2;
     line-height: 1.05;
     letter-spacing: -0.01em;
-    color: t.$mint;
+    color: var(--kp-text-1);
     margin-bottom: 6px;
-    em { font-style: italic; color: t.$olive; }
+    em { font-style: italic; color: var(--kp-primary); }
   }
 
-  .s { color: t.$mint-mute; font-size: t.$text-body; line-height: 1.5; }
+  .s { color: var(--kp-text-2); font-size: t.$text-body; line-height: 1.5; }
 }
 
 .wsection {
@@ -121,14 +121,14 @@
   font-family: t.$font-mono;
   font-size: 10.5px;
   letter-spacing: 0.1em;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   text-transform: uppercase;
   margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: t.$space-2;
 
-  &::before { content: ""; width: 24px; height: 1px; background: t.$olive; }
+  &::before { content: ""; width: 24px; height: 1px; background: var(--kp-primary); }
 }
 
 .mt16 { margin-top: t.$space-4; }
@@ -159,12 +159,12 @@
   margin: t.$space-6 0;
   gap: 14px;
 
-  &::before, &::after { content: ""; flex: 1; height: 1px; background: t.$border; }
+  &::before, &::after { content: ""; flex: 1; height: 1px; background: var(--kp-border); }
 
   span {
     font-family: t.$font-mono;
     font-size: t.$text-tiny;
-    color: t.$mint-mute;
+    color: var(--kp-text-2);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
@@ -174,25 +174,25 @@
   display: flex;
   align-items: center;
   gap: t.$space-3;
-  background: t.$night-soft;
-  border: 1.5px solid t.$border;
+  background: var(--kp-surface-2);
+  border: 1.5px solid var(--kp-border);
   border-radius: t.$radius;
   padding: 14px t.$space-5;
   cursor: pointer;
   font-family: t.$font-sans;
   font-size: t.$text-small;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   transition: all 150ms ease;
   width: 100%;
 
-  &:hover { border-color: t.$border-2; color: t.$mint; }
+  &:hover { border-color: var(--kp-border-strong); color: var(--kp-text-1); }
 
   &.on {
-    border-color: t.$olive;
-    background: t.$olive-bg;
-    color: t.$mint;
+    border-color: var(--kp-primary);
+    background: var(--kp-primary-subtle);
+    color: var(--kp-text-1);
 
-    .sans-bail-check { background: t.$olive; border-color: t.$olive; color: t.$night; }
+    .sans-bail-check { background: var(--kp-primary); border-color: var(--kp-primary); color: var(--kp-primary-on); }
   }
 }
 
@@ -200,7 +200,7 @@
   width: 20px;
   height: 20px;
   border-radius: 5px;
-  border: 1.5px solid t.$border-2;
+  border: 1.5px solid var(--kp-border-strong);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -213,8 +213,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: t.$olive-bg;
-  border: 1px solid t.$olive-line;
+  background: var(--kp-primary-subtle);
+  border: 1px solid var(--kp-border-strong);
   border-radius: 10px;
   padding: 0 14px;
   gap: 4px;
@@ -223,7 +223,7 @@
 .total-lbl {
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
-  color: t.$olive-light;
+  color: var(--kp-primary-hover);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -231,7 +231,7 @@
 .total-val {
   font-family: t.$font-serif;
   font-size: t.$text-h4;
-  color: t.$mint;
+  color: var(--kp-text-1);
   font-variant-numeric: tabular-nums;
 }
 
@@ -251,21 +251,21 @@
   border-radius: t.$radius-sm;
   transition: background 150ms ease;
 
-  &:hover { background: t.$night-soft; }
+  &:hover { background: var(--kp-surface-2); }
 }
 
-.recap-check { color: t.$olive; }
+.recap-check { color: var(--kp-primary); }
 
 .recap-k {
   font-size: t.$text-small;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-weight: 500;
 }
 
 .recap-v {
   font-family: t.$font-mono;
   font-size: t.$text-small;
-  color: t.$mint;
+  color: var(--kp-text-1);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -282,15 +282,15 @@
   align-items: center;
   gap: t.$space-3;
   padding: 12px t.$space-5;
-  background: t.$night-soft;
-  border: 1.5px solid t.$border;
+  background: var(--kp-surface-2);
+  border: 1.5px solid var(--kp-border);
   border-radius: t.$radius;
 
   &.on {
-    border-color: t.$olive;
-    background: t.$olive-bg;
+    border-color: var(--kp-primary);
+    background: var(--kp-primary-subtle);
 
-    .send-check { background: t.$olive; border-color: t.$olive; color: t.$night; }
+    .send-check { background: var(--kp-primary); border-color: var(--kp-primary); color: var(--kp-primary-on); }
   }
 }
 
@@ -298,7 +298,7 @@
   width: 20px;
   height: 20px;
   border-radius: 5px;
-  border: 1.5px solid t.$border-2;
+  border: 1.5px solid var(--kp-border-strong);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -309,7 +309,7 @@
 .send-lbl {
   font-size: t.$text-small;
   font-weight: 500;
-  color: t.$mint;
+  color: var(--kp-text-1);
 }
 
 // ── Footer ───────────────────────────────────────────────────────────────────
@@ -325,21 +325,21 @@
 .wfoot-hint {
   font-family: t.$font-mono;
   font-size: 11.5px;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   display: inline-flex;
   align-items: center;
   gap: 6px;
 
-  kp-icon { color: t.$olive; }
+  kp-icon { color: var(--kp-primary); }
 }
 
 .btn {
   height: 38px;
   padding: 0 t.$space-4;
   border-radius: 9px;
-  border: 1px solid t.$border-2;
+  border: 1px solid var(--kp-border-strong);
   background: transparent;
-  color: t.$mint;
+  color: var(--kp-text-1);
   font-family: t.$font-sans;
   font-size: t.$text-small;
   font-weight: 500;
@@ -349,15 +349,15 @@
   gap: t.$space-2;
   transition: all 150ms ease;
 
-  &:hover { background: rgba(#EFFBDB, 0.04); border-color: t.$mint-mute; }
+  &:hover { background: var(--kp-primary-subtle); border-color: var(--kp-text-2); }
 
   &.primary {
-    background: t.$olive;
-    border-color: t.$olive;
-    color: t.$night;
+    background: var(--kp-primary);
+    border-color: var(--kp-primary);
+    color: var(--kp-primary-on);
     font-weight: 600;
 
-    &:hover { background: t.$olive-light; border-color: t.$olive-light; }
+    &:hover { background: var(--kp-primary-hover); border-color: var(--kp-primary-hover); }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
 }
@@ -419,13 +419,13 @@
       grid-column: 2;
       text-align: left;
       font-size: t.$text-tiny;
-      color: t.$olive-light;
+      color: var(--kp-primary-hover);
       margin-top: 2px;
     }
   }
 }
 
-// ── Paper content styles ──────────────────────────────────────────────────────
+// ── Paper content styles — document imprimé, fond blanc intentionnel ──────────
 .paper-h {
   text-align: center;
   border-bottom: 2px solid t.$night;

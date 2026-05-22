@@ -7,7 +7,7 @@
   <kp-chat-notification />
 
   <!-- Main Content Area -->
-  <main class="db-container">
+  <main class="db-container" [class.db-container--full]="isMessagerie()">
     <router-outlet></router-outlet>
   </main>
 </div>

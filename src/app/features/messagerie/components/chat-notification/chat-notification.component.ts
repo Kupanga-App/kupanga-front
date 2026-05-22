@@ -22,9 +22,10 @@ export class ChatNotificationComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
   constructor() {
+    // Reactive: fires when user logs in during an active session
+    // (e.g. user on public page, then logs in without full reload)
     effect(() => {
       const user = this.authService.currentUser();
-      console.log('[ChatNotif] effect user =', user?.email ?? null);
       if (user) {
         this.store.loadUnreadCount();
       }
@@ -32,6 +33,12 @@ export class ChatNotificationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Safety net: the effect's first run is async (scheduled for next CD cycle).
+    // If currentUser was already set before this component was created
+    // (login flow, page refresh), call loadUnreadCount() immediately here.
+    if (this.authService.currentUser()) {
+      this.store.loadUnreadCount();
+    }
 
     this.subs.add(
       this.ws.notifications$.subscribe((notif) => {

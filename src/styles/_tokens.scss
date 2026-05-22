@@ -108,7 +108,9 @@ $font-display: $font-serif;
   --kp-text-1:                #EFFBDB;
   --kp-text-2:                rgba(239, 251, 219, 0.80);
   --kp-text-3:                rgba(239, 251, 219, 0.55);
+  --kp-text-4:                rgba(239, 251, 219, 0.35);
   --kp-text-invert:           #10212B;
+  --kp-surface-input:         rgba(16, 33, 43, 0.60);
 
   // === Sémantique ===
   --kp-success:               #8FA464;
@@ -185,16 +187,18 @@ $font-display: $font-serif;
   --kp-primary-on:            #EFFBDB;
 
   --kp-bg:                    #EFFBDB;
-  --kp-surface:               #F7FDE9;
-  --kp-surface-2:             #EFFBDB;
-  --kp-surface-3:             #E4F5CC;
-  --kp-border:                rgba(107, 124, 75, 0.18);
-  --kp-border-strong:         rgba(107, 124, 75, 0.32);
+  --kp-surface:               #FFFFFF;
+  --kp-surface-2:             #F2FAE4;
+  --kp-surface-3:             #E5F5CC;
+  --kp-border:                rgba(107, 124, 75, 0.20);
+  --kp-border-strong:         rgba(107, 124, 75, 0.35);
 
   --kp-text-1:                #10212B;
   --kp-text-2:                rgba(16, 33, 43, 0.65);
   --kp-text-3:                rgba(16, 33, 43, 0.40);
+  --kp-text-4:                rgba(16, 33, 43, 0.28);
   --kp-text-invert:           #EFFBDB;
+  --kp-surface-input:         rgba(255, 255, 255, 0.85);
 
   --kp-success:               #6B7C4B;
   --kp-success-subtle:        rgba(107, 124, 75, 0.12);

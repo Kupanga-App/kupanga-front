@@ -10,14 +10,13 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatButtonModule } from '@angular/material/button';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ChatService } from '../../services/chat.service';
 import { ChatStoreService } from '../../services/chat-store.service';
 import { ChatWebSocketService } from '../../services/chat-websocket.service';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ConversationDTO } from '../../models/chat.models';
 
 @Component({
@@ -27,9 +26,7 @@ import { ConversationDTO } from '../../models/chat.models';
     CommonModule,
     DatePipe,
     ReactiveFormsModule,
-    MatIconModule,
     MatProgressSpinnerModule,
-    MatButtonModule,
   ],
   templateUrl: './conversation-list.component.html',
   styleUrls: ['./conversation-list.component.scss'],
@@ -41,12 +38,17 @@ export class ConversationListComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   protected store = inject(ChatStoreService);
   private ws = inject(ChatWebSocketService);
+  private auth = inject(AuthService);
 
   searchControl = new FormControl('');
   filter = signal<'all' | 'unread'>('all');
 
   private searchSubject = new Subject<string>();
   private subs = new Subscription();
+
+  private get myEmail(): string {
+    return this.auth.currentUser()?.email ?? '';
+  }
 
   ngOnInit(): void {
     this.store.loadUnreadCount();
@@ -128,8 +130,56 @@ export class ConversationListComponent implements OnInit, OnDestroy {
     this.conversationSelected.emit(conv);
   }
 
-  interlocuteurInitiale(conv: ConversationDTO): string {
-    const email = conv.emailDestinataire || conv.emailExpediteur;
-    return email.charAt(0).toUpperCase();
+  interlocuteurEmail(conv: ConversationDTO): string {
+    return conv.emailExpediteur === this.myEmail
+      ? conv.emailDestinataire
+      : conv.emailExpediteur;
+  }
+
+  interlocuteurInitiales(conv: ConversationDTO): string {
+    const nom = this.interlocuteurNom(conv);
+    const parts = nom.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return ((parts[0][0] ?? '') + (parts[1][0] ?? '')).toUpperCase();
+    }
+    return nom.substring(0, 2).toUpperCase();
+  }
+
+  interlocuteurNom(conv: ConversationDTO): string {
+    const myEmail = this.myEmail;
+
+    // 1. Champs directs du backend (expediteurName / destinataireName)
+    const nomFromSearch =
+      conv.emailExpediteur === myEmail ? conv.destinataireName : conv.expediteurName;
+    if (nomFromSearch) return nomFromSearch;
+
+    // 2. Nom résolu depuis l'historique (chargé à la première ouverture)
+    const email = this.interlocuteurEmail(conv);
+    const resolved = this.store.resolvedNames().get(email);
+    if (resolved) return resolved;
+
+    // 3. Fallback dérivé de l'email
+    const local = email.split('@')[0];
+    return local
+      .split(/[._-]/)
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(' ');
+  }
+
+  interlocuteurPhotoUrl(conv: ConversationDTO): string {
+    const myEmail = this.myEmail;
+    return conv.emailExpediteur === myEmail
+      ? conv.destinatairePhotoUrl
+      : conv.expediteurPhotoUrl;
+  }
+
+  private readonly TONES = [
+    'tone-olive', 'tone-clay', 'tone-sand',
+    'tone-slate', 'tone-mint', 'tone-night',
+  ] as const;
+
+  toneClass(email: string): string {
+    const hash = email.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return this.TONES[hash % this.TONES.length];
   }
 }

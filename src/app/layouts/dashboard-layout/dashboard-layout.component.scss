@@ -18,4 +18,10 @@
   @media (min-width: 1280px) {
     max-width: 1280px;
   }
+
+  &--full {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
 }

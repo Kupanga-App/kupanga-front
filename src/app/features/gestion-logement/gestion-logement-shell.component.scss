@@ -15,14 +15,14 @@
   border-radius: t.$radius-sm;
   border: none;
   background: transparent;
-  color: t.$mint;
+  color: var(--kp-text-1);
   font-family: t.$font-sans;
   font-size: t.$text-body;
   font-weight: 500;
   cursor: pointer;
   transition: background 150ms ease, color 150ms ease;
 
-  &:hover { background: t.$olive-bg; color: t.$olive-light; }
+  &:hover { background: var(--kp-primary-subtle); color: var(--kp-primary-hover); }
 }
 
 // ── Loading / Erreur ──────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@
 }
 
 .kp-skel {
-  background: linear-gradient(90deg, t.$night-mid 25%, t.$night-soft 50%, t.$night-mid 75%);
+  background: linear-gradient(90deg, var(--kp-surface) 25%, var(--kp-surface-3) 50%, var(--kp-surface) 75%);
   background-size: 200% 100%;
   animation: skel 1.6s ease-in-out infinite;
   display: block;
@@ -46,15 +46,15 @@
   align-items: center;
   gap: t.$space-4;
   padding: t.$space-12;
-  color: t.$red;
+  color: var(--kp-danger);
   font-size: t.$text-large;
   font-weight: 500;
 }
 
 // ── Hero card ─────────────────────────────────────────────────────────────────
 .manage-hero {
-  background: t.$night-mid;
-  border: 1px solid t.$border;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius-lg;
   padding: 22px t.$space-7;
   display: grid;
@@ -69,7 +69,7 @@
   height: 84px;
   border-radius: 14px;
   overflow: hidden;
-  background: t.$night-soft;
+  background: var(--kp-surface-2);
   position: relative;
   flex-shrink: 0;
 
@@ -80,17 +80,18 @@
     height: 100%;
     display: grid;
     place-items: center;
-    color: t.$mint-dim;
+    color: var(--kp-text-3);
   }
 }
 
+// Overlay sur miniature photo — reste sombre quel que soit le thème
 .ph-count {
   position: absolute;
   bottom: 6px;
   right: 6px;
   background: rgba(16, 33, 43, 0.85);
   backdrop-filter: blur(4px);
-  color: t.$mint;
+  color: #EFFBDB;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: t.$text-tiny;
@@ -101,20 +102,20 @@
 
 .m-crumb {
   font-size: t.$text-mini;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   display: flex;
   align-items: center;
   gap: 6px;
   margin-bottom: 6px;
 
-  kp-icon { color: t.$mint-fade; }
-  b { color: t.$mint; font-weight: 500; }
+  kp-icon { color: var(--kp-text-4); }
+  b { color: var(--kp-text-1); font-weight: 500; }
 }
 
 .m-title {
   font-family: t.$font-serif;
   font-size: t.$text-h2;
-  color: t.$mint;
+  color: var(--kp-text-1);
   line-height: 1.05;
   letter-spacing: -0.01em;
   display: flex;
@@ -126,16 +127,16 @@
 .ref-tag {
   font-family: t.$font-mono;
   font-size: t.$text-tiny;
-  color: t.$olive-light;
-  background: t.$olive-bg;
-  border: 1px solid t.$olive-line;
+  color: var(--kp-primary-hover);
+  background: var(--kp-primary-subtle);
+  border: 1px solid var(--kp-border-strong);
   padding: 3px 8px;
   border-radius: 5px;
 }
 
 .m-meta {
   margin-top: t.$space-2;
-  color: t.$mint-mute;
+  color: var(--kp-text-2);
   font-size: t.$text-small;
   display: flex;
   align-items: center;
@@ -148,10 +149,10 @@
   align-items: center;
   gap: 6px;
 
-  kp-icon { color: t.$olive; }
+  kp-icon { color: var(--kp-primary); }
 }
 
-.sep { color: t.$mint-fade; }
+.sep { color: var(--kp-text-4); }
 
 .m-status-col {
   display: flex;
@@ -176,30 +177,30 @@
   .dot { width: 6px; height: 6px; border-radius: 50%; }
 
   &-olive {
-    background: t.$olive-bg;
-    border: 1px solid t.$olive-line;
-    color: t.$olive-light;
-    .dot { background: t.$olive; }
+    background: var(--kp-primary-subtle);
+    border: 1px solid var(--kp-border-strong);
+    color: var(--kp-primary-hover);
+    .dot { background: var(--kp-primary); }
   }
 
   &-amber {
-    background: t.$amber-bg;
-    border: 1px solid rgba(#E8B962, 0.32);
-    color: t.$amber;
-    .dot { background: t.$amber; }
+    background: var(--kp-warning-subtle);
+    border: 1px solid var(--kp-warning);
+    color: var(--kp-warning-text);
+    .dot { background: var(--kp-warning); }
   }
 
   &-ghost {
-    background: rgba(#EFFBDB, 0.04);
-    border: 1px solid t.$border;
-    color: t.$mint-mute;
+    background: var(--kp-surface-2);
+    border: 1px solid var(--kp-border);
+    color: var(--kp-text-2);
   }
 }
 
 // ── Onglets ───────────────────────────────────────────────────────────────────
 .manage-tabs {
-  background: t.$night-mid;
-  border: 1px solid t.$border;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
   border-radius: t.$radius-lg;
   overflow: hidden;
 }
@@ -217,8 +218,8 @@
   font-size: t.$text-tiny;
   padding: 2px 7px;
   border-radius: t.$radius-pill;
-  background: rgba(#EFFBDB, 0.05);
-  color: t.$mint-mute;
+  background: var(--kp-surface-2);
+  color: var(--kp-text-2);
 }
 
 ::ng-deep .mat-mdc-tab-body-wrapper {
@@ -233,7 +234,6 @@
     overflow: visible;
   }
 }
-
 
 // ── Responsive ────────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
@@ -250,7 +250,6 @@
     flex-direction: row;
     align-items: center;
   }
-
 }
 
 @media (max-width: 480px) {

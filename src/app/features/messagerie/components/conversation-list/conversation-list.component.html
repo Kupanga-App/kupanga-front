@@ -1,43 +1,59 @@
 <div class="kp-conv-list">
-  <!-- Barre de recherche -->
-  <div class="kp-conv-search">
-    <div class="kp-search-input">
-      <mat-icon>search</mat-icon>
+  <!-- Header -->
+  <div class="kp-conv-header-block">
+    <p class="kp-eyebrow">Messagerie</p>
+    <h1 class="kp-conv-title">Conversations</h1>
+  </div>
+
+  <!-- Recherche -->
+  <div class="kp-conv-search-wrap">
+    <div class="kp-search-box">
+      <svg class="kp-search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
       <input
-        [formControl]="searchControl"
-        placeholder="Rechercher un bien…"
         class="kp-search-field"
+        [formControl]="searchControl"
+        placeholder="Rechercher…"
+        aria-label="Rechercher une conversation"
       />
     </div>
   </div>
 
-  <!-- Filtres -->
-  <div class="kp-conv-filters">
+  <!-- Chips de filtre -->
+  <div class="kp-conv-chips">
     <button
-      class="kp-conv-filter-btn"
+      class="kp-chip"
       [class.active]="filter() === 'all'"
       (click)="setFilter('all')"
     >
-      Tous
+      Toutes
+      <span class="kp-chip-count">{{ store.conversations().length }}</span>
     </button>
     <button
-      class="kp-conv-filter-btn"
+      class="kp-chip"
       [class.active]="filter() === 'unread'"
       (click)="setFilter('unread')"
     >
-      Non lus
+      Non lues
+      @if (store.unreadTotal() > 0) {
+        <span class="kp-chip-count">{{ store.unreadTotal() }}</span>
+      }
     </button>
   </div>
+
+  <div class="kp-conv-sep"></div>
 
   <!-- Liste -->
   <div class="kp-conv-items">
     @if (store.isLoadingConversations() && store.conversations().length === 0) {
       <div class="kp-conv-loading">
-        <mat-spinner diameter="32" />
+        <mat-spinner diameter="24" />
       </div>
     } @else if (store.conversations().length === 0) {
       <div class="kp-conv-empty">
-        <mat-icon>inbox</mat-icon>
         <p>Aucune conversation</p>
       </div>
     } @else {
@@ -45,22 +61,34 @@
         <div
           class="kp-conv-item"
           [class.active]="conv.id === selectedConvId"
+          [class.unread]="conv.nonLuCount > 0"
           (click)="select(conv)"
           role="button"
-          [attr.aria-label]="'Conversation : ' + conv.bienTitre"
+          [attr.aria-label]="'Conversation avec ' + interlocuteurNom(conv)"
         >
-          <div class="kp-conv-avatar">{{ interlocuteurInitiale(conv) }}</div>
+          <div
+            class="kp-av"
+            [ngClass]="interlocuteurPhotoUrl(conv) ? '' : toneClass(interlocuteurEmail(conv))"
+            aria-hidden="true"
+          >
+            @if (interlocuteurPhotoUrl(conv)) {
+              <img class="kp-av-img" [src]="interlocuteurPhotoUrl(conv)" [alt]="interlocuteurNom(conv)" />
+            } @else {
+              {{ interlocuteurInitiales(conv) }}
+            }
+          </div>
           <div class="kp-conv-body">
-            <div class="kp-conv-header">
-              <span class="kp-conv-name">{{ conv.bienTitre }}</span>
-              <span class="kp-conv-time">
-                {{ conv.lastMessageAt | date: 'HH:mm' }}
-              </span>
+            <div class="kp-conv-row1">
+              <span class="kp-conv-name">{{ interlocuteurNom(conv) }}</span>
+              <span class="kp-conv-time">{{ conv.lastMessageAt | date: 'HH:mm' }}</span>
             </div>
-            <div class="kp-conv-preview">
-              <span class="kp-conv-last">{{ conv.lastMessage }}</span>
+            <div class="kp-conv-row2">{{ conv.bienTitre }}</div>
+            <div class="kp-conv-row3">
+              <span class="kp-conv-preview">{{ conv.lastMessage }}</span>
               @if (conv.nonLuCount > 0) {
-                <span class="kp-badge-count">{{ conv.nonLuCount }}</span>
+                <span class="kp-unread-badge" aria-label="{{ conv.nonLuCount }} messages non lus">
+                  {{ conv.nonLuCount }}
+                </span>
               }
             </div>
           </div>
@@ -69,10 +97,11 @@
 
       @if (store.hasMorePages()) {
         <div class="kp-conv-more">
-          <button mat-stroked-button (click)="loadMore()" [disabled]="store.isLoadingConversations()">
-            @if (store.isLoadingConversations()) {
-              <mat-spinner diameter="16" />
-            }
+          <button
+            class="kp-load-more"
+            (click)="loadMore()"
+            [disabled]="store.isLoadingConversations()"
+          >
             Voir plus
           </button>
         </div>

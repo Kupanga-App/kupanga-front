@@ -1,65 +1,105 @@
 <div class="kp-view">
+
   <!-- En-tête -->
   <div class="kp-view-header">
-    <button mat-icon-button class="kp-back-btn" (click)="backRequested.emit()" aria-label="Retour">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div class="kp-view-avatar">{{ interlocuteurInitiale }}</div>
-    <div class="kp-view-header-info">
-      <div class="kp-view-header-name">{{ titre || emailInterlocuteur }}</div>
-      <div class="kp-view-header-sub">{{ emailInterlocuteur }}</div>
+    <div class="kp-header-left">
+      <div class="kp-av kp-av-lg" [ngClass]="photoUrl ? '' : headerToneClass" aria-hidden="true">
+        @if (photoUrl) {
+          <img class="kp-av-img" [src]="photoUrl" [alt]="displayNom" />
+        } @else {
+          {{ headerInitiales }}
+        }
+      </div>
+      <div class="kp-header-info">
+        <div class="kp-header-name">{{ displayNom }}</div>
+        <div class="kp-header-sub">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>{{ titre || emailInterlocuteur }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="kp-header-actions">
+      <button class="kp-ico-btn" aria-label="Retour à la liste" (click)="backRequested.emit()" title="Retour">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button class="kp-ico-btn" aria-label="Informations">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </button>
+      <button class="kp-ico-btn" aria-label="Plus d'options">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </button>
     </div>
   </div>
 
   <!-- Bandeau reconnexion -->
   @if (!wsConnected()) {
     <div class="kp-reconnect-banner">
-      <mat-icon>wifi_off</mat-icon>
+      <mat-icon aria-hidden="true">wifi_off</mat-icon>
       Reconnexion en cours…
     </div>
   }
 
-  <!-- Messages -->
+  <!-- Fil de messages -->
   <div class="kp-view-messages" #messagesEl>
     @if (loading()) {
       <div class="kp-view-loading">
-        <mat-spinner diameter="32" />
+        <mat-spinner diameter="28" />
       </div>
     } @else if (loadError()) {
-      <div class="kp-view-empty">
-        <mat-icon>error_outline</mat-icon>
+      <div class="kp-view-error">
         <p>Impossible de charger les messages.</p>
-        <button mat-stroked-button (click)="reloadHistorique()">Réessayer</button>
+        <button class="kp-retry-btn" (click)="reloadHistorique()">Réessayer</button>
+      </div>
+    } @else if (messages().length === 0) {
+      <div class="kp-view-no-msgs">
+        <p>Démarrez la conversation !</p>
       </div>
     } @else {
-      @for (msg of messages(); track msg.id) {
-        <div class="kp-msg-row" [class.kp-msg-mine]="isMine(msg)">
-          <div class="kp-msg-bubble">
-            <p class="kp-msg-content">{{ msg.contenu }}</p>
-            <div class="kp-msg-meta">
-              <span class="kp-msg-time">{{ msg.createdAt | date: 'HH:mm' }}</span>
-              @if (isMine(msg) && msg.lu) {
-                <mat-icon class="kp-msg-read">done_all</mat-icon>
-              }
+      @for (group of dayGroups(); track group.label) {
+        <div class="kp-day-sep" role="separator">
+          <span class="kp-day-sep-text">{{ group.label }}</span>
+        </div>
+        @for (msg of group.messages; track msg.id) {
+          <div class="kp-msg-row" [class.kp-msg-mine]="isMine(msg)">
+            <div class="kp-bubble" [class.mine]="isMine(msg)" [class.theirs]="!isMine(msg)">
+              <p class="kp-bubble-text">{{ msg.contenu }}</p>
+              <div class="kp-bubble-foot">
+                <span class="kp-bubble-time">{{ msg.createdAt | date: 'HH:mm' }}</span>
+                @if (isMine(msg)) {
+                  <span class="kp-receipt" [class.read]="msg.lu" [class.sent]="!msg.lu"
+                        aria-hidden="true">
+                    {{ msg.lu ? '✓✓' : '✓' }}
+                  </span>
+                }
+              </div>
             </div>
           </div>
-        </div>
-      }
-
-      @if (messages().length === 0) {
-        <div class="kp-view-empty">
-          <mat-icon>chat</mat-icon>
-          <p>Démarrez la conversation !</p>
-        </div>
+        }
       }
     }
   </div>
 
-  <!-- Saisie -->
+  <!-- Composer -->
   <kp-message-input
     [emailDestinataire]="emailInterlocuteur"
     [bienId]="bienId"
     [wsConnected]="wsConnected()"
+    [interlocuteurNom]="displayNom"
     (messageSent)="onMessageSent($event)"
   />
 </div>
