@@ -2,15 +2,34 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Kupanga</title>
+  <title>Kupanga — Gestion locative particulier à particulier</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kupanga — Gérez votre parc locatif : biens, contrats, quittances et messagerie propriétaires-locataires.">
+
+  <!-- Sécurité : X-Frame-Options et frame-ancestors doivent être des headers HTTP (voir SECURITY-HEADERS.md) -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: http://localhost:9000 http://localhost:8089; connect-src 'self' http://localhost:8089 ws://localhost:8089 http://localhost:9000;">
+
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Polices non-bloquantes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+  </noscript>
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap">
+  </noscript>
+
+  <!-- Google Sign-In : chargé dynamiquement par LoginComponent uniquement -->
 </head>
 <body>
   <app-root></app-root>

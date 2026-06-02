@@ -44,7 +44,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore(reducers),
     provideEffects(...effects),
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
+    ...(isDevMode() ? [provideStoreDevtools({ maxAge: 25 })] : []),
     { provide: LOCALE_ID, useValue: 'fr-FR' },
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } },
     {

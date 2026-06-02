@@ -9,7 +9,13 @@
     <!-- Photo principale -->
     <div class="mp-main" [class.img-error]="!photo1">
       @if (photo1) {
-        <img [src]="photo1" [alt]="bien.titre + ' — photo 1'" (error)="onImgError($event)" />
+        <img
+          [src]="photo1"
+          [alt]="bien.titre + ' — photo 1'"
+          width="343" height="142"
+          [attr.fetchpriority]="isFirstCard ? 'high' : null"
+          (error)="onImgError($event)"
+        />
       } @else {
         <div class="photo-placeholder">
           <lucide-icon name="building" [size]="28" [strokeWidth]="1.2" />
@@ -36,7 +42,7 @@
     <!-- Vignette 2 -->
     <div class="mp-sm">
       @if (photo2) {
-        <img [src]="photo2" [alt]="bien.titre + ' — photo 2'" (error)="onImgError($event)" />
+        <img [src]="photo2" [alt]="bien.titre + ' — photo 2'" width="72" height="88" loading="lazy" (error)="onImgError($event)" />
       } @else {
         <div class="photo-placeholder"></div>
       }
@@ -45,7 +51,7 @@
     <!-- Vignette 3 + overflow -->
     <div class="mp-sm mp-sm-last">
       @if (photo3) {
-        <img [src]="photo3" [alt]="bien.titre + ' — photo 3'" (error)="onImgError($event)" />
+        <img [src]="photo3" [alt]="bien.titre + ' — photo 3'" width="72" height="52" loading="lazy" (error)="onImgError($event)" />
         @if (photosRestantes > 0) {
           <div class="photos-overflow">+{{ photosRestantes }}</div>
         }

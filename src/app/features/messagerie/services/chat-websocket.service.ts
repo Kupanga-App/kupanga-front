@@ -1,5 +1,5 @@
 import { Injectable, inject, OnDestroy, effect } from '@angular/core';
-import { Subject, Observable, firstValueFrom } from 'rxjs';
+import { Subject, Observable, fromEvent, firstValueFrom } from 'rxjs';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { AuthService } from '../../../core/auth/services/auth.service';
@@ -32,6 +32,14 @@ export class ChatWebSocketService implements OnDestroy {
         this.connect();
       } else {
         this.disconnect();
+      }
+    });
+
+    // Libère la connexion WS lors d'une navigation pour autoriser le BFCache.
+    fromEvent(window, 'pagehide').subscribe(() => this.disconnect());
+    fromEvent<PageTransitionEvent>(window, 'pageshow').subscribe((e) => {
+      if (e.persisted && this.authService.currentUser()) {
+        this.connect();
       }
     });
   }
