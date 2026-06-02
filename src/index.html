@@ -7,9 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kupanga — Gérez votre parc locatif : biens, contrats, quittances et messagerie propriétaires-locataires.">
 
-  <!-- Sécurité : X-Frame-Options et frame-ancestors doivent être des headers HTTP (voir SECURITY-HEADERS.md) -->
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: http://localhost:9000 http://localhost:8089; connect-src 'self' http://localhost:8089 ws://localhost:8089 http://localhost:9000;">
+  <!-- Sécurité : configurer CSP, X-Frame-Options et HSTS via headers HTTP côté serveur (voir SECURITY-HEADERS.md) -->
 
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
