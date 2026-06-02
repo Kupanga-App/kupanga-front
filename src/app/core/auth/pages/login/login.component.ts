@@ -54,14 +54,18 @@ export class LoginComponent implements AfterViewInit {
   get rememberCtrl() { return this.loginForm.get('remember') as any; }
 
   ngAfterViewInit(): void {
-    const script = document.querySelector('script[src*="gsi/client"]') as HTMLScriptElement | null;
-    if (!script) return;
-
     if (typeof google !== 'undefined' && google.accounts?.id) {
       this.initGoogleSignIn();
-    } else {
-      script.addEventListener('load', () => this.initGoogleSignIn());
+      return;
     }
+    let script = document.querySelector('script[src*="gsi/client"]') as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+    script.addEventListener('load', () => this.ngZone.run(() => this.initGoogleSignIn()));
   }
 
   private initGoogleSignIn(): void {

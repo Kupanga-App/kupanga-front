@@ -1,59 +1,103 @@
-# KupangaFront
+# Kupanga — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
+Application web de gestion immobiliere de particulier a particulier.
 
-## Development server
+## Architecture
 
-To start a local development server, run:
+La documentation d'architecture technique complete est disponible dans **[DAT-front.md](./DAT-front.md)**.
+
+Elle couvre : structure des dossiers, composants, state management (NgRx + Signals), routing, couche HTTP, formulaires, theming Angular Material et points d'attention.
+
+---
+
+## Stack technique
+
+| Technologie | Version |
+|:---|:---|
+| Angular | 20.3.0 |
+| TypeScript | 5.9.2 |
+| Angular Material | 20.2.14 |
+| NgRx Store / Effects | 20.1.0 |
+| RxJS | 7.8.x |
+| @stomp/stompjs | 7.3.0 |
+| SockJS | 1.6.1 |
+| lucide-angular | 1.0.0 |
+| TailwindCSS | 3.4.4 |
+| Angular CLI | 20.3.8 |
+
+---
+
+## Structure du projet
+
+```
+src/
+  app/
+    core/               # Guards, interceptors, services singleton (auth, theme, logement-context)
+    shared/             # Composants UI reutilisables (14 composants)
+    features/
+      account/          # Profil et parametres compte
+      biens/            # CRUD biens + recherche filtree
+      contrats/         # Liste contrats + page signature token
+      dashboard/        # Vue synthetique
+      etats-des-lieux/  # Liste EDL + page signature token
+      gestion-logement/ # Shell 5 onglets (contrat/EDL/quittances/docs/resume)
+      messagerie/       # Chat temps reel (WebSocket STOMP)
+      notifications/    # Notifications in-app
+      quittances/       # Liste quittances
+      tenant/           # Espace locataire (mon-logement + documents)
+    layouts/            # DashboardLayout (shell principal)
+    store/              # NgRx (AppState minimal)
+  styles/               # Tokens SCSS, theming Material, reset, typo
+  environments/         # dev (localhost:8089) / prod (Render)
+```
+
+---
+
+## Lancer l'application
+
+### Serveur de developpement
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Ouvrir `http://localhost:4200/`. L'API back-end doit etre accessible sur `http://localhost:8089`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+### Build
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Les artefacts sont generes dans `dist/`.
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Tests unitaires
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+Executeur : Karma + Jasmine.
 
-For end-to-end (e2e) testing, run:
+---
+
+## Code scaffolding
 
 ```bash
-ng e2e
+ng generate component component-name
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Pour voir tous les schematics disponibles :
 
-## Additional Resources
+```bash
+ng generate --help
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+## Ressources
+
+- [Angular CLI](https://angular.dev/tools/cli)
+- [Angular Material](https://material.angular.io)
+- [NgRx](https://ngrx.io)
+- [DAT-front.md](./DAT-front.md) — Architecture technique frontend

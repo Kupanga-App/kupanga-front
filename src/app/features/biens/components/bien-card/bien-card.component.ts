@@ -16,6 +16,7 @@ import { PoiChipComponent } from '../../../../shared/components/poi-chip/poi-chi
 })
 export class BienCardComponent {
   @Input({ required: true }) bien!: BienDTO;
+  @Input() isFirstCard = false;
   @Output() viewDetail = new EventEmitter<number>();
 
   get photo1(): string { return (this.bien.images ?? [])[0] ?? ''; }
