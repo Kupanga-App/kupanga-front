@@ -94,8 +94,8 @@
     </div>
   } @else {
     <div class="grid" [class.list-mode]="viewMode() === 'list'">
-      @for (bien of biens(); track bien.id) {
-        <kp-bien-card [bien]="bien" (viewDetail)="navigateToBien($event)" />
+      @for (bien of biens(); track bien.id; let i = $index) {
+        <kp-bien-card [bien]="bien" [isFirstCard]="i === 0" (viewDetail)="navigateToBien($event)" />
       }
     </div>
   }

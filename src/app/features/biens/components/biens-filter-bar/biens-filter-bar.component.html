@@ -30,8 +30,9 @@
     <div class="quick-actions">
       <div class="sort-wrap">
         <lucide-icon name="arrow-up-down" [size]="12" [strokeWidth]="1.5" />
-        <span class="sort-label">{{ sortLabel }}</span>
-        <select formControlName="sortBy" (change)="onQuickChange()" class="sort-select">
+        <label for="sort-select-quick" class="sr-only">Trier les biens par</label>
+        <span class="sort-label" aria-hidden="true">{{ sortLabel }}</span>
+        <select id="sort-select-quick" formControlName="sortBy" (change)="onQuickChange()" class="sort-select">
           @for (opt of sortOptions; track opt.value) {
             <option [value]="opt.value">{{ opt.label }}</option>
           }
