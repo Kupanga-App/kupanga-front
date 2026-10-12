@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MontantPipe, SymboleDevisePipe } from '../../../../core/money/montant';
 import { CommonModule, DatePipe, Location } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -6,9 +7,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BienService } from '../../services/bien.service';
-import { BienDTO, BienType, ModeChauffage } from '../../models/bien.model';
+import { BienDTO, BienType, ModeChauffage, adresseLisible, positionApproximative, libelleTypeBien, LIBELLES_EQUIPEMENT, vignette } from '../../models/bien.model';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'kp-bien-detail',
@@ -19,7 +21,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
     MatButtonModule,
     MatProgressSpinnerModule,
     DatePipe,
-    IconComponent,
+    IconComponent, MontantPipe, SymboleDevisePipe
   ],
   templateUrl: './bien-detail.component.html',
   styleUrls: ['./bien-detail.component.scss'],
@@ -69,11 +71,19 @@ export class BienDetailComponent implements OnInit {
     return '/auth/login';
   });
 
+  /** B12 : bien archivé (vue privée seulement) : lecture seule. */
+  isArchive = computed(() => !!this.bien()?.archive);
+
   messagerieQueryParams = computed(() => {
     const bien = this.bien();
     if (!bien) return {};
     if (!this.isOwner()) {
-      return { bienId: bien.id, interlocuteur: bien.proprietaire.mail };
+      // P0-6 : l'annonce publique ne donne pas l'e-mail du propriétaire ; sans interlocuteur,
+      // la messagerie écrit au propriétaire du bien (déduit par l'API)
+      if (this.isLocataire() && bien.proprietaire.mail) {
+        return { bienId: bien.id, interlocuteur: bien.proprietaire.mail };
+      }
+      return { bienId: bien.id };
     }
     if (this.isOwner() && bien.locataire) {
       return { bienId: bien.id, interlocuteur: bien.locataire.mail };
@@ -83,9 +93,11 @@ export class BienDetailComponent implements OnInit {
 
   assignerLink = computed(() => `/pro/biens/${this.bien()?.id}/assigner`);
 
+  /** R1 : grande photo en 1600 px, les quatre petites en vignettes de 400 px. */
   galleryImages = computed(() => {
-    const images = this.bien()?.images ?? [];
-    return Array.from({ length: 5 }, (_, i) => images[i] ?? null);
+    const bien = this.bien();
+    if (!bien) return Array.from({ length: 5 }, () => null);
+    return Array.from({ length: 5 }, (_, i) => (i === 0 ? bien.images?.[0] ?? null : vignette(bien, i)));
   });
 
   refTag = computed(() => {
@@ -94,24 +106,23 @@ export class BienDetailComponent implements OnInit {
   });
 
   statutVariant = computed<'olive' | 'amber' | 'red' | 'mint'>(() => {
+    if (this.isArchive()) return 'red';
     return this.hasLocataire() ? 'olive' : 'amber';
   });
 
   statutText = computed(() => {
+    if (this.isArchive()) return 'Archivé';
     return this.hasLocataire() ? 'Loué' : 'Disponible';
   });
 
-  typeBienLabel = computed(() => {
-    const map: Record<BienType, string> = {
-      APPARTEMENT: 'Appartement',
-      MAISON: 'Maison',
-      STUDIO: 'Studio',
-      VILLA: 'Villa',
-      BUREAU: 'Bureau',
-      COMMERCE: 'Commerce',
-    };
-    return map[this.bien()?.typeBien ?? 'APPARTEMENT'] ?? this.bien()?.typeBien;
-  });
+  typeBienLabel = computed(() => libelleTypeBien(this.bien()?.typeBien));
+  /** C11 : libellés des équipements du bien. */
+  readonly equipements = computed(() => (this.bien()?.equipements ?? []).map(e => LIBELLES_EQUIPEMENT[e] ?? e));
+
+  /** J4 : adresse sur une ligne (adresse congolaise comprise), sans champ vide. */
+  /** C2 : « position approximative » si la position n'est ni un repère ni une adresse trouvée. */
+  readonly positionApproximative = computed(() => positionApproximative(this.bien()?.precisionLocalisation));
+  readonly adresseComplete = computed(() => { const b = this.bien(); return b ? adresseLisible(b) : ''; });
 
   totalMensuel = computed(() => {
     const loyer = this.bien()?.loyerMensuel ?? 0;
@@ -144,7 +155,15 @@ export class BienDetailComponent implements OnInit {
       this.loading.set(false);
       return;
     }
-    this.bienService.getById(id).subscribe({
+    // Propriétaire ou locataire : vue privée (parties, documents, archivage) ; sinon annonce publique
+    const chargement$ = this.isConnected()
+      ? this.bienService.getPrive(id).pipe(
+          catchError((err: HttpErrorResponse) =>
+            err.status === 403 || err.status === 404 ? this.bienService.getPublic(id) : throwError(() => err)
+          )
+        )
+      : this.bienService.getPublic(id);
+    chargement$.subscribe({
       next: (data) => {
         this.bien.set(data);
         this.loading.set(false);

@@ -28,7 +28,6 @@ import { MessageDTO, MessagePayload } from '../../models/chat.models';
 export class MessageInputComponent {
   @Input({ required: true }) emailDestinataire!: string;
   @Input({ required: true }) bienId!: number;
-  @Input() wsConnected = false;
   @Input() interlocuteurNom = '';
   @Output() messageSent = new EventEmitter<MessageDTO>();
 
@@ -41,8 +40,9 @@ export class MessageInputComponent {
     return this.emailDestinataire === this.authService.currentUser()?.email;
   }
 
+  /** Envoi possible même déconnecté : le message attend dans la file et part à la reconnexion (W13). */
   get canSend(): boolean {
-    return this.wsConnected && !this.isSelf && !!this.control.value?.trim();
+    return !this.isSelf && !!this.control.value?.trim();
   }
 
   onKeydown(event: KeyboardEvent): void {
@@ -61,13 +61,15 @@ export class MessageInputComponent {
 
     const payload: MessagePayload = {
       contenu,
-      emailDestinataire: this.emailDestinataire,
+      emailDestinataire: this.emailDestinataire || undefined,
       bienId: this.bienId,
     };
 
-    // Ajout local immédiat (l'expéditeur ne reçoit pas son propre message via WS)
+    const idClient = this.ws.envoyer(payload);
+
+    // Ajout local immédiat « en attente », remplacé par l'écho du serveur (même idClient)
     const localMsg: MessageDTO = {
-      id: Date.now(),
+      id: -Date.now(),
       contenu,
       lu: false,
       createdAt: new Date().toISOString(),
@@ -79,10 +81,11 @@ export class MessageInputComponent {
       destinataireEmail: this.emailDestinataire,
       bienId: this.bienId,
       bienAdresse: '',
+      idClient,
+      statut: 'en_attente',
     };
 
     this.messageSent.emit(localMsg);
-    this.ws.sendMessage(payload);
     this.control.reset();
   }
 }

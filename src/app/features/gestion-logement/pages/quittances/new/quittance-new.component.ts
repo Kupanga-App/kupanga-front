@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MontantPipe, SymboleDevisePipe } from '../../../../../core/money/montant';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +19,7 @@ import { QuittanceService } from '../../../services/quittance.service';
 import { ContratService } from '../../../services/contrat.service';
 import { BienDTO } from '../../../../biens/models/bien.model';
 import { ContratDTO } from '../../../models/contrat.model';
+import { messageErreurApi } from '../../../../../core/http/api-error';
 
 type PaymentStatus = 'ENCAISSE' | 'PARTIEL' | 'IMPAYE';
 
@@ -35,7 +37,7 @@ type PaymentStatus = 'ENCAISSE' | 'PARTIEL' | 'IMPAYE';
     IconComponent,
     ChipsGroupComponent,
     OptCardComponent,
-    PaperPreviewComponent,
+    PaperPreviewComponent, MontantPipe, SymboleDevisePipe
   ],
   templateUrl: './quittance-new.component.html',
   styleUrls: ['./quittance-new.component.scss'],
@@ -75,6 +77,9 @@ export class QuittanceNewComponent implements OnInit {
     loyerMensuel: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
     chargesMensuelles: new FormControl<number | null>(null, [Validators.min(0)]),
   });
+
+  /** J3 : devise du bail s'il est fourni, sinon celle du bien (même règle que l'API). */
+  readonly devise = computed(() => this.contrat()?.devise ?? this.bien()?.devise);
 
   readonly total = computed(() => {
     const loyer = this.form.get('loyerMensuel')?.value ?? 0;
@@ -146,8 +151,8 @@ export class QuittanceNewComponent implements OnInit {
         this.snackBar.open('Quittance générée avec succès !', 'OK', { duration: 4000 });
         this.gestion.activeView.set(null);
       },
-      error: () => {
-        this.snackBar.open('Erreur lors de la génération', 'Fermer', { duration: 4000 });
+      error: (err) => {
+        this.snackBar.open(messageErreurApi(err, 'Erreur lors de la génération'), 'Fermer', { duration: 4000 });
         this.submitting.set(false);
       },
     });

@@ -84,6 +84,16 @@
         />
       </div>
 
+      <!-- C6 : contact facultatif (liens WhatsApp entre propriétaire et locataire) -->
+      <kp-auth-field
+        label="Téléphone (facultatif)"
+        type="tel"
+        placeholder="+243 81 234 56 78"
+        hint="Format international. Visible seulement par votre propriétaire ou votre locataire."
+        [control]="telephoneCtrl"
+        fieldId="signup-telephone"
+      />
+
       <kp-role-picker [control]="roleCtrl" />
 
       <div class="avatar-field">
@@ -109,7 +119,7 @@
             <label class="btn-ghost btn-half" tabindex="0">
               <lucide-icon [img]="Upload" [size]="14" />
               Importer
-              <input type="file" accept="image/*" class="file-input-hidden" (change)="onFileUpload($event)" />
+              <input type="file" [accept]="acceptPhotos" class="file-input-hidden" (change)="onFileUpload($event)" />
             </label>
           </div>
         </div>
@@ -131,6 +141,41 @@
         </button>
       </div>
     </form>
+  </kp-auth-layout-c>
+}
+
+<!-- ÉTAPE 3 — Lien de confirmation envoyé (A14) -->
+@if (step() === 3) {
+  <kp-auth-layout-c
+    kicker="Bienvenue · Première édition"
+    hero="Presque·&lt;em&gt;prêt&lt;/em&gt;."
+    subhero="Une dernière étape : confirmer que cette adresse e-mail est bien la vôtre."
+    badge="N° 0006"
+    eyebrow="04 · Inscription · confirmation"
+    title="Vérifiez votre e-mail."
+    sub="Votre compte s'active quand vous ouvrez le lien reçu."
+    [footer]="footerStep1"
+  >
+    <div class="sent-state">
+      <div class="sent-icon">
+        <lucide-icon [img]="Check" [size]="24" />
+      </div>
+      <p class="sent-text">
+        Un lien de confirmation vient d'être envoyé à <strong>{{ emailInscrit() }}</strong>.
+        Ouvrez-le pour activer votre compte (valable 24 heures), puis connectez-vous.
+      </p>
+      <p class="sent-text">
+        Rien reçu ? Vérifiez les indésirables, ou demandez un nouveau lien.
+        Si vous aviez déjà un compte, un e-mail vous indique comment retrouver l'accès.
+      </p>
+      <button type="button" class="btn-ghost" (click)="renvoyerLien()" [disabled]="isResending()">
+        Renvoyer le lien
+      </button>
+      @if (resendInfo()) {
+        <p class="sent-text" aria-live="polite">{{ resendInfo() }}</p>
+      }
+      <a routerLink="/auth/login" class="btn-primary btn-full">Aller à la connexion</a>
+    </div>
   </kp-auth-layout-c>
 }
 

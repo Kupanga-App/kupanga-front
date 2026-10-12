@@ -11,7 +11,7 @@
   <div class="rent-right">
     <div class="rent-amount">
       {{ montant() | number:'1.0-0':'fr' }}
-      <span class="rent-unit">€</span>
+      <span class="rent-unit">{{ devise() | symboleDevise }}</span>
     </div>
     <!--
     <div class="rent-actions">

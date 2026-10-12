@@ -9,7 +9,6 @@
       [formControl]="control"
       [placeholder]="interlocuteurNom ? 'Écrire un message à ' + interlocuteurNom + '… (Entrée pour envoyer)' : 'Écrire un message… (Entrée pour envoyer)'"
       rows="1"
-      [attr.disabled]="!wsConnected ? true : null"
       (keydown)="onKeydown($event)"
       aria-label="Composer un message"
     ></textarea>

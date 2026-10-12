@@ -13,6 +13,7 @@ import { routes } from './app.routes';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
 import { authInterceptor } from './core/auth/interceptors/auth.interceptor';
+import { compteCacheInterceptor } from './core/pwa/compte-cache.interceptor';
 import { LUCIDE_ICONS, LucideIconProvider } from 'lucide-angular';
 import {
   Home, Building, Building2, MapPin, Calendar, Users, UserPlus, FileText,
@@ -31,6 +32,7 @@ import {
   // Icônes navbar
   Compass, Folder, HelpCircle, Lightbulb, Moon, Menu,
 } from 'lucide-angular';
+import { provideServiceWorker } from '@angular/service-worker';
 
 registerLocaleData(localeFr);
 
@@ -41,7 +43,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withRouterConfig({ paramsInheritanceStrategy: 'always' })),
     provideAnimationsAsync(),
     provideNativeDateAdapter(),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    // R2 : compteCacheInterceptor d'abord (la requête rejouée après un refresh garde la clé du compte)
+    provideHttpClient(withInterceptors([compteCacheInterceptor, authInterceptor])),
     provideStore(reducers),
     provideEffects(...effects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
@@ -64,6 +67,9 @@ export const appConfig: ApplicationConfig = {
         School, Cross, Pill, Baby, Bus, ShoppingCart,
         Compass, Folder, HelpCircle, Lightbulb, Moon, Menu,
       }),
-    },
+    }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
   ]
 };

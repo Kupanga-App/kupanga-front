@@ -29,15 +29,15 @@
   <div class="irl-card">
     <div class="irl-row">
       <span class="lbl">Loyer mensuel</span>
-      <span class="val">{{ contrat().loyerMensuel }} €</span>
+      <span class="val">{{ contrat().loyerMensuel | montant: contrat().devise }}</span>
     </div>
     <div class="irl-row">
       <span class="lbl">Charges</span>
-      <span class="val">{{ contrat().charges }} €/mois</span>
+      <span class="val">{{ contrat().charges | montant: contrat().devise }}/mois</span>
     </div>
     <div class="irl-row">
       <span class="lbl">Dépôt de garantie</span>
-      <span class="val">{{ contrat().depotGarantie }} €</span>
+      <span class="val">{{ contrat().depotGarantie | montant: contrat().devise }}</span>
     </div>
     @if (contrat().irlIndex) {
       <div class="irl-row">

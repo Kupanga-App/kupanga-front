@@ -1,4 +1,7 @@
+import { JuridictionService } from '../../../../biens/services/juridiction.service';
+import { champVisible } from '../../../../biens/models/juridiction.model';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MontantPipe, SymboleDevisePipe } from '../../../../../core/money/montant';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +22,7 @@ import { PaperPreviewComponent } from '../../../../../shared/components/paper-pr
 import { GestionLogementService } from '../../../services/gestion-logement.service';
 import { ContratService } from '../../../services/contrat.service';
 import { BienDTO } from '../../../../biens/models/bien.model';
+import { messageErreurApi } from '../../../../../core/http/api-error';
 
 type TypeBail = 'NUE' | 'MEUBLEE' | 'COLOC';
 
@@ -40,12 +44,13 @@ type TypeBail = 'NUE' | 'MEUBLEE' | 'COLOC';
     WizardStepperComponent,
     OptCardComponent,
     ChipsGroupComponent,
-    PaperPreviewComponent,
+    PaperPreviewComponent, MontantPipe, SymboleDevisePipe
   ],
   templateUrl: './contrat-new.component.html',
   styleUrls: ['./contrat-new.component.scss'],
 })
 export class ContratNewComponent implements OnInit {
+  private juridictions = inject(JuridictionService);
   private gestion = inject(GestionLogementService);
   private contratService = inject(ContratService);
   private snackBar = inject(MatSnackBar);
@@ -88,7 +93,16 @@ export class ContratNewComponent implements OnInit {
     loyerMensuel: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
     chargesMensuelles: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
     depotGarantie: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
+    // C12 (RDC) : garantie en mois de loyer et loyers payés d'avance (requis quand garantieEnMois)
+    garantieMois: new FormControl<number | null>(null, [Validators.min(0), Validators.max(24)]),
+    avanceMois: new FormControl<number | null>(null, [Validators.min(0), Validators.max(24)]),
   });
+
+  /** C12 : vrai si le pays du bien compte la garantie en mois (dépôt en montant masqué : RDC). */
+  readonly garantieEnMois = signal(false);
+
+  /** J3 : le bail prend la devise du bien. */
+  readonly devise = computed(() => this.bien()?.devise);
 
   readonly totalMensuel = computed(() => {
     const l = this.step3.get('loyerMensuel')?.value ?? 0;
@@ -121,7 +135,28 @@ export class ContratNewComponent implements OnInit {
       loyerMensuel: b.loyerMensuel ?? null,
       chargesMensuelles: b.chargesMensuelles ?? null,
       depotGarantie: b.depotGarantie ?? null,
+      garantieMois: b.garantieMois ?? null,
+      avanceMois: b.avanceMois ?? null,
     });
+    this.juridictions.configuration(b.pays).subscribe({
+      next: config => this.appliquerGarantie(!champVisible(config, 'depotGarantie')),
+      error: () => this.appliquerGarantie(b.garantieMois != null),
+    });
+  }
+
+  private appliquerGarantie(enMois: boolean): void {
+    this.garantieEnMois.set(enMois);
+    const { depotGarantie, garantieMois, avanceMois } = this.step3.controls;
+    if (enMois) {
+      depotGarantie.clearValidators();
+      garantieMois.addValidators(Validators.required);
+      avanceMois.addValidators(Validators.required);
+    } else {
+      depotGarantie.setValidators([Validators.required, Validators.min(0)]);
+      garantieMois.removeValidators(Validators.required);
+      avanceMois.removeValidators(Validators.required);
+    }
+    for (const c of [depotGarantie, garantieMois, avanceMois]) c.updateValueAndValidity();
   }
 
   setTypeBail(type: TypeBail): void {
@@ -182,14 +217,16 @@ export class ContratNewComponent implements OnInit {
       dureeBailMois: v2.dureeBailMois,
       loyerMensuel: v3.loyerMensuel!,
       chargesMensuelles: v3.chargesMensuelles!,
-      depotGarantie: v3.depotGarantie!,
+      ...(this.garantieEnMois()
+        ? { garantieMois: v3.garantieMois!, avanceMois: v3.avanceMois! }
+        : { depotGarantie: v3.depotGarantie! }),
     }).subscribe({
       next: () => {
         this.snackBar.open('Contrat créé — signez pour le valider.', 'OK', { duration: 5000 });
         this.gestion.activeView.set(null);
       },
-      error: () => {
-        this.snackBar.open('Erreur lors de la création du contrat', 'Fermer', { duration: 4000 });
+      error: (err) => {
+        this.snackBar.open(messageErreurApi(err, 'Erreur lors de la création du contrat'), 'Fermer', { duration: 4000 });
         this.submitting.set(false);
       },
     });

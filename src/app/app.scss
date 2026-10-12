@@ -1,0 +1,33 @@
+// R2 : bandeaux du mode hors ligne et des mises à jour (palette Night / Olive / Mint)
+.kp-bandeau-pwa {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  padding: 8px 16px;
+  background: #10212B;
+  color: #EFFBDB;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  text-align: center;
+
+  button {
+    padding: 4px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: #8FA464;
+    color: #10212B;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+.kp-bandeau-pwa--hors-ligne {
+  background: #8FA464;
+  color: #10212B;
+}

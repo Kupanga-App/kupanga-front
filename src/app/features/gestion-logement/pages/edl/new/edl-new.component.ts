@@ -1,3 +1,4 @@
+import { JuridictionService } from '../../../../biens/services/juridiction.service';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -25,6 +26,7 @@ import { GestionLogementService } from '../../../services/gestion-logement.servi
 import { EdlService } from '../../../services/edl.service';
 import { BienDTO } from '../../../../biens/models/bien.model';
 import { EdlType, EtatElement, TypeElement, TypeCompteur } from '../../../models/edl.model';
+import { messageErreurApi } from '../../../../../core/http/api-error';
 
 interface CompteurForm {
   typeCompteur: FormControl<TypeCompteur>;
@@ -52,6 +54,10 @@ interface PieceForm {
   elements: FormArray<FormGroup<ElementForm>>;
 }
 
+
+/** B8 : bornes du formulaire d'EDL, identiques à celles de l'API (EtatDesLieuxFormDTO). */
+const EDL_MAX = { pieces: 50, elements: 50, compteurs: 10, cles: 20, quantiteCle: 50 } as const;
+
 @Component({
   selector: 'kp-edl-new',
   standalone: true,
@@ -75,6 +81,7 @@ interface PieceForm {
 })
 export class EdlNewComponent implements OnInit {
   private gestion = inject(GestionLogementService);
+  private juridictions = inject(JuridictionService);
   private edlService = inject(EdlService);
   private snackBar = inject(MatSnackBar);
 
@@ -136,15 +143,27 @@ export class EdlNewComponent implements OnInit {
     { value: 'AUTRE', label: 'Autre' },
   ];
 
-  readonly typeCompteurOptions: { value: TypeCompteur; label: string; icon: string; unite: string }[] = [
+  private readonly tousLesCompteurs: { value: TypeCompteur; label: string; icon: string; unite: string }[] = [
     { value: 'ELECTRICITE_HP', label: 'Électricité (HP)', icon: 'zap', unite: 'kWh' },
     { value: 'ELECTRICITE_HC', label: 'Électricité (HC)', icon: 'zap', unite: 'kWh' },
+    { value: 'ELECTRICITE', label: 'Électricité', icon: 'zap', unite: 'kWh' },
+    // C13 : compteur prépayé SNEL (crédit restant) et compteur d'heures du groupe électrogène
+    { value: 'CASH_POWER', label: 'Cash Power (prépayé)', icon: 'zap', unite: 'kWh' },
+    { value: 'GROUPE_ELECTROGENE', label: 'Groupe électrogène', icon: 'zap', unite: 'h' },
     { value: 'EAU_FROIDE', label: 'Eau froide', icon: 'droplets', unite: 'm³' },
     { value: 'EAU_CHAUDE', label: 'Eau chaude', icon: 'droplets', unite: 'm³' },
     { value: 'GAZ', label: 'Gaz', icon: 'flame', unite: 'm³' },
   ];
 
-  readonly metersDefault: TypeCompteur[] = ['ELECTRICITE_HP', 'EAU_FROIDE', 'GAZ'];
+  /** C13 : compteurs proposés dans le pays du bien (tous tant que la configuration n'est pas chargée). */
+  private readonly compteursDuPays = signal<TypeCompteur[] | null>(null);
+  get typeCompteurOptions(): { value: TypeCompteur; label: string; icon: string; unite: string }[] {
+    const permis = this.compteursDuPays();
+    return permis ? this.tousLesCompteurs.filter(o => permis.includes(o.value)) : this.tousLesCompteurs;
+  }
+
+  /** Compteurs ajoutés d'office, dans cet ordre, s'ils sont proposés dans le pays. */
+  readonly metersDefault: TypeCompteur[] = ['CASH_POWER', 'ELECTRICITE_HP', 'EAU_FROIDE', 'GAZ'];
 
   readonly keysDefault = [
     { type: 'Porte d\'entrée', icon: 'key' },
@@ -166,7 +185,7 @@ export class EdlNewComponent implements OnInit {
   step1 = new FormGroup({
     date: new FormControl<Date | null>(null, [Validators.required]),
     heure: new FormControl('', { nonNullable: true }),
-    observationsGenerales: new FormControl(''),
+    observationsGenerales: new FormControl('', [Validators.maxLength(2000)]),
   });
 
   step2 = new FormGroup({
@@ -201,14 +220,20 @@ export class EdlNewComponent implements OnInit {
     const b = this.gestion.bien();
     if (!b) return;
     this.bien.set(b);
-    this.initDefaultMeters();
     this.initDefaultKeys();
+    this.juridictions.configuration(b.pays).subscribe({
+      next: config => {
+        this.compteursDuPays.set(config.compteursEdl as TypeCompteur[]);
+        this.initDefaultMeters();
+      },
+      error: () => this.initDefaultMeters(),
+    });
   }
 
   private initDefaultMeters(): void {
     this.metersDefault.forEach(type => {
-      const opt = this.typeCompteurOptions.find(o => o.value === type)!;
-      this.addCompteur(type, opt.unite);
+      const opt = this.typeCompteurOptions.find(o => o.value === type);
+      if (opt) this.addCompteur(type, opt.unite);
     });
   }
 
@@ -217,11 +242,15 @@ export class EdlNewComponent implements OnInit {
   }
 
   addCompteur(type: TypeCompteur = 'EAU_FROIDE', unite = ''): void {
+    if (this.compteurs.length >= EDL_MAX.compteurs) {
+      this.limiteAtteinte(`${EDL_MAX.compteurs} compteurs au maximum.`);
+      return;
+    }
     this.compteurs.push(new FormGroup<CompteurForm>({
       typeCompteur: new FormControl<TypeCompteur>(type, { nonNullable: true, validators: [Validators.required] }),
-      numeroCompteur: new FormControl('', { nonNullable: true }),
-      index: new FormControl(0, { nonNullable: true }),
-      unite: new FormControl(unite, { nonNullable: true }),
+      numeroCompteur: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(50)] }),
+      index: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
+      unite: new FormControl(unite, { nonNullable: true, validators: [Validators.maxLength(10)] }),
     }));
   }
 
@@ -235,9 +264,16 @@ export class EdlNewComponent implements OnInit {
   removeCompteur(i: number): void { this.compteurs.removeAt(i); }
 
   addCle(type = ''): void {
+    if (this.cles.length >= EDL_MAX.cles) {
+      this.limiteAtteinte(`${EDL_MAX.cles} types de clés au maximum.`);
+      return;
+    }
     this.cles.push(new FormGroup<CleForm>({
-      typeCle: new FormControl(type, { nonNullable: true, validators: [Validators.required] }),
-      quantite: new FormControl(1, { nonNullable: true, validators: [Validators.min(1)] }),
+      typeCle: new FormControl(type, { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
+      quantite: new FormControl(1, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.min(1), Validators.max(EDL_MAX.quantiteCle)],
+      }),
     }));
   }
 
@@ -245,7 +281,7 @@ export class EdlNewComponent implements OnInit {
 
   incrementCle(i: number): void {
     const ctrl = this.cles.at(i).get('quantite')!;
-    ctrl.setValue(ctrl.value + 1);
+    if (ctrl.value < EDL_MAX.quantiteCle) ctrl.setValue(ctrl.value + 1);
   }
 
   decrementCle(i: number): void {
@@ -254,10 +290,14 @@ export class EdlNewComponent implements OnInit {
   }
 
   addPiece(type = 'Pièce'): void {
+    if (this.pieces.length >= EDL_MAX.pieces) {
+      this.limiteAtteinte(`${EDL_MAX.pieces} pièces au maximum.`);
+      return;
+    }
     this.pieces.push(new FormGroup<PieceForm>({
-      nomPiece: new FormControl(type, { nonNullable: true, validators: [Validators.required] }),
+      nomPiece: new FormControl(type, { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
       ordre: new FormControl(this.pieces.length + 1, { nonNullable: true }),
-      observations: new FormControl('', { nonNullable: true }),
+      observations: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(2000)] }),
       elements: new FormArray<FormGroup<ElementForm>>([]),
     }));
     this.addElement(this.pieces.length - 1);
@@ -266,12 +306,28 @@ export class EdlNewComponent implements OnInit {
   removePiece(i: number): void { this.pieces.removeAt(i); }
 
   addElement(pieceIdx: number): void {
+    if (this.getElements(pieceIdx).length >= EDL_MAX.elements) {
+      this.limiteAtteinte(`${EDL_MAX.elements} éléments par pièce au maximum.`);
+      return;
+    }
     this.getElements(pieceIdx).push(new FormGroup<ElementForm>({
       typeElement: new FormControl<TypeElement>('MUR', { nonNullable: true, validators: [Validators.required] }),
-      etatElement: new FormControl<EtatElement>('BON', { nonNullable: true }),
-      description: new FormControl('', { nonNullable: true }),
-      observation: new FormControl('', { nonNullable: true }),
+      etatElement: new FormControl<EtatElement>('BON', { nonNullable: true, validators: [Validators.required] }),
+      description: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(255)] }),
+      observation: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(1000)] }),
     }));
+  }
+
+  private limiteAtteinte(message: string): void {
+    this.snackBar.open(message, 'OK', { duration: 3000 });
+  }
+
+  /** B8 : chaque étape est validée avant de passer à la suivante (l'API refuse en 400 sinon). */
+  private etapeInvalide(form: FormGroup, message: string): boolean {
+    if (form.valid) return false;
+    form.markAllAsTouched();
+    this.snackBar.open(message, 'OK', { duration: 4000 });
+    return true;
   }
 
   removeElement(pieceIdx: number, elemIdx: number): void {
@@ -329,6 +385,14 @@ export class EdlNewComponent implements OnInit {
       }
       if (this.step1.invalid) { this.step1.markAllAsTouched(); return; }
     }
+    if (step === 1 && this.etapeInvalide(this.step2,
+        'Compteurs : index obligatoire et positif, numéro de 50 caractères au plus.')) {
+      return;
+    }
+    if (step === 2 && this.etapeInvalide(this.step3,
+        'Clés : nommez chaque type de clé (100 caractères au plus), entre 1 et 50 exemplaires.')) {
+      return;
+    }
     if (step === 3 && this.pieces.length === 0) {
       this.snackBar.open('Ajoutez au moins une pièce.', 'OK', { duration: 3000 });
       return;
@@ -349,6 +413,15 @@ export class EdlNewComponent implements OnInit {
     const email = this.locataireEmail();
     if (!email) {
       this.snackBar.open('Aucun locataire assigné à ce bien.', 'Fermer', { duration: 4000 });
+      return;
+    }
+
+    if (this.pieces.length === 0) {
+      this.snackBar.open('Ajoutez au moins une pièce.', 'OK', { duration: 3000 });
+      return;
+    }
+    if (this.etapeInvalide(this.step4,
+        'Pièces : nommez chaque pièce (100 caractères au plus) et raccourcissez les textes trop longs.')) {
       return;
     }
 
@@ -389,8 +462,8 @@ export class EdlNewComponent implements OnInit {
         this.snackBar.open('État des lieux créé — signez pour valider.', 'OK', { duration: 5000 });
         this.gestion.activeView.set(null);
       },
-      error: () => {
-        this.snackBar.open('Erreur lors de la création', 'Fermer', { duration: 4000 });
+      error: (err) => {
+        this.snackBar.open(messageErreurApi(err, 'Erreur lors de la création'), 'Fermer', { duration: 4000 });
         this.submitting.set(false);
       },
     });

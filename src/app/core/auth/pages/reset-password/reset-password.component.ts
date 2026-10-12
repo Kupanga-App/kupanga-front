@@ -8,6 +8,8 @@ import { AuthLayoutCComponent } from '../../shared/auth-layout-c/auth-layout-c.c
 import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
 import { PasswordStrengthComponent } from '../../shared/password-strength/password-strength.component';
 
+import { messageErreurApi } from '../../../http/api-error';
+import { MOT_DE_PASSE_ROBUSTE } from '../register/register.component';
 const mustMatch: ValidatorFn = (ctrl: AbstractControl): ValidationErrors | null => {
   const pw = ctrl.get('password');
   const confirm = ctrl.get('confirmPassword');
@@ -50,7 +52,7 @@ export class ResetPasswordComponent implements OnInit {
   serverError = signal<string | null>(null);
 
   form = this.fb.group({
-    password:        ['', [Validators.required, Validators.minLength(8)]],
+    password:        ['', [Validators.required, Validators.maxLength(72), Validators.pattern(MOT_DE_PASSE_ROBUSTE)]],
     confirmPassword: ['', [Validators.required]]
   }, { validators: mustMatch });
 
@@ -65,6 +67,8 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
     this.token.set(t);
+    // Le jeton ne reste pas dans l'URL ni dans l'historique du navigateur
+    this.router.navigate([], { queryParams: {}, replaceUrl: true });
   }
 
   onSubmit(): void {
@@ -78,9 +82,10 @@ export class ResetPasswordComponent implements OnInit {
         this.isSuccess.set(true);
         setTimeout(() => this.router.navigate(['/auth/login']), 3000);
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting.set(false);
-        this.serverError.set("Une erreur s'est produite lors de la réinitialisation.");
+        // 400 « Lien de réinitialisation invalide ou expiré » ou règle du mot de passe non respectée
+        this.serverError.set(messageErreurApi(err, "Une erreur s'est produite lors de la réinitialisation."));
       }
     });
   }

@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MontantPipe } from '../../../../core/money/montant';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -15,7 +16,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
 @Component({
   selector: 'kp-documents-logement',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, MontantPipe],
   templateUrl: './documents-logement.component.html',
   styleUrls: ['./documents-logement.component.scss'],
 })

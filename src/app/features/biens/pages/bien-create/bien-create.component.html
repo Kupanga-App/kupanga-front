@@ -33,11 +33,11 @@
   @if (currentStep() === 1) {
     <div class="kp-card">
 
-      
+
       <div class="kp-field">
       <label class="kp-label">Titre du bien <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <input matInput [formControl]="step1Form.controls.titre"
                placeholder="Appartement lumineux T3 — Nantes Centre" />
@@ -54,7 +54,7 @@
       <div class="kp-field-group">
         <label class="kp-field-label">Type de bien</label>
         <div class="kp-type-grid">
-          @for (type of bienTypes; track type.value) {
+          @for (type of typesDuPays(); track type.value) {
             <div class="kp-type-card"
                  [class.selected]="step1Form.controls.typeBien.value === type.value"
                  (click)="step1Form.controls.typeBien.setValue(type.value)">
@@ -68,16 +68,50 @@
         }
       </div>
 
-      
+
       <div class="kp-field">
       <label class="kp-label">Description (optionnel) <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <textarea matInput [formControl]="step1Form.controls.description"
                   rows="3" placeholder="Beau T3 lumineux avec vue dégagée..."></textarea>
         @if (step1Form.controls.description.hasError('maxlength')) {
           <mat-error>Maximum 1000 caractères.</mat-error>
+        }
+      </mat-form-field>
+      </div>
+
+      <div class="kp-field">
+      <label class="kp-label">Pays <span class="kp-req">*</span></label>
+
+
+      <mat-form-field class="form-field-full">
+        <mat-select [formControl]="step3Form.controls.pays" placeholder="Choisir un pays">
+          @for (p of paysOptions(); track p.pays) {
+            <mat-option [value]="p.pays">{{ p.libelle }}</mat-option>
+          }
+        </mat-select>
+        @if (step3Form.controls.pays.hasError('required') && step3Form.controls.pays.touched) {
+          <mat-error>Le pays est obligatoire.</mat-error>
+        }
+      </mat-form-field>
+      </div>
+
+      <div class="kp-field">
+      <label class="kp-label">Devise des montants <span class="kp-req">*</span></label>
+      <mat-form-field class="form-field-full">
+        <mat-select [formControl]="step1Form.controls.devise" placeholder="Choisir une devise">
+          @for (d of devisesDuPays(); track d) {
+            <mat-option [value]="d">{{ libellesDevise[d] }}</mat-option>
+          }
+        </mat-select>
+        @if (erreurConfig()) {
+          <mat-hint>{{ erreurConfig() }}
+            <button mat-button type="button" (click)="reessayerConfiguration()">Réessayer</button>
+          </mat-hint>
+        } @else if (step1Form.controls.devise.hasError('required') && step1Form.controls.devise.touched) {
+          <mat-error>La devise est obligatoire.</mat-error>
         }
       </mat-form-field>
       </div>
@@ -88,7 +122,7 @@
                 <mat-form-field class="form-field-full">
           <input matInput type="number" [formControl]="step1Form.controls.loyerMensuel"
                  placeholder="800" />
-          <span matSuffix>€/mois</span>
+          <span matSuffix>{{ deviseChoisie() | symboleDevise }}/mois</span>
           @if (step1Form.controls.loyerMensuel.hasError('required') && step1Form.controls.loyerMensuel.touched) {
             <mat-error>Le loyer est obligatoire.</mat-error>
           } @else if (step1Form.controls.loyerMensuel.hasError('min') && step1Form.controls.loyerMensuel.touched) {
@@ -97,15 +131,15 @@
         </mat-form-field>
         </div>
 
-        
+
         <div class="kp-field">
         <label class="kp-label">Charges mensuelles <span class="kp-req">*</span></label>
 
-        
+
         <mat-form-field class="form-field-full">
           <input matInput type="number" [formControl]="step1Form.controls.chargesMensuelles"
                  placeholder="50" />
-          <span matSuffix>€/mois</span>
+          <span matSuffix>{{ deviseChoisie() | symboleDevise }}/mois</span>
           @if (step1Form.controls.chargesMensuelles.hasError('required') && step1Form.controls.chargesMensuelles.touched) {
             <mat-error>Les charges sont obligatoires.</mat-error>
           }
@@ -113,26 +147,54 @@
         </div>
       </div>
 
-      
+
+      @if (visible('depotGarantie')) {
       <div class="kp-field">
       <label class="kp-label">Dépôt de garantie <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <input matInput type="number" [formControl]="step1Form.controls.depotGarantie"
                placeholder="1600" />
-        <span matSuffix>€</span>
+        <span matSuffix>{{ deviseChoisie() | symboleDevise }}</span>
         @if (step1Form.controls.depotGarantie.hasError('required') && step1Form.controls.depotGarantie.touched) {
           <mat-error>Le dépôt de garantie est obligatoire.</mat-error>
         }
       </mat-form-field>
       </div>
+      }
 
-      
+      <!-- C12 (RDC) : garantie en mois de loyer et loyers payés d'avance -->
+      @if (visible('garantieMois')) {
+      <div class="kp-row-2">
+        <div class="kp-field">
+          <label class="kp-label">Garantie (en mois de loyer) <span class="kp-req">*</span></label>
+          <mat-form-field class="form-field-full">
+            <input matInput type="number" min="0" max="24" [formControl]="step1Form.controls.garantieMois" placeholder="3" />
+            <span matSuffix>mois</span>
+            @if (step1Form.controls.garantieMois.invalid && step1Form.controls.garantieMois.touched) {
+              <mat-error>Entre 0 et 24 mois.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="kp-field">
+          <label class="kp-label">Loyers payés d'avance <span class="kp-req">*</span></label>
+          <mat-form-field class="form-field-full">
+            <input matInput type="number" min="0" max="24" [formControl]="step1Form.controls.avanceMois" placeholder="3" />
+            <span matSuffix>mois</span>
+            @if (step1Form.controls.avanceMois.invalid && step1Form.controls.avanceMois.touched) {
+              <mat-error>Entre 0 et 24 mois.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+      }
+
+
       <div class="kp-field">
       <label class="kp-label">Disponible dès <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <input matInput [matDatepicker]="pickerDisponible"
                [formControl]="step1Form.controls.disponibleDe"
@@ -166,7 +228,7 @@
 
       <div class="kp-row-2">
                 <div class="kp-field">
-                <label class="kp-label">Surface habitable <span class="kp-req">*</span></label>
+                <label class="kp-label">Surface habitable @if (!sansLogement()) {<span class="kp-req">*</span>}</label>
                 <mat-form-field class="form-field-full">
           <input matInput type="number" [formControl]="step2Form.controls.surfaceHabitable"
                  placeholder="45" />
@@ -179,11 +241,11 @@
         </mat-form-field>
         </div>
 
-        
-        <div class="kp-field">
-        <label class="kp-label">Nombre de pièces <span class="kp-req">*</span></label>
 
-        
+        <div class="kp-field">
+        <label class="kp-label">Nombre de pièces @if (!sansLogement()) {<span class="kp-req">*</span>}</label>
+
+
         <mat-form-field class="form-field-full">
           <input matInput type="number" [formControl]="step2Form.controls.nombrePieces"
                  placeholder="3" />
@@ -203,11 +265,11 @@
         </mat-form-field>
         </div>
 
-        
+
         <div class="kp-field">
         <label class="kp-label">Étage (optionnel) <span class="kp-req">*</span></label>
 
-        
+
         <mat-form-field class="form-field-full">
           <input matInput type="number" [formControl]="step2Form.controls.etage"
                  placeholder="3" />
@@ -219,11 +281,11 @@
         <mat-checkbox [formControl]="step2Form.controls.ascenseur">Ascenseur</mat-checkbox>
       </div>
 
-      
+
       <div class="kp-field">
       <label class="kp-label">Année de construction (optionnel) <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <input matInput type="number" [formControl]="step2Form.controls.anneeConstruction"
                placeholder="1985" />
@@ -235,11 +297,11 @@
       </mat-form-field>
       </div>
 
-      
+
       <div class="kp-field">
       <label class="kp-label">Mode de chauffage (optionnel) <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <mat-select [formControl]="step2Form.controls.modeChauffage">
           <mat-option [value]="null">—</mat-option>
@@ -250,6 +312,7 @@
       </mat-form-field>
       </div>
 
+      @if (visible('classeEnergie')) {
       <div class="kp-row-2">
                 <div class="kp-field">
                 <label class="kp-label">Classe énergie (optionnel) <span class="kp-req">*</span></label>
@@ -263,11 +326,11 @@
         </mat-form-field>
         </div>
 
-        
+
         <div class="kp-field">
         <label class="kp-label">Classe GES (optionnel) <span class="kp-req">*</span></label>
 
-        
+
         <mat-form-field class="form-field-full">
           <mat-select [formControl]="step2Form.controls.classeGes">
             <mat-option [value]="null">—</mat-option>
@@ -278,6 +341,32 @@
         </mat-form-field>
         </div>
       </div>
+      }
+
+      <!-- C11 : équipements proposés dans le pays et heures de courant -->
+      @if (equipementsDuPays().length) {
+      <div class="kp-field">
+        <label class="kp-label">Équipements (optionnel)</label>
+        <div class="kp-equipements">
+          @for (e of equipementsDuPays(); track e) {
+            <mat-checkbox [checked]="equipementsChoisis().includes(e)"
+                          (change)="basculerEquipement(e, $event.checked)">{{ libellesEquipement[e] }}</mat-checkbox>
+          }
+        </div>
+      </div>
+      }
+      @if (visible('heuresElectriciteParJour')) {
+      <div class="kp-field">
+        <label class="kp-label">Heures de courant par jour (optionnel)</label>
+        <mat-form-field class="form-field-full">
+          <input matInput type="number" min="0" max="24" [formControl]="step2Form.controls.heuresElectriciteParJour" placeholder="12" />
+          <span matSuffix>h / jour</span>
+          @if (step2Form.controls.heuresElectriciteParJour.invalid) {
+            <mat-error>Entre 0 et 24 heures.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      }
 
       <div class="kp-step-footer">
         <button mat-button type="button" (click)="prevStep()">
@@ -299,11 +388,11 @@
   @if (currentStep() === 3) {
     <div class="kp-card">
 
-      
+
       <div class="kp-field">
       <label class="kp-label">Adresse <span class="kp-req">*</span></label>
 
-      
+
       <mat-form-field class="form-field-full">
         <input matInput [formControl]="step3Form.controls.adresse"
                placeholder="12 rue des Lilas" />
@@ -327,11 +416,12 @@
         </mat-form-field>
         </div>
 
-        
-        <div class="kp-field">
-        <label class="kp-label">Code postal <span class="kp-req">*</span></label>
 
-        
+        @if (visible('codePostal')) {
+        <div class="kp-field">
+        <label class="kp-label">Code postal @if (obligatoire('codePostal')) {<span class="kp-req">*</span>}</label>
+
+
         <mat-form-field class="form-field-full">
           <input matInput [formControl]="step3Form.controls.codePostal"
                  placeholder="44000" />
@@ -342,20 +432,61 @@
           }
         </mat-form-field>
         </div>
+        }
       </div>
 
-      
-      <div class="kp-field">
-      <label class="kp-label">Pays <span class="kp-req">*</span></label>
 
-      
-      <mat-form-field class="form-field-full">
-        <input matInput [formControl]="step3Form.controls.pays"
-               placeholder="France" />
-        @if (step3Form.controls.pays.hasError('required') && step3Form.controls.pays.touched) {
-          <mat-error>Le pays est obligatoire.</mat-error>
-        }
-      </mat-form-field>
+      @if (visible('commune')) {
+      <div class="kp-row-2">
+        <div class="kp-field">
+          <label class="kp-label">Commune @if (obligatoire('commune')) {<span class="kp-req">*</span>}</label>
+          <mat-form-field class="form-field-full">
+            <input matInput [formControl]="step3Form.controls.commune" placeholder="Kalamu" maxlength="100" />
+            @if (step3Form.controls.commune.hasError('required') && step3Form.controls.commune.touched) {
+              <mat-error>La commune est obligatoire.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="kp-field">
+          <label class="kp-label">Quartier @if (obligatoire('quartier')) {<span class="kp-req">*</span>}</label>
+          <mat-form-field class="form-field-full">
+            <input matInput [formControl]="step3Form.controls.quartier" placeholder="Matonge" maxlength="100" />
+            @if (step3Form.controls.quartier.hasError('required') && step3Form.controls.quartier.touched) {
+              <mat-error>Le quartier est obligatoire.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="kp-row-2">
+        <div class="kp-field">
+          <label class="kp-label">Avenue (optionnel)</label>
+          <mat-form-field class="form-field-full">
+            <input matInput [formControl]="step3Form.controls.avenue" placeholder="Kasa-Vubu" maxlength="150" />
+          </mat-form-field>
+        </div>
+        <div class="kp-field">
+          <label class="kp-label">N° de parcelle (optionnel)</label>
+          <mat-form-field class="form-field-full">
+            <input matInput [formControl]="step3Form.controls.numeroParcelle" placeholder="1234/B" maxlength="50" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="kp-field">
+        <label class="kp-label">Point de repère (optionnel)</label>
+        <mat-form-field class="form-field-full">
+          <input matInput [formControl]="step3Form.controls.pointDeRepere"
+                 placeholder="Derrière l'église X, en face de la station Y" maxlength="255" />
+        </mat-form-field>
+      </div>
+      }
+
+      <!-- C2 : repère sur la carte ou GPS (facultatif) -->
+      <div class="form-field">
+        <label>Emplacement sur la carte <span class="kp-text-caption">(facultatif, recommandé si l'adresse est imprécise)</span></label>
+        <kp-carte-repere [pays]="step3Form.controls.pays.value ?? 'FR'" [initial]="repere()"
+                         (repereChange)="repere.set($event)" />
       </div>
 
       <div class="kp-step-footer">
@@ -380,9 +511,9 @@
       <div class="kp-photo-drop" (click)="fileInput.click()">
         <mat-icon>upload</mat-icon>
         <span>Glissez vos photos ici ou cliquez</span>
-        <span class="kp-text-caption">JPG, PNG, WEBP · 1 Mo max par photo · Au moins 1 photo requise</span>
+        <span class="kp-text-caption">JPG, PNG, WEBP, AVIF, GIF, HEIC · 10 Mo max par photo · 1 à {{ nbMaxPhotos }} photos (50 Mo au total)</span>
       </div>
-      <input #fileInput type="file" multiple accept="image/*"
+      <input #fileInput type="file" multiple [accept]="acceptPhotos"
              style="display:none" (change)="onFilesSelected($event)" />
 
       @if (previewUrls().length > 0) {

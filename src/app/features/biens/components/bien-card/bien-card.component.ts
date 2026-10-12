@@ -1,4 +1,6 @@
+import { libelleTypeBien, vignette } from '../../models/bien.model';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { MontantPipe, SymboleDevisePipe } from '../../../../core/money/montant';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -10,7 +12,7 @@ import { PoiChipComponent } from '../../../../shared/components/poi-chip/poi-chi
 @Component({
   selector: 'kp-bien-card',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterModule, LucideAngularModule, DpeBadgeComponent, OwnerMiniComponent, PoiChipComponent],
+  imports: [DatePipe, DecimalPipe, RouterModule, LucideAngularModule, DpeBadgeComponent, OwnerMiniComponent, PoiChipComponent, MontantPipe, SymboleDevisePipe],
   templateUrl: './bien-card.component.html',
   styleUrls: ['./bien-card.component.scss'],
 })
@@ -18,9 +20,10 @@ export class BienCardComponent {
   @Input({ required: true }) bien!: BienDTO;
   @Output() viewDetail = new EventEmitter<number>();
 
-  get photo1(): string { return (this.bien.images ?? [])[0] ?? ''; }
-  get photo2(): string { return (this.bien.images ?? [])[1] ?? ''; }
-  get photo3(): string { return (this.bien.images ?? [])[2] ?? ''; }
+  // R1 : vignettes de 400 px dans les listes (réseau mobile)
+  get photo1(): string { return vignette(this.bien, 0) ?? ''; }
+  get photo2(): string { return vignette(this.bien, 1) ?? ''; }
+  get photo3(): string { return vignette(this.bien, 2) ?? ''; }
   get photosRestantes(): number { return Math.max(0, (this.bien.images ?? []).length - 3); }
   get totalPhotos(): number { return (this.bien.images ?? []).length; }
   get isVacant(): boolean { return this.bien.locataire == null; }
@@ -28,11 +31,7 @@ export class BienCardComponent {
   get hasCharges(): boolean { return (this.bien.chargesMensuelles ?? 0) > 0; }
 
   typeBienLabel(type: string): string {
-    const map: Record<string, string> = {
-      APPARTEMENT: 'Appartement', STUDIO: 'Studio', MAISON: 'Maison',
-      VILLA: 'Villa', DUPLEX: 'Duplex', BUREAU: 'Bureau', COMMERCE: 'Commerce',
-    };
-    return map[type] ?? type;
+    return libelleTypeBien(type);
   }
 
   onView(event: MouseEvent): void {

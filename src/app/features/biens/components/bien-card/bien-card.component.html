@@ -1,7 +1,7 @@
 <div
   class="card"
   role="article"
-  [attr.aria-label]="bien.titre + ', ' + bien.ville + ', ' + (bien.loyerMensuel ?? 0) + ' € par mois'"
+  [attr.aria-label]="bien.titre + ', ' + bien.ville + ', ' + (bien.loyerMensuel ?? 0 | montant: bien.devise : 0) + ' par mois'"
   (click)="onCardClick()"
 >
   <!-- ── MOSAÏQUE PHOTOS ──────────────────────────────────────────────────── -->
@@ -9,7 +9,7 @@
     <!-- Photo principale -->
     <div class="mp-main" [class.img-error]="!photo1">
       @if (photo1) {
-        <img [src]="photo1" [alt]="bien.titre + ' — photo 1'" (error)="onImgError($event)" />
+        <img [src]="photo1" [alt]="bien.titre + ' — photo 1'" loading="lazy" decoding="async" (error)="onImgError($event)" />
       } @else {
         <div class="photo-placeholder">
           <lucide-icon name="building" [size]="28" [strokeWidth]="1.2" />
@@ -36,7 +36,7 @@
     <!-- Vignette 2 -->
     <div class="mp-sm">
       @if (photo2) {
-        <img [src]="photo2" [alt]="bien.titre + ' — photo 2'" (error)="onImgError($event)" />
+        <img [src]="photo2" [alt]="bien.titre + ' — photo 2'" loading="lazy" decoding="async" (error)="onImgError($event)" />
       } @else {
         <div class="photo-placeholder"></div>
       }
@@ -45,7 +45,7 @@
     <!-- Vignette 3 + overflow -->
     <div class="mp-sm mp-sm-last">
       @if (photo3) {
-        <img [src]="photo3" [alt]="bien.titre + ' — photo 3'" (error)="onImgError($event)" />
+        <img [src]="photo3" [alt]="bien.titre + ' — photo 3'" loading="lazy" decoding="async" (error)="onImgError($event)" />
         @if (photosRestantes > 0) {
           <div class="photos-overflow">+{{ photosRestantes }}</div>
         }
@@ -65,10 +65,10 @@
       </div>
       <div class="price-block">
         <span class="price-value">
-          {{ bien.loyerMensuel | number:'1.0-0' }}&nbsp;<span class="price-unit">€/mois</span>
+          {{ bien.loyerMensuel | number:'1.0-0' }}&nbsp;<span class="price-unit">{{ bien.devise | symboleDevise }}/mois</span>
         </span>
         @if (hasCharges) {
-          <span class="price-charges">+{{ bien.chargesMensuelles }} € charges</span>
+          <span class="price-charges">+{{ bien.chargesMensuelles | montant: bien.devise : 0 }} charges</span>
         }
       </div>
     </div>

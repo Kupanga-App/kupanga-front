@@ -1,4 +1,5 @@
 import { Component, input, computed } from '@angular/core';
+import { MontantPipe } from '../../../../../core/money/montant';
 import { DatePipe } from '@angular/common';
 import { TagPillComponent } from '../../../../../shared/components/tag-pill/tag-pill.component';
 import { ContratDetails } from '../../models/tenant.models';
@@ -6,7 +7,7 @@ import { ContratDetails } from '../../models/tenant.models';
 @Component({
   selector: 'kp-lease-card',
   standalone: true,
-  imports: [TagPillComponent, DatePipe],
+  imports: [TagPillComponent, DatePipe, MontantPipe],
   templateUrl: './lease-card.component.html',
   styleUrl: './lease-card.component.scss',
 })

@@ -6,6 +6,8 @@ import { AuthResponse } from '../models/auth-response.model';
 import { User } from '../models/user.model';
 import { environment } from '../../../../environments/environment';
 import { LogementContextService } from '../../services/logement-context.service';
+import { viderDonneesHorsLigne } from '../../pwa/hors-ligne.service';
+import { normaliserTelephone } from '../../telephone/telephone';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +51,8 @@ export class AuthService {
   }
 
   login(credentials: any): Observable<User> {
+    // R2 : données hors ligne d'un compte précédent effacées avant toute nouvelle connexion
+    void viderDonneesHorsLigne();
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => this.handleAuthSuccess(response)),
       switchMap(() => this.fetchCurrentUser())
@@ -56,6 +60,8 @@ export class AuthService {
   }
 
   loginWithGoogle(idToken: string): Observable<AuthResponse> {
+    // R2 : données hors ligne d'un compte précédent effacées avant toute nouvelle connexion
+    void viderDonneesHorsLigne();
     return this.http.post<AuthResponse>(`${this.apiUrl}/google`, { idToken }, { withCredentials: true }).pipe(
       tap(response => {
         localStorage.setItem('accessToken', response.accessToken);
@@ -78,7 +84,11 @@ export class AuthService {
     return this.fetchCurrentUser();
   }
 
-  register(userData: any, profilePictureFile?: File): Observable<User> {
+  /**
+   * Inscription (A14) : l'API répond 201 avec un message, sans jeton ni cookie. Le compte ne peut se connecter
+   * qu'après avoir ouvert le lien de confirmation reçu par e-mail. Même réponse si l'adresse est déjà inscrite.
+   */
+  register(userData: any, profilePictureFile?: File): Observable<string> {
     const formData = new FormData();
 
     // Construction de l'objet UserFormDTO
@@ -88,7 +98,9 @@ export class AuthService {
       mail: userData.email, // Attention: le backend attend 'mail' mais le form utilise 'email'
       password: userData.password,
       role: userData.role,
-      urlAvatar: profilePictureFile ? null : (userData.avatar || null)
+      urlAvatar: profilePictureFile ? null : (userData.avatar || null),
+      // C6 : facultatif, envoyé au format international (l'API le revérifie)
+      telephone: normaliserTelephone(userData.telephone),
     };
 
     // Ajout du JSON sous forme de Blob/String
@@ -101,10 +113,17 @@ export class AuthService {
       formData.append('imageProfil', profilePictureFile);
     }
 
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, formData).pipe(
-      tap(response => this.handleAuthSuccess(response)),
-      switchMap(() => this.fetchCurrentUser())
-    );
+    return this.http.post(`${this.apiUrl}/register`, formData, { responseType: 'text' });
+  }
+
+  /** A14 : confirme l'adresse e-mail avec le jeton du lien (400 si invalide ou expiré). */
+  verifierEmail(token: string): Observable<string> {
+    return this.http.post(`${this.apiUrl}/verifier-email`, { token }, { responseType: 'text' });
+  }
+
+  /** A14 : renvoie un lien de confirmation (réponse identique que le compte existe ou non ; 429 possible). */
+  renvoyerVerification(email: string): Observable<string> {
+    return this.http.post(`${this.apiUrl}/renvoyer-verification`, { email }, { responseType: 'text' });
   }
 
   // Retourne la liste des avatars locaux
@@ -132,21 +151,13 @@ export class AuthService {
     return localStorage.getItem('accessToken');
   }
 
+  // P0-2 : e-mail et jeton dans le corps JSON (jamais dans l'URL : journaux, historique, Referer)
   forgotPassword(email: string): Observable<string> {
-    return this.http.post(`${this.apiUrl}/forgot-password`, null, {
-      params: { email },
-      responseType: 'text'
-    });
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email }, { responseType: 'text' });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reset-password`, null, {
-      params: {
-        token: token,
-        newPassword: newPassword
-      },
-      responseType: 'text' // Ajout de responseType: 'text' car le backend renvoie probablement une chaîne simple
-    });
+  resetPassword(token: string, newPassword: string): Observable<string> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword }, { responseType: 'text' });
   }
 
   private handleAuthSuccess(response: AuthResponse): void {
@@ -171,10 +182,31 @@ export class AuthService {
       lastName: raw.lastName,
       role: raw.role,
       urlProfile: raw.urlProfile,
+      telephone: raw.telephone ?? null,
     };
   }
 
+  /**
+   * C6 : enregistre (ou efface avec `null`) le numéro de contact du compte connecté.
+   * L'API répond 400 si le numéro n'est pas au format international.
+   */
+  modifierTelephone(telephone: string | null): Observable<User> {
+    return this.http.patch<any>(`${environment.apiUrl}/users/me/telephone`, { telephone }).pipe(
+      map(raw => {
+        const courant = this.currentUser();
+        const user: User = courant
+          ? { ...courant, telephone: raw?.telephone ?? null }
+          : this.normalizeUser(raw);
+        this.currentUser.set(user);
+        localStorage.setItem('user', JSON.stringify(user));
+        return user;
+      })
+    );
+  }
+
   clearClientState(): void {
+    // R2 : aucune donnée de ce compte ne reste disponible hors ligne sur l'appareil
+    void viderDonneesHorsLigne();
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
     this.currentUser.set(null);

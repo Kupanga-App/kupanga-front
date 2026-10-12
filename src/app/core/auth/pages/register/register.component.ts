@@ -1,12 +1,12 @@
+import { validateurTelephone } from '../../../telephone/telephone';
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder, ReactiveFormsModule, Validators,
   AbstractControl, ValidationErrors, ValidatorFn
 } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { LucideAngularModule, ArrowRight, Check, Smile, Upload } from 'lucide-angular';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { AuthLayoutCComponent } from '../../shared/auth-layout-c/auth-layout-c.component';
 import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
@@ -14,6 +14,11 @@ import { PasswordStrengthComponent } from '../../shared/password-strength/passwo
 import { RolePickerComponent } from '../../shared/role-picker/role-picker.component';
 import { AvatarModalComponent } from '../../shared/avatar-modal/avatar-modal.component';
 import { StepsComponent } from '../../shared/steps/steps.component';
+import { messageErreurApi } from '../../../http/api-error';
+import { ACCEPT_PHOTOS, PhotoRefuseeError, preparerPhoto } from '../../../media/photos';
+
+/** Même règle que l'API (UserFormDTO) : 8 caractères minimum, une minuscule, une majuscule, un chiffre. */
+export const MOT_DE_PASSE_ROBUSTE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export const mustMatch: ValidatorFn = (ctrl: AbstractControl): ValidationErrors | null => {
   const pw = ctrl.get('password');
@@ -49,15 +54,18 @@ export const mustMatch: ValidatorFn = (ctrl: AbstractControl): ValidationErrors 
 export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
 
   readonly ArrowRight = ArrowRight;
   readonly Check = Check;
   readonly Smile = Smile;
   readonly Upload = Upload;
 
-  step = signal<1 | 2>(1);
+  /** 3 : compte créé, lien de confirmation envoyé (A14). */
+  step = signal<1 | 2 | 3>(1);
+  readonly acceptPhotos = ACCEPT_PHOTOS;
+  emailInscrit = signal('');
+  isResending = signal(false);
+  resendInfo = signal<string | null>(null);
   isSubmitting = signal(false);
   serverError = signal<string | null>(null);
   showAvatarModal = signal(false);
@@ -67,11 +75,12 @@ export class RegisterComponent {
 
   form = this.fb.group({
     email:           ['', [Validators.required, Validators.email]],
-    password:        ['', [Validators.required, Validators.minLength(8)]],
+    password:        ['', [Validators.required, Validators.maxLength(72), Validators.pattern(MOT_DE_PASSE_ROBUSTE)]],
     confirmPassword: ['', [Validators.required]],
-    firstName:       ['', [Validators.required]],
-    lastName:        ['', [Validators.required]],
+    firstName:       ['', [Validators.required, Validators.maxLength(50)]],
+    lastName:        ['', [Validators.required, Validators.maxLength(50)]],
     role:            ['ROLE_PROPRIETAIRE', [Validators.required]],
+    telephone:       ['', [validateurTelephone]],
   }, { validators: mustMatch });
 
   get emailCtrl()           { return this.form.get('email') as any; }
@@ -80,6 +89,7 @@ export class RegisterComponent {
   get firstNameCtrl()       { return this.form.get('firstName') as any; }
   get lastNameCtrl()        { return this.form.get('lastName') as any; }
   get roleCtrl()            { return this.form.get('role') as any; }
+  get telephoneCtrl()       { return this.form.get('telephone') as any; }
   get passwordValue()       { return this.form.get('password')?.value ?? ''; }
 
   get avatarPreview(): string {
@@ -123,15 +133,25 @@ export class RegisterComponent {
     this.showAvatarModal.set(false);
   }
 
-  onFileUpload(event: Event): void {
+  async onFileUpload(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    input.value = '';
     if (!file) return;
-    this.uploadedFile.set(file);
+    this.serverError.set(null);
+    // B5 : format et taille contrôlés avant l'envoi, HEIC (iPhone) converti en JPEG
+    let photo: File;
+    try {
+      photo = await preparerPhoto(file);
+    } catch (e) {
+      this.serverError.set(e instanceof PhotoRefuseeError ? e.message : 'Cette photo ne peut pas être utilisée.');
+      return;
+    }
+    this.uploadedFile.set(photo);
     this.selectedAvatarUrl.set('');
     const reader = new FileReader();
     reader.onload = e => this.uploadedPreview.set(e.target?.result as string);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(photo);
   }
 
   onSubmit(): void {
@@ -144,14 +164,32 @@ export class RegisterComponent {
 
     const { confirmPassword, ...data } = this.form.value;
     this.authService.register(data, this.uploadedFile() ?? undefined).subscribe({
-      next: (user) => {
+      next: () => {
+        // A14 : pas de connexion automatique, le compte s'active par le lien envoyé par e-mail
         this.isSubmitting.set(false);
-        this.snackBar.open('Compte créé et connecté !', 'Fermer', { duration: 4000 });
-        this.router.navigate(user.role === 'ROLE_PROPRIETAIRE' ? ['/pro'] : ['/loc']);
+        this.emailInscrit.set(data.email ?? '');
+        this.step.set(3);
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        this.serverError.set(err.error?.message ?? "Une erreur s'est produite lors de l'inscription.");
+        this.serverError.set(messageErreurApi(err, "Une erreur s'est produite lors de l'inscription."));
+      }
+    });
+  }
+
+  /** A14 : nouveau lien de confirmation (réponse identique que le compte existe ou non). */
+  renvoyerLien(): void {
+    if (!this.emailInscrit() || this.isResending()) return;
+    this.isResending.set(true);
+    this.resendInfo.set(null);
+    this.authService.renvoyerVerification(this.emailInscrit()).subscribe({
+      next: () => {
+        this.isResending.set(false);
+        this.resendInfo.set('Un nouveau lien a été envoyé si le compte attend encore sa confirmation.');
+      },
+      error: (err) => {
+        this.isResending.set(false);
+        this.resendInfo.set(messageErreurApi(err, "Le lien n'a pas pu être renvoyé. Réessayez plus tard."));
       }
     });
   }

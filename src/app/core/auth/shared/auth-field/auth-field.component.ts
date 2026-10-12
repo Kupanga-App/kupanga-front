@@ -1,3 +1,4 @@
+import { MESSAGE_TELEPHONE_INVALIDE } from '../../../telephone/telephone';
 import { Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
@@ -14,7 +15,7 @@ export class AuthFieldComponent {
   @Input() label = '';
   @Input() required = false;
   @Input() hint = '';
-  @Input() type: 'text' | 'email' | 'password' = 'text';
+  @Input() type: 'text' | 'email' | 'password' | 'tel' = 'text';
   @Input() placeholder = '';
   @Input() control!: FormControl;
   @Input() fieldId = '';
@@ -47,7 +48,10 @@ export class AuthFieldComponent {
     if (errors['required']) return 'Ce champ est requis.';
     if (errors['email']) return 'Adresse email invalide.';
     if (errors['minlength']) return `Minimum ${errors['minlength'].requiredLength} caractères.`;
+    if (errors['maxlength']) return `Maximum ${errors['maxlength'].requiredLength} caractères.`;
+    if (errors['pattern']) return 'Au moins 8 caractères, dont une majuscule, une minuscule et un chiffre.';
     if (errors['passwordMismatch']) return 'Les mots de passe ne correspondent pas.';
+    if (errors['telephone']) return MESSAGE_TELEPHONE_INVALIDE;
     return 'Valeur invalide.';
   }
 }

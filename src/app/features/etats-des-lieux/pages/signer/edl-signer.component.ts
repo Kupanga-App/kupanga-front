@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EdlService } from '../../../gestion-logement/services/edl.service';
 import { EtatDesLieuxDTO } from '../../../gestion-logement/models/edl.model';
 import { SignaturePadComponent } from '../../../../shared/components/signature-pad/signature-pad.component';
+import { messageLienSignature } from '../../../../core/http/api-error';
 
 @Component({
   selector: 'kp-edl-signer',
@@ -47,8 +48,8 @@ export class EdlSignerComponent implements OnInit {
         this.edl.set(e);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set("État des lieux introuvable ou lien expiré");
+      error: (err) => {
+        this.error.set(messageLienSignature(err, "État des lieux introuvable ou lien expiré"));
         this.loading.set(false);
       },
     });
@@ -63,8 +64,8 @@ export class EdlSignerComponent implements OnInit {
         this.signing.set(false);
         this.signed.set(true);
       },
-      error: () => {
-        this.error.set('Erreur lors de la signature');
+      error: (err) => {
+        this.error.set(messageLienSignature(err, 'Erreur lors de la signature'));
         this.signing.set(false);
       },
     });

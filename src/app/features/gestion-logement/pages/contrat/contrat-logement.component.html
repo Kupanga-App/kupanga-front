@@ -42,9 +42,9 @@
             <div class="kp-kv-row"><span class="kp-kv-key">Début</span><span class="kp-kv-val">{{ contrat()!.dateDebut | date:'dd MMM yyyy' }}</span></div>
             <div class="kp-kv-row"><span class="kp-kv-key">Fin</span><span class="kp-kv-val">{{ contrat()!.dateFin | date:'dd MMM yyyy' }}</span></div>
             <div class="kp-kv-row"><span class="kp-kv-key">Durée</span><span class="kp-kv-val">{{ contrat()!.dureeBailMois }} mois</span></div>
-            <div class="kp-kv-row"><span class="kp-kv-key">Loyer</span><span class="kp-kv-val">{{ contrat()!.loyerMensuel }} €/mois</span></div>
-            <div class="kp-kv-row"><span class="kp-kv-key">Charges</span><span class="kp-kv-val">{{ contrat()!.chargesMensuelles }} €/mois</span></div>
-            <div class="kp-kv-row"><span class="kp-kv-key">Dépôt de garantie</span><span class="kp-kv-val">{{ contrat()!.depotGarantie }} €</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Loyer</span><span class="kp-kv-val">{{ contrat()!.loyerMensuel | montant: contrat()!.devise }}/mois</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Charges</span><span class="kp-kv-val">{{ contrat()!.chargesMensuelles | montant: contrat()!.devise }}/mois</span></div>
+            <div class="kp-kv-row"><span class="kp-kv-key">Dépôt de garantie</span><span class="kp-kv-val">{{ contrat()!.depotGarantie | montant: contrat()!.devise }}</span></div>
           </div>
         </div>
         <div class="kp-sign-box">
@@ -71,10 +71,14 @@
             <p>Un email a été envoyé à <strong>{{ contrat()!.locataire?.mail }}</strong>.</p>
           </div>
         </div>
+        @if (bien(); as b) {
+          <kp-bouton-whatsapp type="contrat" [documentId]="contrat()!.id" [pays]="b.pays"
+            libelle="Prévenir le locataire par WhatsApp" />
+        }
         <div class="kp-kv-list">
           <div class="kp-kv-row"><span class="kp-kv-key">Début</span><span class="kp-kv-val">{{ contrat()!.dateDebut | date:'dd MMM yyyy' }}</span></div>
           <div class="kp-kv-row"><span class="kp-kv-key">Fin</span><span class="kp-kv-val">{{ contrat()!.dateFin | date:'dd MMM yyyy' }}</span></div>
-          <div class="kp-kv-row"><span class="kp-kv-key">Loyer</span><span class="kp-kv-val">{{ contrat()!.loyerMensuel }} €/mois + {{ contrat()!.chargesMensuelles }} € charges</span></div>
+          <div class="kp-kv-row"><span class="kp-kv-key">Loyer</span><span class="kp-kv-val">{{ contrat()!.loyerMensuel | montant: contrat()!.devise }}/mois + {{ contrat()!.chargesMensuelles | montant: contrat()!.devise }} charges</span></div>
         </div>
       </div>
     }

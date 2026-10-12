@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BienCreateRequest, BienDTO, BienFormDTO, BienPageDTO, BienSearchDTO, LocatairePageDTO, LocataireSearchDTO } from '../models/bien.model';
+import { BienCreateRequest, BienDTO, BienFormDTO, BienPageDTO, BienSearchDTO, LocatairePageDTO, LocataireSearchDTO, UserDTO } from '../models/bien.model';
 
 @Injectable({ providedIn: 'root' })
 export class BienService {
@@ -23,8 +23,29 @@ export class BienService {
     return this.http.post<BienPageDTO>(`${this.apiUrl}/search`, dto);
   }
 
-  getById(id: number): Observable<BienDTO> {
-    return this.http.get<BienDTO>(`${this.apiUrl}/${id}`);
+  /**
+   * Vue publique d'une annonce (P0-6) : sans locataire ni documents ; propriétaire réduit au prénom,
+   * à l'initiale du nom et à la photo. 404 si le bien est archivé (B12).
+   */
+  getPublic(id: number): Observable<BienDTO> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(bien => ({
+        ...bien,
+        proprietaire: {
+          firstName: bien.proprietaire?.firstName ?? '',
+          lastName: bien.proprietaire?.initialeNom ? `${bien.proprietaire.initialeNom}.` : '',
+          urlProfile: bien.proprietaire?.urlProfile,
+        } as UserDTO,
+        contrats: null,
+        quittances: null,
+        documents: null,
+      }) as BienDTO)
+    );
+  }
+
+  /** Vue privée (propriétaire ou locataire du bien) : parties avec e-mail, documents, statut d'archivage. 403 sinon. */
+  getPrive(id: number): Observable<BienDTO> {
+    return this.http.get<BienDTO>(`${environment.apiUrl}/users/biens/${id}`);
   }
 
   update(id: number, dto: Partial<BienFormDTO>): Observable<BienDTO> {

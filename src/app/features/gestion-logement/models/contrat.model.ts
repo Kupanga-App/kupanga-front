@@ -1,4 +1,5 @@
-import { UserDTO } from '../../biens/models/bien.model';
+import { Pays, UserDTO } from '../../biens/models/bien.model';
+import { Devise } from '../../../core/money/montant';
 
 export type ContratStatut =
   | 'BROUILLON'
@@ -17,6 +18,13 @@ export interface ContratDTO {
   loyerMensuel: number;
   chargesMensuelles: number;
   depotGarantie: number;
+  /** C12 (RDC) : garantie en mois (montant dans depotGarantie) et loyers payés d'avance, figés sur le bail. */
+  garantieMois?: number;
+  avanceMois?: number;
+  /** J3 : juridiction figée sur le bail à sa création. */
+  pays?: Pays;
+  devise?: Devise;
+  modeleVersion?: string;
   dateDebut: string;
   dateFin?: string;
   dureeBailMois: number;
@@ -38,7 +46,10 @@ export interface ContratFormDTO {
   dureeBailMois: number;
   loyerMensuel: number;
   chargesMensuelles: number;
-  depotGarantie: number;
+  /** C12 : France ; en RDC la garantie est en mois (montant calculé par l'API). */
+  depotGarantie?: number;
+  garantieMois?: number;
+  avanceMois?: number;
 }
 
 export interface ContratSearchDTO {

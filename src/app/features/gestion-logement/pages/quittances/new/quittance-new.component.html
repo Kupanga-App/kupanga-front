@@ -101,22 +101,22 @@
             <div class="wsection-h">Montants</div>
             <div class="form-row col3">
                             <div class="kp-field">
-                            <label class="kp-label">Loyer (€) <span class="kp-req">*</span></label>
+                            <label class="kp-label">Loyer ({{ devise() | symboleDevise }}) <span class="kp-req">*</span></label>
                             <mat-form-field>
                 <input matInput type="number" formControlName="loyerMensuel" min="0" />
-                <span matSuffix>€</span>
+                <span matSuffix>{{ devise() | symboleDevise }}</span>
               </mat-form-field>
               </div>
                             <div class="kp-field">
-                            <label class="kp-label">Charges (€) <span class="kp-req">*</span></label>
+                            <label class="kp-label">Charges ({{ devise() | symboleDevise }}) <span class="kp-req">*</span></label>
                             <mat-form-field>
                 <input matInput type="number" formControlName="chargesMensuelles" min="0" />
-                <span matSuffix>€</span>
+                <span matSuffix>{{ devise() | symboleDevise }}</span>
               </mat-form-field>
               </div>
               <div class="total-field">
                 <span class="total-lbl">Total</span>
-                <span class="total-val">{{ total() | number:'1.2-2' }} €</span>
+                <span class="total-val">{{ total() | montant: devise() }}</span>
               </div>
             </div>
           </div>
@@ -230,14 +230,14 @@
 
           <div class="paper-amount">
             <span class="paper-amount-lbl">Total dû</span>
-            <span class="paper-amount-val">{{ total() | number:'1.2-2' }} €</span>
+            <span class="paper-amount-val">{{ total() | montant: devise() }}</span>
           </div>
 
           <div class="paper-kv">
             <span class="k">Loyer</span>
-            <span class="v">{{ form.get('loyerMensuel')?.value ?? 0 | number:'1.2-2' }} €</span>
+            <span class="v">{{ form.get('loyerMensuel')?.value ?? 0 | montant: devise() }}</span>
             <span class="k">Charges</span>
-            <span class="v">{{ form.get('chargesMensuelles')?.value ?? 0 | number:'1.2-2' }} €</span>
+            <span class="v">{{ form.get('chargesMensuelles')?.value ?? 0 | montant: devise() }}</span>
             <span class="k">Période</span>
             <span class="v">{{ monthLabel() }}</span>
           </div>

@@ -11,6 +11,8 @@ import { EdlService } from '../../services/edl.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { EtatDesLieuxDTO } from '../../models/edl.model';
 import { SignaturePadComponent } from '../../../../shared/components/signature-pad/signature-pad.component';
+import { messageErreurApi } from '../../../../core/http/api-error';
+import { BoutonWhatsappComponent } from '../../components/bouton-whatsapp/bouton-whatsapp.component';
 
 @Component({
   selector: 'kp-edl-logement',
@@ -22,6 +24,7 @@ import { SignaturePadComponent } from '../../../../shared/components/signature-p
     MatIconModule,
     MatProgressSpinnerModule,
     SignaturePadComponent,
+    BoutonWhatsappComponent,
   ],
   templateUrl: './edl-logement.component.html',
   styleUrls: ['./edl-logement.component.scss'],
@@ -76,8 +79,8 @@ export class EdlLogementComponent implements OnInit {
           this.signatureBase64.set('');
           this.snackBar.open('Signé ! Un email a été envoyé au locataire.', 'OK', { duration: 5000 });
         },
-        error: () => {
-          this.snackBar.open('Erreur lors de la signature', 'Fermer', { duration: 4000 });
+        error: (err) => {
+          this.snackBar.open(messageErreurApi(err, 'Erreur lors de la signature'), 'Fermer', { duration: 4000 });
           this.signing.set(false);
         },
       });

@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MontantPipe } from '../../../../core/money/montant';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +12,8 @@ import { ContratService } from '../../services/contrat.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ContratDTO, ContratStatut } from '../../models/contrat.model';
 import { SignaturePadComponent } from '../../../../shared/components/signature-pad/signature-pad.component';
+import { messageErreurApi } from '../../../../core/http/api-error';
+import { BoutonWhatsappComponent } from '../../components/bouton-whatsapp/bouton-whatsapp.component';
 
 @Component({
   selector: 'kp-contrat-logement',
@@ -21,7 +24,7 @@ import { SignaturePadComponent } from '../../../../shared/components/signature-p
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    SignaturePadComponent,
+    SignaturePadComponent, MontantPipe, BoutonWhatsappComponent
   ],
   templateUrl: './contrat-logement.component.html',
   styleUrls: ['./contrat-logement.component.scss'],
@@ -64,8 +67,8 @@ export class ContratLogementComponent implements OnInit {
           this.signing.set(false);
           this.signatureBase64.set('');
         },
-        error: () => {
-          this.snackBar.open('Erreur lors de la signature', 'Fermer', { duration: 4000 });
+        error: (err) => {
+          this.snackBar.open(messageErreurApi(err, 'Erreur lors de la signature'), 'Fermer', { duration: 4000 });
           this.signing.set(false);
         },
       });

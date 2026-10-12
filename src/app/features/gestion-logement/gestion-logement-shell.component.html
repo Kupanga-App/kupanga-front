@@ -25,13 +25,20 @@
   <!-- Contenu -->
   @if (!loading() && bien()) {
 
+    @if (bien()!.archive) {
+      <p class="kp-archive-banner" role="status">
+        Ce bien a été archivé : ses contrats, états des lieux et quittances restent consultables,
+        mais aucun document ne peut plus être créé ni signé.
+      </p>
+    }
+
     <!-- Hero card ──────────────────────────────────────────────────── -->
     <div class="manage-hero">
 
       <!-- Thumbnail -->
       <div class="m-thumb">
         @if (bien()!.images?.length) {
-          <img [src]="bien()!.images![0]" [alt]="bien()!.titre" />
+          <img [src]="vignette(bien()!, 0)" [alt]="bien()!.titre" />
           @if (bien()!.images!.length > 1) {
             <div class="ph-count">+{{ bien()!.images!.length - 1 }}</div>
           }
@@ -56,7 +63,7 @@
           <span class="m-meta-i"><kp-icon name="map-pin" [size]="13" /> {{ bien()!.adresse }}, {{ bien()!.ville }}</span>
           @if (bien()!.loyerMensuel) {
             <span class="sep">·</span>
-            <span class="m-meta-i"><kp-icon name="dollar-sign" [size]="13" /> {{ bien()!.loyerMensuel }} €/mois</span>
+            <span class="m-meta-i"><kp-icon name="dollar-sign" [size]="13" /> {{ bien()!.loyerMensuel | montant: bien()!.devise }}/mois</span>
           }
           @if (bien()!.surfaceHabitable) {
             <span class="sep">·</span>
@@ -107,7 +114,7 @@
         </ng-template>
         <ng-template matTabContent>
           <div class="tab-content">
-            @if (gestion.activeView() === 'contrat-new') {
+            @if (gestion.activeView() === 'contrat-new' && !bien()!.archive) {
               <kp-contrat-new />
             } @else {
               <kp-contrat-logement />
@@ -128,7 +135,7 @@
         </ng-template>
         <ng-template matTabContent>
           <div class="tab-content">
-            @if (gestion.activeView() === 'edl-new') {
+            @if (gestion.activeView() === 'edl-new' && !bien()!.archive) {
               <kp-edl-new />
             } @else {
               <kp-edl-logement />
@@ -149,7 +156,7 @@
         </ng-template>
         <ng-template matTabContent>
           <div class="tab-content">
-            @if (gestion.activeView() === 'quittance-new') {
+            @if (gestion.activeView() === 'quittance-new' && !bien()!.archive) {
               <kp-quittance-new />
             } @else {
               <kp-quittances-logement />

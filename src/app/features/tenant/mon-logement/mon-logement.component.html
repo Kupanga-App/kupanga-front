@@ -101,6 +101,7 @@
         <!-- Prochain loyer -->
         <kp-next-rent
           [montant]="d.prochainLoyer.montant"
+          [devise]="d.prochainLoyer.devise"
           [dateEcheance]="d.prochainLoyer.dateEcheance"
           (payerMaintenant)="onPayerMaintenant()"
         />

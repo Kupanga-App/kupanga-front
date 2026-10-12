@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { AuthLayoutCComponent, AuthRubric } from '../../shared/auth-layout-c/auth-layout-c.component';
 import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
 import { environment } from '../../../../../environments/environment';
+import { messageErreurApi } from '../../../http/api-error';
 
 @Component({
   selector: 'app-login',
@@ -36,6 +37,10 @@ export class LoginComponent implements AfterViewInit {
   isGoogleLoading = signal(false);
   serverError = signal<string | null>(null);
   googleReady = signal(false);
+  /** A14 : connexion refusée (403) tant que l'adresse n'est pas confirmée → proposer un nouveau lien. */
+  emailNonVerifie = signal(false);
+  isResending = signal(false);
+  resendInfo = signal<string | null>(null);
 
   loginForm = this.fb.group({
     email:    ['', [Validators.required, Validators.email]],
@@ -101,9 +106,10 @@ export class LoginComponent implements AfterViewInit {
           });
         }
       },
-      error: () => {
+      error: (err) => {
         this.isGoogleLoading.set(false);
-        this.serverError.set('Connexion Google échouée. Vérifiez votre compte et réessayez.');
+        // A4 : 401 « adresse Google non confirmée » ; 429 trop de tentatives
+        this.serverError.set(messageErreurApi(err, 'Connexion Google échouée. Vérifiez votre compte et réessayez.'));
       }
     });
   }
@@ -115,6 +121,8 @@ export class LoginComponent implements AfterViewInit {
     }
     this.isSubmitting.set(true);
     this.serverError.set(null);
+    this.emailNonVerifie.set(false);
+    this.resendInfo.set(null);
 
     const { email, password } = this.loginForm.value;
     this.authService.login({ email, password }).subscribe({
@@ -122,9 +130,33 @@ export class LoginComponent implements AfterViewInit {
         this.isSubmitting.set(false);
         this.router.navigate(user.role === 'ROLE_PROPRIETAIRE' ? ['/pro'] : ['/loc']);
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting.set(false);
-        this.serverError.set('Identifiants incorrects. Veuillez réessayer.');
+        if (err?.status === 403) {
+          this.emailNonVerifie.set(true);
+        }
+        this.serverError.set(
+          err?.status === 401
+            ? 'E-mail ou mot de passe incorrect.'
+            : messageErreurApi(err, 'Connexion impossible. Veuillez réessayer.')
+        );
+      }
+    });
+  }
+
+  /** A14 : renvoie le lien de confirmation (réponse identique que le compte existe ou non). */
+  renvoyerLien(): void {
+    const email = this.emailCtrl.value as string;
+    if (!email || this.isResending()) return;
+    this.isResending.set(true);
+    this.authService.renvoyerVerification(email).subscribe({
+      next: (message) => {
+        this.isResending.set(false);
+        this.resendInfo.set(message || 'Si un compte non confirmé existe pour cette adresse, un nouveau lien a été envoyé.');
+      },
+      error: (err) => {
+        this.isResending.set(false);
+        this.resendInfo.set(messageErreurApi(err, "Le lien n'a pas pu être renvoyé. Réessayez plus tard."));
       }
     });
   }

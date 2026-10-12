@@ -174,25 +174,25 @@
               <div class="wsection-h">Montants mensuels</div>
               <div class="form-row col3">
                                 <div class="kp-field">
-                                <label class="kp-label">Loyer (€) <span class="kp-req">*</span></label>
+                                <label class="kp-label">Loyer ({{ devise() | symboleDevise }}) <span class="kp-req">*</span></label>
                                 <mat-form-field>
                   <input matInput type="number" formControlName="loyerMensuel" min="0" />
-                  <span matSuffix>€</span>
+                  <span matSuffix>{{ devise() | symboleDevise }}</span>
                   @if (step3.get('loyerMensuel')?.invalid && step3.get('loyerMensuel')?.touched) {
                     <mat-error>Loyer requis</mat-error>
                   }
                 </mat-form-field>
                 </div>
                                 <div class="kp-field">
-                                <label class="kp-label">Charges (€) <span class="kp-req">*</span></label>
+                                <label class="kp-label">Charges ({{ devise() | symboleDevise }}) <span class="kp-req">*</span></label>
                                 <mat-form-field>
                   <input matInput type="number" formControlName="chargesMensuelles" min="0" />
-                  <span matSuffix>€</span>
+                  <span matSuffix>{{ devise() | symboleDevise }}</span>
                 </mat-form-field>
                 </div>
                 <div class="total-field">
                   <span class="total-lbl">Total / mois</span>
-                  <span class="total-val">{{ totalMensuel() }} €</span>
+                  <span class="total-val">{{ totalMensuel() | montant: devise() }}</span>
                 </div>
               </div>
             </div>
@@ -200,16 +200,40 @@
             <div class="wsection">
               <div class="wsection-h">Garanties</div>
               <div class="form-row col2">
+                @if (!garantieEnMois()) {
                                 <div class="kp-field">
-                                <label class="kp-label">Dépôt de garantie (€) <span class="kp-req">*</span></label>
+                                <label class="kp-label">Dépôt de garantie ({{ devise() | symboleDevise }}) <span class="kp-req">*</span></label>
                                 <mat-form-field>
                   <input matInput type="number" formControlName="depotGarantie" min="0" />
-                  <span matSuffix>€</span>
+                  <span matSuffix>{{ devise() | symboleDevise }}</span>
                   @if (step3.get('depotGarantie')?.invalid && step3.get('depotGarantie')?.touched) {
                     <mat-error>Dépôt requis</mat-error>
                   }
                 </mat-form-field>
                 </div>
+                } @else {
+                <!-- C12 (RDC) : garantie en mois de loyer et loyers payés d'avance -->
+                <div class="kp-field">
+                  <label class="kp-label">Garantie (mois de loyer) <span class="kp-req">*</span></label>
+                  <mat-form-field>
+                    <input matInput type="number" formControlName="garantieMois" min="0" max="24" />
+                    <span matSuffix>mois</span>
+                    @if (step3.get('garantieMois')?.invalid && step3.get('garantieMois')?.touched) {
+                      <mat-error>Entre 0 et 24 mois</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                <div class="kp-field">
+                  <label class="kp-label">Loyers payés d'avance <span class="kp-req">*</span></label>
+                  <mat-form-field>
+                    <input matInput type="number" formControlName="avanceMois" min="0" max="24" />
+                    <span matSuffix>mois</span>
+                    @if (step3.get('avanceMois')?.invalid && step3.get('avanceMois')?.touched) {
+                      <mat-error>Entre 0 et 24 mois</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                }
               </div>
             </div>
           </div>
@@ -253,17 +277,17 @@
                 <div class="recap-row">
                   <kp-icon name="check" [size]="14" class="recap-check" />
                   <span class="recap-k">Loyer</span>
-                  <span class="recap-v">{{ step3.get('loyerMensuel')?.value }} €/mois</span>
+                  <span class="recap-v">{{ step3.get('loyerMensuel')?.value | montant: devise() }}/mois</span>
                 </div>
                 <div class="recap-row">
                   <kp-icon name="check" [size]="14" class="recap-check" />
                   <span class="recap-k">Charges</span>
-                  <span class="recap-v">{{ step3.get('chargesMensuelles')?.value }} €/mois</span>
+                  <span class="recap-v">{{ step3.get('chargesMensuelles')?.value | montant: devise() }}/mois</span>
                 </div>
                 <div class="recap-row">
                   <kp-icon name="check" [size]="14" class="recap-check" />
                   <span class="recap-k">Dépôt de garantie</span>
-                  <span class="recap-v">{{ step3.get('depotGarantie')?.value }} €</span>
+                  <span class="recap-v">@if (garantieEnMois()) {{{ step3.get('garantieMois')?.value }} mois + {{ step3.get('avanceMois')?.value }} mois d'avance} @else {{{ step3.get('depotGarantie')?.value | montant: devise() }}}</span>
                 </div>
               </div>
             </div>
@@ -368,15 +392,15 @@
             <div class="paper-art">Article 3 — Loyer</div>
             <div class="paper-amount">
               <span class="paper-amount-lbl">Total mensuel</span>
-              <span class="paper-amount-val">{{ totalMensuel() }} €</span>
+              <span class="paper-amount-val">{{ totalMensuel() | montant: devise() }}</span>
             </div>
             <div class="paper-kv mt8">
               <span class="k">Loyer</span>
-              <span class="v">{{ step3.get('loyerMensuel')?.value || '—' }} €</span>
+              <span class="v">{{ (step3.get('loyerMensuel')?.value | montant: devise()) || '—' }}</span>
               <span class="k">Charges</span>
-              <span class="v">{{ step3.get('chargesMensuelles')?.value || '—' }} €</span>
+              <span class="v">{{ (step3.get('chargesMensuelles')?.value | montant: devise()) || '—' }}</span>
               <span class="k">Dépôt</span>
-              <span class="v">{{ step3.get('depotGarantie')?.value || '—' }} €</span>
+              <span class="v">@if (garantieEnMois()) {{{ step3.get('garantieMois')?.value ?? '—' }} mois de loyer} @else {{{ (step3.get('depotGarantie')?.value | montant: devise()) || '—' }}}</span>
             </div>
           </div>
 

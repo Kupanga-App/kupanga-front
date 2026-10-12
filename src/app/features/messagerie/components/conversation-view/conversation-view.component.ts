@@ -51,6 +51,11 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   @Output() backRequested = new EventEmitter<void>();
   @Output() sent = new EventEmitter<MessageDTO>();
   @Output() nameResolved = new EventEmitter<string>();
+  /**
+   * Premier contact depuis une annonce (emailInterlocuteur vide) : l'adresse du propriétaire est connue
+   * à l'écho du premier message envoyé (W13) ; la vue bascule alors sur la conversation créée.
+   */
+  @Output() interlocuteurConnu = new EventEmitter<string>();
 
   @ViewChild('messagesEl') messagesEl!: ElementRef<HTMLElement>;
 
@@ -96,6 +101,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   get displayNom(): string {
     const nom = this.interlocuteurNom();
     if (nom) return nom;
+    if (!this.emailInterlocuteur) return 'Propriétaire';
     const local = this.emailInterlocuteur.split('@')[0];
     return local
       .split(/[._-]/)
@@ -157,12 +163,26 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
       this.ws.messages$.subscribe((msg) => {
         if (this.belongsToCurrentConv(msg)) {
           this.addMessageIfNew(msg);
-          if (msg.expediteurEmail === this.emailInterlocuteur) {
+          if (!this.emailInterlocuteur && msg.destinataireEmail) {
+            this.interlocuteurConnu.emit(msg.destinataireEmail);
+          } else if (msg.expediteurEmail === this.emailInterlocuteur) {
             this.scheduleMarquerLus();
           }
         }
       })
     );
+
+    // W13 : statut des messages envoyés (en attente, échec)
+    this.subs.add(
+      this.ws.statutsEnvoi$.subscribe(({ idClient, statut, erreur }) => {
+        this.messages.update((list) =>
+          list.map((m) => (m.idClient === idClient && m.statut ? { ...m, statut, erreur } : m))
+        );
+      })
+    );
+
+    // W11 : rattrapage des messages reçus pendant la coupure
+    this.subs.add(this.ws.reconnected$.subscribe(() => this.rattraperHistorique()));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -225,6 +245,44 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
     });
   }
 
+  /**
+   * Recharge l'historique sans vider l'écran et garde les messages locaux pas encore confirmés.
+   * Un message en échec retrouvé dans l'historique (enregistré, mais accusé perdu pendant la coupure)
+   * n'est plus suivi : on garde la version du serveur.
+   */
+  private rattraperHistorique(): void {
+    if (!this.bienId || !this.emailInterlocuteur) return;
+    const bienId = this.bienId;
+    const email = this.emailInterlocuteur;
+
+    this.chatService.getHistorique(bienId, email).subscribe({
+      next: (msgs) => {
+        if (bienId !== this.bienId || email !== this.emailInterlocuteur) return;
+        const serveur = msgs ?? [];
+        const dejaAffiches = new Set(this.messages().map((m) => m.id));
+        const nouveauxDeMoi = serveur.filter(
+          (m) => !dejaAffiches.has(m.id) && m.expediteurEmail === this.myEmail
+        );
+        const locaux = this.messages().filter((m) => m.statut && m.idClient).filter((local) => {
+          const i = nouveauxDeMoi.findIndex((m) => m.contenu === local.contenu);
+          if (i === -1) return true;
+          nouveauxDeMoi.splice(i, 1);
+          this.ws.oublier(local.idClient!);
+          return false;
+        });
+        this.messages.set([...serveur, ...locaux]);
+        this.needsScroll = true;
+        this.marquerLus();
+      },
+      error: () => {},
+    });
+  }
+
+  /** Renvoie un message en échec (W13). */
+  renvoyer(msg: MessageDTO): void {
+    if (msg.idClient) this.ws.renvoyer(msg.idClient);
+  }
+
   private marquerLus(): void {
     const conv = this.store.conversations().find(
       (c) =>
@@ -234,7 +292,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
     );
     const nonLuCount = conv?.nonLuCount ?? 0;
 
-    this.chatService.marquerLus(this.emailInterlocuteur).subscribe({
+    this.chatService.marquerLus(this.bienId, this.emailInterlocuteur).subscribe({
       next: () => {
         this.store.markConversationAsRead(this.bienId, this.emailInterlocuteur);
         if (nonLuCount > 0) {
@@ -253,6 +311,10 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   private belongsToCurrentConv(msg: MessageDTO): boolean {
     if (msg.bienId != null && msg.bienId !== this.bienId) return false;
     const myEmail = this.myEmail;
+    if (!this.emailInterlocuteur) {
+      // Premier contact : seul l'écho de mon propre message (même idClient) concerne cette vue
+      return msg.expediteurEmail === myEmail && !!msg.idClient;
+    }
     return (
       (msg.expediteurEmail === myEmail && msg.destinataireEmail === this.emailInterlocuteur) ||
       (msg.expediteurEmail === this.emailInterlocuteur && msg.destinataireEmail === myEmail)
@@ -261,6 +323,14 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
 
   private addMessageIfNew(msg: MessageDTO): void {
     const current = this.messages();
+    // Écho du serveur : remplace le message local « en attente » de même idClient (W13)
+    const local = msg.idClient ? current.findIndex((m) => m.statut && m.idClient === msg.idClient) : -1;
+    if (local !== -1) {
+      const suivants = current.filter((m, i) => i !== local && m.id !== msg.id);
+      suivants.splice(local, 0, msg);
+      this.messages.set(suivants);
+      return;
+    }
     if (!current.some((m) => m.id === msg.id)) {
       this.messages.set([...current, msg]);
       this.needsScroll = true;

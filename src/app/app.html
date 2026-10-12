@@ -1,1 +1,12 @@
+@if (!horsLigne.enLigne()) {
+  <div class="kp-bandeau-pwa kp-bandeau-pwa--hors-ligne" role="status">
+    Hors ligne : vous voyez les dernières données enregistrées sur cet appareil.
+  </div>
+}
+@if (horsLigne.nouvelleVersion()) {
+  <div class="kp-bandeau-pwa" role="status">
+    Une nouvelle version de Kupanga est disponible.
+    <button type="button" (click)="horsLigne.recharger()">Recharger</button>
+  </div>
+}
 <router-outlet></router-outlet>

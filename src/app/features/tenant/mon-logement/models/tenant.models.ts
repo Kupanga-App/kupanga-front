@@ -1,3 +1,5 @@
+import { Devise } from '../../../../core/money/montant';
+
 // ─── Backend API DTOs ─────────────────────────────────────────────────────────
 
 export interface LocataireDashboardDTO {
@@ -36,6 +38,8 @@ export interface ContratResumeDTO {
   loyerMensuel: number;
   charges: number;
   depotGarantie: number;
+  /** J3 : devise figée sur le bail. */
+  devise?: Devise;
   statut: string;
 }
 
@@ -52,6 +56,8 @@ export interface QuittanceBackendDTO {
   loyerMensuel: number;
   chargesMensuelles: number;
   montantTotal: number;
+  /** J3 : devise figée sur la quittance. */
+  devise?: Devise;
   dateEcheance: string;
   datePaiement: string | null;
   statut: 'EN_ATTENTE' | 'PAYEE' | 'EN_RETARD' | 'IMPAYEE';
@@ -94,7 +100,7 @@ export interface MonLogementData {
   contrat: ContratDetails;
   statuts: StatutItem[];
   kpis: KpiItem[];
-  prochainLoyer: { montant: number; dateEcheance: Date };
+  prochainLoyer: { montant: number; devise?: Devise; dateEcheance: Date };
   quittances: Quittance[];
   documents: BienDocument[];
   compteurs: CompteurReleve[];
@@ -112,6 +118,7 @@ export interface ContratDetails {
   loyerMensuel: number;
   charges: number;
   depotGarantie: number;
+  devise?: Devise;
   irlIndex?: string;
   irlProchainDate?: Date;
   moisPreavis?: number;
@@ -138,6 +145,7 @@ export interface Quittance {
   libelle: string;
   meta: string;
   montant: number;
+  devise?: Devise;
   urlPdf: string;
 }
 

@@ -74,7 +74,7 @@
                 <label>Type de bien</label>
                 <mat-form-field class="w-full">
                   <mat-select formControlName="typeBien">
-                    @for (t of bienTypes; track t.value) {
+                    @for (t of typesDuPays(); track t.value) {
                       <mat-option [value]="t.value">{{ t.label }}</mat-option>
                     }
                   </mat-select>
@@ -190,6 +190,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
+              @if (dpeVisible()) {
               <div class="form-field">
                 <label>Classe énergie (DPE)</label>
                 <mat-form-field class="w-full">
@@ -200,9 +201,11 @@
                   </mat-select>
                 </mat-form-field>
               </div>
+              }
             </div>
 
             <div class="form-row">
+              @if (dpeVisible()) {
               <div class="form-field">
                 <label>Classe GES</label>
                 <mat-form-field class="w-full">
@@ -213,6 +216,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
+              }
               <div class="form-field type-toggles">
                 <label>Ascenseur</label>
                 <div class="toggle-group">
@@ -236,12 +240,25 @@
           </div>
 
           <form [formGroup]="step1Form">
+            @if (devisesDuPays().length > 1) {
+              <div class="form-field">
+                <label>Devise des montants</label>
+                <mat-form-field class="w-full">
+                  <mat-select formControlName="devise">
+                    @for (d of devisesDuPays(); track d) {
+                      <mat-option [value]="d">{{ libellesDevise[d] }}</mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>Les baux et quittances déjà créés gardent leur devise.</mat-hint>
+                </mat-form-field>
+              </div>
+            }
             <div class="form-row form-row-col3">
               <div class="form-field">
                 <label>Loyer mensuel</label>
                 <mat-form-field class="w-full">
                   <input matInput type="number" formControlName="loyerMensuel" placeholder="Ex. 800" />
-                  <span matSuffix class="suffix-mono">€</span>
+                  <span matSuffix class="suffix-mono">{{ step1Form.controls.devise.value | symboleDevise }}</span>
                   @if (step1Form.get('loyerMensuel')?.invalid && step1Form.get('loyerMensuel')?.touched) {
                     <mat-error>Loyer requis</mat-error>
                   }
@@ -251,25 +268,68 @@
                 <label>Charges mensuelles</label>
                 <mat-form-field class="w-full">
                   <input matInput type="number" formControlName="chargesMensuelles" placeholder="Ex. 80" />
-                  <span matSuffix class="suffix-mono">€</span>
+                  <span matSuffix class="suffix-mono">{{ step1Form.controls.devise.value | symboleDevise }}</span>
                 </mat-form-field>
               </div>
+              @if (champDuPays('depotGarantie')) {
               <div class="form-field">
                 <label>Dépôt de garantie</label>
                 <mat-form-field class="w-full">
                   <input matInput type="number" formControlName="depotGarantie" placeholder="Ex. 1600" />
-                  <span matSuffix class="suffix-mono">€</span>
+                  <span matSuffix class="suffix-mono">{{ step1Form.controls.devise.value | symboleDevise }}</span>
                 </mat-form-field>
               </div>
+              }
+              <!-- C12 (RDC) -->
+              @if (champDuPays('garantieMois')) {
+              <div class="form-field">
+                <label>Garantie (mois de loyer)</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" min="0" max="24" formControlName="garantieMois" />
+                  <span matSuffix class="suffix-mono">mois</span>
+                </mat-form-field>
+              </div>
+              <div class="form-field">
+                <label>Loyers payés d'avance</label>
+                <mat-form-field class="w-full">
+                  <input matInput type="number" min="0" max="24" formControlName="avanceMois" />
+                  <span matSuffix class="suffix-mono">mois</span>
+                </mat-form-field>
+              </div>
+              }
             </div>
           </form>
         </div>
+
+        <!-- C11 : équipements et heures de courant -->
+        @if (equipementsDuPays().length || champDuPays('heuresElectriciteParJour')) {
+        <div class="form-section">
+          <div class="form-section-h">
+            <div class="form-section-t">Équipements</div>
+          </div>
+          <div class="kp-equipements">
+            @for (e of equipementsDuPays(); track e) {
+              <mat-checkbox [checked]="equipementsChoisis().includes(e)"
+                            (change)="basculerEquipement(e, $event.checked)">{{ libellesEquipement[e] }}</mat-checkbox>
+            }
+          </div>
+          @if (champDuPays('heuresElectriciteParJour')) {
+          <div class="form-field">
+            <label>Heures de courant par jour</label>
+            <mat-form-field class="w-full">
+              <input matInput type="number" min="0" max="24" [formControl]="step2Form.controls.heuresElectriciteParJour" />
+              <span matSuffix class="suffix-mono">h / jour</span>
+            </mat-form-field>
+          </div>
+          }
+        </div>
+        }
 
         <!-- Section Localisation -->
         <div class="form-section" id="section-localisation">
           <div class="form-section-h">
             <div class="form-section-t">Localisation</div>
-            <div class="form-section-s">Adresse complète du bien.</div>
+            <div class="form-section-s">Adresse et pays ne sont pas modifiables après la création du bien.</div>
           </div>
 
           <form [formGroup]="step3Form">
@@ -291,20 +351,47 @@
                   <input matInput formControlName="ville" placeholder="Ex. Paris" />
                 </mat-form-field>
               </div>
+              @if (bien()?.codePostal) {
               <div class="form-field">
                 <label>Code postal</label>
                 <mat-form-field class="w-full">
                   <input matInput formControlName="codePostal" placeholder="Ex. 75001" />
                 </mat-form-field>
               </div>
+              }
               <div class="form-field">
                 <label>Pays</label>
                 <mat-form-field class="w-full">
-                  <input matInput formControlName="pays" />
+                  <mat-select formControlName="pays">
+                    @for (p of paysOptions; track p.value) {
+                      <mat-option [value]="p.value">{{ p.label }}</mat-option>
+                    }
+                  </mat-select>
                 </mat-form-field>
               </div>
             </div>
+            @if (bien()?.quartier || bien()?.commune || bien()?.pointDeRepere) {
+              <div class="form-field">
+                <label>Adresse complète</label>
+                <p>{{ adresseComplete() }}</p>
+                @if (bien()?.pointDeRepere) {
+                  <p>Repère : {{ bien()!.pointDeRepere }}</p>
+                }
+              </div>
+            }
           </form>
+
+          <!-- C2 : déplacer le repère (l'adresse ne change pas) -->
+          @if (bien(); as b) {
+            <div class="form-field">
+              <label>Emplacement sur la carte</label>
+              @if (positionApproximative(b.precisionLocalisation); as message) {
+                <p class="kp-text-caption">{{ message }} : cliquez sur la carte pour indiquer l'emplacement exact.</p>
+              }
+              <kp-carte-repere [pays]="b.pays" [initial]="repereActuel()" [retirable]="false"
+                               (repereChange)="repereDeplace.set($event)" />
+            </div>
+          }
         </div>
 
       </div>

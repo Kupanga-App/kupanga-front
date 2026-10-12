@@ -47,11 +47,11 @@
           </div>
           <div class="kp-kv-row">
             <span class="kp-kv-key">Loyer</span>
-            <span class="kp-kv-val">{{ contrat()!.loyerMensuel }} € + {{ contrat()!.chargesMensuelles }} € charges</span>
+            <span class="kp-kv-val">{{ contrat()!.loyerMensuel | montant: contrat()!.devise }} + {{ contrat()!.chargesMensuelles | montant: contrat()!.devise }} charges</span>
           </div>
           <div class="kp-kv-row">
             <span class="kp-kv-key">Dépôt de garantie</span>
-            <span class="kp-kv-val">{{ contrat()!.depotGarantie }} €</span>
+            <span class="kp-kv-val">{{ contrat()!.depotGarantie | montant: contrat()!.devise }}</span>
           </div>
         </div>
       </div>

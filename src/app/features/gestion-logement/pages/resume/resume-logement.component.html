@@ -44,9 +44,9 @@
           Loyer théorique (12 mois)
         </div>
         <div class="kpi-val">
-          {{ loyerAnnuel() }}<span class="u">€</span>
+          {{ loyerAnnuel() }}<span class="u">{{ bien()!.devise | symboleDevise }}</span>
         </div>
-        <div class="kpi-foot">base : {{ bien()!.loyerMensuel }} €/mois</div>
+        <div class="kpi-foot">base : {{ bien()!.loyerMensuel | montant: bien()!.devise }}/mois</div>
       </div>
       <div class="kpi">
         <div class="kpi-lbl">
@@ -103,6 +103,9 @@
             <div class="user-info">
               <div class="user-name">{{ locataire()!.firstName }} {{ locataire()!.lastName }}</div>
               <div class="user-mail">{{ locataire()!.mail }}</div>
+              @if (locataire()!.telephone; as tel) {
+                <a class="user-mail" [href]="'tel:' + tel">{{ tel }}</a>
+              }
             </div>
           </div>
         } @else {

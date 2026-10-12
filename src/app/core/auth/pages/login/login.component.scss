@@ -160,3 +160,34 @@ form {
 
   &:hover { color: var(--mint); }
 }
+
+// A14 : adresse non confirmée
+.verify-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: -4px 0 12px;
+}
+
+.btn-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--olive);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.info-text {
+  font-size: 13px;
+  color: var(--mint-80);
+  margin: 0 0 12px;
+  line-height: 1.5;
+}

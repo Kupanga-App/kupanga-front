@@ -10,7 +10,7 @@ import {
 import { MessageDTO } from '../../models/chat.models';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, catchError } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ChatStoreService } from '../../services/chat-store.service';
 import { ConversationDTO } from '../../models/chat.models';
@@ -45,9 +45,22 @@ export class ChatLayoutComponent implements OnInit, OnDestroy {
   interlocuteurNom = signal<string>('');
 
   private pendingEmail = signal<string | null>(null);
+  /** Premier contact depuis une annonce : le propriétaire du bien, dont l'e-mail n'est pas public (P0-6). */
+  nouveauContact = signal(false);
+  private pendingBienId = signal<number | null>(null);
   private subs = new Subscription();
 
   constructor() {
+    // Conversation déjà ouverte sur ce bien (côté candidat, l'autre participant est toujours le propriétaire, W1)
+    effect(() => {
+      const bienId = this.pendingBienId();
+      const conv = bienId ? this.store.conversations().find((c) => c.bienId === bienId) : undefined;
+      if (conv) {
+        this.pendingBienId.set(null);
+        this.onConversationSelected(conv);
+      }
+    });
+
     effect(() => {
       const pending = this.pendingEmail();
       const convs = this.store.conversations();
@@ -88,7 +101,7 @@ export class ChatLayoutComponent implements OnInit, OnDestroy {
       : conv.expediteurPhotoUrl;
   });
 
-  showView = computed(() => this.viewBienId() > 0 && !!this.viewInterlocuteur());
+  showView = computed(() => this.viewBienId() > 0 && (!!this.viewInterlocuteur() || this.nouveauContact()));
 
   selectedConvId = computed(() => this.selectedConv()?.id ?? null);
 
@@ -98,9 +111,12 @@ export class ChatLayoutComponent implements OnInit, OnDestroy {
         const bienIdParam = params.get('bienId');
         const interlocuteur = params.get('interlocuteur');
 
-        if (!interlocuteur) return;
-
         const bienId = bienIdParam ? Number(bienIdParam) : null;
+
+        if (!interlocuteur) {
+          if (bienId && !isNaN(bienId)) this.ouvrirContactProprietaire(bienId);
+          return;
+        }
 
         if (bienId && !isNaN(bienId)) {
           this.selectedConv.set(null);
@@ -133,7 +149,33 @@ export class ChatLayoutComponent implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
+  /** Écrire au propriétaire d'un bien depuis son annonce, sans connaître son e-mail. */
+  private ouvrirContactProprietaire(bienId: number): void {
+    this.selectedConv.set(null);
+    this.pendingEmail.set(null);
+    this.interlocuteurNom.set('');
+    const existante = this.store.conversations().find((c) => c.bienId === bienId);
+    if (existante) {
+      this.onConversationSelected(existante);
+      return;
+    }
+    this.directBienId.set(bienId);
+    this.directInterlocuteur.set(null);
+    this.nouveauContact.set(true);
+    this.pendingBienId.set(bienId);
+    this.loadBienContext(bienId);
+  }
+
+  /** Écho du premier message : l'API a créé la conversation avec le propriétaire. */
+  onInterlocuteurConnu(email: string): void {
+    this.pendingBienId.set(null);
+    this.nouveauContact.set(false);
+    this.directInterlocuteur.set(email);
+  }
+
   onConversationSelected(conv: ConversationDTO): void {
+    this.nouveauContact.set(false);
+    this.pendingBienId.set(null);
     this.selectedConv.set(conv);
     this.directBienId.set(null);
     this.directInterlocuteur.set(null);
@@ -143,6 +185,8 @@ export class ChatLayoutComponent implements OnInit, OnDestroy {
   }
 
   onBackToList(): void {
+    this.nouveauContact.set(false);
+    this.pendingBienId.set(null);
     this.selectedConv.set(null);
     this.directBienId.set(null);
     this.directInterlocuteur.set(null);
@@ -167,7 +211,10 @@ export class ChatLayoutComponent implements OnInit, OnDestroy {
       return;
     }
     this.subs.add(
-      this.bienService.getById(bienId).subscribe({
+      // Vue privée si l'on est propriétaire ou locataire du bien, sinon annonce publique (candidat)
+      this.bienService.getPrive(bienId).pipe(
+        catchError(() => this.bienService.getPublic(bienId))
+      ).subscribe({
         next: (bien) => this.bienContext.set(bien),
         error: () => this.bienContext.set(null),
       })

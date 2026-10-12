@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MontantPipe } from '../../core/money/montant';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +18,7 @@ import { ContratDTO, ContratStatut } from '../gestion-logement/models/contrat.mo
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    IconComponent,
+    IconComponent, MontantPipe
   ],
   templateUrl: './contrats.component.html',
   styleUrls: ['./contrats.component.scss'],

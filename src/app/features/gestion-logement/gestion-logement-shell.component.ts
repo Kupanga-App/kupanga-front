@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
+import { MontantPipe } from '../../core/money/montant';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 
 import { BienService } from '../biens/services/bien.service';
+import { vignette } from '../biens/models/bien.model';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { GestionLogementService } from './services/gestion-logement.service';
 import { ContratService } from './services/contrat.service';
@@ -45,7 +47,7 @@ import { QuittanceNewComponent } from './pages/quittances/new/quittance-new.comp
     ContratNewComponent,
     EdlNewComponent,
     QuittanceNewComponent,
-    IconComponent,
+    IconComponent, MontantPipe
   ],
   templateUrl: './gestion-logement-shell.component.html',
   styleUrls: ['./gestion-logement-shell.component.scss'],
@@ -61,6 +63,7 @@ export class GestionLogementShellComponent implements OnInit {
   readonly gestion = inject(GestionLogementService);
 
   readonly bien = this.gestion.bien;
+  protected readonly vignette = vignette;
   readonly loading = this.gestion.loading;
   readonly error = this.gestion.error;
   readonly contratStatut = this.gestion.contratStatut;
@@ -85,7 +88,7 @@ export class GestionLogementShellComponent implements OnInit {
       return;
     }
     this.gestion.loading.set(true);
-    this.bienService.getById(id).pipe(
+    this.bienService.getPrive(id).pipe(
       switchMap((bien) => {
         this.gestion.setBien(bien);
         return forkJoin({

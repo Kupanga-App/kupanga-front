@@ -28,7 +28,7 @@
       <div class="assign-summary">
         <div class="thumb">
           @if (bien()!.images?.length) {
-            <img [src]="bien()!.images![0]" [alt]="bien()!.titre" />
+            <img [src]="vignette(bien()!, 0)" [alt]="bien()!.titre" />
           } @else {
             <div class="thumb-ph"><kp-icon name="home" [size]="22" /></div>
           }
@@ -38,7 +38,7 @@
           <div class="summary-meta">
             <span><kp-icon name="map-pin" [size]="13" /> {{ bien()!.ville }}</span>
             @if (totalMensuel() > 0) {
-              <span><kp-icon name="dollar-sign" [size]="13" /> {{ totalMensuel() }} €/mois</span>
+              <span><kp-icon name="dollar-sign" [size]="13" /> {{ totalMensuel() | montant: bien()?.devise }}/mois</span>
             }
             @if (bien()!.surfaceHabitable) {
               <span><kp-icon name="maximize-2" [size]="13" /> {{ bien()!.surfaceHabitable }} m²</span>

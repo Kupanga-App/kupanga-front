@@ -172,3 +172,32 @@ form {
 
   &:hover { color: var(--mint); }
 }
+
+// A14 : écran « vérifiez votre e-mail »
+.sent-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  text-align: center;
+}
+
+.sent-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(143, 164, 100, 0.12);
+  border: 1px solid var(--olive-25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--olive);
+}
+
+.sent-text {
+  font-size: 13px;
+  color: var(--mint-80);
+  margin: 0;
+  line-height: 1.55;
+}

@@ -26,6 +26,8 @@ export class AppNotificationService implements OnDestroy {
         this.notifications.update(list => [notif, ...list]);
       })
     );
+    // W11 : notifications poussées pendant la coupure
+    this.subs.add(this.ws.reconnected$.subscribe(() => this.loadUnread()));
 
     effect(() => {
       if (this.authService.currentUser()) {

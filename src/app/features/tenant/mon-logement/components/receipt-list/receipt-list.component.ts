@@ -1,12 +1,12 @@
 import { Component, input, output } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { MontantPipe } from '../../../../../core/money/montant';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { Quittance } from '../../models/tenant.models';
 
 @Component({
   selector: 'kp-receipt-list',
   standalone: true,
-  imports: [IconComponent, DecimalPipe],
+  imports: [IconComponent, MontantPipe],
   templateUrl: './receipt-list.component.html',
   styleUrl: './receipt-list.component.scss',
 })

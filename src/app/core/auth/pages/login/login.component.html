@@ -39,6 +39,18 @@
       <p class="server-error" role="alert" aria-live="polite">{{ serverError() }}</p>
     }
 
+    @if (emailNonVerifie()) {
+      <div class="verify-block">
+        <button type="button" class="btn-link" (click)="renvoyerLien()" [disabled]="isResending()">
+          Renvoyer le lien de confirmation
+        </button>
+        <a routerLink="/auth/forgot" class="btn-link">Mot de passe oublié ?</a>
+      </div>
+      @if (resendInfo()) {
+        <p class="info-text" aria-live="polite">{{ resendInfo() }}</p>
+      }
+    }
+
     <button type="submit" class="btn-primary btn-full" [disabled]="isSubmitting() || isGoogleLoading()">
       @if (isSubmitting()) {
         <span class="spinner"></span>

@@ -78,6 +78,33 @@
       </mat-card-actions>
     </mat-card>
 
+    <!-- C6 : numéro de contact, enregistré à part (PATCH /users/me/telephone) -->
+    <mat-card class="mt-4">
+      <mat-card-header>
+        <mat-card-title>Téléphone</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="kp-field">
+          <label class="kp-label" for="settings-telephone">Numéro (facultatif)</label>
+          <mat-form-field class="form-field-full">
+            <input matInput id="settings-telephone" type="tel" autocomplete="tel"
+                   placeholder="+243 81 234 56 78" [(ngModel)]="telephone" name="telephone">
+            <mat-hint>Format international. Visible seulement par votre propriétaire ou votre locataire. Laissez vide pour le supprimer.</mat-hint>
+          </mat-form-field>
+        </div>
+        @if (telephoneMessage) {
+          <p [class.telephone-erreur]="telephoneErreur" role="status">{{ telephoneMessage }}</p>
+        }
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-raised-button color="primary" type="button" [disabled]="telephoneEnCours"
+                (click)="enregistrerTelephone()">
+          <mat-icon>save</mat-icon>
+          Enregistrer le numéro
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
     <mat-card class="mt-4">
       <mat-card-header>
         <mat-card-title>Apparence</mat-card-title>

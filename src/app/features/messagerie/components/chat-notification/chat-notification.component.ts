@@ -40,6 +40,9 @@ export class ChatNotificationComponent implements OnInit, OnDestroy {
       this.store.loadUnreadCount();
     }
 
+    // W11 : messages reçus pendant la coupure
+    this.subs.add(this.ws.reconnected$.subscribe(() => this.store.loadUnreadCount()));
+
     this.subs.add(
       this.ws.notifications$.subscribe((notif) => {
         const isOnMessagingPage = this.router.url.includes('/messagerie');

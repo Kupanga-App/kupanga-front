@@ -37,6 +37,13 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'verifier-email',
+        loadComponent: () =>
+          import('./core/auth/pages/verify-email/verify-email.component').then(
+            m => m.VerifyEmailComponent
+          )
+      },
+      {
         path: 'google-role',
         loadComponent: () =>
           import('./core/auth/pages/complete-profile/complete-profile.component').then(

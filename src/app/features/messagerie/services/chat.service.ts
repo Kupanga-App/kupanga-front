@@ -58,9 +58,10 @@ export class ChatService {
     return this.http.get<MessageDTO[]>(url);
   }
 
-  marquerLus(emailExpediteur: string): Observable<void> {
+  /** Marque comme lus les messages de cette conversation uniquement (bien + interlocuteur, W6 côté API). */
+  marquerLus(bienId: number, emailExpediteur: string): Observable<void> {
     return this.http.post<void>(
-      `${this.api}/messages/conversation/${encodeURIComponent(emailExpediteur)}/lire`,
+      `${this.api}/messages/conversation/${encodeURIComponent(emailExpediteur)}/lire?bienId=${bienId}`,
       {}
     );
   }

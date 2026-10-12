@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { formatMontant } from '../../../../core/money/montant';
 import { CommonModule } from '@angular/common';
 import { BienDTO } from '../../../biens/models/bien.model';
 
@@ -28,11 +29,8 @@ export class ChatContextRailComponent {
 
   get loyerFormatted(): string {
     if (!this.bien?.loyerMensuel) return '—';
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-    }).format(this.bien.loyerMensuel);
+    // J3 : dans la devise du bien
+    return formatMontant(this.bien.loyerMensuel, this.bien.devise);
   }
 
   get bienRef(): string {

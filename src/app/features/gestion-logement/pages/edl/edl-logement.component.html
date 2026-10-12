@@ -77,6 +77,12 @@
             }
           }
 
+          <!-- C7-C16 : prévenir le locataire par WhatsApp (pays avec ce canal) -->
+          @if (isProprietaire() && edl.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' && bien(); as b) {
+            <kp-bouton-whatsapp type="edl" [documentId]="edl.id" [pays]="b!.pays"
+              libelle="Prévenir le locataire par WhatsApp" />
+          }
+
           <!-- Locataire : signature via email uniquement -->
           @if (!isProprietaire() && edl.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE') {
             <div class="kp-info-banner kp-info-banner--info">

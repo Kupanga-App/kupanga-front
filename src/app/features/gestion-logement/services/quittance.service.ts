@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { QuittanceCreateDTO, QuittanceDTO, QuittancePageDTO, QuittanceSearchDTO } from '../models/quittance.model';
+import { MarquerPayeeDTO, QuittanceCreateDTO, QuittanceDTO, QuittancePageDTO, QuittanceSearchDTO } from '../models/quittance.model';
 
 @Injectable({ providedIn: 'root' })
 export class QuittanceService {
@@ -25,10 +25,15 @@ export class QuittanceService {
     return this.http.post<QuittanceDTO>(this.apiUrl, dto);
   }
 
-  marquerPayee(id: number, signatureBase64: string): Observable<QuittanceDTO> {
-    return this.http.post<QuittanceDTO>(
-      `${this.apiUrl}/${id}/marquer-payee`,
-      { signatureBase64 }
-    );
+  /** C8-bis : 204 sans corps (recharger la quittance ensuite). */
+  marquerPayee(id: number, dto: MarquerPayeeDTO): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${id}/marquer-payee`, dto);
+  }
+
+  /** C8-bis : joint ou remplace la photo du reçu (quittance payée). */
+  ajouterRecu(id: number, photo: File): Observable<QuittanceDTO> {
+    const form = new FormData();
+    form.append('recu', photo);
+    return this.http.post<QuittanceDTO>(`${this.apiUrl}/${id}/recu`, form);
   }
 }

@@ -119,7 +119,7 @@
                 <span class="kp-badge {{ quittanceBadgeClass(q.statut) }}">
                   {{ quittanceStatutLabel(q.statut) }}
                 </span>
-                <span class="doc-amount">{{ q.montantTotal | number:'1.2-2' }} €</span>
+                <span class="doc-amount">{{ q.montantTotal | montant: q.devise }}</span>
               </div>
             </div>
             <div class="doc-actions">

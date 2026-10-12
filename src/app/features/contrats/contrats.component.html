@@ -69,7 +69,7 @@
                 <span class="kp-meta-sep">·</span>
                 <span class="kp-meta-item">
                   <kp-icon name="dollar-sign" [size]="12" />
-                  {{ c.loyerMensuel }} €/mois
+                  {{ c.loyerMensuel | montant: c.devise }}/mois
                 </span>
               </div>
             </div>

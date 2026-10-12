@@ -76,7 +76,7 @@
           </div>
 
           <div class="kp-q-card-right">
-            <span class="kp-q-montant">{{ q.montantTotal | number:'1.2-2' }} €</span>
+            <span class="kp-q-montant">{{ q.montantTotal | montant: q.devise }}</span>
             <span class="kp-statut-badge" [class]="statutClass(q.statut)">
               {{ statutLabel(q.statut) }}
             </span>

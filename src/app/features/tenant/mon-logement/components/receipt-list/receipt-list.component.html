@@ -17,7 +17,7 @@
         <div class="t">{{ q.libelle }}</div>
         <div class="s">{{ q.meta }}</div>
       </div>
-      <div class="receipt-amount">{{ q.montant | number:'1.0-0':'fr' }} €</div>
+      <div class="receipt-amount">{{ q.montant | montant: q.devise : 0 }}</div>
       <button class="dl-btn" (click)="telecharger(q)" title="Télécharger">
         <kp-icon name="download" [size]="14" />
       </button>

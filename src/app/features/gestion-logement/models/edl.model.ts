@@ -13,8 +13,11 @@ export type TypeElement =
   | 'MUR' | 'PLAFOND' | 'SOL' | 'FENETRE' | 'PORTE' | 'VOLET'
   | 'PRISE' | 'LUMINAIRE' | 'RADIATEUR' | 'EQUIPEMENT' | 'AUTRE';
 
+/** Compteurs d'EDL ; ceux proposés dépendent du pays (`GET /juridictions/{pays}` : `compteursEdl`). */
 export type TypeCompteur =
-  | 'EAU_FROIDE' | 'EAU_CHAUDE' | 'ELECTRICITE_HP' | 'ELECTRICITE_HC' | 'GAZ';
+  | 'EAU_FROIDE' | 'EAU_CHAUDE' | 'ELECTRICITE_HP' | 'ELECTRICITE_HC' | 'GAZ'
+  // C13
+  | 'ELECTRICITE' | 'CASH_POWER' | 'GROUPE_ELECTROGENE';
 
 export interface CompteurFormDTO {
   typeCompteur: TypeCompteur;

@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MontantPipe } from '../../../../core/money/montant';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -6,13 +7,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { BienService } from '../../services/bien.service';
-import { BienDTO, UserDTO } from '../../models/bien.model';
+import { BienDTO, UserDTO, vignette } from '../../models/bien.model';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { messageErreurApi } from '../../../../core/http/api-error';
 
 @Component({
   selector: 'kp-assign-tenant',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, IconComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, IconComponent, MontantPipe],
   templateUrl: './assign-tenant.component.html',
   styleUrls: ['./assign-tenant.component.scss'],
 })
@@ -24,6 +26,7 @@ export class AssignTenantComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   bien = signal<BienDTO | null>(null);
+  protected readonly vignette = vignette;
   candidates = signal<UserDTO[]>([]);
   loading = signal(true);
   searching = signal(false);
@@ -44,7 +47,7 @@ export class AssignTenantComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.bienId.set(id);
 
-    this.bienService.getById(id).subscribe({
+    this.bienService.getPrive(id).subscribe({
       next: (b) => {
         this.bien.set(b);
         this.loading.set(false);
@@ -99,10 +102,11 @@ export class AssignTenantComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.assigningId.set(null);
-        const msg = err.status === 409
-          ? 'Ce bien a déjà un locataire'
-          : "Erreur lors de l'assignation";
-        this.snackBar.open(msg, 'Fermer', { duration: 4000 });
+        // 404 : seuls les candidats qui ont écrit au sujet de ce bien peuvent être assignés (W1) ; 409 : bien archivé
+        const msg = err.status === 404
+          ? "Ce compte ne peut pas être assigné : il doit d'abord vous avoir écrit au sujet de ce bien."
+          : messageErreurApi(err, "Erreur lors de l'assignation");
+        this.snackBar.open(msg, 'Fermer', { duration: 5000 });
       },
     });
   }

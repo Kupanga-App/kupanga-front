@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { AuthLayoutCComponent } from '../../shared/auth-layout-c/auth-layout-c.component';
 import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
 
+import { messageErreurApi } from '../../../http/api-error';
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
@@ -53,9 +54,9 @@ export class ForgotPasswordComponent {
         this.isSubmitting.set(false);
         this.isSent.set(true);
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting.set(false);
-        this.serverError.set("Une erreur s'est produite. Veuillez réessayer.");
+        this.serverError.set(messageErreurApi(err, "Une erreur s'est produite. Veuillez réessayer."));
       }
     });
   }

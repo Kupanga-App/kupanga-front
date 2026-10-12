@@ -50,7 +50,7 @@
   @if (!wsConnected()) {
     <div class="kp-reconnect-banner">
       <mat-icon aria-hidden="true">wifi_off</mat-icon>
-      Reconnexion en cours…
+      Reconnexion en cours… Vos messages partiront dès le retour de la connexion.
     </div>
   }
 
@@ -80,7 +80,17 @@
               <p class="kp-bubble-text">{{ msg.contenu }}</p>
               <div class="kp-bubble-foot">
                 <span class="kp-bubble-time">{{ msg.createdAt | date: 'HH:mm' }}</span>
-                @if (isMine(msg)) {
+                @if (msg.statut === 'en_attente') {
+                  <span class="kp-receipt pending" role="img" title="En attente d'envoi"
+                        aria-label="En attente d'envoi">
+                    <mat-icon aria-hidden="true">schedule</mat-icon>
+                  </span>
+                } @else if (msg.statut === 'echec') {
+                  <span class="kp-send-failed" role="status">
+                    <span>Non envoyé{{ msg.erreur ? ' · ' + msg.erreur : '' }}</span>&nbsp;
+                    <button type="button" (click)="renvoyer(msg)">Réessayer</button>
+                  </span>
+                } @else if (isMine(msg)) {
                   <span class="kp-receipt" [class.read]="msg.lu" [class.sent]="!msg.lu"
                         aria-hidden="true">
                     {{ msg.lu ? '✓✓' : '✓' }}
@@ -98,7 +108,6 @@
   <kp-message-input
     [emailDestinataire]="emailInterlocuteur"
     [bienId]="bienId"
-    [wsConnected]="wsConnected()"
     [interlocuteurNom]="displayNom"
     (messageSent)="onMessageSent($event)"
   />

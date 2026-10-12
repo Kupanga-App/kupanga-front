@@ -39,7 +39,7 @@ export class LocDocumentsComponent {
       if (bienId !== null && bienId !== this.lastLoadedId) {
         this.lastLoadedId = bienId;
         this.gestion.loading.set(true);
-        this.bienService.getById(bienId).subscribe({
+        this.bienService.getPrive(bienId).subscribe({
           next: (bien) => {
             this.gestion.setBien(bien);
             this.gestion.loading.set(false);

@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { MontantPipe, SymboleDevisePipe } from '../../../../core/money/montant';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GestionLogementService } from '../../services/gestion-logement.service';
@@ -8,7 +9,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
 @Component({
   selector: 'kp-resume-logement',
   standalone: true,
-  imports: [CommonModule, RouterModule, IconComponent],
+  imports: [CommonModule, RouterModule, IconComponent, MontantPipe, SymboleDevisePipe],
   templateUrl: './resume-logement.component.html',
   styleUrls: ['./resume-logement.component.scss'],
 })

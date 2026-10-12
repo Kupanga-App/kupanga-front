@@ -1,3 +1,4 @@
+import { TYPES_BIEN } from '../../models/bien.model';
 import { Component, Output, EventEmitter, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -15,12 +16,10 @@ export class BiensFilterBarComponent {
 
   isAdvOpen = signal(false);
 
+  // C10 : tous les types de l'API (ceux de la RDC compris)
   readonly bienTypes: { value: string; label: string }[] = [
-    { value: '',            label: 'Tous' },
-    { value: 'APPARTEMENT', label: 'Appt.' },
-    { value: 'STUDIO',      label: 'Studio' },
-    { value: 'MAISON',      label: 'Maison' },
-    { value: 'VILLA',       label: 'Villa' },
+    { value: '', label: 'Tous' },
+    ...TYPES_BIEN.map(t => ({ value: t.value as string, label: t.label })),
   ];
 
   readonly sortOptions: { value: string; label: string }[] = [

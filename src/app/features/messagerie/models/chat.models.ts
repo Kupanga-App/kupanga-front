@@ -1,6 +1,7 @@
 export interface MessagePayload {
   contenu: string;
-  emailDestinataire: string;
+  /** Absent au premier contact depuis une annonce (P0-6) : l'API écrit au propriétaire du bien. */
+  emailDestinataire?: string;
   bienId: number;
 }
 
@@ -17,6 +18,25 @@ export interface MessageDTO {
   destinataireEmail: string;
   bienId: number;
   bienAdresse: string;
+  /** Écho de son propre message par le serveur (accusé d'envoi, W13). */
+  idClient?: string;
+  /** Message local pas encore confirmé (W13) ; absent pour un message enregistré. */
+  statut?: StatutEnvoi;
+  erreur?: string;
+}
+
+export type StatutEnvoi = 'en_attente' | 'echec';
+
+export interface StatutEnvoiEvent {
+  idClient: string;
+  statut: StatutEnvoi;
+  erreur?: string;
+}
+
+/** Erreur d'envoi reçue sur /user/queue/errors. */
+export interface ErreurEnvoiDTO {
+  message: string;
+  idClient?: string;
 }
 
 export interface NotificationDTO {

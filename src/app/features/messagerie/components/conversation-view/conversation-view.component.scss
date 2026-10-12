@@ -310,3 +310,25 @@
     color: var(--kp-primary);
   }
 }
+
+// W13 : message en attente d'accusé, ou refusé / non confirmé
+.kp-receipt.pending mat-icon {
+  width: 12px;
+  height: 12px;
+  font-size: 12px;
+}
+
+.kp-send-failed {
+  font-size: 11px;
+  color: var(--kp-danger-text);
+}
+
+.kp-send-failed button {
+  all: unset;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: auto; // all: unset retire l'anneau de focus du navigateur
+  }
+}

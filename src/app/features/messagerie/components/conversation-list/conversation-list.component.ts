@@ -77,6 +77,11 @@ export class ConversationListComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // W11 : messages reçus pendant la coupure (le compteur global est rechargé par kp-chat-notification)
+    this.subs.add(
+      this.ws.reconnected$.subscribe(() => this.loadConversations(0, this.searchControl.value ?? ''))
+    );
   }
 
   ngOnDestroy(): void {

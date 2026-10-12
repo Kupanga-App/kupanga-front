@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { MontantPipe } from '../../../../core/money/montant';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ContratService } from '../../../gestion-logement/services/contrat.service';
 import { ContratDTO } from '../../../gestion-logement/models/contrat.model';
 import { SignaturePadComponent } from '../../../../shared/components/signature-pad/signature-pad.component';
+import { messageLienSignature } from '../../../../core/http/api-error';
 
 @Component({
   selector: 'kp-contrat-signer',
@@ -17,7 +19,7 @@ import { SignaturePadComponent } from '../../../../shared/components/signature-p
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    SignaturePadComponent,
+    SignaturePadComponent, MontantPipe
   ],
   templateUrl: './contrat-signer.component.html',
   styleUrls: ['./contrat-signer.component.scss'],
@@ -47,8 +49,8 @@ export class ContratSignerComponent implements OnInit {
         this.contrat.set(c);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('Contrat introuvable ou lien expiré');
+      error: (err) => {
+        this.error.set(messageLienSignature(err, 'Contrat introuvable ou lien expiré'));
         this.loading.set(false);
       },
     });
@@ -63,8 +65,8 @@ export class ContratSignerComponent implements OnInit {
         this.signing.set(false);
         this.signed.set(true);
       },
-      error: () => {
-        this.error.set('Erreur lors de la signature');
+      error: (err) => {
+        this.error.set(messageLienSignature(err, 'Erreur lors de la signature'));
         this.signing.set(false);
       },
     });

@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { Devise, formatMontant, symboleDevise } from '../../../../core/money/montant';
 import {
   MonLogementData, ContratDetails, StatutItem, KpiItem, Quittance,
   CompteurReleve, ProprietaireInfo, QuickAction,
@@ -99,6 +100,7 @@ export class TenantHomeService {
       loyerMensuel: c.loyerMensuel,
       charges: c.charges,
       depotGarantie: c.depotGarantie,
+      devise: c.devise,
       statut: this.normalizeContratStatut(c.statut),
     };
   }
@@ -143,18 +145,20 @@ export class TenantHomeService {
     const c = dto.contrat;
     const montantMensuel = (c?.loyerMensuel ?? 0) + (c?.charges ?? 0);
     const moisRestants = (c?.dureeTotale ?? 0) - (c?.moisEcoules ?? 0);
-    const totalVerse = dto.quittances
-      .filter(q => q.statut === 'PAYEE')
-      .reduce((sum, q) => sum + (q.montantTotal ?? 0), 0);
     const finContrat = c?.dateFin ? new Date(c.dateFin) : null;
+    // J3 : montants dans la devise figée du bail ; le total versé ne cumule que les quittances de cette devise
+    const devise = c?.devise;
+    const totalVerse = dto.quittances
+      .filter(q => q.statut === 'PAYEE' && (q.devise ?? devise) === devise)
+      .reduce((sum, q) => sum + (q.montantTotal ?? 0), 0);
 
     return [
       {
         label: 'Loyer mensuel',
         icon: 'calendar',
         valeur: montantMensuel.toLocaleString('fr-FR'),
-        unite: '€',
-        note: `Loyer ${(c?.loyerMensuel ?? 0).toLocaleString('fr-FR')} € + charges ${(c?.charges ?? 0).toLocaleString('fr-FR')} €`,
+        unite: symboleDevise(devise),
+        note: `Loyer ${formatMontant(c?.loyerMensuel ?? 0, devise, 0)} + charges ${formatMontant(c?.charges ?? 0, devise, 0)}`,
       },
       {
         label: 'Fin du bail',
@@ -168,31 +172,33 @@ export class TenantHomeService {
         label: 'Loyers payés',
         icon: 'check-circle',
         valeur: `${c?.moisEcoules ?? 0} / ${c?.dureeTotale ?? 0}`,
-        note: totalVerse > 0 ? `soit ${totalVerse.toLocaleString('fr-FR')} € versés` : '',
+        note: totalVerse > 0 ? `soit ${formatMontant(totalVerse, devise, 0)} versés` : '',
       },
       {
         label: 'Dépôt de garantie',
         icon: 'shield',
         valeur: (c?.depotGarantie ?? 0).toLocaleString('fr-FR'),
-        unite: '€',
+        unite: symboleDevise(devise),
         note: finContrat ? `Restitution prévue ${finContrat.getFullYear()}` : '',
       },
     ];
   }
 
-  private deriveProchainLoyer(dto: LocataireDashboardDTO): { montant: number; dateEcheance: Date } {
+  private deriveProchainLoyer(dto: LocataireDashboardDTO): { montant: number; devise?: Devise; dateEcheance: Date } {
     const prochain = dto.quittances.find(
       q => q.statut === 'EN_ATTENTE' || q.statut === 'EN_RETARD'
     );
     if (prochain) {
       return {
         montant: prochain.montantTotal,
+        devise: prochain.devise,
         dateEcheance: new Date(prochain.dateEcheance),
       };
     }
     const now = new Date();
     return {
       montant: (dto.contrat?.loyerMensuel ?? 0) + (dto.contrat?.charges ?? 0),
+      devise: dto.contrat?.devise,
       dateEcheance: new Date(now.getFullYear(), now.getMonth() + 1, 5),
     };
   }
@@ -221,6 +227,7 @@ export class TenantHomeService {
       libelle: `Quittance ${moisLabel}`,
       meta,
       montant: q.montantTotal,
+      devise: q.devise,
       urlPdf: q.urlPdf ?? '#',
     };
   }
