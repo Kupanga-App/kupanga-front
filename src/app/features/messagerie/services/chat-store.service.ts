@@ -22,16 +22,9 @@ export class ChatStoreService {
   resolvedNames = signal<Map<string, string>>(new Map());
 
   loadUnreadCount(): void {
-    console.log('[ChatStore] loadUnreadCount() appelé');
     this.chatService.getNonLusCount().subscribe({
-      next: (count) => {
-        console.log('[ChatStore] getNonLusCount réponse API =', count, '| type =', typeof count);
-        this.unreadTotal.set(count);
-        console.log('[ChatStore] unreadTotal mis à jour =', this.unreadTotal());
-      },
-      error: (err) => {
-        console.error('[ChatStore] getNonLusCount ERREUR =', err);
-      },
+      next: (count) => this.unreadTotal.set(count),
+      error: () => undefined,
     });
   }
 
@@ -70,8 +63,6 @@ export class ChatStoreService {
   }
 
   setConversations(convs: ConversationDTO[]): void {
-    console.log('[ChatStore] setConversations — nb =', convs.length,
-      '| nonLuCounts =', convs.map(c => ({ bienTitre: c.bienTitre, nonLuCount: c.nonLuCount })));
     this.conversations.set(convs);
   }
 

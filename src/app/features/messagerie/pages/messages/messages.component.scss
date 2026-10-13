@@ -1,0 +1,59 @@
+@use 'mq';
+
+.messages {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  @include mq.tablette {
+    grid-template-columns: minmax(300px, 380px) 1fr;
+    height: 100dvh;
+  }
+}
+
+.colonne-liste {
+  min-width: 0;
+
+  @include mq.tablette {
+    overflow-y: auto;
+    border-right: 1px solid var(--kp-border);
+  }
+}
+
+.colonne-conversation {
+  display: none;
+  min-width: 0;
+
+  @include mq.tablette {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+}
+
+// Téléphone : la conversation remplace la liste (pile d'écrans)
+.messages--conversation {
+  @include mq.telephone {
+    .colonne-liste {
+      display: none;
+    }
+
+    .colonne-conversation {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+  }
+}
+
+.aucune {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 32px;
+
+  kp-vide {
+    max-width: 420px;
+    border: 0;
+  }
+}

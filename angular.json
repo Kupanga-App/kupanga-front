@@ -35,11 +35,19 @@
               "src/styles/index.scss"
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["src/styles"]
+              "includePaths": [
+                "src/styles"
+              ]
             },
             "define": {
               "global": "globalThis"
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "heic2any",
+              "@stomp/stompjs",
+              "sockjs-client"
+            ]
           },
           "configurations": {
             "production": {
@@ -99,7 +107,9 @@
               "global": "globalThis"
             },
             "stylePreprocessorOptions": {
-              "includePaths": ["src/styles"]
+              "includePaths": [
+                "src/styles"
+              ]
             },
             "inlineStyleLanguage": "scss",
             "assets": [

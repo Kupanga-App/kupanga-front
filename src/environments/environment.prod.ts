@@ -2,5 +2,5 @@ export const environment = {
   production: true,
   apiUrl: 'https://kupanga-api.onrender.com',
   wsUrl: 'https://kupanga-api.onrender.com/ws',
-  googleClientId: '1088579856242-tolunpp18pq43uto9ck68oo4rrbgpjc2.apps.googleusercontent.com'
+  googleClientId: '259313207607-eh77jnr12h67arnr0o4n53kndb81lvg4.apps.googleusercontent.com'
 };

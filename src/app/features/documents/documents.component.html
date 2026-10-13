@@ -1,0 +1,61 @@
+<div class="kp-page kp-page--etroite" kpTirerPourActualiser (actualiser)="charger()">
+  <kp-page-header titre="Documents" />
+
+  <kp-segmented [options]="options()" [(valeur)]="onglet" libelle="Type de document" />
+
+  <div class="contenu">
+    @if (chargement() && !lignes().length) {
+      <div class="kp-stack kp-stack--sm" aria-busy="true">
+        @for (i of [1, 2, 3]; track i) {
+          <span class="kp-skeleton kp-skeleton--carte"></span>
+        }
+      </div>
+    } @else if (erreur()) {
+      <kp-vide icone="wifi-off" titre="Documents indisponibles" texte="Vérifiez votre connexion puis réessayez.">
+        <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
+      </kp-vide>
+    } @else if (!lignes().length) {
+      <kp-vide icone="file-text"
+               [titre]="onglet() === 'baux' ? 'Aucun bail' : onglet() === 'edl' ? 'Aucun état des lieux' : 'Aucune quittance'"
+               [texte]="proprietaire() ? 'Les documents se créent depuis la fiche de chaque bien.' : 'Vos documents apparaîtront ici dès que votre propriétaire les aura préparés.'">
+        @if (proprietaire()) {
+          <a routerLink="/biens" class="kp-btn kp-btn--secondary">Mes biens</a>
+        }
+      </kp-vide>
+    } @else {
+      <ul class="kp-list">
+        @for (l of lignes(); track l.cle) {
+          <li class="ligne">
+            @if (l.lien) {
+              <a class="kp-list__item" [routerLink]="l.lien">
+                <span class="kp-list__body">
+                  <span class="kp-list__title">{{ l.titre }}</span>
+                  <span class="kp-list__sub">{{ l.detail }}</span>
+                </span>
+                <kp-statut [statut]="l.statut" />
+              </a>
+            } @else {
+              <div class="kp-list__item">
+                <span class="kp-list__body">
+                  <span class="kp-list__title">{{ l.titre }}</span>
+                  <span class="kp-list__sub">{{ l.detail }}</span>
+                  <span class="actions">
+                    @if (l.signer) {
+                      <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="l.signer"><kp-icon name="pen-line" [size]="18" /> Signer</a>
+                    } @else if (l.aTraiter) {
+                      <span class="kp-aide">Ouvrez le lien de signature reçu par e-mail.</span>
+                    }
+                    @if (l.pdf) {
+                      <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="l.pdf" target="_blank" rel="noopener"><kp-icon name="download" [size]="18" /> PDF</a>
+                    }
+                  </span>
+                </span>
+                <kp-statut [statut]="l.statut" />
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

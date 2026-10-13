@@ -28,7 +28,6 @@ export class ChatService {
    */
   private normalizeConversationPage(raw: Record<string, unknown>): ConversationPageDTO {
     const contenu = (raw['contenu'] as Record<string, unknown>[]) ?? [];
-    console.log('[ChatService] normalizeConversationPage — raw sample[0] =', contenu[0]);
     return {
       contenu: contenu.map((c) => ({
         id: c['id'] as number,

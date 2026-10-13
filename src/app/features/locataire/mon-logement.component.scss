@@ -1,0 +1,40 @@
+.choix {
+  margin-bottom: var(--kp-space-5);
+}
+
+.loyer {
+  gap: var(--kp-space-2);
+
+  h2 {
+    font-size: var(--kp-fs-md);
+  }
+
+  .lien {
+    align-self: flex-start;
+    margin-top: var(--kp-space-2);
+  }
+}
+
+.montant {
+  font-size: var(--kp-fs-2xl);
+}
+
+.identite {
+  gap: 0;
+}
+
+.contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kp-space-2);
+
+  .kp-btn {
+    flex: 1 1 auto;
+  }
+}
+
+.logement p {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

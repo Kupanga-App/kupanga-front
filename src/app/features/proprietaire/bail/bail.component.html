@@ -1,0 +1,122 @@
+<div class="kp-page kp-page--etroite">
+  <kp-page-header titre="Bail" [sousTitre]="bien()?.titre" [retour]="['/biens', id()]" />
+
+  @if (chargement() && !bien()) {
+    <div class="kp-stack" aria-busy="true">
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+    </div>
+  } @else if (erreur()) {
+    <kp-vide icone="wifi-off" titre="Bail indisponible" texte="Vérifiez votre connexion puis réessayez.">
+      <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
+    </kp-vide>
+  } @else if (bien(); as b) {
+    @if (bail(); as c) {
+      <div class="kp-stack kp-stack--lg">
+        <section class="kp-card">
+          <div class="kp-row kp-row--between">
+            <h2>Bail en cours</h2>
+            <kp-statut [statut]="statut()" />
+          </div>
+          @switch (c.statut) {
+            @case ('EN_ATTENTE_SIGNATURE_PROPRIO') {
+              <p>Signez le bail : le locataire recevra ensuite un lien par e-mail pour le signer à son tour.</p>
+            }
+            @case ('EN_ATTENTE_SIGNATURE_LOCATAIRE') {
+              <p>{{ nomLocataire() }} a reçu un lien par e-mail pour signer. Le bail sera actif dès sa signature.</p>
+            }
+            @case ('EXPIRE') {
+              <p>Le lien envoyé au locataire a expiré. Renvoyez-en un nouveau.</p>
+            }
+            @case ('SIGNE') {
+              <p>Signé par les deux parties{{ c.dateSignatureLocataire ? ' le ' + (c.dateSignatureLocataire | dateLongue) : '' }}.</p>
+            }
+          }
+          <div class="kp-actions">
+            @if (peutSigner()) {
+              <button type="button" class="kp-btn kp-btn--primary" (click)="ouvrirSignature()">
+                <kp-icon name="pen-line" [size]="18" /> Signer le bail
+              </button>
+            }
+            @if (peutRelancer()) {
+              <button type="button" class="kp-btn kp-btn--secondary" (click)="ouvrirSignature()">
+                <kp-icon name="refresh-cw" [size]="18" /> Renvoyer le lien
+              </button>
+            }
+            @if (c.urlPdf) {
+              <a class="kp-btn kp-btn--secondary" [href]="c.urlPdf" target="_blank" rel="noopener">
+                <kp-icon name="download" [size]="18" /> PDF
+              </a>
+            }
+          </div>
+          @if (c.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' && c.pays) {
+            <kp-bouton-whatsapp type="contrat" [documentId]="c.id" [pays]="c.pays" libelle="Prévenir par WhatsApp" />
+          }
+        </section>
+
+        <section class="kp-section">
+          <h2 class="kp-section-title">Conditions</h2>
+          <dl class="kp-details">
+            <div><dt>Locataire</dt><dd>{{ nomLocataire() }}</dd></div>
+            <div><dt>Début</dt><dd>{{ c.dateDebut | dateLongue }}</dd></div>
+            <div><dt>Durée</dt><dd>{{ c.dureeBailMois }} mois</dd></div>
+            @if (c.dateFin) { <div><dt>Fin</dt><dd>{{ c.dateFin | dateLongue }}</dd></div> }
+            <div><dt>Loyer</dt><dd>{{ c.loyerMensuel | montant: c.devise }}</dd></div>
+            <div><dt>Charges</dt><dd>{{ c.chargesMensuelles | montant: c.devise }}</dd></div>
+            @if (c.garantieMois != null) {
+              <div><dt>Garantie</dt><dd>{{ c.garantieMois }} mois ({{ c.depotGarantie | montant: c.devise }})</dd></div>
+            } @else if (c.depotGarantie != null) {
+              <div><dt>Dépôt de garantie</dt><dd>{{ c.depotGarantie | montant: c.devise }}</dd></div>
+            }
+            @if (c.avanceMois != null) { <div><dt>Loyers d’avance</dt><dd>{{ c.avanceMois }} mois</dd></div> }
+          </dl>
+        </section>
+
+        @if (peutCreer()) {
+          <a class="kp-btn kp-btn--secondary kp-btn--block" [routerLink]="['/biens', b.id, 'bail', 'nouveau']">
+            <kp-icon name="plus" [size]="18" /> Nouveau bail
+          </a>
+        }
+
+        @if (precedents().length) {
+          <section class="kp-section">
+            <h2 class="kp-section-title">Baux précédents</h2>
+            <ul class="kp-list">
+              @for (p of precedents(); track p.id) {
+                <li class="kp-list__item">
+                  <span class="kp-list__body">
+                    <span class="kp-list__title">Début le {{ p.dateDebut | dateLongue }}</span>
+                    <span class="kp-list__sub">{{ p.dureeBailMois }} mois · {{ p.loyerMensuel | montant: p.devise : 0 }}</span>
+                  </span>
+                  <kp-statut [statut]="statutDe(p)" />
+                  @if (p.urlPdf) {
+                    <a class="kp-icon-btn" [href]="p.urlPdf" target="_blank" rel="noopener" aria-label="PDF du bail"><kp-icon name="download" /></a>
+                  }
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    } @else if (b.locataire && !b.archive) {
+      <kp-vide icone="file-text" titre="Pas encore de bail" [texte]="'Préparez le bail de ' + nomLocataire() + ' : vous le signerez, puis il recevra un lien pour signer.'">
+        <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'bail', 'nouveau']"><kp-icon name="plus" /> Créer le bail</a>
+      </kp-vide>
+    } @else {
+      <kp-vide icone="file-text" titre="Pas de bail" texte="Choisissez d’abord le locataire de ce bien.">
+        @if (!b.archive) {
+          <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'locataire']">Choisir le locataire</a>
+        }
+      </kp-vide>
+    }
+  }
+</div>
+
+<kp-feuille-signature
+  [(ouvert)]="signatureOuverte"
+  [titre]="peutRelancer() ? 'Renvoyer le lien' : 'Signer le bail'"
+  [texte]="peutRelancer() ? 'Signez de nouveau : un nouveau lien part au locataire et l’ancien ne fonctionne plus.' : 'En signant, vous acceptez les conditions du bail.'"
+  [libelle]="peutRelancer() ? 'Signer et renvoyer' : 'Signer'"
+  [enCours]="signatureEnCours()"
+  [erreur]="erreurSignature()"
+  (valider)="signer($event)" />

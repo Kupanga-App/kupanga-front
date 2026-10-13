@@ -1,0 +1,127 @@
+<div class="kp-page kp-page--etroite">
+  <kp-page-header [titre]="bien()?.titre ?? 'Annonce'" retour="/explorer" />
+
+  @if (chargement()) {
+    <div class="kp-stack" aria-busy="true">
+      <span class="kp-skeleton kp-skeleton--photo"></span>
+      <span class="kp-skeleton kp-skeleton--titre"></span>
+      <span class="kp-skeleton kp-skeleton--ligne"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+    </div>
+  } @else if (introuvable()) {
+    <kp-vide icone="search" titre="Annonce introuvable" texte="Ce logement n’est plus proposé à la location.">
+      <a routerLink="/explorer" class="kp-btn kp-btn--primary">Voir les annonces</a>
+    </kp-vide>
+  } @else if (erreur()) {
+    <kp-vide icone="wifi-off" titre="Annonce indisponible" texte="Vérifiez votre connexion puis réessayez.">
+      <button type="button" class="kp-btn kp-btn--secondary" (click)="ngOnInit()">Réessayer</button>
+    </kp-vide>
+  } @else if (bien(); as b) {
+    <div class="kp-stack kp-stack--lg">
+      <kp-galerie [photos]="b.images ?? []" />
+
+      <section class="kp-section">
+        <p class="prix">
+          <span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
+          <span class="kp-muted"> / mois</span>
+        </p>
+        @if (b.chargesMensuelles) {
+          <p class="kp-muted kp-small">+ {{ b.chargesMensuelles | montant: b.devise : 0 }} de charges</p>
+        }
+        <p class="lieu"><kp-icon name="map-pin" [size]="18" /> {{ lieu() }}</p>
+        <div class="kp-row kp-row--wrap">
+          <span class="kp-tag">{{ typeBien() }}</span>
+          @if (b.meuble) { <span class="kp-tag">Meublé</span> }
+          @if (b.colocation) { <span class="kp-tag">Colocation</span> }
+          <span class="kp-tag">
+            <kp-icon name="calendar" [size]="16" />
+            @if (disponibleMaintenant()) { Disponible } @else { Disponible le {{ b.disponibleDe | dateLongue: true }} }
+          </span>
+        </div>
+      </section>
+
+      <section class="kp-section">
+        <h2 class="kp-section-title">Caractéristiques</h2>
+        <dl class="kp-details">
+          @if (b.surfaceHabitable) { <div><dt>Surface</dt><dd>{{ b.surfaceHabitable }} m²</dd></div> }
+          @if (b.nombrePieces) { <div><dt>Pièces</dt><dd>{{ b.nombrePieces }}</dd></div> }
+          @if (b.nombreChambres) { <div><dt>Chambres</dt><dd>{{ b.nombreChambres }}</dd></div> }
+          @if (b.etage != null) { <div><dt>Étage</dt><dd>{{ b.etage === 0 ? 'Rez-de-chaussée' : b.etage }}</dd></div> }
+          @if (b.ascenseur != null) { <div><dt>Ascenseur</dt><dd>{{ b.ascenseur ? 'Oui' : 'Non' }}</dd></div> }
+          @if (b.anneeConstruction) { <div><dt>Construction</dt><dd>{{ b.anneeConstruction }}</dd></div> }
+          @if (b.modeChauffage) { <div><dt>Chauffage</dt><dd>{{ chauffage(b.modeChauffage) }}</dd></div> }
+          @if (b.heuresElectriciteParJour != null) { <div><dt>Courant</dt><dd>{{ b.heuresElectriciteParJour }} h par jour</dd></div> }
+          @if (b.classeEnergie) { <div><dt>Classe énergie (DPE)</dt><dd>{{ b.classeEnergie }}</dd></div> }
+          @if (b.classeGes) { <div><dt>Émissions (GES)</dt><dd>{{ b.classeGes }}</dd></div> }
+        </dl>
+      </section>
+
+      <section class="kp-section">
+        <h2 class="kp-section-title">Conditions</h2>
+        <dl class="kp-details">
+          <div><dt>Loyer</dt><dd>{{ b.loyerMensuel | montant: b.devise : 0 }}</dd></div>
+          @if (b.chargesMensuelles) { <div><dt>Charges</dt><dd>{{ b.chargesMensuelles | montant: b.devise : 0 }}</dd></div> }
+          @if (b.garantieMois) { <div><dt>Garantie</dt><dd>{{ b.garantieMois }} mois de loyer</dd></div> }
+          @if (b.avanceMois) { <div><dt>Loyers d’avance</dt><dd>{{ b.avanceMois }} mois</dd></div> }
+          @if (b.depotGarantie) { <div><dt>Dépôt de garantie</dt><dd>{{ b.depotGarantie | montant: b.devise : 0 }}</dd></div> }
+        </dl>
+      </section>
+
+      @if (equipements().length) {
+        <section class="kp-section">
+          <h2 class="kp-section-title">Équipements</h2>
+          <div class="kp-row kp-row--wrap">
+            @for (e of equipements(); track e) {
+              <span class="kp-tag"><kp-icon name="check" [size]="16" /> {{ e }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      @if (b.description) {
+        <section class="kp-section">
+          <h2 class="kp-section-title">Description</h2>
+          <p class="description">{{ b.description }}</p>
+        </section>
+      }
+
+      <section class="kp-section">
+        <h2 class="kp-section-title">Adresse</h2>
+        <p>{{ adresse() }}</p>
+        <kp-carte-bien [latitude]="b.latitude" [longitude]="b.longitude" [precision]="b.precisionLocalisation" [publique]="true" />
+        @if (b.pointDeRepere) {
+          <p class="kp-muted">Repère : {{ b.pointDeRepere }}</p>
+        }
+        @if (positionApprox()) {
+          <p class="kp-aide">{{ positionApprox() }}</p>
+        }
+        @if (b.pois?.length) {
+          <p class="kp-small kp-strong">À proximité</p>
+          <div class="kp-row kp-row--wrap">
+            @for (p of b.pois; track p) {
+              <span class="kp-tag">{{ p }}</span>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="kp-section">
+        <h2 class="kp-section-title">Propriétaire</h2>
+        <div class="kp-row">
+          <kp-avatar [photo]="b.proprietaire.urlProfile" [nom]="nomProprietaire()" [taille]="48" />
+          <p class="kp-strong">{{ nomProprietaire() }}</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="kp-bottom-bar contact">
+      <p class="contact__prix">
+        <span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
+        <span class="kp-muted kp-small"> / mois</span>
+      </p>
+      <button type="button" class="kp-btn kp-btn--primary" (click)="contacter()">
+        <kp-icon name="message-circle" [size]="20" /> Contacter
+      </button>
+    </div>
+  }
+</div>

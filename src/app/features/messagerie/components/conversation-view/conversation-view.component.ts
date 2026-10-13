@@ -14,9 +14,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ChatService } from '../../services/chat.service';
@@ -24,6 +22,9 @@ import { ChatStoreService } from '../../services/chat-store.service';
 import { ChatWebSocketService } from '../../services/chat-websocket.service';
 import { MessageDTO } from '../../models/chat.models';
 import { MessageInputComponent } from '../message-input/message-input.component';
+import { AvatarComponent } from '../../../../shared/ui/avatar.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { dateLongue, joursAvant } from '../../../../shared/format';
 
 export interface MessageGroup {
   label: string;
@@ -33,24 +34,19 @@ export interface MessageGroup {
 @Component({
   selector: 'kp-conversation-view',
   standalone: true,
-  imports: [
-    CommonModule,
-    DatePipe,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MessageInputComponent,
-  ],
+  imports: [RouterLink, MessageInputComponent, AvatarComponent, IconComponent],
   templateUrl: './conversation-view.component.html',
-  styleUrls: ['./conversation-view.component.scss'],
+  styleUrl: './conversation-view.component.scss',
 })
 export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
   @Input({ required: true }) bienId!: number;
   @Input({ required: true }) emailInterlocuteur!: string;
+  @Input() nom = '';
   @Input() titre = '';
   @Input() photoUrl = '';
+  @Input() lienBien: unknown[] | null = null;
   @Output() backRequested = new EventEmitter<void>();
   @Output() sent = new EventEmitter<MessageDTO>();
-  @Output() nameResolved = new EventEmitter<string>();
   /**
    * Premier contact depuis une annonce (emailInterlocuteur vide) : l'adresse du propriétaire est connue
    * à l'écho du premier message envoyé (W13) ; la vue bascule alors sur la conversation créée.
@@ -74,93 +70,49 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   private subs = new Subscription();
   private markAsReadTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private readonly TONES = [
-    'tone-olive', 'tone-clay', 'tone-sand',
-    'tone-slate', 'tone-mint', 'tone-night',
-  ] as const;
-
   get myEmail(): string {
     return this.authService.currentUser()?.email ?? '';
   }
 
-  get headerInitiales(): string {
-    const local = this.emailInterlocuteur.split('@')[0];
-    const parts = local.split(/[._-]/);
-    if (parts.length >= 2) {
-      return ((parts[0][0] ?? '') + (parts[1][0] ?? '')).toUpperCase();
-    }
-    return local.substring(0, 2).toUpperCase();
-  }
-
-  get headerToneClass(): string {
-    const email = this.emailInterlocuteur;
-    const hash = email.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    return this.TONES[hash % this.TONES.length];
-  }
-
   get displayNom(): string {
-    const nom = this.interlocuteurNom();
-    if (nom) return nom;
-    if (!this.emailInterlocuteur) return 'Propriétaire';
-    const local = this.emailInterlocuteur.split('@')[0];
-    return local
-      .split(/[._-]/)
-      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-      .join(' ');
+    return this.interlocuteurNom() || this.nom || (this.emailInterlocuteur ? this.emailInterlocuteur.split('@')[0] : 'Propriétaire');
   }
 
   dayGroups = computed<MessageGroup[]>(() => {
-    const msgs = this.messages();
-    if (!msgs.length) return [];
-
     const result: MessageGroup[] = [];
-    let currentLabel = '';
-    let currentMsgs: MessageDTO[] = [];
-
-    for (const msg of msgs) {
-      const label = this.getDayLabel(msg.createdAt);
-      if (label !== currentLabel) {
-        if (currentMsgs.length) result.push({ label: currentLabel, messages: currentMsgs });
-        currentLabel = label;
-        currentMsgs = [msg];
+    for (const msg of this.messages()) {
+      const label = this.libelleJour(msg.createdAt);
+      const dernier = result[result.length - 1];
+      if (dernier?.label === label) {
+        dernier.messages.push(msg);
       } else {
-        currentMsgs.push(msg);
+        result.push({ label, messages: [msg] });
       }
     }
-    if (currentMsgs.length) result.push({ label: currentLabel, messages: currentMsgs });
     return result;
   });
 
-  private getDayLabel(isoDate: string): string {
-    const today = new Date();
-    const todayStr = today.toISOString().substring(0, 10);
-    const dStr = isoDate.substring(0, 10);
+  private libelleJour(iso: string): string {
+    const j = joursAvant(iso);
+    if (j === 0) return 'Aujourd’hui';
+    if (j === -1) return 'Hier';
+    return dateLongue(iso, true);
+  }
 
-    if (dStr === todayStr) return "AUJOURD'HUI";
-
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (dStr === yesterday.toISOString().substring(0, 10)) return 'HIER';
-
-    const d = new Date(dStr + 'T12:00:00');
-    return d
-      .toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-      .toUpperCase();
+  heure(iso: string): string {
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? '' : d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 
   ngOnInit(): void {
     this.store.setActiveConv(this.emailInterlocuteur);
     this.loadHistorique();
 
-    this.subs.add(
-      this.ws.connected$.subscribe((connected) => {
-        this.wsConnected.set(connected);
-      })
-    );
+    this.subs.add(this.ws.connected$.subscribe(connected => this.wsConnected.set(connected)));
     this.wsConnected.set(this.ws.isConnected);
 
     this.subs.add(
-      this.ws.messages$.subscribe((msg) => {
+      this.ws.messages$.subscribe(msg => {
         if (this.belongsToCurrentConv(msg)) {
           this.addMessageIfNew(msg);
           if (!this.emailInterlocuteur && msg.destinataireEmail) {
@@ -169,16 +121,14 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
             this.scheduleMarquerLus();
           }
         }
-      })
+      }),
     );
 
     // W13 : statut des messages envoyés (en attente, échec)
     this.subs.add(
       this.ws.statutsEnvoi$.subscribe(({ idClient, statut, erreur }) => {
-        this.messages.update((list) =>
-          list.map((m) => (m.idClient === idClient && m.statut ? { ...m, statut, erreur } : m))
-        );
-      })
+        this.messages.update(list => list.map(m => (m.idClient === idClient && m.statut ? { ...m, statut, erreur } : m)));
+      }),
     );
 
     // W11 : rattrapage des messages reçus pendant la coupure
@@ -219,22 +169,18 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
     this.messages.set([]);
 
     this.chatService.getHistorique(this.bienId, this.emailInterlocuteur).subscribe({
-      next: (msgs) => {
+      next: msgs => {
         this.messages.set(msgs ?? []);
         this.loading.set(false);
         this.needsScroll = true;
         this.marquerLus();
 
-        // Résolution du nom : interlocuteur comme expéditeur en priorité,
-        // sinon comme destinataire dans un de mes messages.
-        const sentByThem = msgs?.find((m) => m.expediteurEmail === this.emailInterlocuteur);
+        // Nom de l'interlocuteur : comme expéditeur en priorité, sinon comme destinataire d'un de mes messages
         const nom =
-          sentByThem?.expediteurNom ||
-          msgs?.find((m) => m.destinataireEmail === this.emailInterlocuteur)?.destinataireNom;
-
+          msgs?.find(m => m.expediteurEmail === this.emailInterlocuteur)?.expediteurNom ||
+          msgs?.find(m => m.destinataireEmail === this.emailInterlocuteur)?.destinataireNom;
         if (nom) {
           this.interlocuteurNom.set(nom);
-          this.nameResolved.emit(nom);
           this.store.setResolvedName(this.emailInterlocuteur, nom);
         }
       },
@@ -256,25 +202,25 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
     const email = this.emailInterlocuteur;
 
     this.chatService.getHistorique(bienId, email).subscribe({
-      next: (msgs) => {
+      next: msgs => {
         if (bienId !== this.bienId || email !== this.emailInterlocuteur) return;
         const serveur = msgs ?? [];
-        const dejaAffiches = new Set(this.messages().map((m) => m.id));
-        const nouveauxDeMoi = serveur.filter(
-          (m) => !dejaAffiches.has(m.id) && m.expediteurEmail === this.myEmail
-        );
-        const locaux = this.messages().filter((m) => m.statut && m.idClient).filter((local) => {
-          const i = nouveauxDeMoi.findIndex((m) => m.contenu === local.contenu);
-          if (i === -1) return true;
-          nouveauxDeMoi.splice(i, 1);
-          this.ws.oublier(local.idClient!);
-          return false;
-        });
+        const dejaAffiches = new Set(this.messages().map(m => m.id));
+        const nouveauxDeMoi = serveur.filter(m => !dejaAffiches.has(m.id) && m.expediteurEmail === this.myEmail);
+        const locaux = this.messages()
+          .filter(m => m.statut && m.idClient)
+          .filter(local => {
+            const i = nouveauxDeMoi.findIndex(m => m.contenu === local.contenu);
+            if (i === -1) return true;
+            nouveauxDeMoi.splice(i, 1);
+            this.ws.oublier(local.idClient!);
+            return false;
+          });
         this.messages.set([...serveur, ...locaux]);
         this.needsScroll = true;
         this.marquerLus();
       },
-      error: () => {},
+      error: () => undefined,
     });
   }
 
@@ -285,10 +231,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
 
   private marquerLus(): void {
     const conv = this.store.conversations().find(
-      (c) =>
-        c.bienId === this.bienId &&
-        (c.emailExpediteur === this.emailInterlocuteur ||
-          c.emailDestinataire === this.emailInterlocuteur)
+      c => c.bienId === this.bienId && (c.emailExpediteur === this.emailInterlocuteur || c.emailDestinataire === this.emailInterlocuteur),
     );
     const nonLuCount = conv?.nonLuCount ?? 0;
 
@@ -299,7 +242,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
           this.store.decrementUnread(nonLuCount);
         }
       },
-      error: () => {},
+      error: () => undefined,
     });
   }
 
@@ -324,14 +267,14 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   private addMessageIfNew(msg: MessageDTO): void {
     const current = this.messages();
     // Écho du serveur : remplace le message local « en attente » de même idClient (W13)
-    const local = msg.idClient ? current.findIndex((m) => m.statut && m.idClient === msg.idClient) : -1;
+    const local = msg.idClient ? current.findIndex(m => m.statut && m.idClient === msg.idClient) : -1;
     if (local !== -1) {
       const suivants = current.filter((m, i) => i !== local && m.id !== msg.id);
       suivants.splice(local, 0, msg);
       this.messages.set(suivants);
       return;
     }
-    if (!current.some((m) => m.id === msg.id)) {
+    if (!current.some(m => m.id === msg.id)) {
       this.messages.set([...current, msg]);
       this.needsScroll = true;
     }
@@ -347,11 +290,7 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   }
 
   private scrollToBottom(): void {
-    try {
-      const el = this.messagesEl?.nativeElement;
-      if (el) el.scrollTop = el.scrollHeight;
-    } catch {
-      // ignore
-    }
+    const el = this.messagesEl?.nativeElement;
+    if (el) el.scrollTop = el.scrollHeight;
   }
 }

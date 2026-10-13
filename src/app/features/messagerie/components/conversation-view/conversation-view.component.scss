@@ -1,334 +1,147 @@
-@use 'tokens' as t;
+@use 'mq';
 
 :host {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  background: var(--kp-bg);
 }
 
-.kp-view {
+.entete {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  min-height: calc(64px + var(--kp-safe-top));
+  padding: var(--kp-safe-top) var(--kp-space-4) 0 var(--kp-space-2);
+  border-bottom: 1px solid var(--kp-border);
+  background: var(--kp-surface);
+
+  @include mq.tablette {
+    padding-left: var(--kp-space-5);
+
+    .retour {
+      display: none;
+    }
+  }
+}
+
+.qui {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.nom {
+  font-weight: 700;
+}
+
+.bien {
+  color: var(--kp-text-3);
+  font-size: var(--kp-fs-sm);
+  text-decoration: none;
+}
+
+a.bien {
+  color: var(--kp-primary-text);
+}
+
+.reconnexion {
+  margin: var(--kp-space-2) var(--kp-space-4) 0;
+}
+
+.fil {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
-}
-
-// ── En-tête ──────────────────────────────────────────────────────────────────
-
-.kp-view-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 28px;
-  border-bottom: 1px solid var(--kp-border);
-  flex-shrink: 0;
-}
-
-.kp-header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.kp-header-info {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.kp-header-name {
-  font-family: t.$font-serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--kp-text-1);
-  letter-spacing: -0.005em;
-  line-height: 1.1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.kp-header-sub {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-family: t.$font-mono;
-  font-size: 10.5px;
-  color: var(--kp-text-3);
-
-  svg { flex-shrink: 0; }
-  span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.kp-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.kp-ico-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  border: 1px solid var(--kp-border-strong);
-  background: transparent;
-  color: var(--kp-text-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
-
-  &:hover {
-    border-color: var(--kp-primary);
-    color: var(--kp-primary-hover);
-  }
-}
-
-// ── Avatar ───────────────────────────────────────────────────────────────────
-
-.kp-av {
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: t.$font-mono;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.kp-av-lg {
-  width: 44px;
-  height: 44px;
-  font-size: 13px;
-}
-
-.kp-av-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.tone-olive { background: rgba(143, 164, 100, 0.18); color: #8FA464; }
-.tone-clay  { background: rgba(192,  97,  74, 0.18); color: #D4856F; }
-.tone-sand  { background: rgba(212, 168,  83, 0.18); color: #E8C87A; }
-.tone-slate { background: rgba( 90, 143, 175, 0.18); color: #7AACC8; }
-.tone-mint  { background: rgba(143, 164, 100, 0.12); color: var(--kp-primary-active); }
-.tone-night { background: var(--kp-surface);         color: var(--kp-text-3); }
-
-// ── Bandeau reconnexion ──────────────────────────────────────────────────────
-
-.kp-reconnect-banner {
-  padding: 8px 16px;
-  background: var(--kp-warning-subtle);
-  color: var(--kp-warning-text);
-  font-family: t.$font-sans;
-  font-size: 12px;
-  font-weight: 500;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-shrink: 0;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-}
-
-// ── Fil ──────────────────────────────────────────────────────────────────────
-
-.kp-view-messages {
-  flex: 1;
   overflow-y: auto;
-  padding: 20px 28px;
+  overscroll-behavior: contain;
+  padding: var(--kp-space-4);
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  scrollbar-width: none;
+  gap: var(--kp-space-2);
 
-  &::-webkit-scrollbar {
-    display: none;
+  @include mq.tablette {
+    padding: var(--kp-space-5) var(--kp-space-8);
   }
 }
 
-.kp-view-loading {
+.etat {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 32px;
-}
-
-.kp-view-error,
-.kp-view-no-msgs {
+  gap: var(--kp-space-3);
   flex: 1;
+  text-align: center;
+}
+
+.jour {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 12px;
-  color: var(--kp-text-3);
-  font-family: t.$font-sans;
-  font-size: 13px;
-}
+  margin: var(--kp-space-3) 0;
 
-.kp-retry-btn {
-  padding: 6px 16px;
-  border: 1px solid var(--kp-border-strong);
-  border-radius: 100px;
-  background: transparent;
-  color: var(--kp-text-3);
-  font-family: t.$font-sans;
-  font-size: 12px;
-  cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
-
-  &:hover {
-    border-color: var(--kp-primary);
-    color: var(--kp-text-1);
+  span {
+    padding: 4px 12px;
+    border-radius: var(--kp-radius-full);
+    background: var(--kp-surface-2);
+    color: var(--kp-text-3);
+    font-size: var(--kp-fs-xs);
+    font-weight: 600;
   }
 }
 
-// ── Séparateur de jour ───────────────────────────────────────────────────────
-
-.kp-day-sep {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 16px 0 8px;
-
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--kp-border);
-    background-image: repeating-linear-gradient(
-      to right,
-      var(--kp-border) 0,
-      var(--kp-border) 4px,
-      transparent 4px,
-      transparent 8px
-    );
-  }
-}
-
-.kp-day-sep-text {
-  font-family: t.$font-mono;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--kp-primary-active);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-// ── Lignes de message ────────────────────────────────────────────────────────
-
-.kp-msg-row {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 4px;
-
-  &.kp-msg-mine {
-    justify-content: flex-end;
-  }
-}
-
-// ── Bulles ───────────────────────────────────────────────────────────────────
-
-.kp-bubble {
-  max-width: 540px;
-  padding: 12px 14px 8px;
+.ligne {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
 
-  &.theirs {
-    background: var(--kp-surface);
-    border: 1px solid var(--kp-border);
-    border-radius: 14px 14px 14px 6px;
-    align-self: flex-start;
-  }
-
-  &.mine {
-    background: var(--kp-primary-subtle-md);
-    border: 1px solid var(--kp-border-strong);
-    border-radius: 14px 14px 6px 14px;
-    align-self: flex-end;
+  &--moi {
+    align-items: flex-end;
   }
 }
 
-.kp-bubble-text {
-  font-family: t.$font-sans;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--kp-text-1);
-  margin: 0;
+.bulle {
+  max-width: min(80%, 560px);
+  padding: 8px 12px 6px;
+  border-radius: 18px 18px 18px 6px;
+  background: var(--kp-surface);
+  border: 1px solid var(--kp-border);
+
+  &--moi {
+    border-color: transparent;
+    border-radius: 18px 18px 6px 18px;
+    background: var(--kp-primary);
+    color: var(--kp-primary-on);
+
+    .pied {
+      color: rgba(16, 33, 43, 0.7);
+    }
+  }
+
+  &--echec {
+    opacity: 0.7;
+  }
+}
+
+.texte {
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
-.kp-bubble-foot {
+.pied {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  color: var(--kp-text-3);
+  font-size: var(--kp-fs-xs);
+}
+
+.echec {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-.kp-bubble-time {
-  font-family: t.$font-mono;
-  font-size: 10px;
-  color: var(--kp-text-3);
-}
-
-.kp-receipt {
-  font-family: t.$font-mono;
-  font-size: 10px;
-  line-height: 1;
-
-  &.sent {
-    color: var(--kp-text-4);
-  }
-
-  &.read {
-    color: var(--kp-primary);
-  }
-}
-
-// W13 : message en attente d'accusé, ou refusé / non confirmé
-.kp-receipt.pending mat-icon {
-  width: 12px;
-  height: 12px;
-  font-size: 12px;
-}
-
-.kp-send-failed {
-  font-size: 11px;
-  color: var(--kp-danger-text);
-}
-
-.kp-send-failed button {
-  all: unset;
-  text-decoration: underline;
-  cursor: pointer;
-
-  &:focus-visible {
-    outline: auto; // all: unset retire l'anneau de focus du navigateur
-  }
+  gap: var(--kp-space-2);
+  color: var(--kp-danger);
+  font-size: var(--kp-fs-xs);
 }

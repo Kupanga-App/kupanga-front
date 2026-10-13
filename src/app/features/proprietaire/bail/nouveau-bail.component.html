@@ -1,0 +1,108 @@
+<kp-assistant
+  titre="Nouveau bail"
+  [etapes]="etapes"
+  [etape]="etape()"
+  [aide]="etape() === 0 && nomLocataire() ? 'Bail de ' + nomLocataire() + ' pour ' + bien()?.titre : null"
+  [peutContinuer]="etapeValide() && !!bien()"
+  [enCours]="envoi()"
+  [erreur]="erreur()"
+  libelleFin="Créer le bail"
+  (precedent)="precedent()"
+  (suivant)="suivant()"
+  (quitter)="quitter()">
+
+  <form class="kp-form" [formGroup]="form" (ngSubmit)="suivant()" novalidate>
+    @switch (etape()) {
+      @case (0) {
+        <div class="kp-field">
+          <label class="kp-label" for="dateDebut">Date de début</label>
+          <input id="dateDebut" class="kp-input" type="date" formControlName="dateDebut" [min]="aujourdhui" />
+          @if (form.controls.dateDebut.touched && form.controls.dateDebut.invalid) {
+            <span class="kp-erreur">Choisissez la date d’entrée dans le logement.</span>
+          }
+        </div>
+        <div class="kp-field">
+          <span class="kp-label" id="duree-libelle">Durée</span>
+          <div class="kp-choix" role="group" aria-labelledby="duree-libelle">
+            @for (d of durees; track d) {
+              <button type="button" class="kp-choix-item" [attr.aria-pressed]="form.controls.dureeBailMois.value === d"
+                      (click)="choisirDuree(d)">{{ d / 12 }} an{{ d > 12 ? 's' : '' }}</button>
+            }
+          </div>
+          <label class="kp-label" for="duree">Ou durée en mois</label>
+          <div class="kp-input-groupe">
+            <input id="duree" class="kp-input" type="number" inputmode="numeric" min="1" max="120" formControlName="dureeBailMois" />
+            <span class="kp-suffixe">mois</span>
+          </div>
+          @if (form.controls.dureeBailMois.touched && form.controls.dureeBailMois.invalid) {
+            <span class="kp-erreur">Entre 1 et 120 mois.</span>
+          }
+        </div>
+      }
+      @case (1) {
+        <div class="kp-form-row">
+          <div class="kp-field">
+            <label class="kp-label" for="loyer">Loyer mensuel</label>
+            <div class="kp-input-groupe">
+              <input id="loyer" class="kp-input" type="number" inputmode="decimal" min="0" step="0.01" formControlName="loyerMensuel" />
+              <span class="kp-suffixe">{{ symbole() }}</span>
+            </div>
+          </div>
+          <div class="kp-field">
+            <label class="kp-label" for="charges">Charges mensuelles</label>
+            <div class="kp-input-groupe">
+              <input id="charges" class="kp-input" type="number" inputmode="decimal" min="0" step="0.01" formControlName="chargesMensuelles" />
+              <span class="kp-suffixe">{{ symbole() }}</span>
+            </div>
+          </div>
+        </div>
+        @if (garantieEnMois()) {
+          <div class="kp-form-row">
+            <div class="kp-field">
+              <label class="kp-label" for="garantie">Garantie</label>
+              <div class="kp-input-groupe">
+                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" max="24" formControlName="garantieMois" />
+                <span class="kp-suffixe">mois</span>
+              </div>
+              <span class="kp-aide">Soit {{ montantGarantie() | montant: devise() : 0 }}</span>
+            </div>
+            <div class="kp-field">
+              <label class="kp-label" for="avance">Loyers payés d’avance</label>
+              <div class="kp-input-groupe">
+                <input id="avance" class="kp-input" type="number" inputmode="numeric" min="0" max="24" formControlName="avanceMois" />
+                <span class="kp-suffixe">mois</span>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="kp-field">
+            <label class="kp-label" for="depot">Dépôt de garantie</label>
+            <div class="kp-input-groupe">
+              <input id="depot" class="kp-input" type="number" inputmode="decimal" min="0" step="0.01" formControlName="depotGarantie" />
+              <span class="kp-suffixe">{{ symbole() }}</span>
+            </div>
+          </div>
+        }
+      }
+      @case (2) {
+        @if (form.getRawValue(); as v) {
+          <dl class="kp-details">
+            <div><dt>Locataire</dt><dd>{{ nomLocataire() }}</dd></div>
+            <div><dt>Bien</dt><dd>{{ bien()?.titre }}</dd></div>
+            <div><dt>Début</dt><dd>{{ v.dateDebut | dateLongue }}</dd></div>
+            <div><dt>Durée</dt><dd>{{ v.dureeBailMois }} mois</dd></div>
+            <div><dt>Loyer</dt><dd>{{ v.loyerMensuel | montant: devise() }}</dd></div>
+            <div><dt>Charges</dt><dd>{{ v.chargesMensuelles | montant: devise() }}</dd></div>
+            @if (garantieEnMois()) {
+              <div><dt>Garantie</dt><dd>{{ v.garantieMois }} mois ({{ montantGarantie() | montant: devise() }})</dd></div>
+              <div><dt>Loyers d’avance</dt><dd>{{ v.avanceMois }} mois</dd></div>
+            } @else {
+              <div><dt>Dépôt de garantie</dt><dd>{{ v.depotGarantie | montant: devise() }}</dd></div>
+            }
+          </dl>
+          <p class="kp-aide">Après la création, vous signerez le bail, puis le locataire recevra un lien pour le signer.</p>
+        }
+      }
+    }
+  </form>
+</kp-assistant>

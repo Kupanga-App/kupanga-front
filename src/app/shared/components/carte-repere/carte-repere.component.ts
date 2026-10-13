@@ -1,8 +1,7 @@
 import {
   AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, input, output, signal,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { IconComponent } from '../icon/icon.component';
 import * as L from 'leaflet';
 
 /** C2 : repère choisi par le propriétaire (clic sur la carte ou GPS du téléphone). */
@@ -27,33 +26,31 @@ const VUE_PAR_PAYS: Record<string, { centre: L.LatLngTuple; zoom: number }> = {
 @Component({
   selector: 'kp-carte-repere',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule],
+  imports: [IconComponent],
   template: `
     <div class="kp-carte">
       <div #carte class="kp-carte-map" role="application"
-           aria-label="Carte : cliquez pour placer le repère du logement"></div>
-      <div class="kp-carte-actions">
-        <button mat-stroked-button type="button" (click)="maPosition()" [disabled]="localisationEnCours()">
-          <mat-icon>my_location</mat-icon> Ma position
+           aria-label="Carte : touchez pour placer le repère du logement"></div>
+      <div class="kp-actions">
+        <button class="kp-btn kp-btn--secondary kp-btn--sm" type="button" (click)="maPosition()" [disabled]="localisationEnCours()">
+          <kp-icon name="locate-fixed" [size]="18" /> Ma position
         </button>
         @if (repere() && retirable()) {
-          <button mat-button type="button" (click)="retirer()">
-            <mat-icon>close</mat-icon> Retirer le repère
+          <button class="kp-btn kp-btn--ghost kp-btn--sm" type="button" (click)="retirer()">
+            <kp-icon name="x" [size]="18" /> Retirer le repère
           </button>
         }
       </div>
       @if (erreur()) {
-        <p class="kp-carte-erreur">{{ erreur() }}</p>
+        <p class="kp-erreur">{{ erreur() }}</p>
       } @else if (!repere()) {
-        <p class="kp-text-caption">Cliquez sur la carte pour indiquer l'emplacement exact du logement (facultatif).</p>
+        <p class="kp-aide">Touchez la carte à l'emplacement exact du logement, ou utilisez votre position.</p>
       }
     </div>
   `,
   styles: [`
     .kp-carte { display: flex; flex-direction: column; gap: 8px; }
-    .kp-carte-map { height: 280px; width: 100%; border-radius: 12px; overflow: hidden; z-index: 0; }
-    .kp-carte-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .kp-carte-erreur { color: #b3261e; margin: 0; font-size: 13px; }
+    .kp-carte-map { height: clamp(240px, 45dvh, 380px); width: 100%; border-radius: var(--kp-radius); overflow: hidden; z-index: 0; }
   `],
 })
 export class CarteRepereComponent implements AfterViewInit, OnDestroy {

@@ -1,0 +1,159 @@
+// styles/_theme.scss — jetons de design Kupanga (AUDIT.md §8.2)
+// Couleurs, tailles, espacements, rayons et ombres de l'interface : uniquement ces variables CSS.
+// Thème clair par défaut, sombre selon le réglage du système, forçable par <html data-theme="light|dark">.
+
+@mixin clair {
+  --kp-bg: #f5f6f2;
+  --kp-surface: #ffffff;
+  --kp-surface-2: #eef0e9;
+  --kp-surface-3: #e3e7dc;
+  --kp-border: #dde1d6;
+  --kp-border-strong: #c4cab9;
+
+  --kp-text-1: #10212b;
+  --kp-text-2: #3d4d57;
+  --kp-text-3: #5c6b74;
+  --kp-text-invert: #effbdb;
+
+  // Olive : action principale et états « fait »
+  --kp-primary: #8fa464;
+  --kp-primary-hover: #7f9457;
+  --kp-primary-on: #10212b;
+  --kp-primary-text: #52652c;
+  --kp-primary-subtle: #edf3e0;
+
+  --kp-success: #52652c;
+  --kp-success-subtle: #edf3e0;
+  --kp-warning: #8a5c0b;
+  --kp-warning-subtle: #fbf0d9;
+  --kp-danger: #b03a27;
+  --kp-danger-subtle: #fbe6e1;
+  --kp-info: #285a74;
+  --kp-info-subtle: #e2edf3;
+
+  // Barre d'onglets et barre latérale (Night)
+  --kp-nav-bg: #10212b;
+  --kp-nav-text: rgba(239, 251, 219, 0.72);
+  --kp-nav-active: #effbdb;
+  --kp-nav-accent: #8fa464;
+
+  --kp-backdrop: rgba(16, 33, 43, 0.45);
+  --kp-shadow: 0 8px 24px rgba(16, 33, 43, 0.16);
+  --kp-focus: 0 0 0 3px rgba(143, 164, 100, 0.55);
+
+  color-scheme: light;
+}
+
+@mixin sombre {
+  --kp-bg: #0b181f;
+  --kp-surface: #10212b;
+  --kp-surface-2: #182c38;
+  --kp-surface-3: #213846;
+  --kp-border: #233a48;
+  --kp-border-strong: #33505f;
+
+  --kp-text-1: #effbdb;
+  --kp-text-2: rgba(239, 251, 219, 0.82);
+  --kp-text-3: rgba(239, 251, 219, 0.64);
+  --kp-text-invert: #10212b;
+
+  --kp-primary: #8fa464;
+  --kp-primary-hover: #a1b577;
+  --kp-primary-on: #10212b;
+  --kp-primary-text: #b5ca8d;
+  --kp-primary-subtle: rgba(143, 164, 100, 0.16);
+
+  --kp-success: #b5ca8d;
+  --kp-success-subtle: rgba(143, 164, 100, 0.16);
+  --kp-warning: #e8c87a;
+  --kp-warning-subtle: rgba(212, 168, 83, 0.16);
+  --kp-danger: #e8917f;
+  --kp-danger-subtle: rgba(192, 97, 74, 0.18);
+  --kp-info: #8dbad3;
+  --kp-info-subtle: rgba(90, 143, 175, 0.18);
+
+  --kp-nav-bg: #0e1c24;
+  --kp-nav-text: rgba(239, 251, 219, 0.66);
+  --kp-nav-active: #effbdb;
+  --kp-nav-accent: #8fa464;
+
+  --kp-backdrop: rgba(0, 0, 0, 0.6);
+  --kp-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --kp-focus: 0 0 0 3px rgba(143, 164, 100, 0.6);
+
+  color-scheme: dark;
+}
+
+:root {
+  @include clair;
+
+  // DM Sans partout ; DM Serif Display pour le nom de l'application seulement
+  --kp-font: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --kp-font-display: 'DM Serif Display', Georgia, serif;
+
+  // Échelle de 6 tailles
+  --kp-fs-xs: 12px;
+  --kp-fs-sm: 14px;
+  --kp-fs-md: 16px;
+  --kp-fs-lg: 20px;
+  --kp-fs-xl: 24px;
+  --kp-fs-2xl: 32px;
+
+  // Grille de 4 px
+  --kp-space-1: 4px;
+  --kp-space-2: 8px;
+  --kp-space-3: 12px;
+  --kp-space-4: 16px;
+  --kp-space-5: 20px;
+  --kp-space-6: 24px;
+  --kp-space-8: 32px;
+  --kp-space-10: 40px;
+
+  // Trois rayons
+  --kp-radius-sm: 8px;
+  --kp-radius: 12px;
+  --kp-radius-lg: 20px;
+  --kp-radius-full: 999px;
+
+  --kp-tap: 44px;
+  --kp-duree: 220ms;
+
+  // Zones sûres (encoche, barre de geste) : viewport-fit=cover dans index.html
+  --kp-safe-top: env(safe-area-inset-top, 0px);
+  --kp-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --kp-safe-left: env(safe-area-inset-left, 0px);
+  --kp-safe-right: env(safe-area-inset-right, 0px);
+
+  // Hauteur de la barre d'onglets du bas (0 si absente) : posée par la mise en page
+  --kp-tabbar-h: 0px;
+  --kp-bottom-offset: calc(var(--kp-tabbar-h) + var(--kp-safe-bottom));
+}
+
+// Barre d'onglets du bas affichée (téléphone, hors écrans pleins) : posé par AppShellComponent
+@media (max-width: 767px) {
+  :root[data-onglets] {
+    --kp-tabbar-h: 64px;
+  }
+}
+
+// Transition entre deux écrans (View Transitions du routeur) : fondu court
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 160ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include sombre;
+  }
+}
+
+:root[data-theme='dark'] {
+  @include sombre;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --kp-duree: 0ms;
+  }
+}

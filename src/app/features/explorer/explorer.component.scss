@@ -1,0 +1,62 @@
+.outils {
+  display: flex;
+  gap: var(--kp-space-2);
+}
+
+.recherche {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+
+  kp-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--kp-text-3);
+    pointer-events: none;
+  }
+
+  .kp-input {
+    padding-left: 42px;
+  }
+}
+
+.filtres {
+  flex-shrink: 0;
+  padding: 0 var(--kp-space-4);
+
+  .nombre {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--kp-primary);
+    color: var(--kp-primary-on);
+    font-size: var(--kp-fs-xs);
+    line-height: 20px;
+  }
+}
+
+.barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+  margin: var(--kp-space-4) 0;
+}
+
+.tri {
+  width: auto;
+  min-height: 40px;
+  font-size: var(--kp-fs-sm);
+}
+
+.suite {
+  margin-top: var(--kp-space-6);
+}
+
+.carte-aide {
+  margin-top: var(--kp-space-2);
+}

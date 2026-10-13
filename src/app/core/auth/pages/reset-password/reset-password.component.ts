@@ -1,42 +1,69 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, Check } from 'lucide-angular';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth.service';
-import { AuthLayoutCComponent } from '../../shared/auth-layout-c/auth-layout-c.component';
-import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
-import { PasswordStrengthComponent } from '../../shared/password-strength/password-strength.component';
-
 import { messageErreurApi } from '../../../http/api-error';
-import { MOT_DE_PASSE_ROBUSTE } from '../register/register.component';
-const mustMatch: ValidatorFn = (ctrl: AbstractControl): ValidationErrors | null => {
-  const pw = ctrl.get('password');
-  const confirm = ctrl.get('confirmPassword');
-  if (pw && confirm && pw.value !== confirm.value) {
-    confirm.setErrors({ passwordMismatch: true });
-    return { passwordMismatch: true };
-  }
-  if (confirm?.hasError('passwordMismatch')) {
-    confirm.setErrors(null);
-  }
-  return null;
-};
+import { AuthLayoutComponent } from '../../ui/auth-layout.component';
+import { MOT_DE_PASSE_ROBUSTE, ReglesMotDePasseComponent, motsDePasseIdentiques } from '../../ui/mot-de-passe';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
+/** Page ouverte depuis le lien « mot de passe oublié » (`/auth/reset-password?token=…`). */
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    LucideAngularModule,
-    AuthLayoutCComponent,
-    AuthFieldComponent,
-    PasswordStrengthComponent,
-  ],
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss']
+  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, ReglesMotDePasseComponent, IconComponent],
+  template: `
+    @if (fait()) {
+      <kp-auth-layout titre="Mot de passe modifié">
+        <div class="kp-stack">
+          <p>Vous pouvez vous connecter avec votre nouveau mot de passe.</p>
+          <a routerLink="/auth/login" class="kp-btn kp-btn--primary kp-btn--block">Se connecter</a>
+        </div>
+      </kp-auth-layout>
+    } @else {
+      <kp-auth-layout titre="Nouveau mot de passe">
+        <form class="kp-form" [formGroup]="form" (ngSubmit)="valider()" novalidate>
+          <div class="kp-field">
+            <label class="kp-label" for="password">Nouveau mot de passe</label>
+            <div class="kp-input-groupe">
+              <input id="password" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="password"
+                     autocomplete="new-password" maxlength="72" />
+              <button type="button" class="kp-icon-btn oeil" (click)="voir.set(!voir())"
+                      [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                <kp-icon [name]="voir() ? 'eye-off' : 'eye'" />
+              </button>
+            </div>
+            <kp-regles-mot-de-passe [valeur]="motDePasse()" />
+          </div>
+          <div class="kp-field">
+            <label class="kp-label" for="confirmPassword">Confirmez le mot de passe</label>
+            <input id="confirmPassword" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="confirmPassword"
+                   autocomplete="new-password" maxlength="72" />
+            @if (form.controls.confirmPassword.touched && form.hasError('differents')) {
+              <span class="kp-erreur">Les deux mots de passe sont différents.</span>
+            }
+          </div>
+          @if (erreur()) {
+            <div class="kp-bandeau kp-bandeau--danger" role="alert">
+              <kp-icon name="circle-alert" [size]="18" />
+              <div class="kp-stack kp-stack--sm">
+                <p>{{ erreur() }}</p>
+                <a routerLink="/auth/forgot">Demander un nouveau lien</a>
+              </div>
+            </div>
+          }
+          <button type="submit" class="kp-btn kp-btn--primary kp-btn--block" [disabled]="envoi()">
+            @if (envoi()) {
+              <span class="kp-spinner"></span>
+            }
+            Enregistrer
+          </button>
+        </form>
+      </kp-auth-layout>
+    }
+  `,
+  styles: [`.oeil { position: absolute; right: 2px; }`],
 })
 export class ResetPasswordComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -44,49 +71,49 @@ export class ResetPasswordComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  readonly Check = Check;
+  private jeton: string | null = null;
+  readonly envoi = signal(false);
+  readonly fait = signal(false);
+  readonly voir = signal(false);
+  readonly erreur = signal<string | null>(null);
 
-  token = signal<string | null>(null);
-  isSubmitting = signal(false);
-  isSuccess = signal(false);
-  serverError = signal<string | null>(null);
+  readonly form = this.fb.nonNullable.group(
+    {
+      password: ['', [Validators.required, Validators.maxLength(72), Validators.pattern(MOT_DE_PASSE_ROBUSTE)]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    { validators: motsDePasseIdentiques },
+  );
 
-  form = this.fb.group({
-    password:        ['', [Validators.required, Validators.maxLength(72), Validators.pattern(MOT_DE_PASSE_ROBUSTE)]],
-    confirmPassword: ['', [Validators.required]]
-  }, { validators: mustMatch });
-
-  get passwordCtrl()        { return this.form.get('password') as any; }
-  get confirmPasswordCtrl() { return this.form.get('confirmPassword') as any; }
-  get passwordValue()       { return this.form.get('password')?.value ?? ''; }
+  readonly motDePasse = toSignal(this.form.controls.password.valueChanges, { initialValue: '' });
 
   ngOnInit(): void {
-    const t = this.route.snapshot.queryParamMap.get('token');
-    if (!t) {
-      this.router.navigate(['/auth/forgot']);
+    this.jeton = this.route.snapshot.queryParamMap.get('token');
+    if (!this.jeton) {
+      void this.router.navigate(['/auth/forgot']);
       return;
     }
-    this.token.set(t);
     // Le jeton ne reste pas dans l'URL ni dans l'historique du navigateur
-    this.router.navigate([], { queryParams: {}, replaceUrl: true });
+    void this.router.navigate([], { queryParams: {}, replaceUrl: true });
   }
 
-  onSubmit(): void {
-    if (this.form.invalid || !this.token()) return;
-    this.isSubmitting.set(true);
-    this.serverError.set(null);
-
-    this.authService.resetPassword(this.token()!, this.form.value.password!).subscribe({
+  valider(): void {
+    if (this.form.invalid || !this.jeton) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.envoi.set(true);
+    this.erreur.set(null);
+    this.authService.resetPassword(this.jeton, this.form.controls.password.value).subscribe({
       next: () => {
-        this.isSubmitting.set(false);
-        this.isSuccess.set(true);
-        setTimeout(() => this.router.navigate(['/auth/login']), 3000);
+        this.envoi.set(false);
+        this.fait.set(true);
       },
-      error: (err) => {
-        this.isSubmitting.set(false);
+      error: err => {
+        this.envoi.set(false);
         // 400 « Lien de réinitialisation invalide ou expiré » ou règle du mot de passe non respectée
-        this.serverError.set(messageErreurApi(err, "Une erreur s'est produite lors de la réinitialisation."));
-      }
+        this.erreur.set(messageErreurApi(err, 'Le mot de passe n’a pas pu être modifié.'));
+      },
     });
   }
 }

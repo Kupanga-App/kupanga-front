@@ -1,7 +1,5 @@
 import { Component, DestroyRef, OnInit, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { EMPTY } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 
@@ -9,6 +7,7 @@ import { Pays } from '../../../biens/models/bien.model';
 import { whatsappPropose } from '../../../biens/models/juridiction.model';
 import { JuridictionService } from '../../../biens/services/juridiction.service';
 import { DocumentWhatsApp, LienWhatsApp, WhatsappService } from '../../services/whatsapp.service';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 /**
  * C7-C16 : bouton « Envoyer par WhatsApp » (propriétaire). Affiché seulement si le pays du bien propose le canal
@@ -18,22 +17,21 @@ import { DocumentWhatsApp, LienWhatsApp, WhatsappService } from '../../services/
 @Component({
   selector: 'kp-bouton-whatsapp',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule],
+  imports: [IconComponent],
   template: `
     @if (lien(); as l) {
       <div class="kp-whatsapp">
-        <a mat-stroked-button class="kp-whatsapp-btn" [href]="l.url" target="_blank" rel="noopener noreferrer">
-          <mat-icon>chat</mat-icon> {{ libelle() }}
+        <a class="kp-btn kp-btn--whatsapp kp-btn--block" [href]="l.url" target="_blank" rel="noopener noreferrer">
+          <kp-icon name="smartphone" [size]="18" /> {{ libelle() }}
         </a>
         @if (!l.numeroConnu) {
-          <span class="kp-text-caption">Numéro du locataire inconnu : choisissez le contact dans WhatsApp.</span>
+          <span class="kp-aide">Numéro du locataire inconnu : choisissez le contact dans WhatsApp.</span>
         }
       </div>
     }
   `,
   styles: [`
     .kp-whatsapp { display: flex; flex-direction: column; gap: 4px; }
-    .kp-whatsapp-btn { color: #1f7a3f; border-color: #25d366; }
   `],
 })
 export class BoutonWhatsappComponent implements OnInit {

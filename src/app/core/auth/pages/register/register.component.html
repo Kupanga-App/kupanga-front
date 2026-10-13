@@ -1,194 +1,134 @@
-<!-- ÉTAPE 1 — Identifiants -->
-@if (step() === 1) {
-  <kp-auth-layout-c
-    kicker="Bienvenue · Première édition"
-    hero="Rejoindre·&lt;br&gt;Kup&lt;em&gt;anga&lt;/em&gt;."
-    subhero="Quelques minutes pour créer votre espace, et vous gérez vos premiers biens dans la foulée."
-    badge="N° 0004"
-    eyebrow="04 · Inscription · 1/2"
-    title="Vos identifiants."
-    sub="Étape 1 sur 2 — on s'occupe du profil ensuite."
-    [footer]="footerStep1"
-  >
-    <form [formGroup]="form" novalidate>
-      <kp-steps [current]="1" [total]="2" [labels]="['Identifiants', 'Profil']" />
-
-      <kp-auth-field
-        label="Adresse email"
-        [required]="true"
-        type="email"
-        placeholder="vous@exemple.fr"
-        [control]="emailCtrl"
-        fieldId="signup-email"
-      />
-
-      <kp-auth-field
-        label="Mot de passe"
-        [required]="true"
-        type="password"
-        placeholder="••••••••"
-        hint="Min. 8 caractères, une majuscule, un chiffre."
-        [control]="passwordCtrl"
-        fieldId="signup-password"
-      />
-
-      <kp-password-strength [password]="passwordValue" />
-
-      <kp-auth-field
-        label="Confirmer le mot de passe"
-        [required]="true"
-        type="password"
-        placeholder="••••••••"
-        [control]="confirmPasswordCtrl"
-        fieldId="signup-confirm"
-      />
-
-      <button type="button" class="btn-primary btn-full" (click)="nextStep()">
-        Continuer
-        <lucide-icon [img]="ArrowRight" [size]="16" />
+@if (etape() === 'envoye') {
+  <kp-auth-layout titre="Vérifiez votre e-mail">
+    <div class="envoye">
+      <span class="envoye__icone"><kp-icon name="mail" [size]="28" /></span>
+      <p>Nous avons envoyé un lien de confirmation à <strong>{{ emailInscrit() }}</strong>. Ouvrez-le pour activer votre compte (valable 24 heures).</p>
+      <p class="kp-muted kp-small">Rien reçu ? Regardez dans les indésirables, ou demandez un nouveau lien.</p>
+      @if (infoRenvoi()) {
+        <p class="kp-small" role="status">{{ infoRenvoi() }}</p>
+      }
+      <button type="button" class="kp-btn kp-btn--secondary kp-btn--block" (click)="renvoyerLien()" [disabled]="renvoiEnCours()">
+        Renvoyer le lien
       </button>
-    </form>
-  </kp-auth-layout-c>
-}
+      <a routerLink="/auth/login" [queryParams]="retourParams()" class="kp-btn kp-btn--primary kp-btn--block">Aller à la connexion</a>
+    </div>
+  </kp-auth-layout>
+} @else {
+  <kp-auth-layout [titre]="titres[numeroEtape()]" retour="/explorer">
+    <div class="progression" role="progressbar" aria-valuemin="1" aria-valuemax="3" [attr.aria-valuenow]="numeroEtape() + 1"
+         [attr.aria-label]="'Étape ' + (numeroEtape() + 1) + ' sur 3'">
+      @for (i of [0, 1, 2]; track i) {
+        <span [class.fait]="i <= numeroEtape()"></span>
+      }
+    </div>
 
-<!-- ÉTAPE 2 — Profil -->
-@if (step() === 2) {
-  <kp-auth-layout-c
-    kicker="Bienvenue · Première édition"
-    hero="Votre·&lt;em&gt;profil&lt;/em&gt;."
-    subhero="Le minimum pour personnaliser votre espace — vous pourrez tout modifier ensuite."
-    badge="N° 0005"
-    eyebrow="04 · Inscription · 2/2"
-    title="Complétez votre profil."
-    sub="Étape 2 sur 2 — presque fini."
-  >
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      <kp-steps [current]="2" [total]="2" [labels]="['Identifiants', 'Profil']" />
-
-      <div class="name-grid">
-        <kp-auth-field
-          label="Prénom"
-          [required]="true"
-          type="text"
-          placeholder="Marie"
-          [control]="firstNameCtrl"
-          fieldId="signup-firstname"
-        />
-        <kp-auth-field
-          label="Nom"
-          [required]="true"
-          type="text"
-          placeholder="Dupont"
-          [control]="lastNameCtrl"
-          fieldId="signup-lastname"
-        />
-      </div>
-
-      <!-- C6 : contact facultatif (liens WhatsApp entre propriétaire et locataire) -->
-      <kp-auth-field
-        label="Téléphone (facultatif)"
-        type="tel"
-        placeholder="+243 81 234 56 78"
-        hint="Format international. Visible seulement par votre propriétaire ou votre locataire."
-        [control]="telephoneCtrl"
-        fieldId="signup-telephone"
-      />
-
-      <kp-role-picker [control]="roleCtrl" />
-
-      <div class="avatar-field">
-        <div class="avatar-field-label">
-          <span>Photo de profil</span>
-          <span class="opt-tag">optionnel</span>
-        </div>
-        <div class="avatar-section">
-          <div class="avatar-preview-wrap">
-            @if (avatarPreview) {
-              <img class="avatar-preview" [src]="avatarPreview" alt="Avatar sélectionné" />
+    <form class="kp-form" [formGroup]="form" (ngSubmit)="suivant()" novalidate>
+      @switch (etape()) {
+        @case (0) {
+          <kp-choix-role formControlName="role" />
+        }
+        @case (1) {
+          <div class="kp-form-row">
+            <div class="kp-field">
+              <label class="kp-label" for="firstName">Prénom</label>
+              <input id="firstName" class="kp-input" formControlName="firstName" autocomplete="given-name" maxlength="50" />
+              @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+                <span class="kp-erreur">Entrez votre prénom.</span>
+              }
+            </div>
+            <div class="kp-field">
+              <label class="kp-label" for="lastName">Nom</label>
+              <input id="lastName" class="kp-input" formControlName="lastName" autocomplete="family-name" maxlength="50" />
+              @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+                <span class="kp-erreur">Entrez votre nom.</span>
+              }
+            </div>
+          </div>
+          <div class="kp-field">
+            <label class="kp-label" for="telephone">Téléphone <span class="kp-optionnel">(facultatif)</span></label>
+            <input id="telephone" class="kp-input" type="tel" inputmode="tel" formControlName="telephone" autocomplete="tel"
+                   placeholder="+243 81 234 56 78" />
+            @if (form.controls.telephone.touched && form.controls.telephone.invalid) {
+              <span class="kp-erreur">{{ messageTelephone }}</span>
             } @else {
-              <div class="avatar-placeholder">
-                <lucide-icon [img]="Smile" [size]="20" />
-              </div>
+              <span class="kp-aide">Visible seulement par votre propriétaire ou votre locataire.</span>
             }
           </div>
-          <div class="avatar-btns">
-            <button type="button" class="btn-ghost btn-half" (click)="openAvatarModal()">
-              <lucide-icon [img]="Smile" [size]="14" />
-              Choisir
-            </button>
-            <label class="btn-ghost btn-half" tabindex="0">
-              <lucide-icon [img]="Upload" [size]="14" />
-              Importer
-              <input type="file" [accept]="acceptPhotos" class="file-input-hidden" (change)="onFileUpload($event)" />
-            </label>
+          <div class="kp-field">
+            <span class="kp-label">Photo <span class="kp-optionnel">(facultatif)</span></span>
+            <div class="photo">
+              @if (apercu()) {
+                <img class="apercu" [src]="apercu()" alt="Votre photo" />
+              } @else {
+                <span class="apercu-vide"><kp-icon name="user" [size]="28" /></span>
+              }
+              <label class="kp-btn kp-btn--secondary kp-btn--sm">
+                <kp-icon name="camera" [size]="18" /> {{ apercu() ? 'Changer' : 'Ajouter' }}
+                <input type="file" class="kp-sr-only" [accept]="acceptPhotos" (change)="choisirPhoto($event)" />
+              </label>
+              @if (apercu()) {
+                <button type="button" class="kp-btn kp-btn--ghost kp-btn--sm" (click)="retirerPhoto()">Retirer</button>
+              }
+            </div>
           </div>
-        </div>
-      </div>
-
-      @if (serverError()) {
-        <p class="server-error" role="alert" aria-live="polite">{{ serverError() }}</p>
+        }
+        @case (2) {
+          <div class="kp-field">
+            <label class="kp-label" for="email">E-mail</label>
+            <input id="email" class="kp-input" type="email" inputmode="email" formControlName="email" autocomplete="email"
+                   autocapitalize="off" spellcheck="false" />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <span class="kp-erreur">Entrez une adresse e-mail valide.</span>
+            }
+          </div>
+          <div class="kp-field">
+            <label class="kp-label" for="password">Mot de passe</label>
+            <div class="kp-input-groupe">
+              <input id="password" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="password"
+                     autocomplete="new-password" maxlength="72" />
+              <button type="button" class="kp-icon-btn oeil" (click)="voir.set(!voir())"
+                      [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                <kp-icon [name]="voir() ? 'eye-off' : 'eye'" />
+              </button>
+            </div>
+            <kp-regles-mot-de-passe [valeur]="motDePasse()" />
+          </div>
+          <div class="kp-field">
+            <label class="kp-label" for="confirmPassword">Confirmez le mot de passe</label>
+            <input id="confirmPassword" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="confirmPassword"
+                   autocomplete="new-password" maxlength="72" />
+            @if (form.controls.confirmPassword.touched && form.hasError('differents')) {
+              <span class="kp-erreur">Les deux mots de passe sont différents.</span>
+            }
+          </div>
+        }
       }
 
-      <div class="wizard-footer">
-        <button type="button" class="btn-ghost" (click)="prevStep()">← Retour</button>
-        <button type="submit" class="btn-primary" style="flex:1" [disabled]="isSubmitting()">
-          @if (isSubmitting()) {
-            <span class="spinner"></span>
-          } @else {
-            S'inscrire
-            <lucide-icon [img]="Check" [size]="16" />
+      @if (erreur()) {
+        <div class="kp-bandeau kp-bandeau--danger" role="alert">
+          <kp-icon name="circle-alert" [size]="18" />
+          <p>{{ erreur() }}</p>
+        </div>
+      }
+
+      <div class="kp-actions">
+        @if (numeroEtape() > 0) {
+          <button type="button" class="kp-btn kp-btn--secondary" (click)="precedent()" [disabled]="envoi()">Retour</button>
+        }
+        <button type="submit" class="kp-btn kp-btn--primary kp-spacer" [disabled]="envoi()">
+          @if (envoi()) {
+            <span class="kp-spinner"></span>
           }
+          {{ numeroEtape() === 2 ? 'Créer mon compte' : 'Continuer' }}
         </button>
       </div>
     </form>
-  </kp-auth-layout-c>
+
+    @if (numeroEtape() === 0) {
+      <div class="separateur"><span>ou</span></div>
+      <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
+    }
+
+    <p pied>Déjà un compte ? <a routerLink="/auth/login" [queryParams]="retourParams()">Se connecter</a></p>
+  </kp-auth-layout>
 }
-
-<!-- ÉTAPE 3 — Lien de confirmation envoyé (A14) -->
-@if (step() === 3) {
-  <kp-auth-layout-c
-    kicker="Bienvenue · Première édition"
-    hero="Presque·&lt;em&gt;prêt&lt;/em&gt;."
-    subhero="Une dernière étape : confirmer que cette adresse e-mail est bien la vôtre."
-    badge="N° 0006"
-    eyebrow="04 · Inscription · confirmation"
-    title="Vérifiez votre e-mail."
-    sub="Votre compte s'active quand vous ouvrez le lien reçu."
-    [footer]="footerStep1"
-  >
-    <div class="sent-state">
-      <div class="sent-icon">
-        <lucide-icon [img]="Check" [size]="24" />
-      </div>
-      <p class="sent-text">
-        Un lien de confirmation vient d'être envoyé à <strong>{{ emailInscrit() }}</strong>.
-        Ouvrez-le pour activer votre compte (valable 24 heures), puis connectez-vous.
-      </p>
-      <p class="sent-text">
-        Rien reçu ? Vérifiez les indésirables, ou demandez un nouveau lien.
-        Si vous aviez déjà un compte, un e-mail vous indique comment retrouver l'accès.
-      </p>
-      <button type="button" class="btn-ghost" (click)="renvoyerLien()" [disabled]="isResending()">
-        Renvoyer le lien
-      </button>
-      @if (resendInfo()) {
-        <p class="sent-text" aria-live="polite">{{ resendInfo() }}</p>
-      }
-      <a routerLink="/auth/login" class="btn-primary btn-full">Aller à la connexion</a>
-    </div>
-  </kp-auth-layout-c>
-}
-
-<!-- Modal avatar -->
-<kp-avatar-modal
-  [isOpen]="showAvatarModal()"
-  [initialUrl]="selectedAvatarUrl()"
-  (confirmed)="onAvatarConfirmed($event)"
-  (cancelled)="onAvatarCancelled()"
-/>
-
-<!-- Footer étape 1 -->
-<ng-template #footerStep1>
-  Déjà un compte ?&nbsp;
-  <a routerLink="/auth/login" class="footer-link">Se connecter</a>
-</ng-template>

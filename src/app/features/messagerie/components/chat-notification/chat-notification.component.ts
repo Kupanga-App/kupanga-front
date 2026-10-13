@@ -1,83 +1,53 @@
 import { Component, effect, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { ToastService } from '../../../../core/ui/toast.service';
 import { ChatWebSocketService } from '../../services/chat-websocket.service';
 import { ChatStoreService } from '../../services/chat-store.service';
 
+/** Messages reçus en temps réel : compteur de non-lus et message éphémère hors de l'écran Messages. */
 @Component({
   selector: 'kp-chat-notification',
   standalone: true,
-  imports: [],
   template: '',
 })
 export class ChatNotificationComponent implements OnInit, OnDestroy {
   private ws = inject(ChatWebSocketService);
   private store = inject(ChatStoreService);
-  private snackBar = inject(MatSnackBar);
+  private toasts = inject(ToastService);
   private router = inject(Router);
   private authService = inject(AuthService);
-
   private subs = new Subscription();
 
   constructor() {
-    // Reactive: fires when user logs in during an active session
-    // (e.g. user on public page, then logs in without full reload)
+    // Connexion pendant la session (page publique puis connexion sans rechargement)
     effect(() => {
-      const user = this.authService.currentUser();
-      if (user) {
+      if (this.authService.currentUser()) {
         this.store.loadUnreadCount();
       }
     });
   }
 
   ngOnInit(): void {
-    // Safety net: the effect's first run is async (scheduled for next CD cycle).
-    // If currentUser was already set before this component was created
-    // (login flow, page refresh), call loadUnreadCount() immediately here.
-    if (this.authService.currentUser()) {
-      this.store.loadUnreadCount();
-    }
-
     // W11 : messages reçus pendant la coupure
     this.subs.add(this.ws.reconnected$.subscribe(() => this.store.loadUnreadCount()));
 
     this.subs.add(
-      this.ws.notifications$.subscribe((notif) => {
-        const isOnMessagingPage = this.router.url.includes('/messagerie');
-        const isViewingThisConv =
-          isOnMessagingPage && this.store.activeConvEmail() === notif.expediteurEmail;
-
-        if (!isViewingThisConv) {
+      this.ws.notifications$.subscribe(notif => {
+        const surMessages = this.router.url.startsWith('/messages');
+        if (!(surMessages && this.store.activeConvEmail() === notif.expediteurEmail)) {
           this.store.incrementUnread(1);
         }
-
-        if (!isOnMessagingPage) {
-          const role = this.authService.currentUser()?.role;
-          const basePath =
-            role === 'ROLE_PROPRIETAIRE' ? '/pro/messagerie' : '/loc/messagerie';
-
-          const ref = this.snackBar.open(
-            `${notif.expediteurNom} : ${notif.contenuPreview}`,
-            'Voir',
-            {
-              duration: 5000,
-              panelClass: ['kp-toast'],
-              horizontalPosition: 'right',
-              verticalPosition: 'bottom',
-            }
-          );
-
-          ref.onAction().subscribe(() => {
-            void this.router.navigate([basePath], {
-              queryParams: {
-                interlocuteur: notif.expediteurEmail,
-              },
-            });
+        if (!surMessages) {
+          this.toasts.afficher(`${notif.expediteurNom} : ${notif.contenuPreview}`, {
+            action: {
+              libelle: 'Voir',
+              executer: () => void this.router.navigate(['/messages'], { queryParams: { interlocuteur: notif.expediteurEmail } }),
+            },
           });
         }
-      })
+      }),
     );
   }
 

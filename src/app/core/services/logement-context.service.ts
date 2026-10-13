@@ -1,56 +1,67 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BienDTO } from '../../features/biens/models/bien.model';
 
+const CLE = 'kp_logement_bien_id';
+
+/**
+ * Logement d'un locataire (premier bien non archivé de `GET /users/biens`).
+ * Décide de ses onglets (« Mon logement » ou « Explorer ») et de son écran d'accueil.
+ */
 @Injectable({ providedIn: 'root' })
 export class LogementContextService {
   private http = inject(HttpClient);
 
-  /** bienId du logement actif (assigné à un locataire) */
-  readonly logementBienId = signal<number | null>(null);
-
+  readonly logementBienId = signal<number | null>(lireCache());
   readonly hasLogement = computed(() => this.logementBienId() !== null);
+  private charge = false;
 
-  /**
-   * Charge le logement actif depuis l'API.
-   * - Propriétaire : premier bien ayant un locataire.
-   * - Locataire    : premier bien retourné par GET /users/biens.
-   * Stocke aussi en localStorage pour éviter un appel supplémentaire au rechargement.
-   */
-  load(role: string): void {
-    const cached = localStorage.getItem('kp_logement_bien_id');
-    if (cached) {
-      this.logementBienId.set(Number(cached));
-      return;
+  /** Relit le logement une fois par session (la valeur gardée sert hors ligne ou en cas d'erreur). */
+  charger(): Observable<number | null> {
+    if (this.charge) {
+      return of(this.logementBienId());
     }
-
-    this.http.get<BienDTO[]>(`${environment.apiUrl}/users/biens`).subscribe({
-      next: (biens) => {
-        let bienId: number | null = null;
-        if (role === 'ROLE_PROPRIETAIRE') {
-          const avec = biens.find(b => !!b.locataire);
-          bienId = avec?.id ?? null;
-        } else {
-          bienId = biens[0]?.id ?? null;
-        }
-        this.set(bienId);
-      },
-      error: () => { /* silencieux — le lien n'apparaît tout simplement pas */ }
-    });
+    return this.http.get<BienDTO[]>(`${environment.apiUrl}/users/biens`).pipe(
+      map(biens => (biens.find(b => !b.archive) ?? biens[0])?.id ?? null),
+      tap(id => {
+        this.charge = true;
+        this.set(id);
+      }),
+      catchError(() => of(this.logementBienId())),
+    );
   }
 
-  /** Appelé juste après une assignation réussie */
+  /** Après une assignation : relecture au prochain `charger()`. */
+  invalider(): void {
+    this.charge = false;
+  }
+
   set(bienId: number | null): void {
     this.logementBienId.set(bienId);
-    if (bienId !== null) {
-      localStorage.setItem('kp_logement_bien_id', String(bienId));
-    } else {
-      localStorage.removeItem('kp_logement_bien_id');
+    try {
+      if (bienId !== null) {
+        localStorage.setItem(CLE, String(bienId));
+      } else {
+        localStorage.removeItem(CLE);
+      }
+    } catch {
+      // Stockage indisponible
     }
   }
 
   clear(): void {
+    this.charge = false;
     this.set(null);
+  }
+}
+
+function lireCache(): number | null {
+  try {
+    const valeur = localStorage.getItem(CLE);
+    return valeur ? Number(valeur) : null;
+  } catch {
+    return null;
   }
 }

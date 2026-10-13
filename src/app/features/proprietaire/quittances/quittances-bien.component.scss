@@ -1,0 +1,22 @@
+.quittances {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h2 {
+  font-size: var(--kp-fs-md);
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.montant {
+  font-size: var(--kp-fs-lg);
+}
+
+label.kp-btn[aria-disabled='true'] {
+  opacity: 0.6;
+  pointer-events: none;
+}

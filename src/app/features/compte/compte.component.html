@@ -1,0 +1,109 @@
+<div class="kp-page kp-page--etroite">
+  <kp-page-header titre="Compte" />
+
+  @if (user(); as u) {
+    <div class="kp-stack kp-stack--lg">
+      <section class="profil">
+        <kp-avatar [photo]="u.urlProfile" [nom]="nom()" [taille]="64" />
+        <div>
+          <p class="nom">{{ nom() }}</p>
+          <p class="kp-muted kp-small">{{ u.email }}</p>
+          <p class="kp-muted kp-small">{{ role() }}</p>
+        </div>
+      </section>
+
+      <section class="kp-section">
+        <h2 class="kp-list-header">Coordonnées</h2>
+        <div class="kp-list">
+          <button type="button" class="kp-list__item" (click)="ouvrirTelephone()">
+            <span class="kp-list__icon"><kp-icon name="phone" /></span>
+            <span class="kp-list__body">
+              <span class="kp-list__title">Téléphone</span>
+              <span class="kp-list__sub">Visible par votre propriétaire ou votre locataire</span>
+            </span>
+            <span class="kp-list__value">{{ u.telephone || 'Ajouter' }}</span>
+          </button>
+          <div class="kp-list__item">
+            <span class="kp-list__icon"><kp-icon name="mail" /></span>
+            <span class="kp-list__body"><span class="kp-list__title">E-mail</span></span>
+            <span class="kp-list__value">{{ u.email }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="kp-section">
+        <h2 class="kp-list-header">Préférences</h2>
+        <div class="kp-list">
+          <button type="button" class="kp-list__item" (click)="feuilleTheme.set(true)">
+            <span class="kp-list__icon"><kp-icon name="sun-medium" /></span>
+            <span class="kp-list__body"><span class="kp-list__title">Thème</span></span>
+            <span class="kp-list__value">{{ libellesTheme[theme.choix()] }}</span>
+          </button>
+          <a class="kp-list__item" routerLink="/notifications">
+            <span class="kp-list__icon"><kp-icon name="bell" /></span>
+            <span class="kp-list__body"><span class="kp-list__title">Notifications</span></span>
+          </a>
+        </div>
+      </section>
+
+      <section class="kp-section">
+        <h2 class="kp-list-header">Sécurité</h2>
+        <div class="kp-list">
+          <button type="button" class="kp-list__item" (click)="recevoirLienMotDePasse()" [disabled]="envoiLien()">
+            <span class="kp-list__icon"><kp-icon name="lock" /></span>
+            <span class="kp-list__body">
+              <span class="kp-list__title">Changer le mot de passe</span>
+              <span class="kp-list__sub">Nous vous envoyons un lien par e-mail</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <div class="kp-list">
+        <button type="button" class="kp-list__item kp-list__item--danger" (click)="seDeconnecter()" [disabled]="deconnexion()">
+          <span class="kp-list__icon"><kp-icon name="log-out" /></span>
+          <span class="kp-list__body"><span class="kp-list__title">Se déconnecter</span></span>
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<kp-sheet [(ouvert)]="feuilleTelephone" titre="Téléphone">
+  <form class="kp-form" (ngSubmit)="enregistrerTelephone()">
+    <div class="kp-field">
+      <label class="kp-label" for="telephone">Numéro au format international</label>
+      <input id="telephone" class="kp-input" type="tel" inputmode="tel" autocomplete="tel" placeholder="+243 81 234 56 78"
+             [formControl]="telephone" />
+      @if (telephone.touched && telephone.invalid) {
+        <span class="kp-erreur">{{ messageTelephone }}</span>
+      } @else {
+        <span class="kp-aide">Seuls votre propriétaire ou votre locataire le voient (appel, WhatsApp).</span>
+      }
+    </div>
+    @if (erreurTelephone()) {
+      <p class="kp-erreur" role="alert">{{ erreurTelephone() }}</p>
+    }
+  </form>
+  <div pied>
+    @if (user()?.telephone) {
+      <button type="button" class="kp-btn kp-btn--danger" (click)="enregistrerTelephone(true)" [disabled]="envoiTelephone()">Retirer</button>
+    }
+    <button type="button" class="kp-btn kp-btn--primary" (click)="enregistrerTelephone()" [disabled]="envoiTelephone()">Enregistrer</button>
+  </div>
+</kp-sheet>
+
+<kp-sheet [(ouvert)]="feuilleTheme" titre="Thème">
+  <div class="kp-list" role="radiogroup" aria-label="Thème">
+    @for (t of themes; track t) {
+      <button type="button" class="kp-list__item kp-list__item--sans-chevron" role="radio" [attr.aria-checked]="theme.choix() === t"
+              (click)="choisirTheme(t)">
+        <span class="kp-list__icon"><kp-icon [name]="t === 'sombre' ? 'moon' : t === 'clair' ? 'sun' : 'monitor'" /></span>
+        <span class="kp-list__body"><span class="kp-list__title">{{ libellesTheme[t] }}</span></span>
+        @if (theme.choix() === t) {
+          <kp-icon name="check" class="coche" />
+        }
+      </button>
+    }
+  </div>
+</kp-sheet>

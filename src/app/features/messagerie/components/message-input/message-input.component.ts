@@ -1,29 +1,16 @@
-import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  Output,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject, signal } from '@angular/core';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ChatWebSocketService } from '../../services/chat-websocket.service';
 import { MessageDTO, MessagePayload } from '../../models/chat.models';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
+/** Zone de saisie collée au bas de la conversation (au-dessus du clavier et de la barre de geste). */
 @Component({
   selector: 'kp-message-input',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
+  imports: [IconComponent],
   templateUrl: './message-input.component.html',
-  styleUrls: ['./message-input.component.scss'],
+  styleUrl: './message-input.component.scss',
 })
 export class MessageInputComponent {
   @Input({ required: true }) emailDestinataire!: string;
@@ -31,29 +18,38 @@ export class MessageInputComponent {
   @Input() interlocuteurNom = '';
   @Output() messageSent = new EventEmitter<MessageDTO>();
 
+  @ViewChild('champ') champ?: ElementRef<HTMLTextAreaElement>;
+
   private authService = inject(AuthService);
   private ws = inject(ChatWebSocketService);
 
-  control = new FormControl('');
+  readonly texte = signal('');
 
   get isSelf(): boolean {
-    return this.emailDestinataire === this.authService.currentUser()?.email;
+    return !!this.emailDestinataire && this.emailDestinataire === this.authService.currentUser()?.email;
   }
 
   /** Envoi possible même déconnecté : le message attend dans la file et part à la reconnexion (W13). */
   get canSend(): boolean {
-    return !this.isSelf && !!this.control.value?.trim();
+    return !this.isSelf && !!this.texte().trim();
   }
 
+  saisir(valeur: string): void {
+    this.texte.set(valeur);
+    this.ajusterHauteur();
+  }
+
+  /** Entrée envoie sur ordinateur ; sur téléphone, la touche Entrée va à la ligne (bouton d'envoi dédié). */
   onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    const tactile = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+    if (event.key === 'Enter' && !event.shiftKey && !tactile) {
       event.preventDefault();
       this.send();
     }
   }
 
   send(): void {
-    const contenu = this.control.value?.trim();
+    const contenu = this.texte().trim();
     if (!contenu || !this.canSend) return;
 
     const user = this.authService.currentUser();
@@ -86,6 +82,18 @@ export class MessageInputComponent {
     };
 
     this.messageSent.emit(localMsg);
-    this.control.reset();
+    this.texte.set('');
+    if (this.champ) {
+      this.champ.nativeElement.value = '';
+      this.ajusterHauteur();
+      this.champ.nativeElement.focus();
+    }
+  }
+
+  private ajusterHauteur(): void {
+    const el = this.champ?.nativeElement;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 144)}px`;
   }
 }

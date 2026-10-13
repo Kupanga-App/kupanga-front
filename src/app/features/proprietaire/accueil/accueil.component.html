@@ -1,0 +1,73 @@
+<div class="kp-page" kpTirerPourActualiser (actualiser)="charger()">
+  <kp-page-header [titre]="prenom() ? 'Bonjour ' + prenom() : 'Accueil'">
+    <a actions routerLink="/notifications" class="kp-icon-btn cloche" aria-label="Notifications">
+      <kp-icon name="bell" />
+      @if (notifications.unreadCount(); as n) {
+        <span class="kp-pastille">{{ n > 99 ? '99+' : n }}</span>
+      }
+    </a>
+  </kp-page-header>
+
+  @if (chargement() && !biens().length) {
+    <div class="kp-stack" aria-busy="true">
+      <span class="kp-skeleton kp-skeleton--titre"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+    </div>
+  } @else if (erreur()) {
+    <kp-vide icone="wifi-off" titre="Accueil indisponible" texte="Vérifiez votre connexion puis réessayez.">
+      <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
+    </kp-vide>
+  } @else if (!biens().length) {
+    <kp-vide icone="building-2" titre="Ajoutez votre premier bien"
+             texte="Publiez l’annonce, choisissez votre locataire, puis gérez le bail, l’état des lieux et les quittances ici.">
+      <a routerLink="/biens/nouveau" class="kp-btn kp-btn--primary"><kp-icon name="plus" /> Ajouter un bien</a>
+    </kp-vide>
+  } @else {
+    <div class="kp-stack kp-stack--lg">
+      <section class="kp-section" aria-labelledby="titre-taches">
+        <h2 class="kp-section-title" id="titre-taches">À faire</h2>
+        @if (taches().length) {
+          <ul class="taches">
+            @for (t of taches(); track t.cle) {
+              <li>
+                <a class="kp-card kp-tache tache" [class.kp-tache--urgent]="t.urgence === 'urgent'"
+                   [class.kp-tache--attention]="t.urgence === 'attention'" [class.kp-tache--info]="t.urgence === 'info'"
+                   [routerLink]="t.lien">
+                  <span class="kp-list__icon"><kp-icon [name]="t.icone" /></span>
+                  <span class="tache__texte">
+                    <span class="kp-strong">{{ t.titre }}</span>
+                    <span class="kp-small kp-muted kp-ellipsis">{{ t.detail }}</span>
+                  </span>
+                  <span class="tache__action">{{ t.action }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="kp-bandeau kp-bandeau--ok">
+            <kp-icon name="circle-check" [size]="18" />
+            <p>Rien à faire pour l’instant.</p>
+          </div>
+        }
+      </section>
+
+      <section class="kp-section" aria-labelledby="titre-biens">
+        <h2 class="kp-section-title" id="titre-biens">
+          Mes biens
+          <a routerLink="/biens">Tout voir ({{ biensActifs().length }})</a>
+        </h2>
+        <p class="kp-small kp-muted">{{ nbLoues() }} loué{{ nbLoues() > 1 ? 's' : '' }} sur {{ biensActifs().length }}</p>
+        <div class="kp-grid">
+          @for (b of apercu(); track b.id) {
+            <kp-carte-bien [bien]="b" [lien]="['/biens', b.id]">
+              <span statut [class]="b.locataire ? 'kp-statut kp-statut--ok' : 'kp-statut kp-statut--attention'">
+                {{ b.locataire ? 'Loué' : 'Vacant' }}
+              </span>
+            </kp-carte-bien>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>

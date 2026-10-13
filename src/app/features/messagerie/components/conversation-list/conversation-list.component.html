@@ -1,111 +1,57 @@
-<div class="kp-conv-list">
-  <!-- Header -->
-  <div class="kp-conv-header-block">
-    <p class="kp-eyebrow">Messagerie</p>
-    <h1 class="kp-conv-title">Conversations</h1>
+<div class="kp-page liste" kpTirerPourActualiser (actualiser)="actualiser()">
+  <kp-page-header titre="Messages" />
+
+  <div class="outils">
+    <label class="recherche">
+      <kp-icon name="search" [size]="18" />
+      <span class="kp-sr-only">Rechercher par bien</span>
+      <input class="kp-input" type="search" placeholder="Rechercher un bien" enterkeyhint="search"
+             [value]="recherche()" (input)="rechercher($any($event.target).value)" />
+    </label>
+    <kp-segmented [options]="options" [valeur]="filtre()" (valeurChange)="changerFiltre($event)" libelle="Filtrer les conversations" />
   </div>
 
-  <!-- Recherche -->
-  <div class="kp-conv-search-wrap">
-    <div class="kp-search-box">
-      <svg class="kp-search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-           aria-hidden="true">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
-      <input
-        class="kp-search-field"
-        [formControl]="searchControl"
-        placeholder="Rechercher…"
-        aria-label="Rechercher une conversation"
-      />
+  @if (store.isLoadingConversations() && store.conversations().length === 0) {
+    <div class="kp-stack kp-stack--sm" aria-busy="true">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <span class="kp-skeleton kp-skeleton--carte"></span>
+      }
     </div>
-  </div>
-
-  <!-- Chips de filtre -->
-  <div class="kp-conv-chips">
-    <button
-      class="kp-chip"
-      [class.active]="filter() === 'all'"
-      (click)="setFilter('all')"
-    >
-      Toutes
-      <span class="kp-chip-count">{{ store.conversations().length }}</span>
-    </button>
-    <button
-      class="kp-chip"
-      [class.active]="filter() === 'unread'"
-      (click)="setFilter('unread')"
-    >
-      Non lues
-      @if (store.unreadTotal() > 0) {
-        <span class="kp-chip-count">{{ store.unreadTotal() }}</span>
-      }
-    </button>
-  </div>
-
-  <div class="kp-conv-sep"></div>
-
-  <!-- Liste -->
-  <div class="kp-conv-items">
-    @if (store.isLoadingConversations() && store.conversations().length === 0) {
-      <div class="kp-conv-loading">
-        <mat-spinner diameter="24" />
-      </div>
-    } @else if (store.conversations().length === 0) {
-      <div class="kp-conv-empty">
-        <p>Aucune conversation</p>
-      </div>
-    } @else {
+  } @else if (erreur() && store.conversations().length === 0) {
+    <kp-vide icone="wifi-off" titre="Messages indisponibles" texte="Vérifiez votre connexion puis réessayez.">
+      <button type="button" class="kp-btn kp-btn--secondary" (click)="actualiser()">Réessayer</button>
+    </kp-vide>
+  } @else if (store.conversations().length === 0) {
+    <kp-vide icone="message-circle"
+             [titre]="filtre() === 'non-lues' ? 'Aucun message non lu' : 'Aucune conversation'"
+             [texte]="filtre() === 'non-lues' ? null : 'Pour écrire à un propriétaire, ouvrez une annonce et touchez « Contacter ».'" />
+  } @else {
+    <ul class="conversations">
       @for (conv of store.conversations(); track conv.id) {
-        <div
-          class="kp-conv-item"
-          [class.active]="conv.id === selectedConvId"
-          [class.unread]="conv.nonLuCount > 0"
-          (click)="select(conv)"
-          role="button"
-          [attr.aria-label]="'Conversation avec ' + interlocuteurNom(conv)"
-        >
-          <div
-            class="kp-av"
-            [ngClass]="interlocuteurPhotoUrl(conv) ? '' : toneClass(interlocuteurEmail(conv))"
-            aria-hidden="true"
-          >
-            @if (interlocuteurPhotoUrl(conv)) {
-              <img class="kp-av-img" [src]="interlocuteurPhotoUrl(conv)" [alt]="interlocuteurNom(conv)" />
-            } @else {
-              {{ interlocuteurInitiales(conv) }}
-            }
-          </div>
-          <div class="kp-conv-body">
-            <div class="kp-conv-row1">
-              <span class="kp-conv-name">{{ interlocuteurNom(conv) }}</span>
-              <span class="kp-conv-time">{{ conv.lastMessageAt | date: 'HH:mm' }}</span>
-            </div>
-            <div class="kp-conv-row2">{{ conv.bienTitre }}</div>
-            <div class="kp-conv-row3">
-              <span class="kp-conv-preview">{{ conv.lastMessage }}</span>
-              @if (conv.nonLuCount > 0) {
-                <span class="kp-unread-badge" aria-label="{{ conv.nonLuCount }} messages non lus">
-                  {{ conv.nonLuCount }}
-                </span>
-              }
-            </div>
-          </div>
-        </div>
-      }
-
-      @if (store.hasMorePages()) {
-        <div class="kp-conv-more">
-          <button
-            class="kp-load-more"
-            (click)="loadMore()"
-            [disabled]="store.isLoadingConversations()"
-          >
-            Voir plus
+        <li>
+          <button type="button" class="conversation" [class.conversation--active]="conv.id === selectedConvId()"
+                  [class.conversation--non-lue]="conv.nonLuCount > 0" (click)="conversationSelected.emit(conv)">
+            <kp-avatar [photo]="interlocuteurPhoto(conv)" [nom]="interlocuteurNom(conv)" [taille]="48" />
+            <span class="corps">
+              <span class="ligne">
+                <span class="nom kp-ellipsis">{{ interlocuteurNom(conv) }}</span>
+                <span class="heure">{{ heure(conv.lastMessageAt) }}</span>
+              </span>
+              <span class="bien kp-ellipsis">{{ conv.bienTitre }}</span>
+              <span class="ligne">
+                <span class="apercu kp-ellipsis">{{ conv.lastMessage }}</span>
+                @if (conv.nonLuCount > 0) {
+                  <span class="non-lus" [attr.aria-label]="conv.nonLuCount + ' non lus'">{{ conv.nonLuCount }}</span>
+                }
+              </span>
+            </span>
           </button>
-        </div>
+        </li>
       }
+    </ul>
+    @if (store.hasMorePages()) {
+      <button type="button" class="kp-btn kp-btn--secondary kp-btn--block suite" (click)="suite()"
+              [disabled]="store.isLoadingConversations()">Voir plus</button>
     }
-  </div>
+  }
 </div>

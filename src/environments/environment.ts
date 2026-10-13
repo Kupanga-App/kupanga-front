@@ -2,5 +2,5 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:8089',
   wsUrl: 'http://localhost:8089/ws',
-  googleClientId: '1088579856242-tolunpp18pq43uto9ck68oo4rrbgpjc2.apps.googleusercontent.com'
+  googleClientId: '259313207607-eh77jnr12h67arnr0o4n53kndb81lvg4.apps.googleusercontent.com'
 };

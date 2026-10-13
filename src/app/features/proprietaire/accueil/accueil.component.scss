@@ -1,0 +1,33 @@
+.taches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tache {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-3) var(--kp-space-4);
+}
+
+.tache__texte {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.tache__action {
+  flex-shrink: 0;
+  color: var(--kp-primary-text);
+  font-size: var(--kp-fs-sm);
+  font-weight: 700;
+}
+
+[statut] {
+  background: var(--kp-surface);
+}

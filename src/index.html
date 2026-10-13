@@ -4,16 +4,29 @@
   <meta charset="utf-8">
   <title>Kupanga</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="description" content="Gestion locative entre propriétaires et locataires : biens, baux, états des lieux, quittances et messages.">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=DM+Sans:wght@300;400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async="" defer=""></script>
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#10212B">
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kupanga">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <script>
+    // Thème choisi dans le compte, appliqué avant le premier rendu (pas de passage du clair au sombre)
+    try {
+      var t = localStorage.getItem('kp_theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+    // Proposition d’installation arrivée avant le démarrage d’Angular : gardée pour le bandeau « Installer »
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.__kpInstallation = e; });
+  </script>
 </head>
 <body>
   <app-root></app-root>

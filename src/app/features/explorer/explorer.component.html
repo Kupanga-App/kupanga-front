@@ -1,0 +1,141 @@
+<div class="kp-page" kpTirerPourActualiser (actualiser)="charger(0)">
+  <kp-page-header titre="Logements à louer" [retour]="estProprietaire() ? '/biens' : null" />
+
+  <div class="outils">
+    <form class="recherche" (submit)="$event.preventDefault(); rechercher(champ.value)" role="search">
+      <kp-icon name="search" [size]="18" />
+      <label class="kp-sr-only" for="q">Rechercher une annonce</label>
+      <input #champ id="q" class="kp-input" type="search" placeholder="Rechercher" enterkeyhint="search"
+             [value]="filtres().q" (search)="rechercher(champ.value)" maxlength="100" />
+    </form>
+    <button type="button" class="kp-btn kp-btn--secondary filtres" (click)="ouvrirFiltres()">
+      <kp-icon name="sliders-horizontal" [size]="18" />
+      <span>Filtres</span>
+      @if (nbFiltres()) {
+        <span class="nombre">{{ nbFiltres() }}</span>
+      }
+    </button>
+  </div>
+
+  <div class="barre">
+    <p class="kp-small kp-muted" aria-live="polite">
+      @if (!chargement() || biens().length) {
+        {{ total() }} annonce{{ total() > 1 ? 's' : '' }}
+      }
+    </p>
+    <div class="kp-row">
+      <label class="kp-sr-only" for="tri">Trier</label>
+      <select id="tri" class="kp-input tri" [value]="filtres().tri" (change)="changerTri($any($event.target).value)">
+        @for (t of tris; track t.valeur) {
+          <option [value]="t.valeur">{{ t.libelle }}</option>
+        }
+      </select>
+      <kp-segmented [options]="vues" [(valeur)]="vue" libelle="Affichage" />
+    </div>
+  </div>
+
+  @if (chargement() && biens().length === 0) {
+    <div class="kp-grid" aria-busy="true">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div class="kp-stack kp-stack--sm">
+          <span class="kp-skeleton kp-skeleton--photo"></span>
+          <span class="kp-skeleton kp-skeleton--titre"></span>
+          <span class="kp-skeleton kp-skeleton--ligne"></span>
+        </div>
+      }
+    </div>
+  } @else if (erreur() && biens().length === 0) {
+    <kp-vide icone="wifi-off" titre="Annonces indisponibles" texte="Vérifiez votre connexion puis réessayez.">
+      <button type="button" class="kp-btn kp-btn--secondary" (click)="charger(0)">Réessayer</button>
+    </kp-vide>
+  } @else if (biens().length === 0) {
+    <kp-vide icone="search" titre="Aucune annonce" texte="Aucun logement ne correspond à votre recherche.">
+      @if (nbFiltres() || filtres().q) {
+        <button type="button" class="kp-btn kp-btn--secondary" (click)="toutEffacer()">Effacer les filtres</button>
+      }
+    </kp-vide>
+  } @else if (vue() === 'carte') {
+    <kp-carte-annonces [biens]="biens()" (ouvrir)="ouvrirAnnonce($event)" />
+    <p class="kp-aide carte-aide">Positions approchées à environ 100 m. {{ biens().length }} annonce{{ biens().length > 1 ? 's' : '' }} chargée{{ biens().length > 1 ? 's' : '' }}.</p>
+  } @else {
+    <div class="kp-grid">
+      @for (b of biens(); track b.id) {
+        <kp-carte-bien [bien]="b" [lien]="['/annonces', b.id]" />
+      }
+    </div>
+  }
+
+  @if (!derniere() && biens().length) {
+    <button type="button" class="kp-btn kp-btn--secondary kp-btn--block suite" (click)="suite()" [disabled]="chargement()">
+      @if (chargement()) {
+        <span class="kp-spinner"></span>
+      }
+      Voir plus d’annonces
+    </button>
+  }
+</div>
+
+<kp-sheet [(ouvert)]="feuilleOuverte" titre="Filtres">
+  <div class="kp-form">
+    <div class="kp-field">
+      <label class="kp-label" for="f-pays">Pays</label>
+      <select id="f-pays" class="kp-input" [value]="brouillon().pays" (change)="modifier('pays', $any($event.target).value)">
+        <option value="">Tous les pays</option>
+        @for (p of paysDisponibles(); track p.pays) {
+          <option [value]="p.pays">{{ p.libelle }}</option>
+        }
+      </select>
+    </div>
+    <div class="kp-field">
+      <label class="kp-label" for="f-ville">Ville</label>
+      <input id="f-ville" class="kp-input" [value]="brouillon().ville" (input)="modifier('ville', $any($event.target).value)"
+             maxlength="100" autocomplete="address-level2" placeholder="Kinshasa, Lyon…" />
+    </div>
+    <div class="kp-field">
+      <span class="kp-label">Type de bien</span>
+      <div class="kp-choix">
+        <button type="button" class="kp-choix-item" [attr.aria-pressed]="!brouillon().type" (click)="modifier('type', '')">Tous</button>
+        @for (t of typesBien; track t.value) {
+          <button type="button" class="kp-choix-item" [attr.aria-pressed]="brouillon().type === t.value"
+                  (click)="modifier('type', t.value)">{{ t.label }}</button>
+        }
+      </div>
+    </div>
+    @if (brouillon().pays) {
+      <div class="kp-field">
+        <label class="kp-label" for="f-loyer">Loyer maximum par mois</label>
+        <input id="f-loyer" class="kp-input" type="number" inputmode="decimal" min="0"
+               [value]="brouillon().loyerMax ?? ''" (input)="modifier('loyerMax', nombre($any($event.target).value))" />
+        <span class="kp-aide">Dans la devise de l’annonce.</span>
+      </div>
+    }
+    <div class="kp-form-row">
+      <div class="kp-field">
+        <label class="kp-label" for="f-surface">Surface min. (m²)</label>
+        <input id="f-surface" class="kp-input" type="number" inputmode="numeric" min="0"
+               [value]="brouillon().surfaceMin ?? ''" (input)="modifier('surfaceMin', nombre($any($event.target).value))" />
+      </div>
+      <div class="kp-field">
+        <label class="kp-label" for="f-pieces">Pièces min.</label>
+        <input id="f-pieces" class="kp-input" type="number" inputmode="numeric" min="0"
+               [value]="brouillon().piecesMin ?? ''" (input)="modifier('piecesMin', nombre($any($event.target).value))" />
+      </div>
+    </div>
+    <div>
+      <label class="kp-check"><input type="checkbox" [checked]="brouillon().meuble" (change)="modifier('meuble', $any($event.target).checked)" /> Meublé</label>
+      <label class="kp-check"><input type="checkbox" [checked]="brouillon().colocation" (change)="modifier('colocation', $any($event.target).checked)" /> Colocation</label>
+    </div>
+    <div class="kp-field">
+      <span class="kp-label">À proximité</span>
+      <div class="kp-choix">
+        @for (p of pois; track p[0]) {
+          <button type="button" class="kp-choix-item" [attr.aria-pressed]="brouillon().pois.includes(p[0])" (click)="basculerPoi(p[0])">{{ p[1] }}</button>
+        }
+      </div>
+    </div>
+  </div>
+  <div pied>
+    <button type="button" class="kp-btn kp-btn--secondary" (click)="effacerFiltres()">Effacer</button>
+    <button type="button" class="kp-btn kp-btn--primary" (click)="validerFiltres()">Voir les annonces</button>
+  </div>
+</kp-sheet>

@@ -1,0 +1,18 @@
+.profil {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-4);
+}
+
+.nom {
+  font-size: var(--kp-fs-lg);
+  font-weight: 700;
+}
+
+.coche {
+  color: var(--kp-primary-text);
+}
+
+button.kp-list__item:disabled {
+  opacity: 0.6;
+}

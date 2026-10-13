@@ -1,0 +1,60 @@
+@if (!nav.pleinEcran()) {
+  <nav class="laterale" aria-label="Navigation principale">
+    <a routerLink="/" class="logo" aria-label="Kupanga, accueil">
+      <span class="logo__k" aria-hidden="true">K</span>
+      <span class="logo__nom">Kupanga</span>
+    </a>
+    <ul>
+      @for (o of nav.onglets(); track o.lien) {
+        <li>
+          <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="lien">
+            <span class="lien__icone">
+              <kp-icon [name]="o.icone" [size]="22" />
+              @if (compteur(o); as n) {
+                <span class="kp-pastille">{{ n > 99 ? '99+' : n }}</span>
+              }
+            </span>
+            <span class="lien__libelle">{{ o.libelle }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+    <div class="laterale__bas">
+      @if (connecte()) {
+        <a routerLink="/notifications" routerLinkActive="actif" ariaCurrentWhenActive="page" class="lien">
+          <span class="lien__icone">
+            <kp-icon name="bell" [size]="22" />
+            @if (notifications.unreadCount(); as n) {
+              <span class="kp-pastille">{{ n > 99 ? '99+' : n }}</span>
+            }
+          </span>
+          <span class="lien__libelle">Notifications</span>
+        </a>
+      } @else {
+        <a routerLink="/auth/register" class="kp-btn kp-btn--primary inscription">Créer un compte</a>
+      }
+    </div>
+  </nav>
+}
+
+<main class="contenu" id="contenu">
+  <router-outlet />
+</main>
+
+@if (!nav.pleinEcran()) {
+  <nav class="onglets" aria-label="Navigation principale">
+    @for (o of nav.onglets(); track o.lien) {
+      <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="onglet">
+        <span class="onglet__icone">
+          <kp-icon [name]="o.icone" [size]="24" />
+          @if (compteur(o); as n) {
+            <span class="kp-pastille">{{ n > 99 ? '99+' : n }}</span>
+          }
+        </span>
+        <span class="onglet__libelle">{{ o.libelle }}</span>
+      </a>
+    }
+  </nav>
+}
+
+<kp-chat-notification />

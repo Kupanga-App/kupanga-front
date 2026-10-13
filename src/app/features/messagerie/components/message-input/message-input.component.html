@@ -1,29 +1,11 @@
-<div class="kp-composer">
-  @if (isSelf) {
-    <div class="kp-composer-warn">
-      Vous ne pouvez pas vous envoyer un message.
-    </div>
-  } @else {
-    <textarea
-      class="kp-composer-textarea"
-      [formControl]="control"
-      [placeholder]="interlocuteurNom ? 'Écrire un message à ' + interlocuteurNom + '… (Entrée pour envoyer)' : 'Écrire un message… (Entrée pour envoyer)'"
-      rows="1"
-      (keydown)="onKeydown($event)"
-      aria-label="Composer un message"
-    ></textarea>
-    <button
-      class="kp-send-btn"
-      [disabled]="!canSend"
-      (click)="send()"
-      aria-label="Envoyer le message"
-    >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="22" y1="2" x2="11" y2="13"/>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>
-      Envoyer
-    </button>
-  }
-</div>
+@if (isSelf) {
+  <p class="kp-muted kp-small soi">Vous ne pouvez pas vous écrire à vous-même.</p>
+} @else {
+  <label class="kp-sr-only" for="message">Message à {{ interlocuteurNom }}</label>
+  <textarea #champ id="message" class="champ" rows="1" maxlength="2000" placeholder="Message"
+            enterkeyhint="send" autocomplete="off"
+            [value]="texte()" (input)="saisir($any($event.target).value)" (keydown)="onKeydown($event)"></textarea>
+  <button type="button" class="envoyer" [disabled]="!canSend" (click)="send()" aria-label="Envoyer">
+    <kp-icon name="send" [size]="20" />
+  </button>
+}

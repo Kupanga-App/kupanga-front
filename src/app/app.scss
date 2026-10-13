@@ -1,33 +1,111 @@
-// R2 : bandeaux du mode hors ligne et des mises à jour (palette Night / Olive / Mint)
-.kp-bandeau-pwa {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+// R2 : bandeaux « hors ligne » et « nouvelle version », en haut, sous la zone sûre
+.bandeau {
+  position: fixed;
+  top: var(--kp-safe-top);
+  left: 50%;
+  z-index: 960;
+  transform: translateX(-50%);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 8px 12px;
-  padding: 8px 16px;
-  background: #10212B;
-  color: #EFFBDB;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  text-align: center;
+  gap: 12px;
+  max-width: calc(100vw - 24px);
+  margin-top: 8px;
+  padding: 8px 8px 8px 16px;
+  border-radius: var(--kp-radius-full);
+  background: #10212b;
+  color: #effbdb;
+  box-shadow: var(--kp-shadow);
+  font-size: var(--kp-fs-sm);
 
   button {
-    padding: 4px 12px;
+    min-height: 36px;
+    padding: 0 14px;
     border: 0;
-    border-radius: 999px;
-    background: #8FA464;
-    color: #10212B;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
+    border-radius: var(--kp-radius-full);
+    background: #8fa464;
+    color: #10212b;
+    font-weight: 700;
   }
 }
 
-.kp-bandeau-pwa--hors-ligne {
-  background: #8FA464;
-  color: #10212B;
+.bandeau--hors-ligne {
+  padding-right: 16px;
+  background: #5c4a14;
+  color: #fff8e6;
 }
+
+.evitement {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 1000;
+  padding: 8px 16px;
+  border-radius: var(--kp-radius-sm);
+  background: var(--kp-surface);
+  color: var(--kp-text-1);
+
+  &:focus {
+    left: 8px;
+  }
+}
+
+// Bandeau « Installer l’application », en haut, sous la zone sûre
+.installation {
+  position: fixed;
+  top: var(--kp-safe-top);
+  left: 50%;
+  z-index: 960;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(560px, calc(100vw - 24px));
+  margin-top: 8px;
+  padding: 10px 8px 10px 12px;
+  border-radius: var(--kp-radius-lg);
+  background: #10212b;
+  color: #effbdb;
+  box-shadow: var(--kp-shadow);
+  font-size: var(--kp-fs-sm);
+}
+
+.installation__logo {
+  flex-shrink: 0;
+  border-radius: 10px;
+}
+
+.installation__texte {
+  flex: 1;
+  margin: 0;
+  line-height: 1.4;
+
+  kp-icon {
+    display: inline-flex;
+    vertical-align: -3px;
+  }
+}
+
+.installation__action {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--kp-radius-full);
+  background: #8fa464;
+  color: #10212b;
+  font-weight: 700;
+}
+
+.installation__fermer {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--kp-radius-full);
+  background: transparent;
+  color: inherit;
+}
+

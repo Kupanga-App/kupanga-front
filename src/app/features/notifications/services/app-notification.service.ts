@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { ChatWebSocketService } from '../../messagerie/services/chat-websocket.service';
+import { LogementContextService } from '../../../core/services/logement-context.service';
 import { AppNotification, NotificationType } from '../models/app-notification.model';
 
 @Injectable({ providedIn: 'root' })
@@ -13,6 +14,7 @@ export class AppNotificationService implements OnDestroy {
   private authService = inject(AuthService);
   private ws = inject(ChatWebSocketService);
   private router = inject(Router);
+  private logement = inject(LogementContextService);
   private api = environment.apiUrl;
 
   private subs = new Subscription();
@@ -24,6 +26,11 @@ export class AppNotificationService implements OnDestroy {
     this.subs.add(
       this.ws.appNotifications$.subscribe(notif => {
         this.notifications.update(list => [notif, ...list]);
+        // Logement assigné au locataire : ses onglets passent à « Mon logement »
+        if (notif.type === 'BIEN_ASSIGNE') {
+          this.logement.invalider();
+          this.logement.charger().subscribe();
+        }
       })
     );
     // W11 : notifications poussées pendant la coupure
@@ -63,12 +70,29 @@ export class AppNotificationService implements OnDestroy {
     });
   }
 
+  /** Ouvre l'écran concerné par la notification (et la marque comme lue). */
   handleClick(notif: AppNotification): void {
     this.markRead(notif.id);
-    if (notif.type === 'INVITATION_SIGNATURE_CONTRAT' && notif.lien) {
-      void this.router.navigate([`/contrats/signer/${notif.lien}`]);
-    } else if (notif.type === 'INVITATION_SIGNATURE_EDL' && notif.lien) {
-      void this.router.navigate([`/etats-des-lieux/signer/${notif.lien}`]);
+    const role = this.authService.currentUser()?.role;
+    switch (notif.type) {
+      case 'INVITATION_SIGNATURE_CONTRAT':
+        void this.router.navigate(notif.lien ? ['/contrats/signer', notif.lien] : ['/documents']);
+        break;
+      case 'INVITATION_SIGNATURE_EDL':
+        void this.router.navigate(notif.lien ? ['/edl/signer', notif.lien] : ['/documents']);
+        break;
+      case 'QUITTANCE_DISPONIBLE':
+        void this.router.navigate([role === 'ROLE_LOCATAIRE' ? '/quittances' : '/documents']);
+        break;
+      case 'BIEN_ASSIGNE':
+        this.logement.invalider();
+        void this.router.navigate(['/']);
+        break;
+      case 'BIEN_ASSIGNATION_CONFIRMEE':
+        void this.router.navigate(['/biens']);
+        break;
+      default:
+        void this.router.navigate(['/documents']);
     }
   }
 

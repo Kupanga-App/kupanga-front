@@ -1,0 +1,26 @@
+<div class="messages" [class.messages--conversation]="showView()">
+  <section class="colonne-liste" aria-label="Conversations">
+    <kp-conversation-list [selectedConvId]="selectedConvId()" (conversationSelected)="onConversationSelected($event)" />
+  </section>
+
+  <section class="colonne-conversation">
+    @if (showView()) {
+      <kp-conversation-view
+        [bienId]="viewBienId()"
+        [emailInterlocuteur]="viewInterlocuteur()"
+        [nom]="viewNom()"
+        [titre]="viewTitre()"
+        [photoUrl]="viewPhotoUrl()"
+        [lienBien]="lienBien()"
+        (backRequested)="onBackToList()"
+        (sent)="onMessageSentInConv($event)"
+        (interlocuteurConnu)="onInterlocuteurConnu($event)"
+      />
+    } @else {
+      <div class="aucune">
+        <kp-vide icone="message-circle" titre="Choisissez une conversation"
+                 texte="Les échanges avec vos propriétaires ou vos locataires apparaissent ici." />
+      </div>
+    }
+  </section>
+</div>

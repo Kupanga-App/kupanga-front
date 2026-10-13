@@ -1,15 +1,4 @@
-// styles/index.scss — barrel Kupanga
-@use 'tokens';
-@use 'reset';
-@use 'typography';
-@use 'material-theme';
-@use 'dark-theme';
-@use 'auth';
-
-
-// C11 : cases à cocher des équipements d'un bien (création, modification)
-.kp-equipements {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-}
+// styles/index.scss — styles globaux Kupanga
+@use 'theme';
+@use 'base';
+@use 'components';

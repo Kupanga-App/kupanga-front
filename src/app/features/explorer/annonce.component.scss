@@ -1,0 +1,39 @@
+@use 'mq';
+
+.prix {
+  font-size: var(--kp-fs-xl);
+}
+
+.lieu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--kp-text-2);
+}
+
+.description {
+  white-space: pre-line;
+  color: var(--kp-text-2);
+}
+
+.contact {
+  align-items: center;
+
+  .contact__prix {
+    flex: 1;
+    font-size: var(--kp-fs-lg);
+  }
+
+  > .kp-btn {
+    flex: 0 0 auto;
+    min-width: 160px;
+  }
+
+  @include mq.tablette {
+    justify-content: space-between;
+    padding: var(--kp-space-4) var(--kp-space-5);
+    border: 1px solid var(--kp-border);
+    border-radius: var(--kp-radius);
+    background: var(--kp-surface);
+  }
+}

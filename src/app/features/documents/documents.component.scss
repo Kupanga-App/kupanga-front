@@ -1,0 +1,28 @@
+.contenu {
+  margin-top: var(--kp-space-4);
+}
+
+.ligne {
+  list-style: none;
+  border-bottom: 1px solid var(--kp-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  .kp-list__item {
+    border-bottom: 0;
+    align-items: flex-start;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kp-space-2);
+  margin-top: var(--kp-space-2);
+
+  &:empty {
+    display: none;
+  }
+}

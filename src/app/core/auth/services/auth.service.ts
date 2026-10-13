@@ -20,28 +20,6 @@ export class AuthService {
 
   currentUser = signal<User | null>(null);
 
-  // Liste statique des avatars disponibles dans les assets
-  private readonly LOCAL_AVATARS = [
-    'assets/avatars_profil/Femme1.jpg',
-    'assets/avatars_profil/femme2.jpg',
-    'assets/avatars_profil/femme3.jpg',
-    'assets/avatars_profil/femme4.jpg',
-    'assets/avatars_profil/femme5.jpg',
-    'assets/avatars_profil/femme6.jpg',
-    'assets/avatars_profil/femme8.jpg',
-    'assets/avatars_profil/femme9.jpg',
-    'assets/avatars_profil/femme10.jpg',
-    'assets/avatars_profil/homme30.jpg',
-    'assets/avatars_profil/homme31.jpg',
-    'assets/avatars_profil/imageH4.jpg',
-    'assets/avatars_profil/imageJeuneHomme1.jpg',
-    'assets/avatars_profil/imageJeuneHomme2.jpg',
-    'assets/avatars_profil/imageJeuneHomme3.jpg',
-    'assets/avatars_profil/avatar_homme_grand1.avif',
-    'assets/avatars_profil/avatar_homme_grand2.avif',
-    'assets/avatars_profil/avatar_homme_grand3.avif'
-  ];
-
   constructor() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -50,9 +28,10 @@ export class AuthService {
     }
   }
 
-  login(credentials: any): Observable<User> {
+  login(credentials: { email: string; password: string }): Observable<User> {
     // R2 : données hors ligne d'un compte précédent effacées avant toute nouvelle connexion
     void viderDonneesHorsLigne();
+    this.logementContext.clear();
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => this.handleAuthSuccess(response)),
       switchMap(() => this.fetchCurrentUser())
@@ -62,6 +41,7 @@ export class AuthService {
   loginWithGoogle(idToken: string): Observable<AuthResponse> {
     // R2 : données hors ligne d'un compte précédent effacées avant toute nouvelle connexion
     void viderDonneesHorsLigne();
+    this.logementContext.clear();
     return this.http.post<AuthResponse>(`${this.apiUrl}/google`, { idToken }, { withCredentials: true }).pipe(
       tap(response => {
         localStorage.setItem('accessToken', response.accessToken);
@@ -85,30 +65,38 @@ export class AuthService {
   }
 
   /**
+   * Connexion avec le jeton Google : `null` si le compte doit encore choisir son rôle (nouveau compte,
+   * ou compte non confirmé repris, A14), sinon l'utilisateur connecté.
+   */
+  connecterAvecGoogle(idToken: string): Observable<User | null> {
+    return this.loginWithGoogle(idToken).pipe(
+      switchMap(reponse => (reponse.requiresRoleSelection ? of(null) : this.fetchCurrentUser())),
+    );
+  }
+
+  /**
    * Inscription (A14) : l'API répond 201 avec un message, sans jeton ni cookie. Le compte ne peut se connecter
    * qu'après avoir ouvert le lien de confirmation reçu par e-mail. Même réponse si l'adresse est déjà inscrite.
    */
-  register(userData: any, profilePictureFile?: File): Observable<string> {
+  register(userData: { firstName: string; lastName: string; email: string; password: string; role: string; telephone?: string | null }, profilePictureFile?: File): Observable<string> {
     const formData = new FormData();
 
-    // Construction de l'objet UserFormDTO
     const userFormDTO = {
       firstName: userData.firstName,
       lastName: userData.lastName,
-      mail: userData.email, // Attention: le backend attend 'mail' mais le form utilise 'email'
+      mail: userData.email,
       password: userData.password,
       role: userData.role,
-      urlAvatar: profilePictureFile ? null : (userData.avatar || null),
+      // B5 : l'API n'accepte qu'une adresse de son propre stockage ; la photo part en fichier
+      urlAvatar: null,
       // C6 : facultatif, envoyé au format international (l'API le revérifie)
       telephone: normaliserTelephone(userData.telephone),
     };
 
-    // Ajout du JSON sous forme de Blob/String
     formData.append('userFormDTO', new Blob([JSON.stringify(userFormDTO)], {
       type: 'application/json'
     }));
 
-    // Ajout du fichier image si présent
     if (profilePictureFile) {
       formData.append('imageProfil', profilePictureFile);
     }
@@ -124,11 +112,6 @@ export class AuthService {
   /** A14 : renvoie un lien de confirmation (réponse identique que le compte existe ou non ; 429 possible). */
   renvoyerVerification(email: string): Observable<string> {
     return this.http.post(`${this.apiUrl}/renvoyer-verification`, { email }, { responseType: 'text' });
-  }
-
-  // Retourne la liste des avatars locaux
-  getAvatars(): Observable<string[]> {
-    return of(this.LOCAL_AVATARS);
   }
 
   refreshToken(): Observable<AuthResponse> {

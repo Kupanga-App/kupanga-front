@@ -63,7 +63,7 @@ describe('Mode hors ligne (R2)', () => {
     });
 
     it('nouvelle connexion : les données d’un compte précédent sont effacées avant tout', async () => {
-      auth.login({ mail: 'b@b.fr', password: 'x' }).subscribe({ error: () => undefined });
+      auth.login({ email: 'b@b.fr', password: 'x' }).subscribe({ error: () => undefined });
       await attendreVidage();
 
       expect(await nombreEntrees(CACHE_DONNEES)).toBe(0);

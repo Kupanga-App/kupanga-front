@@ -1,0 +1,843 @@
+// styles/_components.scss — composants de base partagés par tous les écrans
+// Boutons, champs, listes groupées, cartes, puces de statut, bandeaux, squelettes, mises en page.
+@use 'mq';
+
+// ── Mise en page ─────────────────────────────────────────────────────────────
+
+.kp-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--kp-space-4) var(--kp-space-8);
+  padding-left: calc(var(--kp-space-4) + var(--kp-safe-left));
+  padding-right: calc(var(--kp-space-4) + var(--kp-safe-right));
+
+  @include mq.tablette {
+    padding: 0 var(--kp-space-8) var(--kp-space-10);
+  }
+
+  &--etroite {
+    max-width: 720px;
+  }
+}
+
+.kp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+
+  &--sm {
+    gap: var(--kp-space-2);
+  }
+
+  &--lg {
+    gap: var(--kp-space-6);
+  }
+}
+
+.kp-row {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  min-width: 0;
+
+  &--wrap {
+    flex-wrap: wrap;
+  }
+
+  &--between {
+    justify-content: space-between;
+  }
+}
+
+.kp-spacer {
+  flex: 1;
+}
+
+.kp-grid {
+  display: grid;
+  gap: var(--kp-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+
+.kp-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-3);
+}
+
+.kp-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+  font-size: var(--kp-fs-md);
+  font-weight: 700;
+  color: var(--kp-text-1);
+
+  a,
+  button {
+    font-size: var(--kp-fs-sm);
+    font-weight: 600;
+  }
+}
+
+// ── Texte ────────────────────────────────────────────────────────────────────
+
+.kp-muted {
+  color: var(--kp-text-3);
+}
+
+.kp-small {
+  font-size: var(--kp-fs-sm);
+}
+
+.kp-xs {
+  font-size: var(--kp-fs-xs);
+}
+
+.kp-strong {
+  font-weight: 600;
+}
+
+.kp-montant {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.kp-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+// ── Boutons ──────────────────────────────────────────────────────────────────
+
+.kp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--kp-space-2);
+  min-height: 48px;
+  padding: 0 var(--kp-space-5);
+  border: 1px solid transparent;
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface-2);
+  color: var(--kp-text-1);
+  font-size: var(--kp-fs-md);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--kp-duree), border-color var(--kp-duree), opacity var(--kp-duree);
+
+  @include mq.tablette {
+    min-height: 44px;
+  }
+
+  &:active:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background: var(--kp-primary);
+    color: var(--kp-primary-on);
+
+    &:hover:not(:disabled) {
+      background: var(--kp-primary-hover);
+    }
+  }
+
+  &--secondary {
+    background: var(--kp-surface);
+    border-color: var(--kp-border-strong);
+
+    &:hover:not(:disabled) {
+      background: var(--kp-surface-2);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--kp-primary-text);
+    padding: 0 var(--kp-space-3);
+
+    &:hover:not(:disabled) {
+      background: var(--kp-surface-2);
+    }
+  }
+
+  &--danger {
+    background: transparent;
+    border-color: var(--kp-border-strong);
+    color: var(--kp-danger);
+
+    &:hover:not(:disabled) {
+      background: var(--kp-danger-subtle);
+    }
+  }
+
+  &--whatsapp {
+    background: #1f7a3f;
+    color: #ffffff;
+  }
+
+  &--block {
+    width: 100%;
+  }
+
+  &--sm {
+    min-height: 40px;
+    padding: 0 var(--kp-space-4);
+    font-size: var(--kp-fs-sm);
+  }
+}
+
+.kp-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--kp-tap);
+  height: var(--kp-tap);
+  padding: 0;
+  border: 0;
+  border-radius: var(--kp-radius-full);
+  background: transparent;
+  color: var(--kp-text-1);
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    background: var(--kp-surface-2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.kp-pastille {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--kp-radius-full);
+  background: var(--kp-danger);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.kp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kp-space-3);
+
+  &--fin {
+    justify-content: flex-end;
+  }
+
+  > .kp-btn {
+    @include mq.telephone {
+      flex: 1 1 auto;
+    }
+  }
+}
+
+// Bouton principal collé en bas de l'écran (au pouce), au-dessus de la barre d'onglets
+.kp-bottom-bar {
+  position: sticky;
+  bottom: var(--kp-bottom-offset);
+  z-index: 20;
+  display: flex;
+  gap: var(--kp-space-3);
+  margin: var(--kp-space-6) calc(-1 * var(--kp-space-4)) 0;
+  padding: var(--kp-space-3) var(--kp-space-4);
+  background: var(--kp-bg);
+  border-top: 1px solid var(--kp-border);
+
+  > .kp-btn {
+    flex: 1;
+  }
+
+  @include mq.tablette {
+    position: static;
+    margin: var(--kp-space-6) 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    justify-content: flex-end;
+
+    > .kp-btn {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+// Bouton d'action flottant (téléphone) ; sur ordinateur, bouton classique dans l'en-tête
+.kp-fab {
+  position: fixed;
+  right: calc(var(--kp-space-4) + var(--kp-safe-right));
+  bottom: calc(var(--kp-bottom-offset) + var(--kp-space-4));
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+  min-height: 56px;
+  padding: 0 var(--kp-space-5);
+  border: 0;
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-primary);
+  color: var(--kp-primary-on);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--kp-shadow);
+
+  @include mq.tablette {
+    display: none;
+  }
+}
+
+// ── Champs de formulaire ─────────────────────────────────────────────────────
+
+.kp-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-5);
+}
+
+.kp-form-row {
+  display: grid;
+  gap: var(--kp-space-4);
+  grid-template-columns: 1fr;
+
+  @include mq.tablette {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.kp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.kp-label {
+  font-size: var(--kp-fs-sm);
+  font-weight: 600;
+  color: var(--kp-text-1);
+}
+
+.kp-optionnel {
+  font-weight: 400;
+  color: var(--kp-text-3);
+}
+
+.kp-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--kp-space-4);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface);
+  color: var(--kp-text-1);
+  // 16 px : iOS ne zoome pas sur le champ
+  font-size: var(--kp-fs-md);
+  transition: border-color var(--kp-duree), box-shadow var(--kp-duree);
+
+  &::placeholder {
+    color: var(--kp-text-3);
+    opacity: 0.8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--kp-primary);
+    box-shadow: var(--kp-focus);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background: var(--kp-surface-2);
+    color: var(--kp-text-2);
+  }
+
+  &--erreur,
+  &.ng-invalid.ng-touched {
+    border-color: var(--kp-danger);
+  }
+}
+
+textarea.kp-input {
+  min-height: 112px;
+  padding: var(--kp-space-3) var(--kp-space-4);
+  resize: vertical;
+  line-height: 1.5;
+}
+
+select.kp-input {
+  appearance: none;
+  padding-right: var(--kp-space-10);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235c6b74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.kp-input-groupe {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .kp-input {
+    padding-right: 64px;
+  }
+
+  .kp-suffixe {
+    position: absolute;
+    right: var(--kp-space-4);
+    color: var(--kp-text-3);
+    font-size: var(--kp-fs-sm);
+    font-weight: 600;
+    pointer-events: none;
+  }
+}
+
+.kp-aide {
+  font-size: var(--kp-fs-sm);
+  color: var(--kp-text-3);
+}
+
+.kp-erreur {
+  font-size: var(--kp-fs-sm);
+  color: var(--kp-danger);
+}
+
+.kp-check {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  min-height: var(--kp-tap);
+  font-size: var(--kp-fs-md);
+  cursor: pointer;
+
+  input {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    accent-color: var(--kp-primary);
+  }
+}
+
+// Puces à choix (équipements, types)
+.kp-choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kp-space-2);
+}
+
+.kp-choix-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+  min-height: 44px;
+  padding: 0 var(--kp-space-4);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-full);
+  background: var(--kp-surface);
+  color: var(--kp-text-1);
+  font-size: var(--kp-fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+
+  &[aria-pressed='true'],
+  &--actif {
+    border-color: var(--kp-primary);
+    background: var(--kp-primary-subtle);
+    color: var(--kp-primary-text);
+  }
+}
+
+// ── Liste groupée (style réglages) ───────────────────────────────────────────
+
+.kp-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface);
+  overflow: hidden;
+}
+
+.kp-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  min-height: 56px;
+  width: 100%;
+  padding: var(--kp-space-3) var(--kp-space-4);
+  border: 0;
+  border-bottom: 1px solid var(--kp-border);
+  background: transparent;
+  color: var(--kp-text-1);
+  font-size: var(--kp-fs-md);
+  text-align: left;
+  text-decoration: none;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+a.kp-list__item,
+button.kp-list__item {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--kp-surface-2);
+  }
+
+  &::after {
+    content: '';
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-left: var(--kp-space-1);
+    border-right: 2px solid var(--kp-text-3);
+    border-bottom: 2px solid var(--kp-text-3);
+    transform: rotate(-45deg);
+  }
+}
+
+.kp-list__item--sans-chevron::after {
+  display: none;
+}
+
+.kp-list__item--danger {
+  color: var(--kp-danger);
+  font-weight: 600;
+
+  &::after {
+    display: none;
+  }
+}
+
+.kp-list__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--kp-radius-sm);
+  background: var(--kp-surface-2);
+  color: var(--kp-text-2);
+}
+
+.kp-list__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.kp-list__title {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.kp-list__sub {
+  font-size: var(--kp-fs-sm);
+  color: var(--kp-text-3);
+  overflow-wrap: anywhere;
+}
+
+.kp-list__value {
+  flex-shrink: 0;
+  max-width: 55%;
+  color: var(--kp-text-2);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.kp-list-header {
+  padding: 0 var(--kp-space-1);
+  font-size: var(--kp-fs-sm);
+  font-weight: 600;
+  color: var(--kp-text-3);
+}
+
+// Liste de définitions (détails d'un bail, d'un bien)
+.kp-details {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 0;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface);
+  overflow: hidden;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--kp-space-4);
+    min-height: 52px;
+    padding: var(--kp-space-3) var(--kp-space-4);
+    border-bottom: 1px solid var(--kp-border);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  dt {
+    color: var(--kp-text-3);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ── Cartes ───────────────────────────────────────────────────────────────────
+
+.kp-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-4);
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface);
+  color: var(--kp-text-1);
+  text-decoration: none;
+
+  @include mq.tablette {
+    padding: var(--kp-space-5);
+  }
+}
+
+a.kp-card,
+button.kp-card {
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    border-color: var(--kp-border-strong);
+  }
+}
+
+// Carte « à faire » : bordure d'accent selon l'urgence
+.kp-tache {
+  border-left: 4px solid var(--kp-border-strong);
+
+  &--urgent {
+    border-left-color: var(--kp-danger);
+  }
+
+  &--attention {
+    border-left-color: var(--kp-warning);
+  }
+
+  &--info {
+    border-left-color: var(--kp-info);
+  }
+}
+
+// ── Puces de statut ──────────────────────────────────────────────────────────
+
+.kp-statut {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--kp-radius-full);
+  background: var(--kp-surface-2);
+  color: var(--kp-text-2);
+  font-size: var(--kp-fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &--ok {
+    background: var(--kp-success-subtle);
+    color: var(--kp-success);
+  }
+
+  &--attention {
+    background: var(--kp-warning-subtle);
+    color: var(--kp-warning);
+  }
+
+  &--danger {
+    background: var(--kp-danger-subtle);
+    color: var(--kp-danger);
+  }
+
+  &--info {
+    background: var(--kp-info-subtle);
+    color: var(--kp-info);
+  }
+}
+
+.kp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: var(--kp-radius-full);
+  background: var(--kp-surface-2);
+  color: var(--kp-text-2);
+  font-size: var(--kp-fs-sm);
+}
+
+// ── Bandeaux d'information ───────────────────────────────────────────────────
+
+.kp-bandeau {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-3) var(--kp-space-4);
+  border-radius: var(--kp-radius);
+  background: var(--kp-info-subtle);
+  color: var(--kp-info);
+  font-size: var(--kp-fs-sm);
+
+  > kp-icon {
+    margin-top: 2px;
+  }
+
+  &--ok {
+    background: var(--kp-success-subtle);
+    color: var(--kp-success);
+  }
+
+  &--attention {
+    background: var(--kp-warning-subtle);
+    color: var(--kp-warning);
+  }
+
+  &--danger {
+    background: var(--kp-danger-subtle);
+    color: var(--kp-danger);
+  }
+
+  p,
+  strong {
+    color: inherit;
+  }
+}
+
+// ── Chargement ───────────────────────────────────────────────────────────────
+
+.kp-skeleton {
+  display: block;
+  border-radius: var(--kp-radius-sm);
+  background: linear-gradient(90deg, var(--kp-surface-2) 25%, var(--kp-surface-3) 50%, var(--kp-surface-2) 75%);
+  background-size: 200% 100%;
+  animation: kp-shimmer 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  &--ligne {
+    height: 16px;
+  }
+
+  &--titre {
+    height: 24px;
+    width: 60%;
+  }
+
+  &--carte {
+    height: 96px;
+    border-radius: var(--kp-radius);
+  }
+
+  &--photo {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--kp-radius);
+  }
+}
+
+@keyframes kp-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.kp-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: kp-tourne 0.8s linear infinite;
+}
+
+@keyframes kp-tourne {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Photos ───────────────────────────────────────────────────────────────────
+
+.kp-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface-2);
+}
+
+.kp-photo-vide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--kp-radius);
+  background: var(--kp-surface-2);
+  color: var(--kp-text-3);
+}

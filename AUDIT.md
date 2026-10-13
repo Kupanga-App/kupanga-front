@@ -201,3 +201,16 @@ Même architecture : barre latérale gauche (onglets du rôle), contenu centré 
 | **5. Recette** | Android d'entrée de gamme (Chrome) et iPhone (Safari, PWA installée), réseau lent (3G simulée), lecteur d'écran, mode sombre | 1-2 jours |
 
 Contraintes à garder pendant la refonte : contrats d'API inchangés, comportements de sécurité du front (intercepteur, routes publiques, cache hors ligne par compte R2, vidage à la déconnexion), formats multi-pays (`GET /juridictions/{pays}`), tests existants.
+
+---
+
+## 10. État de la refonte (2026-10-13)
+
+Étapes 1, 3 et 4 du plan faites directement dans le code (étape 2, le prototype, sautée à la demande du propriétaire du projet). Non commité.
+
+- **Nettoyage** : NgRx, Tailwind, Angular Material, police Material Icons, `console.log`, composants morts, faux boutons, « Bientôt », badge « Vérifié », « Payer », actions vers des pages inexistantes, avatars prédéfinis supprimés. Une seule famille d'icônes (`kp-icon`, Lucide), une seule source de styles (`src/styles/` : `_theme.scss` jetons clair/sombre, `_base.scss`, `_components.scss`, `_mq.scss` à deux points de rupture).
+- **Navigation par rôle** (§6.2) : `layouts/app-shell` (onglets du bas sur téléphone, barre latérale ailleurs), `core/navigation/navigation.service.ts` ; routes stables (`/explorer`, `/annonces/:id`, `/accueil`, `/biens/...`, `/documents`, `/mon-logement`, `/quittances`, `/messages`, `/compte`, `/notifications`), gardes `authGuard` (avec `returnUrl`), `roleGuard`, `accueilGuard`, `invitesGuard` ; anciennes adresses redirigées. Annonce publique sans compte.
+- **Composants mobiles** (§8.3, `shared/ui/`) : en-tête à grand titre repliable, feuille du bas / boîte de dialogue, contrôle segmenté, assistant pas à pas plein écran, signature au doigt (pointeur, taille plafonnée pour l'API), galerie plein écran, tirer pour actualiser, messages éphémères, squelettes, états vides. Zones sûres, `100dvh`, `inputmode`, sélecteurs natifs.
+- **Écrans** : connexion, inscription en 3 étapes, mot de passe, confirmation ; Explorer (liste, carte Leaflet, filtres en feuille, filtres dans l'URL) ; annonce ; accueil propriétaire « À faire » ; biens ; fiche d'un bien ; bail, état des lieux, quittances (et leurs assistants) ; documents ; mon logement ; mes quittances ; messages ; notifications ; compte ; signature publique ; 404.
+- **Vérifié** : `ng build` sans avertissement (462 Ko initial, 131 Ko transférés), `ng test` 73/73.
+- **Reste** : étape 5 (recette sur appareils réels), icônes PWA définitives, pages CGU / confidentialité (RGPD).

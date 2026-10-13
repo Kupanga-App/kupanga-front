@@ -1,0 +1,122 @@
+<div class="kp-page kp-page--etroite">
+  <kp-page-header titre="Quittances" [sousTitre]="bien()?.titre" [retour]="['/biens', id()]">
+    @if (bien()?.locataire && !bien()?.archive) {
+      <a actions class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'quittances', 'nouvelle']">
+        <kp-icon name="plus" [size]="18" /> Nouvelle
+      </a>
+    }
+  </kp-page-header>
+
+  @if (chargement() && !bien()) {
+    <div class="kp-stack" aria-busy="true">
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+    </div>
+  } @else if (erreur()) {
+    <kp-vide icone="wifi-off" titre="Quittances indisponibles" texte="Vérifiez votre connexion puis réessayez.">
+      <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
+    </kp-vide>
+  } @else if (!quittances().length) {
+    <kp-vide icone="receipt" titre="Aucune quittance"
+             [texte]="bien()?.locataire ? 'Créez la quittance du mois : vous déclarerez le loyer reçu quand il sera payé.' : 'Choisissez d’abord le locataire de ce bien.'">
+      @if (bien()?.locataire && !bien()?.archive) {
+        <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', id(), 'quittances', 'nouvelle']">Créer une quittance</a>
+      }
+    </kp-vide>
+  } @else {
+    <ul class="kp-stack quittances">
+      @for (q of quittances(); track q.id) {
+        <li class="kp-card">
+          <div class="kp-row kp-row--between">
+            <h2>{{ mois(q) }}</h2>
+            <kp-statut [statut]="statut(q)" />
+          </div>
+          <p class="kp-montant montant">{{ q.montantTotal | montant: q.devise }}</p>
+          <p class="kp-small kp-muted">
+            @if (q.statut === 'PAYEE') {
+              Reçu le {{ q.datePaiement | dateLongue }}{{ q.modePaiement ? ' · ' + libellesMode[q.modePaiement] : '' }}{{ q.referencePaiement ? ' · réf. ' + q.referencePaiement : '' }}
+            } @else {
+              Échéance le {{ q.dateEcheance | dateLongue }}
+            }
+          </p>
+          <div class="kp-actions">
+            @if (q.statut !== 'PAYEE' && !bien()?.archive) {
+              <button type="button" class="kp-btn kp-btn--primary" (click)="declarer(q)">
+                <kp-icon name="banknote" [size]="18" /> Déclarer le loyer reçu
+              </button>
+            }
+            @if (q.statut === 'PAYEE') {
+              @if (q.urlPdf) {
+                <a class="kp-btn kp-btn--secondary" [href]="q.urlPdf" target="_blank" rel="noopener"><kp-icon name="download" [size]="18" /> Quittance</a>
+              }
+              @if (q.urlRecu) {
+                <a class="kp-btn kp-btn--secondary" [href]="q.urlRecu" target="_blank" rel="noopener"><kp-icon name="image" [size]="18" /> Reçu</a>
+              }
+              @if (!bien()?.archive) {
+                <label class="kp-btn kp-btn--ghost" [attr.aria-disabled]="envoiRecuId() === q.id">
+                  @if (envoiRecuId() === q.id) {
+                    <span class="kp-spinner"></span> Envoi…
+                  } @else {
+                    <kp-icon name="camera" [size]="18" /> {{ q.urlRecu ? 'Remplacer le reçu' : 'Joindre le reçu' }}
+                  }
+                  <input type="file" class="kp-sr-only" [accept]="acceptPhotos" (change)="joindreRecu(q, $event)" [disabled]="envoiRecuId() === q.id" />
+                </label>
+              }
+            }
+          </div>
+          @if (q.statut !== 'PAYEE' && bien()?.pays) {
+            <kp-bouton-whatsapp type="quittance" [documentId]="q.id" [pays]="bien()!.pays" libelle="Rappel par WhatsApp" />
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>
+
+<kp-sheet [(ouvert)]="feuilleOuverte" [titre]="titreDeclaration()" [plein]="true">
+  <form class="kp-form" [formGroup]="paiement" (ngSubmit)="validerDeclaration()">
+    <p class="kp-muted">L’argent n’est pas passé par Kupanga : indiquez comment vous l’avez reçu.</p>
+    <div class="kp-field">
+      <span class="kp-label" id="mode-libelle">Mode de paiement</span>
+      <div class="kp-choix" role="radiogroup" aria-labelledby="mode-libelle">
+        @for (m of modes(); track m) {
+          <button type="button" class="kp-choix-item" role="radio" [attr.aria-checked]="paiement.controls.modePaiement.value === m"
+                  [attr.aria-pressed]="paiement.controls.modePaiement.value === m" (click)="paiement.controls.modePaiement.setValue(m)">
+            {{ libellesMode[m] }}
+          </button>
+        }
+      </div>
+    </div>
+    <div class="kp-form-row">
+      <div class="kp-field">
+        <label class="kp-label" for="datePaiement">Reçu le <span class="kp-optionnel">(aujourd’hui si vide)</span></label>
+        <input id="datePaiement" class="kp-input" type="date" formControlName="datePaiement" [max]="aujourdhui" />
+      </div>
+      <div class="kp-field">
+        <label class="kp-label" for="reference">Référence <span class="kp-optionnel">(facultatif)</span></label>
+        <input id="reference" class="kp-input" formControlName="referencePaiement" maxlength="100" placeholder="N° de transaction" />
+        @if (paiement.controls.referencePaiement.invalid) {
+          <span class="kp-erreur">Lettres, chiffres et . , / # _ - seulement.</span>
+        }
+      </div>
+    </div>
+    <div class="kp-field">
+      <span class="kp-label">Votre signature</span>
+      @if (feuilleOuverte()) {
+        <kp-signature (signature)="signature.set($event)" />
+      }
+    </div>
+    @if (erreurDeclaration()) {
+      <p class="kp-erreur" role="alert">{{ erreurDeclaration() }}</p>
+    }
+  </form>
+  <div pied>
+    <button type="button" class="kp-btn kp-btn--primary" (click)="validerDeclaration()"
+            [disabled]="!signature() || paiement.invalid || declarationEnCours()">
+      @if (declarationEnCours()) {
+        <span class="kp-spinner"></span>
+      }
+      Confirmer
+    </button>
+  </div>
+</kp-sheet>

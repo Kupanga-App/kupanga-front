@@ -1,196 +1,198 @@
-import { validateurTelephone } from '../../../telephone/telephone';
-import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  FormBuilder, ReactiveFormsModule, Validators,
-  AbstractControl, ValidationErrors, ValidatorFn
-} from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule, ArrowRight, Check, Smile, Upload } from 'lucide-angular';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth.service';
-import { AuthLayoutCComponent } from '../../shared/auth-layout-c/auth-layout-c.component';
-import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
-import { PasswordStrengthComponent } from '../../shared/password-strength/password-strength.component';
-import { RolePickerComponent } from '../../shared/role-picker/role-picker.component';
-import { AvatarModalComponent } from '../../shared/avatar-modal/avatar-modal.component';
-import { StepsComponent } from '../../shared/steps/steps.component';
+import { retourSur } from '../../guards/auth.guard';
 import { messageErreurApi } from '../../../http/api-error';
 import { ACCEPT_PHOTOS, PhotoRefuseeError, preparerPhoto } from '../../../media/photos';
+import { MESSAGE_TELEPHONE_INVALIDE, validateurTelephone } from '../../../telephone/telephone';
+import { AuthLayoutComponent } from '../../ui/auth-layout.component';
+import { BoutonGoogleComponent } from '../../ui/bouton-google.component';
+import { MOT_DE_PASSE_ROBUSTE, ReglesMotDePasseComponent, motsDePasseIdentiques } from '../../ui/mot-de-passe';
+import { ChoixRoleComponent } from '../../ui/choix-role.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
-/** Même règle que l'API (UserFormDTO) : 8 caractères minimum, une minuscule, une majuscule, un chiffre. */
-export const MOT_DE_PASSE_ROBUSTE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+type Etape = 0 | 1 | 2 | 'envoye';
 
-export const mustMatch: ValidatorFn = (ctrl: AbstractControl): ValidationErrors | null => {
-  const pw = ctrl.get('password');
-  const confirm = ctrl.get('confirmPassword');
-  if (pw && confirm && pw.value !== confirm.value) {
-    confirm.setErrors({ passwordMismatch: true });
-    return { passwordMismatch: true };
-  }
-  if (confirm?.hasError('passwordMismatch')) {
-    confirm.setErrors(null);
-  }
-  return null;
-};
+const TITRES = ['Vous êtes', 'Votre profil', 'Vos identifiants'];
 
+/** Inscription en 3 étapes ; le compte s'active par le lien envoyé par e-mail (A14, pas de connexion automatique). */
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    LucideAngularModule,
-    AuthLayoutCComponent,
-    AuthFieldComponent,
-    PasswordStrengthComponent,
-    RolePickerComponent,
-    AvatarModalComponent,
-    StepsComponent,
-  ],
+  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, BoutonGoogleComponent, ReglesMotDePasseComponent, ChoixRoleComponent, IconComponent],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styles: [`
+    .progression { display: flex; gap: 6px; margin-bottom: 24px; }
+    .progression span { flex: 1; height: 4px; border-radius: 2px; background: var(--kp-surface-3); }
+    .progression span.fait { background: var(--kp-primary); }
+    .photo { display: flex; align-items: center; gap: 16px; }
+    .apercu { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+    .apercu-vide {
+      display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
+      border-radius: 50%; background: var(--kp-surface-2); color: var(--kp-text-3);
+    }
+    .oeil { position: absolute; right: 2px; }
+    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
+    .separateur::before, .separateur::after { content: ''; flex: 1; border-top: 1px solid var(--kp-border); }
+    .envoye { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+    .envoye__icone {
+      display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
+      border-radius: 50%; background: var(--kp-primary-subtle); color: var(--kp-primary-text);
+    }
+  `],
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  readonly ArrowRight = ArrowRight;
-  readonly Check = Check;
-  readonly Smile = Smile;
-  readonly Upload = Upload;
-
-  /** 3 : compte créé, lien de confirmation envoyé (A14). */
-  step = signal<1 | 2 | 3>(1);
+  readonly etape = signal<Etape>(0);
+  readonly titres = TITRES;
   readonly acceptPhotos = ACCEPT_PHOTOS;
-  emailInscrit = signal('');
-  isResending = signal(false);
-  resendInfo = signal<string | null>(null);
-  isSubmitting = signal(false);
-  serverError = signal<string | null>(null);
-  showAvatarModal = signal(false);
-  selectedAvatarUrl = signal<string>('');
-  uploadedFile = signal<File | null>(null);
-  uploadedPreview = signal<string | null>(null);
+  readonly messageTelephone = MESSAGE_TELEPHONE_INVALIDE;
+  readonly envoi = signal(false);
+  readonly erreur = signal<string | null>(null);
+  readonly voir = signal(false);
+  readonly photo = signal<File | null>(null);
+  readonly apercu = signal<string | null>(null);
+  readonly emailInscrit = signal('');
+  readonly renvoiEnCours = signal(false);
+  readonly infoRenvoi = signal<string | null>(null);
 
-  form = this.fb.group({
-    email:           ['', [Validators.required, Validators.email]],
-    password:        ['', [Validators.required, Validators.maxLength(72), Validators.pattern(MOT_DE_PASSE_ROBUSTE)]],
-    confirmPassword: ['', [Validators.required]],
-    firstName:       ['', [Validators.required, Validators.maxLength(50)]],
-    lastName:        ['', [Validators.required, Validators.maxLength(50)]],
-    role:            ['ROLE_PROPRIETAIRE', [Validators.required]],
-    telephone:       ['', [validateurTelephone]],
-  }, { validators: mustMatch });
+  readonly form = this.fb.nonNullable.group(
+    {
+      role: ['ROLE_PROPRIETAIRE' as 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE', Validators.required],
+      firstName: ['', [Validators.required, Validators.maxLength(50)]],
+      lastName: ['', [Validators.required, Validators.maxLength(50)]],
+      telephone: ['', [validateurTelephone]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      password: ['', [Validators.required, Validators.maxLength(72), Validators.pattern(MOT_DE_PASSE_ROBUSTE)]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    { validators: motsDePasseIdentiques },
+  );
 
-  get emailCtrl()           { return this.form.get('email') as any; }
-  get passwordCtrl()        { return this.form.get('password') as any; }
-  get confirmPasswordCtrl() { return this.form.get('confirmPassword') as any; }
-  get firstNameCtrl()       { return this.form.get('firstName') as any; }
-  get lastNameCtrl()        { return this.form.get('lastName') as any; }
-  get roleCtrl()            { return this.form.get('role') as any; }
-  get telephoneCtrl()       { return this.form.get('telephone') as any; }
-  get passwordValue()       { return this.form.get('password')?.value ?? ''; }
+  readonly motDePasse = toSignal(this.form.controls.password.valueChanges, { initialValue: '' });
 
-  get avatarPreview(): string {
-    return this.uploadedPreview() ?? this.selectedAvatarUrl();
+  readonly numeroEtape = computed(() => {
+    const e = this.etape();
+    return e === 'envoye' ? 3 : e;
+  });
+
+  private readonly retour = retourSur(this.route.snapshot.queryParamMap.get('returnUrl'));
+
+  retourParams(): Record<string, string> | null {
+    return this.retour ? { returnUrl: this.retour } : null;
   }
 
-  nextStep(): void {
-    const step1 = ['email', 'password', 'confirmPassword'];
-    const valid = step1.every(k => this.form.get(k)?.valid);
-    if (!valid) {
-      step1.forEach(k => this.form.get(k)?.markAsTouched());
+  private readonly champsParEtape: (keyof typeof this.form.controls)[][] = [
+    ['role'],
+    ['firstName', 'lastName', 'telephone'],
+    ['email', 'password', 'confirmPassword'],
+  ];
+
+  suivant(): void {
+    const e = this.etape();
+    if (e === 'envoye') return;
+    const champs = this.champsParEtape[e];
+    champs.forEach(c => this.form.controls[c].markAsTouched());
+    if (champs.some(c => this.form.controls[c].invalid)) return;
+    if (e < 2) {
+      this.etape.set((e + 1) as Etape);
+      this.erreur.set(null);
       return;
     }
-    this.step.set(2);
+    if (this.form.hasError('differents')) return;
+    this.inscrire();
   }
 
-  prevStep(): void {
-    this.step.set(1);
+  precedent(): void {
+    const e = this.etape();
+    if (typeof e === 'number' && e > 0) {
+      this.etape.set((e - 1) as Etape);
+      this.erreur.set(null);
+    }
   }
 
-  openAvatarModal(): void {
-    this.showAvatarModal.set(true);
-  }
-
-  onAvatarConfirmed(url: string): void {
-    this.selectedAvatarUrl.set(url);
-    this.uploadedPreview.set(null);
-    this.uploadedFile.set(null);
-    // Fetch local asset → File for multipart upload
-    fetch(url)
-      .then(r => r.blob())
-      .then(blob => {
-        const name = url.split('/').pop() ?? 'avatar.jpg';
-        this.uploadedFile.set(new File([blob], name, { type: blob.type || 'image/jpeg' }));
-      })
-      .catch(() => this.uploadedFile.set(null));
-    this.showAvatarModal.set(false);
-  }
-
-  onAvatarCancelled(): void {
-    this.showAvatarModal.set(false);
-  }
-
-  async onFileUpload(event: Event): Promise<void> {
+  async choisirPhoto(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const fichier = input.files?.[0];
     input.value = '';
-    if (!file) return;
-    this.serverError.set(null);
+    if (!fichier) return;
+    this.erreur.set(null);
     // B5 : format et taille contrôlés avant l'envoi, HEIC (iPhone) converti en JPEG
-    let photo: File;
     try {
-      photo = await preparerPhoto(file);
+      const photo = await preparerPhoto(fichier);
+      this.photo.set(photo);
+      const ancien = this.apercu();
+      if (ancien) URL.revokeObjectURL(ancien);
+      this.apercu.set(URL.createObjectURL(photo));
     } catch (e) {
-      this.serverError.set(e instanceof PhotoRefuseeError ? e.message : 'Cette photo ne peut pas être utilisée.');
-      return;
+      this.erreur.set(e instanceof PhotoRefuseeError ? e.message : 'Cette photo ne peut pas être utilisée.');
     }
-    this.uploadedFile.set(photo);
-    this.selectedAvatarUrl.set('');
-    const reader = new FileReader();
-    reader.onload = e => this.uploadedPreview.set(e.target?.result as string);
-    reader.readAsDataURL(photo);
   }
 
-  onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    this.isSubmitting.set(true);
-    this.serverError.set(null);
+  retirerPhoto(): void {
+    const ancien = this.apercu();
+    if (ancien) URL.revokeObjectURL(ancien);
+    this.photo.set(null);
+    this.apercu.set(null);
+  }
 
-    const { confirmPassword, ...data } = this.form.value;
-    this.authService.register(data, this.uploadedFile() ?? undefined).subscribe({
-      next: () => {
-        // A14 : pas de connexion automatique, le compte s'active par le lien envoyé par e-mail
-        this.isSubmitting.set(false);
-        this.emailInscrit.set(data.email ?? '');
-        this.step.set(3);
+  private inscrire(): void {
+    this.envoi.set(true);
+    this.erreur.set(null);
+    const v = this.form.getRawValue();
+    const email = v.email.trim();
+    this.authService
+      .register(
+        { firstName: v.firstName.trim(), lastName: v.lastName.trim(), email, password: v.password, role: v.role, telephone: v.telephone },
+        this.photo() ?? undefined,
+      )
+      .subscribe({
+        next: () => {
+          this.envoi.set(false);
+          this.emailInscrit.set(email);
+          this.etape.set('envoye');
+        },
+        error: err => {
+          this.envoi.set(false);
+          this.erreur.set(messageErreurApi(err, 'L’inscription n’a pas abouti. Réessayez.'));
+        },
+      });
+  }
+
+  connecterAvecGoogle(jeton: string): void {
+    this.erreur.set(null);
+    this.authService.connecterAvecGoogle(jeton).subscribe({
+      next: user => {
+        if (!user) {
+          void this.router.navigate(['/auth/google-role'], { queryParams: this.retourParams() });
+        } else {
+          void this.router.navigateByUrl(this.retour ?? '/', { replaceUrl: true });
+        }
       },
-      error: (err) => {
-        this.isSubmitting.set(false);
-        this.serverError.set(messageErreurApi(err, "Une erreur s'est produite lors de l'inscription."));
-      }
+      error: err => this.erreur.set(messageErreurApi(err, 'Connexion Google impossible. Réessayez.')),
     });
   }
 
   /** A14 : nouveau lien de confirmation (réponse identique que le compte existe ou non). */
   renvoyerLien(): void {
-    if (!this.emailInscrit() || this.isResending()) return;
-    this.isResending.set(true);
-    this.resendInfo.set(null);
+    if (!this.emailInscrit() || this.renvoiEnCours()) return;
+    this.renvoiEnCours.set(true);
+    this.infoRenvoi.set(null);
     this.authService.renvoyerVerification(this.emailInscrit()).subscribe({
       next: () => {
-        this.isResending.set(false);
-        this.resendInfo.set('Un nouveau lien a été envoyé si le compte attend encore sa confirmation.');
+        this.renvoiEnCours.set(false);
+        this.infoRenvoi.set('Un nouveau lien vient d’être envoyé si le compte attend encore sa confirmation.');
       },
-      error: (err) => {
-        this.isResending.set(false);
-        this.resendInfo.set(messageErreurApi(err, "Le lien n'a pas pu être renvoyé. Réessayez plus tard."));
-      }
+      error: err => {
+        this.renvoiEnCours.set(false);
+        this.infoRenvoi.set(messageErreurApi(err, 'Le lien n’a pas pu être renvoyé. Réessayez plus tard.'));
+      },
     });
   }
 }

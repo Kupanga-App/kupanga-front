@@ -79,6 +79,17 @@ export type ModeChauffage =
   'POMPE_A_CHALEUR' | 'POELE' | 'COLLECTIF' |
   'SANS_CHAUFFAGE';
 
+export const LIBELLES_CHAUFFAGE: Record<ModeChauffage, string> = {
+  ELECTRIQUE: 'Électrique',
+  GAZ: 'Gaz',
+  FIOUL: 'Fioul',
+  BOIS: 'Bois',
+  POMPE_A_CHALEUR: 'Pompe à chaleur',
+  POELE: 'Poêle',
+  COLLECTIF: 'Collectif',
+  SANS_CHAUFFAGE: 'Sans chauffage',
+};
+
 export type ClasseEnergie = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
 export type ClasseGes = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
 
@@ -207,9 +218,21 @@ export interface BienDTO {
   updatedAt: string;
 }
 
+/** Lieux proches gérés par la recherche de l'API (`poisRequis`). */
+export type PoiType = 'SCHOOL' | 'HOSPITAL' | 'PHARMACY' | 'KINDERGARTEN';
+
+export const LIBELLES_POI: Record<PoiType, string> = {
+  SCHOOL: 'École',
+  HOSPITAL: 'Hôpital',
+  PHARMACY: 'Pharmacie',
+  KINDERGARTEN: 'Garderie',
+};
+
 export interface BienSearchDTO {
   titre?: string;
   villes?: string[];
+  pays?: Pays[];
+  poisRequis?: PoiType[];
   typesBien?: BienType[];
   page?: number;
   size?: number;
@@ -259,29 +282,13 @@ export interface BienPageDTO {
   premierePage: boolean;
 }
 
-export interface BienFilters {
-  q?: string;
-  typeBien?: string;
-  ville?: string;
-  codePostal?: string;
-  loyerMax?: number;
-  surfaceMin?: number;
-  nbPiecesMin?: number;
-  nbChambresMin?: number;
-  classeEnergieMax?: string;
-  pois?: string[];
-  meuble?: boolean;
-  colocation?: boolean;
-  ascenseur?: boolean;
-  sortBy?: 'date_desc' | 'date_asc' | 'prix_asc' | 'prix_desc' | 'surface_desc';
-}
 
-/** C2 : origine de la position d'un bien. */
 /** R1 : vignette de 400 px de la i-ème photo (la photo elle-même si elle date d'avant R1), ou null. */
 export function vignette(b: Pick<BienDTO, 'images' | 'vignettes'>, i: number): string | null {
   return b.vignettes?.[i] ?? b.images?.[i] ?? null;
 }
 
+/** C2 : origine de la position d'un bien. */
 export type PrecisionLocalisation = 'REPERE' | 'ADRESSE' | 'QUARTIER' | 'COMMUNE' | 'VILLE' | 'AUCUNE';
 
 /** C2 : message à afficher quand la position n'est pas exacte (null si exacte ou inconnue). */

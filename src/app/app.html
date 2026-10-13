@@ -1,12 +1,32 @@
+<a class="evitement" href="#contenu">Aller au contenu</a>
+
 @if (!horsLigne.enLigne()) {
-  <div class="kp-bandeau-pwa kp-bandeau-pwa--hors-ligne" role="status">
-    Hors ligne : vous voyez les dernières données enregistrées sur cet appareil.
-  </div>
+  <div class="bandeau bandeau--hors-ligne" role="status">Hors ligne : dernières données enregistrées sur cet appareil.</div>
 }
 @if (horsLigne.nouvelleVersion()) {
-  <div class="kp-bandeau-pwa" role="status">
-    Une nouvelle version de Kupanga est disponible.
-    <button type="button" (click)="horsLigne.recharger()">Recharger</button>
+  <div class="bandeau" role="status">
+    <span>Une nouvelle version est disponible.</span>
+    <button type="button" (click)="horsLigne.recharger()">Mettre à jour</button>
   </div>
 }
-<router-outlet></router-outlet>
+@if (horsLigne.enLigne() && !horsLigne.nouvelleVersion() && installation.proposition(); as mode) {
+  <aside class="installation" aria-label="Installer l’application">
+    <img class="installation__logo" src="icons/icon-96x96.png" alt="" width="40" height="40">
+    @if (mode === 'natif') {
+      <p class="installation__texte"><strong>Installez Kupanga</strong> : plus rapide, même hors ligne.</p>
+      <button type="button" class="installation__action" (click)="installation.installer()">Installer</button>
+    } @else {
+      <p class="installation__texte">
+        <strong>Installez Kupanga</strong> : touchez
+        <kp-icon name="share" [size]="16" /><span class="kp-sr-only">Partager</span>
+        puis « Sur l’écran d’accueil » <kp-icon name="square-plus" [size]="16" />.
+      </p>
+    }
+    <button type="button" class="installation__fermer" (click)="installation.plusTard()" aria-label="Plus tard">
+      <kp-icon name="x" [size]="20" />
+    </button>
+  </aside>
+}
+
+<router-outlet />
+<kp-toasts />

@@ -1,0 +1,183 @@
+<div class="kp-page kp-page--etroite">
+  <kp-page-header [titre]="bien()?.titre ?? 'Bien'" retour="/biens">
+    @if (bien()) {
+      <button actions type="button" class="kp-icon-btn" (click)="actionsOuvertes.set(true)" aria-label="Actions sur le bien">
+        <kp-icon name="ellipsis" />
+      </button>
+    }
+  </kp-page-header>
+
+  @if (chargement() && !bien()) {
+    <div class="kp-stack" aria-busy="true">
+      <span class="kp-skeleton kp-skeleton--photo"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+      <span class="kp-skeleton kp-skeleton--carte"></span>
+    </div>
+  } @else if (erreur()) {
+    <kp-vide icone="building-2" titre="Bien indisponible" [texte]="erreur()">
+      <a routerLink="/biens" class="kp-btn kp-btn--secondary">Mes biens</a>
+    </kp-vide>
+  } @else if (bien(); as b) {
+    <div class="kp-stack kp-stack--lg">
+      @if (b.archive) {
+        <div class="kp-bandeau kp-bandeau--attention">
+          <kp-icon name="archive" [size]="18" />
+          <p>Ce bien est archivé : il n’apparaît plus dans les annonces et ne peut plus être modifié. Ses documents restent consultables.</p>
+        </div>
+      }
+
+      <kp-galerie [photos]="b.images ?? []" />
+
+      <section class="kp-card resume">
+        <div class="kp-row kp-row--between">
+          @if (b.archive) {
+            <span class="kp-statut">Archivé</span>
+          } @else if (b.locataire) {
+            <span class="kp-statut kp-statut--ok">Loué</span>
+          } @else {
+            <span class="kp-statut kp-statut--attention">Vacant</span>
+          }
+          <span class="kp-small kp-muted">{{ typeBien() }}</span>
+        </div>
+        <p class="loyer">
+          <span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
+          <span class="kp-muted kp-small"> / mois</span>
+          @if (b.chargesMensuelles) {
+            <span class="kp-muted kp-small"> + {{ b.chargesMensuelles | montant: b.devise : 0 }} de charges</span>
+          }
+        </p>
+        <p class="kp-small kp-muted">{{ adresse() }}</p>
+      </section>
+
+      <section class="kp-section" aria-labelledby="titre-locataire">
+        <h2 class="kp-section-title" id="titre-locataire">Locataire</h2>
+        @if (b.locataire; as l) {
+          <div class="kp-card">
+            <div class="kp-row">
+              <kp-avatar [photo]="l.urlProfile" [nom]="nomLocataire()" [taille]="48" />
+              <div class="kp-stack kp-stack--sm identite">
+                <span class="kp-strong">{{ nomLocataire() }}</span>
+                @if (l.telephone) {
+                  <span class="kp-small kp-muted">{{ l.telephone }}</span>
+                }
+              </div>
+            </div>
+            <div class="contacts">
+              <a class="kp-btn kp-btn--secondary kp-btn--sm" routerLink="/messages" [queryParams]="lienMessage()">
+                <kp-icon name="message-circle" [size]="18" /> Message
+              </a>
+              @if (l.telephone) {
+                <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="lienAppel(l.telephone)"><kp-icon name="phone" [size]="18" /> Appeler</a>
+              }
+              @if (lienWhatsapp(); as wa) {
+                <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="wa" target="_blank" rel="noopener noreferrer">
+                  <kp-icon name="smartphone" [size]="18" /> WhatsApp
+                </a>
+              }
+            </div>
+          </div>
+        } @else if (!b.archive) {
+          <div class="kp-card">
+            <p>Choisissez votre locataire parmi les personnes qui vous ont écrit au sujet de ce bien.</p>
+            <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'locataire']"><kp-icon name="user-plus" [size]="18" /> Choisir le locataire</a>
+          </div>
+        } @else {
+          <p class="kp-muted">Aucun locataire.</p>
+        }
+      </section>
+
+      <section class="kp-section" aria-labelledby="titre-documents">
+        <h2 class="kp-section-title" id="titre-documents">Documents</h2>
+        <nav class="kp-list" aria-label="Documents du bien">
+          <a class="kp-list__item" [routerLink]="['/biens', b.id, 'bail']">
+            <span class="kp-list__icon"><kp-icon name="file-text" /></span>
+            <span class="kp-list__body">
+              <span class="kp-list__title">Bail</span>
+              <span class="kp-list__sub">{{ bail() ? 'Début le ' + (bail()!.dateDebut | dateLongue) : 'Aucun bail' }}</span>
+            </span>
+            @if (statutBail(); as s) { <kp-statut [statut]="s" /> }
+          </a>
+          <a class="kp-list__item" [routerLink]="['/biens', b.id, 'etats-des-lieux']">
+            <span class="kp-list__icon"><kp-icon name="clipboard-check" /></span>
+            <span class="kp-list__body">
+              <span class="kp-list__title">États des lieux</span>
+              <span class="kp-list__sub">{{ edls().length ? edls().length + ' état' + (edls().length > 1 ? 's' : '') + ' des lieux' : 'Aucun état des lieux' }}</span>
+            </span>
+            @if (statutEdl(); as s) { <kp-statut [statut]="s" /> }
+          </a>
+          <a class="kp-list__item" [routerLink]="['/biens', b.id, 'quittances']">
+            <span class="kp-list__icon"><kp-icon name="receipt" /></span>
+            <span class="kp-list__body">
+              <span class="kp-list__title">Quittances et loyers</span>
+              <span class="kp-list__sub">{{ derniereQuittance() ? 'Dernière : ' + moisDerniereQuittance() : 'Aucune quittance' }}</span>
+            </span>
+            @if (statutDerniereQuittance(); as s) { <kp-statut [statut]="s" /> }
+          </a>
+        </nav>
+      </section>
+
+      <section class="kp-section" aria-labelledby="titre-details">
+        <h2 class="kp-section-title" id="titre-details">Détails</h2>
+        <dl class="kp-details">
+          @if (b.surfaceHabitable) { <div><dt>Surface</dt><dd>{{ b.surfaceHabitable }} m²</dd></div> }
+          @if (b.nombrePieces) { <div><dt>Pièces</dt><dd>{{ b.nombrePieces }}</dd></div> }
+          @if (b.nombreChambres) { <div><dt>Chambres</dt><dd>{{ b.nombreChambres }}</dd></div> }
+          <div><dt>Meublé</dt><dd>{{ b.meuble ? 'Oui' : 'Non' }}</dd></div>
+          @if (b.depotGarantie) { <div><dt>Dépôt de garantie</dt><dd>{{ b.depotGarantie | montant: b.devise : 0 }}</dd></div> }
+          @if (b.garantieMois != null) { <div><dt>Garantie</dt><dd>{{ b.garantieMois }} mois de loyer</dd></div> }
+          @if (b.avanceMois != null) { <div><dt>Loyers d’avance</dt><dd>{{ b.avanceMois }} mois</dd></div> }
+          @if (b.disponibleDe) { <div><dt>Disponible le</dt><dd>{{ b.disponibleDe | dateLongue }}</dd></div> }
+          @if (b.pointDeRepere) { <div><dt>Repère</dt><dd>{{ b.pointDeRepere }}</dd></div> }
+        </dl>
+        @if (equipements().length) {
+          <div class="kp-row kp-row--wrap">
+            @for (e of equipements(); track e) {
+              <span class="kp-tag">{{ e }}</span>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="kp-section" aria-labelledby="titre-localisation">
+        <h2 class="kp-section-title" id="titre-localisation">Localisation</h2>
+        <p class="kp-small kp-muted">{{ adresse() }}</p>
+        <kp-carte-bien [latitude]="b.latitude" [longitude]="b.longitude" [precision]="b.precisionLocalisation" />
+        @if (positionApprox()) {
+          <p class="kp-aide">{{ positionApprox() }}. Placez le repère sur la carte depuis « Modifier ».</p>
+        }
+      </section>
+    </div>
+
+    <kp-sheet [(ouvert)]="actionsOuvertes" titre="Actions">
+      <div class="kp-list">
+        @if (!b.archive) {
+          <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'modifier'])">
+            <span class="kp-list__icon"><kp-icon name="pencil" /></span>
+            <span class="kp-list__body"><span class="kp-list__title">Modifier le bien</span></span>
+          </button>
+          @if (!b.locataire) {
+            <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'locataire'])">
+              <span class="kp-list__icon"><kp-icon name="user-plus" /></span>
+              <span class="kp-list__body"><span class="kp-list__title">Choisir le locataire</span></span>
+            </button>
+          }
+          <button type="button" class="kp-list__item" (click)="aller(['/annonces', b.id])">
+            <span class="kp-list__icon"><kp-icon name="eye" /></span>
+            <span class="kp-list__body">
+              <span class="kp-list__title">Voir l’annonce</span>
+              <span class="kp-list__sub">Telle que la voient les visiteurs</span>
+            </span>
+          </button>
+        }
+        <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'quittances', 'nouvelle'])" [disabled]="b.archive || !b.locataire">
+          <span class="kp-list__icon"><kp-icon name="receipt" /></span>
+          <span class="kp-list__body">
+            <span class="kp-list__title">Nouvelle quittance</span>
+            @if (!b.locataire) { <span class="kp-list__sub">Il faut d’abord un locataire</span> }
+          </span>
+        </button>
+      </div>
+      <p class="kp-aide archivage">L’archivage d’un bien se fait par l’administrateur de Kupanga.</p>
+    </kp-sheet>
+  }
+</div>

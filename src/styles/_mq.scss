@@ -1,0 +1,24 @@
+// styles/_mq.scss — deux points de rupture seulement
+// < 768 px : téléphone (barre d'onglets du bas, feuilles du bas, pile d'écrans)
+// ≥ 768 px : tablette et ordinateur (barre latérale, boîtes de dialogue) ; ≥ 1100 px : barre latérale complète
+
+$tablette: 768px;
+$ordinateur: 1100px;
+
+@mixin telephone {
+  @media (max-width: #{$tablette - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablette {
+  @media (min-width: $tablette) {
+    @content;
+  }
+}
+
+@mixin ordinateur {
+  @media (min-width: $ordinateur) {
+    @content;
+  }
+}

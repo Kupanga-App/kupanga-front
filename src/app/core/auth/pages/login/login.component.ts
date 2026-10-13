@@ -1,163 +1,183 @@
-import { Component, inject, signal, NgZone, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { LucideAngularModule, ArrowRight } from 'lucide-angular';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { AuthLayoutCComponent, AuthRubric } from '../../shared/auth-layout-c/auth-layout-c.component';
-import { AuthFieldComponent } from '../../shared/auth-field/auth-field.component';
-import { environment } from '../../../../../environments/environment';
+import { User } from '../../models/user.model';
+import { retourSur } from '../../guards/auth.guard';
 import { messageErreurApi } from '../../../http/api-error';
+import { AuthLayoutComponent } from '../../ui/auth-layout.component';
+import { BoutonGoogleComponent } from '../../ui/bouton-google.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    MatCheckboxModule,
-    LucideAngularModule,
-    AuthLayoutCComponent,
-    AuthFieldComponent,
-  ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, BoutonGoogleComponent, IconComponent],
+  template: `
+    <kp-auth-layout titre="Connexion" retour="/explorer">
+      <form class="kp-form" [formGroup]="form" (ngSubmit)="connecter()" novalidate>
+        <div class="kp-field">
+          <label class="kp-label" for="email">E-mail</label>
+          <input id="email" class="kp-input" type="email" formControlName="email" autocomplete="username"
+                 inputmode="email" autocapitalize="off" spellcheck="false" />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <span class="kp-erreur">Entrez une adresse e-mail valide.</span>
+          }
+        </div>
+
+        <div class="kp-field">
+          <div class="kp-row kp-row--between">
+            <label class="kp-label" for="password">Mot de passe</label>
+            <a routerLink="/auth/forgot" class="kp-small">Mot de passe oublié ?</a>
+          </div>
+          <div class="kp-input-groupe">
+            <input id="password" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="password"
+                   autocomplete="current-password" />
+            <button type="button" class="kp-icon-btn oeil" (click)="voir.set(!voir())"
+                    [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+              <kp-icon [name]="voir() ? 'eye-off' : 'eye'" />
+            </button>
+          </div>
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <span class="kp-erreur">Entrez votre mot de passe.</span>
+          }
+        </div>
+
+        @if (erreur()) {
+          <div class="kp-bandeau kp-bandeau--danger" role="alert">
+            <kp-icon name="circle-alert" [size]="18" />
+            <p>{{ erreur() }}</p>
+          </div>
+        }
+
+        @if (emailNonVerifie()) {
+          <div class="kp-bandeau kp-bandeau--attention">
+            <kp-icon name="mail" [size]="18" />
+            <div class="kp-stack kp-stack--sm">
+              <p>Confirmez d’abord votre adresse avec le lien reçu par e-mail.</p>
+              @if (infoRenvoi()) {
+                <p role="status">{{ infoRenvoi() }}</p>
+              } @else {
+                <button type="button" class="kp-btn kp-btn--secondary kp-btn--sm" (click)="renvoyerLien()" [disabled]="renvoiEnCours()">
+                  Renvoyer le lien
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <button type="submit" class="kp-btn kp-btn--primary kp-btn--block" [disabled]="envoi() || google()">
+          @if (envoi()) {
+            <span class="kp-spinner"></span>
+          }
+          Se connecter
+        </button>
+      </form>
+
+      <div class="separateur"><span>ou</span></div>
+      <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
+
+      <p pied>Pas encore de compte ? <a routerLink="/auth/register" [queryParams]="retourParams()">Créer un compte</a></p>
+    </kp-auth-layout>
+  `,
+  styles: [`
+    .oeil { position: absolute; right: 2px; }
+    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
+    .separateur::before, .separateur::after { content: ''; flex: 1; border-top: 1px solid var(--kp-border); }
+  `],
 })
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private ngZone = inject(NgZone);
+  private route = inject(ActivatedRoute);
 
-  readonly ArrowRight = ArrowRight;
-
-  isSubmitting = signal(false);
-  isGoogleLoading = signal(false);
-  serverError = signal<string | null>(null);
-  googleReady = signal(false);
+  readonly envoi = signal(false);
+  readonly google = signal(false);
+  readonly erreur = signal<string | null>(null);
+  readonly voir = signal(false);
   /** A14 : connexion refusée (403) tant que l'adresse n'est pas confirmée → proposer un nouveau lien. */
-  emailNonVerifie = signal(false);
-  isResending = signal(false);
-  resendInfo = signal<string | null>(null);
+  readonly emailNonVerifie = signal(false);
+  readonly renvoiEnCours = signal(false);
+  readonly infoRenvoi = signal<string | null>(null);
 
-  loginForm = this.fb.group({
-    email:    ['', [Validators.required, Validators.email]],
+  readonly form = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
     password: ['', [Validators.required]],
-    remember: [true]
   });
 
-  readonly rubrics: AuthRubric[] = [
-    { page: 'p. 02', text: 'Biens — gérez votre patrimoine' },
-    { page: 'p. 04', text: 'Loyers — suivez vos encaissements' },
-    { page: 'p. 07', text: 'Baux — vos contrats en un coup d\'œil' }
-  ];
+  /** Page demandée avant la connexion (lien reçu par e-mail, bouton « Contacter » d'une annonce). */
+  private readonly retour = retourSur(this.route.snapshot.queryParamMap.get('returnUrl'));
 
-  get emailCtrl() { return this.loginForm.get('email') as any; }
-  get passwordCtrl() { return this.loginForm.get('password') as any; }
-  get rememberCtrl() { return this.loginForm.get('remember') as any; }
-
-  ngAfterViewInit(): void {
-    const script = document.querySelector('script[src*="gsi/client"]') as HTMLScriptElement | null;
-    if (!script) return;
-
-    if (typeof google !== 'undefined' && google.accounts?.id) {
-      this.initGoogleSignIn();
-    } else {
-      script.addEventListener('load', () => this.initGoogleSignIn());
-    }
+  retourParams(): Record<string, string> | null {
+    return this.retour ? { returnUrl: this.retour } : null;
   }
 
-  private initGoogleSignIn(): void {
-    google.accounts.id.initialize({
-      client_id: environment.googleClientId,
-      callback: (response: google.accounts.id.CredentialResponse) => {
-        this.ngZone.run(() => this.handleGoogleCredential(response.credential));
-      }
-    });
-    this.ngZone.run(() => this.googleReady.set(true));
-  }
-
-  signInWithGoogle(): void {
-    if (!this.googleReady()) return;
-    google.accounts.id.prompt();
-  }
-
-  private handleGoogleCredential(credential: string): void {
-    this.isGoogleLoading.set(true);
-    this.serverError.set(null);
-
-    this.authService.loginWithGoogle(credential).subscribe({
-      next: (response) => {
-        if (response.requiresRoleSelection) {
-          this.isGoogleLoading.set(false);
-          this.router.navigate(['/auth/google-role']);
-        } else {
-          this.authService.loadCurrentUser().subscribe({
-            next: (user) => {
-              this.isGoogleLoading.set(false);
-              this.router.navigate(user.role === 'ROLE_PROPRIETAIRE' ? ['/pro'] : ['/loc']);
-            },
-            error: () => {
-              this.isGoogleLoading.set(false);
-              this.serverError.set('Connexion Google échouée. Réessayez.');
-            }
-          });
-        }
-      },
-      error: (err) => {
-        this.isGoogleLoading.set(false);
-        // A4 : 401 « adresse Google non confirmée » ; 429 trop de tentatives
-        this.serverError.set(messageErreurApi(err, 'Connexion Google échouée. Vérifiez votre compte et réessayez.'));
-      }
-    });
-  }
-
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+  connecter(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
-    this.isSubmitting.set(true);
-    this.serverError.set(null);
+    this.envoi.set(true);
+    this.erreur.set(null);
     this.emailNonVerifie.set(false);
-    this.resendInfo.set(null);
+    this.infoRenvoi.set(null);
 
-    const { email, password } = this.loginForm.value;
-    this.authService.login({ email, password }).subscribe({
-      next: (user) => {
-        this.isSubmitting.set(false);
-        this.router.navigate(user.role === 'ROLE_PROPRIETAIRE' ? ['/pro'] : ['/loc']);
-      },
-      error: (err) => {
-        this.isSubmitting.set(false);
+    const { email, password } = this.form.getRawValue();
+    this.authService.login({ email: email.trim(), password }).subscribe({
+      next: user => this.suite(user),
+      error: err => {
+        this.envoi.set(false);
         if (err?.status === 403) {
           this.emailNonVerifie.set(true);
+          return;
         }
-        this.serverError.set(
-          err?.status === 401
-            ? 'E-mail ou mot de passe incorrect.'
-            : messageErreurApi(err, 'Connexion impossible. Veuillez réessayer.')
+        this.erreur.set(
+          err?.status === 401 ? 'E-mail ou mot de passe incorrect.' : messageErreurApi(err, 'Connexion impossible. Réessayez.'),
         );
-      }
+      },
+    });
+  }
+
+  connecterAvecGoogle(jeton: string): void {
+    this.google.set(true);
+    this.erreur.set(null);
+    this.authService.connecterAvecGoogle(jeton).subscribe({
+      next: user => {
+        if (!user) {
+          void this.router.navigate(['/auth/google-role'], { queryParams: this.retourParams() });
+          return;
+        }
+        this.suite(user);
+      },
+      error: err => {
+        this.google.set(false);
+        // A4 : 401 « adresse Google non confirmée » ; 429 trop de tentatives
+        this.erreur.set(messageErreurApi(err, 'Connexion Google impossible. Réessayez.'));
+      },
     });
   }
 
   /** A14 : renvoie le lien de confirmation (réponse identique que le compte existe ou non). */
   renvoyerLien(): void {
-    const email = this.emailCtrl.value as string;
-    if (!email || this.isResending()) return;
-    this.isResending.set(true);
+    const email = this.form.controls.email.value.trim();
+    if (!email || this.renvoiEnCours()) return;
+    this.renvoiEnCours.set(true);
     this.authService.renvoyerVerification(email).subscribe({
-      next: (message) => {
-        this.isResending.set(false);
-        this.resendInfo.set(message || 'Si un compte non confirmé existe pour cette adresse, un nouveau lien a été envoyé.');
+      next: () => {
+        this.renvoiEnCours.set(false);
+        this.infoRenvoi.set('Si votre compte attend sa confirmation, un nouveau lien vient de vous être envoyé.');
       },
-      error: (err) => {
-        this.isResending.set(false);
-        this.resendInfo.set(messageErreurApi(err, "Le lien n'a pas pu être renvoyé. Réessayez plus tard."));
-      }
+      error: err => {
+        this.renvoiEnCours.set(false);
+        this.infoRenvoi.set(messageErreurApi(err, 'Le lien n’a pas pu être renvoyé. Réessayez plus tard.'));
+      },
     });
+  }
+
+  private suite(_user: User): void {
+    this.envoi.set(false);
+    this.google.set(false);
+    void this.router.navigateByUrl(this.retour ?? '/', { replaceUrl: true });
   }
 }
