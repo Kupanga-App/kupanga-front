@@ -1,10 +1,11 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BienService } from '../biens/services/bien.service';
-import { LogementContextService } from '../../core/services/logement-context.service';
+import { LogementContextService, logementsLoues } from '../../core/services/logement-context.service';
+import { AuthService } from '../../core/auth/services/auth.service';
 import { AppNotificationService } from '../notifications/services/app-notification.service';
 import { BienDTO, adresseLisible, libelleTypeBien } from '../biens/models/bien.model';
 import { LocataireDashboardDTO, QuittanceBackendDTO } from './locataire.models';
@@ -18,6 +19,8 @@ import { VideComponent } from '../../shared/ui/vide.component';
 import { TirerPourActualiserDirective } from '../../shared/ui/tirer-pour-actualiser.directive';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../shared/components/carte-bien/carte-bien.component';
+import { DemandesRecuesComponent } from './demandes-recues.component';
+import { FinDeBailComponent } from '../biens/components/fin-de-bail.component';
 
 interface DocumentASigner {
   cle: string;
@@ -34,7 +37,8 @@ interface DocumentASigner {
   standalone: true,
   imports: [
     RouterLink, MontantPipe, DateLonguePipe, DateRelativePipe, PageHeaderComponent, AvatarComponent, StatutComponent,
-    VideComponent, TirerPourActualiserDirective, IconComponent, CarteBienComponent,
+    VideComponent, TirerPourActualiserDirective, IconComponent, CarteBienComponent, DemandesRecuesComponent,
+    FinDeBailComponent,
   ],
   templateUrl: './mon-logement.component.html',
   styleUrl: './mon-logement.component.scss',
@@ -43,6 +47,8 @@ export class MonLogementComponent implements OnInit {
   private http = inject(HttpClient);
   private bienService = inject(BienService);
   private logement = inject(LogementContextService);
+  private auth = inject(AuthService);
+  private route = inject(ActivatedRoute);
   protected notifications = inject(AppNotificationService);
 
   readonly lienAppel = lienAppel;
@@ -125,9 +131,13 @@ export class MonLogementComponent implements OnInit {
     this.erreur.set(false);
     this.notifications.loadUnread();
     this.bienService.getMesBiens().subscribe({
-      next: biens => {
+      next: tous => {
+        // Lot 3 : le compte peut aussi posséder des biens ; ici, seulement ceux qu'il loue
+        const biens = logementsLoues(tous, this.auth.currentUser()?.id);
         this.logements.set(biens);
-        const actuel = this.bienId() ?? (biens.find(b => !b.archive) ?? biens[0])?.id ?? null;
+        const demande = Number(this.route.snapshot.queryParamMap.get('bien'));
+        const choisi = biens.find(b => b.id === demande)?.id ?? null;
+        const actuel = choisi ?? this.bienId() ?? (biens.find(b => !b.archive) ?? biens[0])?.id ?? null;
         this.logement.set(actuel);
         if (actuel === null) {
           this.chargement.set(false);

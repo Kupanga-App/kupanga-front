@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { NavigationService } from '../../core/navigation/navigation.service';
 import { ChoixTheme, LIBELLES_THEME, ThemeService } from '../../core/services/theme.service';
 import { ToastService } from '../../core/ui/toast.service';
 import { messageErreurApi } from '../../core/http/api-error';
@@ -23,13 +24,19 @@ export class CompteComponent {
   private auth = inject(AuthService);
   protected theme = inject(ThemeService);
   private toasts = inject(ToastService);
+  protected nav = inject(NavigationService);
 
   readonly user = this.auth.currentUser;
   readonly nom = computed(() => {
     const u = this.user();
     return u ? `${u.firstName} ${u.lastName}`.trim() : '';
   });
-  readonly role = computed(() => (this.user()?.role === 'ROLE_PROPRIETAIRE' ? 'Propriétaire' : 'Locataire'));
+  /** Lot 3 : profil déduit des données (biens possédés, logement loué), plus du rôle choisi à l'inscription. */
+  readonly role = computed(() => {
+    const profils = [this.nav.aDesBiens() ? 'Propriétaire' : null, this.nav.aUnLogement() ? 'Locataire' : null]
+      .filter(Boolean);
+    return profils.length ? profils.join(' et ') : 'Compte Kupanga';
+  });
   readonly libellesTheme = LIBELLES_THEME;
   readonly themes: ChoixTheme[] = ['systeme', 'clair', 'sombre'];
   readonly messageTelephone = MESSAGE_TELEPHONE_INVALIDE;

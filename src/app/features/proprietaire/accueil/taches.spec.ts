@@ -22,6 +22,21 @@ function dans(jours: number): string {
 }
 
 describe('calculerTaches (accueil du propriétaire)', () => {
+  it('fin de bail : à enregistrer le jour venu (urgent), annoncée dans les 30 jours (info), rien au-delà', () => {
+    const avecConge = (id: number, jours: number) =>
+      ({ ...bien(id), location: { id: 50 + id, dateDebut: null, dateFinPrevue: dans(jours), congeDonnePar: 'LOCATAIRE', depotGarantie: 700 } }) as BienDTO;
+    const contrats = [1, 2, 3].map(id => ({ id: 10 + id, bienId: id, statut: 'SIGNE' }) as ContratDTO);
+    const edlsParBien = new Map([1, 2, 3].map(id => [id, [{ id: 20 + id, type: 'ENTREE', statut: 'SIGNE' } as EtatDesLieuxDTO]]));
+
+    const taches = calculerTaches({ ...vide(), biens: [avecConge(1, 0), avecConge(2, 10), avecConge(3, 60)], contrats, edlsParBien });
+
+    expect(taches.map(t => [t.cle, t.urgence, t.titre])).toEqual([
+      ['fin-1', 'urgent', 'Fin du bail à enregistrer'],
+      ['fin-2', 'info', 'Fin du bail dans 10 jours'],
+    ]);
+    expect(taches[0].lien).toEqual(['/biens', 1]);
+  });
+
   it('rien à faire pour un bien vacant', () => {
     expect(calculerTaches({ ...vide(), biens: [bien(1, false)] })).toEqual([]);
   });

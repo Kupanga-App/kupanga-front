@@ -5,18 +5,21 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 type Role = 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE';
 
 const ROLES: { valeur: Role; titre: string; texte: string; icone: string }[] = [
-  { valeur: 'ROLE_PROPRIETAIRE', titre: 'Propriétaire', texte: 'Je mets un bien en location et je gère mes locataires.', icone: 'building-2' },
-  { valeur: 'ROLE_LOCATAIRE', titre: 'Locataire', texte: 'Je cherche un logement ou je loue déjà.', icone: 'key' },
+  { valeur: 'ROLE_LOCATAIRE', titre: 'Trouver un logement', texte: 'Je cherche un logement ou je loue déjà.', icone: 'key' },
+  { valeur: 'ROLE_PROPRIETAIRE', titre: 'Mettre un bien en location', texte: 'Je publie mes biens et je gère mes locataires.', icone: 'building-2' },
 ];
 
-/** Choix du rôle à l'inscription (champ de formulaire). */
+/**
+ * Ce que la personne veut faire en premier (champ de formulaire de l'inscription). Lot 3 (2026-11-05) : ce choix
+ * ne limite rien ; le même compte peut louer un logement et mettre ses biens en location.
+ */
 @Component({
   selector: 'kp-choix-role',
   standalone: true,
   imports: [IconComponent],
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ChoixRoleComponent), multi: true }],
   template: `
-    <div class="roles" role="radiogroup" aria-label="Vous êtes">
+    <div class="roles" role="radiogroup" aria-label="Vous souhaitez d’abord">
       @for (r of roles; track r.valeur) {
         <button type="button" class="role" role="radio" [attr.aria-checked]="valeur() === r.valeur" (click)="choisir(r.valeur)">
           <span class="icone"><kp-icon [name]="r.icone" [size]="24" /></span>
@@ -27,6 +30,7 @@ const ROLES: { valeur: Role; titre: string; texte: string; icone: string }[] = [
           <span class="coche" aria-hidden="true"></span>
         </button>
       }
+      <p class="kp-small kp-muted">Vous pourrez faire les deux avec le même compte.</p>
     </div>
   `,
   styles: [`

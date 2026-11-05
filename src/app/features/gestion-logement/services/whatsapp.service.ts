@@ -11,19 +11,20 @@ export interface LienWhatsApp {
   numeroConnu: boolean;
 }
 
-export type DocumentWhatsApp = 'contrat' | 'edl' | 'quittance';
+export type DocumentWhatsApp = 'contrat' | 'edl' | 'quittance' | 'demande';
 
 const CHEMINS: Record<DocumentWhatsApp, string> = {
   contrat: 'contrats',
   edl: 'etats-des-lieux',
   quittance: 'quittances',
+  demande: 'demandes-location',
 };
 
 @Injectable({ providedIn: 'root' })
 export class WhatsappService {
   private http = inject(HttpClient);
 
-  /** Invitation à signer (contrat, EDL) ou rappel de loyer (quittance) ; 409 si non proposé. */
+  /** Invitation à signer (contrat, EDL), rappel de loyer (quittance) ou demande de location ; 409 si non proposé. */
   lien(type: DocumentWhatsApp, id: number): Observable<LienWhatsApp> {
     return this.http.get<LienWhatsApp>(`${environment.apiUrl}/${CHEMINS[type]}/${id}/lien-whatsapp`);
   }

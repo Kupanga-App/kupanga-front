@@ -1,5 +1,5 @@
 <div class="kp-page" kpTirerPourActualiser (actualiser)="charger(0)">
-  <kp-page-header titre="Logements à louer" [retour]="estProprietaire() ? '/biens' : null" />
+  <kp-page-header titre="Logements à louer" />
 
   <div class="outils">
     <form class="recherche" (submit)="$event.preventDefault(); rechercher(champ.value)" role="search">

@@ -145,6 +145,30 @@ export interface BienCreateRequest {
   files: File[];
 }
 
+/** Réservation d'un bien vue par son propriétaire : candidat (sans téléphone) et échéance (14 jours). */
+export interface ReservationBien {
+  id: number;
+  locataire: UserDTO;
+  dateReservation: string;
+  dateExpiration: string;
+}
+
+/** Location en cours d'un bien (vue privée) : congé et dépôt de garantie du bail signé. */
+export interface LocationEnCours {
+  id: number;
+  dateDebut: string | null;
+  /** Date de fin annoncée par le congé (aaaa-mm-jj), null sans congé. */
+  dateFinPrevue: string | null;
+  congeDonnePar: 'PROPRIETAIRE' | 'LOCATAIRE' | null;
+  /** Dépôt du bail signé (plafond du montant restitué), null si inconnu. */
+  depotGarantie: number | null;
+}
+
+/** Personne pour qui préparer le bail : le locataire actuel, sinon le candidat qui a réservé. */
+export function locataireDuBail(bien: Pick<BienDTO, 'locataire' | 'reservation'> | null | undefined): UserDTO | null {
+  return bien?.locataire ?? bien?.reservation?.locataire ?? null;
+}
+
 export interface UserDTO {
   id: number;
   firstName: string;
@@ -207,6 +231,13 @@ export interface BienDTO {
    */
   proprietaire: UserDTO;
   locataire?: UserDTO;
+  /**
+   * Réservation en cours (demande acceptée, bail pas encore signé) ; vue du propriétaire seulement.
+   * Le candidat devient `locataire` à la signature du bail (décision du 2026-11-05).
+   */
+  reservation?: ReservationBien | null;
+  /** Location en cours (congé, fin de bail) ; propriétaire et locataire actuel seulement. */
+  location?: LocationEnCours | null;
   contrats: string[] | null;
   quittances: string[] | null;
   documents: string[] | null;

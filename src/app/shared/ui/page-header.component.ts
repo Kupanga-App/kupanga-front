@@ -1,15 +1,17 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../components/icon/icon.component';
+import { ClocheComponent } from './cloche.component';
 
 /**
  * En-tête d'écran : grand titre qui se replie dans la barre du haut au défilement (AUDIT.md §8.3),
- * chevron de retour vers l'écran parent, actions à droite (`<… actions>`).
+ * chevron de retour vers l'écran parent, actions à droite (`<… actions>`), puis la cloche des notifications
+ * (téléphone, utilisateur connecté).
  */
 @Component({
   selector: 'kp-page-header',
   standalone: true,
-  imports: [RouterLink, IconComponent],
+  imports: [RouterLink, IconComponent, ClocheComponent],
   template: `
     <div class="barre" [class.barre--compacte]="compact()">
       @if (retour(); as url) {
@@ -19,6 +21,7 @@ import { IconComponent } from '../components/icon/icon.component';
       }
       <span class="barre__titre" aria-hidden="true">{{ titre() }}</span>
       <span class="actions"><ng-content select="[actions]" /></span>
+      <kp-cloche />
     </div>
     <div class="grand" #grand>
       <h1>{{ titre() }}</h1>

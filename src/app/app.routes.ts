@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
 import { AppShellComponent } from './layouts/app-shell/app-shell.component';
-import { accueilGuard, authGuard, invitesGuard, roleGuard } from './core/auth/guards/auth.guard';
-
-const PROPRIETAIRE = [authGuard, roleGuard('ROLE_PROPRIETAIRE')];
-const LOCATAIRE = [authGuard, roleGuard('ROLE_LOCATAIRE')];
+import { accueilGuard, authGuard, invitesGuard } from './core/auth/guards/auth.guard';
 
 /**
- * Une route par écran (AUDIT.md §6.2) ; le rôle est vérifié par des gardes, jamais déduit de l'URL.
+ * Lot 3 (2026-11-05) : plus de rôle par compte. Les écrans « propriétaire » et « locataire » demandent seulement
+ * un compte connecté ; l'API vérifie que le compte est le propriétaire ou le locataire du bien concerné.
+ */
+const PROPRIETAIRE = [authGuard];
+const LOCATAIRE = [authGuard];
+
+/**
+ * Une route par écran (AUDIT.md §6.2).
  * Adresses utilisées dans les e-mails de l'API, à ne pas changer : /auth/login, /auth/forgot,
  * /auth/reset-password, /auth/verifier-email, /contrats/signer/:token, /edl/signer/:token.
  */
@@ -24,7 +28,7 @@ export const routes: Routes = [
         loadComponent: () => import('./core/auth/pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
       { path: 'verifier-email', title: 'Confirmation de l’e-mail · Kupanga',
         loadComponent: () => import('./core/auth/pages/verify-email/verify-email.component').then(m => m.VerifyEmailComponent) },
-      { path: 'google-role', title: 'Votre rôle · Kupanga',
+      { path: 'google-role', title: 'Pour commencer · Kupanga',
         loadComponent: () => import('./core/auth/pages/complete-profile/complete-profile.component').then(m => m.CompleteProfileComponent) },
       { path: 'signup', redirectTo: 'register' },
       { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -61,7 +65,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/proprietaire/fiche/fiche-bien.component').then(m => m.FicheBienComponent) },
       { path: 'biens/:id/modifier', canActivate: PROPRIETAIRE, title: 'Modifier le bien · Kupanga',
         loadComponent: () => import('./features/biens/pages/bien-edit/bien-edit.component').then(m => m.BienEditComponent) },
-      { path: 'biens/:id/locataire', canActivate: PROPRIETAIRE, title: 'Choisir le locataire · Kupanga',
+      { path: 'biens/:id/locataire', canActivate: PROPRIETAIRE, title: 'Proposer la location · Kupanga',
         loadComponent: () => import('./features/biens/pages/assign-tenant/assign-tenant.component').then(m => m.AssignTenantComponent) },
       { path: 'biens/:id/bail', canActivate: PROPRIETAIRE, title: 'Bail · Kupanga',
         loadComponent: () => import('./features/proprietaire/bail/bail.component').then(m => m.BailComponent) },
@@ -79,6 +83,8 @@ export const routes: Routes = [
       // Locataire
       { path: 'mon-logement', canActivate: LOCATAIRE, title: 'Mon logement · Kupanga',
         loadComponent: () => import('./features/locataire/mon-logement.component').then(m => m.MonLogementComponent) },
+      { path: 'demandes-location', canActivate: LOCATAIRE, title: 'Demandes de location · Kupanga',
+        loadComponent: () => import('./features/locataire/demandes-recues.component').then(m => m.DemandesRecuesComponent) },
       { path: 'quittances', canActivate: LOCATAIRE, title: 'Mes quittances · Kupanga',
         loadComponent: () => import('./features/locataire/mes-quittances.component').then(m => m.MesQuittancesComponent) },
 

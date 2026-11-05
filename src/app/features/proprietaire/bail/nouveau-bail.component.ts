@@ -6,7 +6,7 @@ import { catchError, of } from 'rxjs';
 import { BienService } from '../../biens/services/bien.service';
 import { JuridictionService } from '../../biens/services/juridiction.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
-import { BienDTO } from '../../biens/models/bien.model';
+import { BienDTO, locataireDuBail } from '../../biens/models/bien.model';
 import { champVisible } from '../../biens/models/juridiction.model';
 import { MontantPipe, symboleDevise } from '../../../core/money/montant';
 import { messageErreurApi } from '../../../core/http/api-error';
@@ -58,7 +58,7 @@ export class NouveauBailComponent implements OnInit {
   readonly devise = computed(() => this.bien()?.devise);
   readonly symbole = computed(() => symboleDevise(this.devise()));
   readonly nomLocataire = computed(() => {
-    const l = this.bien()?.locataire;
+    const l = locataireDuBail(this.bien());
     return l ? `${l.firstName} ${l.lastName}` : '';
   });
   readonly montantGarantie = computed(() => {
@@ -138,7 +138,9 @@ export class NouveauBailComponent implements OnInit {
 
   private creer(): void {
     const bien = this.bien();
-    if (!bien?.locataire) {
+    // Locataire actuel, ou candidat qui a réservé le bien (il deviendra locataire en signant)
+    const locataire = locataireDuBail(bien);
+    if (!bien || !locataire) {
       this.erreur.set('Choisissez d’abord le locataire de ce bien.');
       return;
     }
@@ -147,7 +149,7 @@ export class NouveauBailComponent implements OnInit {
     this.erreur.set(null);
     this.contratService.create({
       bienId: bien.id,
-      emailLocataire: bien.locataire.mail,
+      emailLocataire: locataire.mail,
       dateDebut: v.dateDebut!,
       dureeBailMois: Number(v.dureeBailMois),
       loyerMensuel: Number(v.loyerMensuel),

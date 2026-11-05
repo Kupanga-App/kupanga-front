@@ -10,7 +10,7 @@ import { IconComponent } from '../components/icon/icon.component';
   standalone: true,
   imports: [RouterLink, MontantPipe, IconComponent],
   template: `
-    <a class="carte" [routerLink]="lien()">
+    <a class="carte" [routerLink]="lien()" [queryParams]="queryParams()">
       <div class="photo">
         @if (photo(); as p) {
           <img [src]="p" alt="" loading="lazy" decoding="async" />
@@ -54,6 +54,7 @@ import { IconComponent } from '../components/icon/icon.component';
 export class CarteBienComponent {
   readonly bien = input.required<BienDTO>();
   readonly lien = input.required<string | unknown[]>();
+  readonly queryParams = input<Record<string, unknown> | null>(null);
 
   readonly photo = computed(() => vignette(this.bien(), 0));
 
