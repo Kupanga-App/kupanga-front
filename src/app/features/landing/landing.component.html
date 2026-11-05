@@ -1,0 +1,172 @@
+<div class="lp">
+  <header class="nav">
+    <a class="marque" routerLink="/" aria-label="Kupanga, accueil">
+      <img class="logo" src="/brand/kupanga-logo.svg" alt="" width="40" height="40" />
+      <span>Kupanga</span>
+    </a>
+    <nav class="liens" aria-label="Sections">
+      <a href="#video">Vidéo</a>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="#pays">France et RDC</a>
+      <a href="#parcours">Le parcours</a>
+    </nav>
+    <div class="nav-actions">
+      <button type="button" class="icone" (click)="basculerTheme()"
+              [attr.aria-label]="sombre() ? 'Passer en thème clair' : 'Passer en thème sombre'">
+        <kp-icon [name]="sombre() ? 'sun' : 'moon'" [size]="20" />
+      </button>
+      <a class="btn discret cache-mobile" routerLink="/auth/login">Se connecter</a>
+      <a class="btn principal" routerLink="/explorer"><span class="cache-mobile">Voir les&nbsp;</span>annonces</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============================================== Héros -->
+    <section class="heros">
+      <div class="heros-texte">
+        <p class="surtitre">Gestion locative · France et RDC</p>
+        <h1>De l’annonce à la fin du bail, tout au même endroit.</h1>
+        <p class="chapo">
+          Publiez, louez, signez le bail en ligne, faites l’état des lieux et envoyez les quittances.
+          Une seule application, en euros à Lyon comme en dollars à Kinshasa.
+        </p>
+        <div class="heros-actions">
+          <a class="btn principal grand" routerLink="/auth/register">
+            Créer un compte gratuit <kp-icon name="chevron-right" [size]="20" />
+          </a>
+          <a class="btn contour grand" href="#video">Voir la vidéo · {{ videoDuree }}</a>
+        </div>
+        <ul class="atouts" aria-label="Points forts">
+          <li><kp-icon name="pen-line" [size]="18" /> Signature à l’écran</li>
+          <li><kp-icon name="file-text" [size]="18" /> Bail, état des lieux, quittances en PDF</li>
+          <li><kp-icon name="message-circle" [size]="18" /> Messagerie en direct</li>
+          <li><kp-icon name="smartphone" [size]="18" /> Installable sur téléphone</li>
+        </ul>
+      </div>
+      <div class="heros-visuel" aria-hidden="true">
+        <img class="ecran" src="/landing/app-explorer.jpg" alt="" width="1600" height="900" fetchpriority="high" />
+        <img class="telephone" src="/landing/app-telephone.jpg" alt="" width="780" height="1688" />
+      </div>
+    </section>
+
+    <!-- ============================================== Vidéo -->
+    <section class="bande sombre-fixe" id="video" aria-labelledby="titre-video">
+      <div class="centre">
+        <h2 id="titre-video">Kupanga en action</h2>
+        <p class="sous-titre">Dix minutes pour suivre une location complète, à Lyon puis à Kinshasa : annonce, messages, bail signé, état des lieux, quittances, fin de bail et back-office.</p>
+        <div class="video">
+          @if (lecture() && lecteur(); as url) {
+            <iframe [src]="url" title="Kupanga en action : vidéo de démonstration"
+                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          } @else {
+            <button type="button" class="affiche" (click)="lire()" [disabled]="!videoId"
+                    [attr.aria-label]="videoId ? 'Lire la vidéo de démonstration de Kupanga' : 'Vidéo bientôt en ligne'">
+              <img src="/landing/video-affiche.jpg" alt="" width="1600" height="900" loading="lazy" decoding="async" />
+              <span class="lecture" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" /></svg>
+              </span>
+              <span class="duree" aria-hidden="true">{{ videoId ? 'Voir la démo · ' + videoDuree : 'Bientôt en ligne' }}</span>
+            </button>
+          }
+        </div>
+        @if (lienYoutube(); as lien) {
+          <p class="note">Lecture via YouTube, chargée seulement au clic. <a [href]="lien" target="_blank" rel="noopener">Ouvrir sur YouTube</a></p>
+        }
+      </div>
+    </section>
+
+    <!-- ============================================== Espaces -->
+    <section class="section" id="fonctionnalites" aria-labelledby="titre-espaces">
+      <h2 id="titre-espaces">Chacun son espace, un seul compte</h2>
+      <p class="sous-titre">Un même compte peut chercher un logement et mettre ses propres biens en location.</p>
+      <div class="cartes">
+        <article class="carte">
+          <span class="carte-icone"><kp-icon name="building-2" [size]="24" /></span>
+          <h3>Propriétaire</h3>
+          <ul>
+            <li>Annonce pas à pas, repère sur la carte, photos allégées</li>
+            <li>Proposition de location et réservation de 14 jours</li>
+            <li>Bail, état des lieux et quittances signés à l’écran</li>
+            <li>Congé, fin de bail et dépôt restitué</li>
+          </ul>
+        </article>
+        <article class="carte">
+          <span class="carte-icone"><kp-icon name="key" [size]="24" /></span>
+          <h3>Locataire</h3>
+          <ul>
+            <li>Recherche par liste ou sur la carte, filtres utiles</li>
+            <li>Messagerie en temps réel, sans dévoiler son e-mail</li>
+            <li>Signature du bail au doigt, sur téléphone</li>
+            <li>Quittances et documents toujours sous la main</li>
+          </ul>
+        </article>
+        <article class="carte">
+          <span class="carte-icone"><kp-icon name="lock" [size]="24" /></span>
+          <h3>En toute confiance</h3>
+          <ul>
+            <li>Documents privés ouverts par des liens temporaires</li>
+            <li>Aucun argent ne transite par l’application</li>
+            <li>Position publique arrondie à 100 mètres</li>
+            <li>E-mails jamais perdus, renvoyés automatiquement</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================================== France et RDC -->
+    <section class="bande menthe" id="pays" aria-labelledby="titre-pays">
+      <div class="section">
+        <h2 id="titre-pays">Deux pays, les bonnes règles pour chacun</h2>
+        <div class="pays">
+          <article class="pays-carte">
+            <img src="/landing/france.jpg" alt="Salon lumineux d’un appartement" width="1200" height="800" loading="lazy" />
+            <div>
+              <h3>En France</h3>
+              <p>Loyers en euros, code postal, DPE et GES, dépôt de garantie. Bail, état des lieux et quittances au modèle français, payés par virement ou chèque.</p>
+            </div>
+          </article>
+          <article class="pays-carte">
+            <img src="/landing/rdc.jpg" alt="Villa avec piscine" width="1200" height="800" loading="lazy" />
+            <div>
+              <h3>En RDC</h3>
+              <p>Dollars ou francs congolais, commune, quartier et point de repère, position par le GPS du téléphone. Garantie et avance en mois, compteur Cash Power, Mobile Money et rappels WhatsApp.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== Parcours -->
+    <section class="section" id="parcours" aria-labelledby="titre-parcours">
+      <h2 id="titre-parcours">Une location, cinq étapes</h2>
+      <ol class="etapes">
+        <li><span class="num">1</span><h3>Publier</h3><p>L’annonce en huit écrans, avec la carte et les photos.</p></li>
+        <li><span class="num">2</span><h3>Échanger</h3><p>Messages en direct, rattachés au bien.</p></li>
+        <li><span class="num">3</span><h3>Réserver</h3><p>Proposition acceptée, logement réservé 14 jours.</p></li>
+        <li><span class="num">4</span><h3>Signer</h3><p>Bail et état des lieux signés par les deux parties.</p></li>
+        <li><span class="num">5</span><h3>Gérer</h3><p>Quittances chaque mois, congé, fin de bail.</p></li>
+      </ol>
+    </section>
+
+    <!-- ============================================== Appel -->
+    <section class="section">
+      <div class="appel">
+        <div>
+          <h2>Prêt à louer plus sereinement ?</h2>
+          <p>Gratuit, sans carte bancaire. S’installe sur Android, iPhone et ordinateur.</p>
+        </div>
+        <a class="btn nuit grand" routerLink="/auth/register">Créer un compte</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <span>© {{ annee }} Kupanga · France et République démocratique du Congo</span>
+    <nav aria-label="Liens du pied de page">
+      <a routerLink="/explorer">Annonces</a>
+      <a routerLink="/auth/login">Se connecter</a>
+      <a routerLink="/auth/register">Créer un compte</a>
+    </nav>
+  </footer>
+</div>

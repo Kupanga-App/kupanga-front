@@ -49,6 +49,12 @@ export const accueilGuard: CanActivateFn = (): Observable<UrlTree> => {
   return of(router.createUrlTree([accueilPour(user)]));
 };
 
+/** Racine `/` : la landing page pour un visiteur, l'accueil pour un compte connecté. */
+export const landingGuard: CanActivateFn = (route, state) => {
+  const auth = inject(AuthService);
+  return auth.getAccessToken() && auth.currentUser() ? accueilGuard(route, state) : true;
+};
+
 /** Pages de connexion et d'inscription : un compte déjà connecté va à son accueil. */
 export const invitesGuard: CanActivateFn = () => {
   const auth = inject(AuthService);

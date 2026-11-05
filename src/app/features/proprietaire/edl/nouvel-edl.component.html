@@ -45,7 +45,8 @@
               <select class="kp-input" [id]="'type-c-' + i" [value]="c.controls.typeCompteur.value"
                       (change)="changerTypeCompteur(i, $any($event.target).value)">
                 @for (o of compteursDuPays(); track o.valeur) {
-                  <option [value]="o.valeur">{{ o.libelle }}</option>
+                  <!-- [selected] : le [value] du <select> est appliqué avant la création des options (la 1re restait affichée) -->
+                  <option [value]="o.valeur" [selected]="o.valeur === c.controls.typeCompteur.value">{{ o.libelle }}</option>
                 }
               </select>
               <button type="button" class="kp-icon-btn" (click)="compteurs.removeAt(i)" aria-label="Retirer ce compteur"><kp-icon name="trash-2" /></button>
