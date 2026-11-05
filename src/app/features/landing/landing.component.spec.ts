@@ -24,6 +24,17 @@ describe('LandingComponent', () => {
     expect(f.nativeElement.querySelector('.affiche')).not.toBeNull();
   });
 
+  it('s’affiche en clair par défaut, même si l’appareil est en sombre, et rend la main en partant', () => {
+    const theme = TestBed.inject(ThemeService);
+    theme.choisir('systeme');
+    const f = TestBed.createComponent(LandingComponent);
+    f.detectChanges();
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    expect(f.componentInstance.sombre()).toBeFalse();
+    f.destroy();
+    expect(document.documentElement.hasAttribute('data-theme')).toBeFalse();
+  });
+
   it('bascule entre thème clair et sombre', () => {
     const theme = TestBed.inject(ThemeService);
     theme.choisir('clair');

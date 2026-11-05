@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
@@ -13,7 +13,8 @@ export const VIDEO_DUREE = '10:00';
 
 /**
  * Page d'accueil publique (visiteur non connecté, adresse `/`) : direction « Nuit éditoriale ».
- * Thème clair ou sombre selon l'appareil, basculable (même réglage que le compte : `ThemeService`).
+ * Thème clair par défaut, quel que soit l'appareil ; le bouton passe en sombre (choix mémorisé, même réglage que le
+ * compte : `ThemeService`). En quittant la page, l'application retrouve le thème de l'appareil si rien n'a été choisi.
  * La vidéo est une façade : le lecteur YouTube (sans cookies) ne se charge qu'au clic.
  */
 @Component({
@@ -24,7 +25,7 @@ export const VIDEO_DUREE = '10:00';
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LandingComponent {
+export class LandingComponent implements OnDestroy {
   private readonly theme = inject(ThemeService);
   private readonly sanitizer = inject(DomSanitizer);
 
@@ -33,12 +34,17 @@ export class LandingComponent {
   readonly lecture = signal(false);
   readonly annee = new Date().getFullYear();
 
-  /** Thème réellement affiché (le choix « comme l'appareil » suit `prefers-color-scheme`). */
-  readonly sombre = computed(() => {
-    const choix = this.theme.choix();
-    if (choix !== 'systeme') return choix === 'sombre';
-    return typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+  /** Sombre seulement si l'utilisateur l'a choisi ; sinon la landing page est en clair. */
+  readonly sombre = computed(() => this.theme.choix() === 'sombre');
+
+  constructor() {
+    if (this.theme.choix() === 'systeme') document.documentElement.setAttribute('data-theme', 'light');
+  }
+
+  ngOnDestroy(): void {
+    // Aucun choix fait sur la page : le reste de l'application suit de nouveau l'appareil
+    if (this.theme.choix() === 'systeme') document.documentElement.removeAttribute('data-theme');
+  }
 
   readonly lecteur = computed<SafeResourceUrl | null>(() => this.videoId
     ? this.sanitizer.bypassSecurityTrustResourceUrl(
