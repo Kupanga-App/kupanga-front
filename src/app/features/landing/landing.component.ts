@@ -8,8 +8,8 @@ import { ThemeService } from '../../core/services/theme.service';
  * Vidéo de démonstration (kupanga-Api/video). Identifiant YouTube à renseigner après la mise en ligne
  * (https://youtu.be/<identifiant>) ; vide = affiche seule, sans lecteur.
  */
-export const VIDEO_YOUTUBE_ID = '';
-export const VIDEO_DUREE = '10:00';
+export const VIDEO_YOUTUBE_ID = 'lGlYv87DOc0';
+export const VIDEO_DUREE = '9:57';
 
 /**
  * Page d'accueil publique (visiteur non connecté, adresse `/`) : direction « Nuit éditoriale ».
