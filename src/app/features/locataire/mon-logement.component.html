@@ -1,12 +1,8 @@
 <div class="kp-page kp-page--etroite" kpTirerPourActualiser (actualiser)="charger()">
-  <kp-page-header titre="Mon logement">
-    <a actions routerLink="/notifications" class="kp-icon-btn" aria-label="Notifications">
-      <kp-icon name="bell" />
-      @if (notifications.unreadCount(); as n) {
-        <span class="kp-pastille">{{ n > 99 ? '99+' : n }}</span>
-      }
-    </a>
-  </kp-page-header>
+  <kp-page-header titre="Mon logement" />
+
+  <!-- Demandes de location en attente : le logement n'est attribué qu'après acceptation -->
+  <kp-demandes-recues [integre]="true" (acceptee)="charger()" />
 
   @if (logements().length > 1) {
     <div class="kp-field choix">
@@ -27,7 +23,7 @@
     </div>
   } @else if (bienId() === null && !erreur()) {
     <kp-vide icone="house" titre="Pas encore de logement"
-             texte="Quand un propriétaire vous choisira comme locataire, votre logement, votre bail et vos quittances apparaîtront ici.">
+             texte="Quand vous aurez signé le bail d’un logement, il apparaîtra ici avec vos quittances. Un logement réservé s’affiche en haut de cette page en attendant.">
       <a routerLink="/explorer" class="kp-btn kp-btn--primary"><kp-icon name="compass" /> Voir les annonces</a>
     </kp-vide>
   } @else if (erreur()) {
@@ -109,6 +105,11 @@
               <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="wa" target="_blank" rel="noopener noreferrer"><kp-icon name="smartphone" [size]="18" /> WhatsApp</a>
             }
           </div>
+          @if (bien(); as b) {
+            @if (b.location && !b.archive) {
+              <kp-fin-de-bail [bien]="b" cote="locataire" (modifie)="choisir(b.id)" />
+            }
+          }
         </div>
       </section>
 

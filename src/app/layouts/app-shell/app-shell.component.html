@@ -43,7 +43,7 @@
 
 @if (!nav.pleinEcran()) {
   <nav class="onglets" aria-label="Navigation principale">
-    @for (o of nav.onglets(); track o.lien) {
+    @for (o of nav.ongletsMobile(); track o.lien) {
       <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="onglet">
         <span class="onglet__icone">
           <kp-icon [name]="o.icone" [size]="24" />

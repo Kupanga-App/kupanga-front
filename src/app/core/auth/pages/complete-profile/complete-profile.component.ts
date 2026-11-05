@@ -7,13 +7,13 @@ import { messageErreurApi } from '../../../http/api-error';
 import { AuthLayoutComponent } from '../../ui/auth-layout.component';
 import { ChoixRoleComponent } from '../../ui/choix-role.component';
 
-/** Première connexion Google : le compte choisit son rôle. */
+/** Première connexion Google : le compte dit ce qu'il veut faire d'abord (lot 3 : sans limiter ses droits). */
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
   imports: [ReactiveFormsModule, AuthLayoutComponent, ChoixRoleComponent],
   template: `
-    <kp-auth-layout titre="Vous êtes" sousTitre="Dernière étape avant d’utiliser Kupanga.">
+    <kp-auth-layout titre="Vous souhaitez d’abord" sousTitre="Dernière étape avant d’utiliser Kupanga.">
       <form class="kp-form" [formGroup]="form" (ngSubmit)="valider()">
         <kp-choix-role formControlName="role" />
         @if (erreur()) {
@@ -39,7 +39,7 @@ export class CompleteProfileComponent {
   readonly erreur = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
-    role: ['ROLE_PROPRIETAIRE' as 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE', Validators.required],
+    role: ['ROLE_LOCATAIRE' as 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE', Validators.required],
   });
 
   valider(): void {

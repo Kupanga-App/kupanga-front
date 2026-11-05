@@ -1,3 +1,5 @@
+import { biensPossedes } from '../../../core/services/logement-context.service';
+import { AuthService } from '../../../core/auth/services/auth.service';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BienService } from '../../biens/services/bien.service';
@@ -92,6 +94,8 @@ export class BiensComponent implements OnInit {
     }
   });
 
+  private auth = inject(AuthService);
+
   ngOnInit(): void {
     this.charger();
   }
@@ -101,7 +105,8 @@ export class BiensComponent implements OnInit {
     this.erreur.set(false);
     this.bienService.getMesBiens().subscribe({
       next: biens => {
-        this.biens.set(biens);
+        // Lot 3 : sans les logements que le compte loue
+        this.biens.set(biensPossedes(biens, this.auth.currentUser()?.id));
         this.chargement.set(false);
       },
       error: () => {

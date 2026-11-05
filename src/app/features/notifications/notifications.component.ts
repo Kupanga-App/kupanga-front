@@ -14,6 +14,17 @@ const ICONES: Record<NotificationType, string> = {
   QUITTANCE_DISPONIBLE: 'receipt',
   BIEN_ASSIGNE: 'house',
   BIEN_ASSIGNATION_CONFIRMEE: 'user-plus',
+  DEMANDE_LOCATION: 'key',
+  DEMANDE_LOCATION_ACCEPTEE: 'circle-check',
+  DEMANDE_LOCATION_REFUSEE: 'x',
+  DEMANDE_LOCATION_ANNULEE: 'circle-alert',
+  RESERVATION_DESISTEE: 'circle-alert',
+  RESERVATION_ANNULEE: 'circle-alert',
+  RESERVATION_EXPIREE: 'clock',
+  RESERVATION_EXPIREE_CANDIDAT: 'clock',
+  CONGE_POUR_PROPRIETAIRE: 'calendar',
+  CONGE_POUR_LOCATAIRE: 'calendar',
+  LOCATION_TERMINEE: 'house',
 };
 
 /** Notifications non lues (l'API ne renvoie que celles-ci) ; toucher une notification ouvre l'écran concerné. */

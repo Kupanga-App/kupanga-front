@@ -34,6 +34,8 @@
             <span class="kp-statut">Archivé</span>
           } @else if (b.locataire) {
             <span class="kp-statut kp-statut--ok">Loué</span>
+          } @else if (b.reservation) {
+            <span class="kp-statut kp-statut--attention">Réservé</span>
           } @else {
             <span class="kp-statut kp-statut--attention">Vacant</span>
           }
@@ -75,11 +77,30 @@
                 </a>
               }
             </div>
+            @if (!b.archive) {
+              <kp-fin-de-bail [bien]="b" cote="proprietaire" (modifie)="charger()" />
+            }
+          </div>
+        } @else if (b.reservation; as r) {
+          <div class="kp-card">
+            <div class="kp-row">
+              <kp-avatar [photo]="r.locataire.urlProfile" [nom]="r.locataire.firstName + ' ' + r.locataire.lastName" [taille]="48" />
+              <div class="kp-stack kp-stack--sm identite">
+                <span class="kp-strong">{{ r.locataire.firstName }} {{ r.locataire.lastName }}</span>
+                <span class="kp-small kp-muted">Réservé jusqu’au {{ finDeReservation(r.dateExpiration) }}, en attente du bail signé</span>
+              </div>
+            </div>
+            <div class="contacts">
+              <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', b.id, 'bail']">
+                <kp-icon name="file-text" [size]="18" /> Bail
+              </a>
+              <a class="kp-btn kp-btn--secondary kp-btn--sm" [routerLink]="['/biens', b.id, 'locataire']">Gérer la réservation</a>
+            </div>
           </div>
         } @else if (!b.archive) {
           <div class="kp-card">
             <p>Choisissez votre locataire parmi les personnes qui vous ont écrit au sujet de ce bien.</p>
-            <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'locataire']"><kp-icon name="user-plus" [size]="18" /> Choisir le locataire</a>
+            <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'locataire']"><kp-icon name="user-plus" [size]="18" /> Proposer la location</a>
           </div>
         } @else {
           <p class="kp-muted">Aucun locataire.</p>
@@ -158,7 +179,7 @@
           @if (!b.locataire) {
             <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'locataire'])">
               <span class="kp-list__icon"><kp-icon name="user-plus" /></span>
-              <span class="kp-list__body"><span class="kp-list__title">Choisir le locataire</span></span>
+              <span class="kp-list__body"><span class="kp-list__title">{{ b.reservation ? 'Gérer la réservation' : 'Proposer la location' }}</span></span>
             </button>
           }
           <button type="button" class="kp-list__item" (click)="aller(['/annonces', b.id])">

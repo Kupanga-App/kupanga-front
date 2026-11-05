@@ -26,10 +26,10 @@ export class AppNotificationService implements OnDestroy {
     this.subs.add(
       this.ws.appNotifications$.subscribe(notif => {
         this.notifications.update(list => [notif, ...list]);
-        // Logement assigné au locataire : ses onglets passent à « Mon logement »
+        // Bail signé : le logement apparaît (onglets « Mon logement », accueil)
         if (notif.type === 'BIEN_ASSIGNE') {
           this.logement.invalider();
-          this.logement.charger().subscribe();
+          this.logement.charger(this.authService.currentUser()?.id).subscribe();
         }
       })
     );
@@ -73,7 +73,6 @@ export class AppNotificationService implements OnDestroy {
   /** Ouvre l'écran concerné par la notification (et la marque comme lue). */
   handleClick(notif: AppNotification): void {
     this.markRead(notif.id);
-    const role = this.authService.currentUser()?.role;
     switch (notif.type) {
       case 'INVITATION_SIGNATURE_CONTRAT':
         void this.router.navigate(notif.lien ? ['/contrats/signer', notif.lien] : ['/documents']);
@@ -82,7 +81,8 @@ export class AppNotificationService implements OnDestroy {
         void this.router.navigate(notif.lien ? ['/edl/signer', notif.lien] : ['/documents']);
         break;
       case 'QUITTANCE_DISPONIBLE':
-        void this.router.navigate([role === 'ROLE_LOCATAIRE' ? '/quittances' : '/documents']);
+        // Envoyée au locataire de la quittance
+        void this.router.navigate(['/quittances']);
         break;
       case 'BIEN_ASSIGNE':
         this.logement.invalider();
@@ -90,6 +90,43 @@ export class AppNotificationService implements OnDestroy {
         break;
       case 'BIEN_ASSIGNATION_CONFIRMEE':
         void this.router.navigate(['/biens']);
+        break;
+      case 'DEMANDE_LOCATION':
+      case 'DEMANDE_LOCATION_ANNULEE':
+        void this.router.navigate(['/demandes-location']);
+        break;
+      case 'DEMANDE_LOCATION_ACCEPTEE':
+        // referenceId = id du bien, désormais réservé : préparer le bail
+        void this.router.navigate(notif.referenceId ? ['/biens', notif.referenceId, 'bail'] : ['/biens']);
+        break;
+      case 'RESERVATION_DESISTEE':
+        // Bien de nouveau libre : le proposer à quelqu'un d'autre
+        void this.router.navigate(notif.referenceId ? ['/biens', notif.referenceId, 'locataire'] : ['/biens']);
+        break;
+      case 'RESERVATION_ANNULEE':
+        void this.router.navigate(['/demandes-location']);
+        break;
+      case 'RESERVATION_EXPIREE':
+        // Au propriétaire (referenceId = son bien) : le proposer à quelqu'un d'autre
+        void this.router.navigate(notif.referenceId ? ['/biens', notif.referenceId, 'locataire'] : ['/biens']);
+        break;
+      case 'RESERVATION_EXPIREE_CANDIDAT':
+        void this.router.navigate(['/explorer']);
+        break;
+      case 'CONGE_POUR_PROPRIETAIRE':
+        void this.router.navigate(notif.referenceId ? ['/biens', notif.referenceId] : ['/biens']);
+        break;
+      case 'CONGE_POUR_LOCATAIRE':
+        void this.router.navigate(['/mon-logement'], { queryParams: notif.referenceId ? { bien: notif.referenceId } : {} });
+        break;
+      case 'LOCATION_TERMINEE':
+        // Le logement n'est plus loué : onglets et accueil relus
+        this.logement.invalider();
+        this.logement.charger(this.authService.currentUser()?.id).subscribe();
+        void this.router.navigate(['/documents']);
+        break;
+      case 'DEMANDE_LOCATION_REFUSEE':
+        void this.router.navigate(notif.referenceId ? ['/biens', notif.referenceId, 'locataire'] : ['/biens']);
         break;
       default:
         void this.router.navigate(['/documents']);
@@ -109,6 +146,20 @@ export class AppNotificationService implements OnDestroy {
       case 'BIEN_ASSIGNE':
       case 'BIEN_ASSIGNATION_CONFIRMEE':
         return 'primary';
+      case 'DEMANDE_LOCATION':
+        return 'warning';
+      case 'DEMANDE_LOCATION_ACCEPTEE':
+        return 'success';
+      case 'DEMANDE_LOCATION_REFUSEE':
+      case 'DEMANDE_LOCATION_ANNULEE':
+      case 'RESERVATION_DESISTEE':
+      case 'RESERVATION_ANNULEE':
+      case 'RESERVATION_EXPIREE':
+      case 'RESERVATION_EXPIREE_CANDIDAT':
+      case 'CONGE_POUR_PROPRIETAIRE':
+      case 'CONGE_POUR_LOCATAIRE':
+      case 'LOCATION_TERMINEE':
+        return 'info';
     }
   }
 

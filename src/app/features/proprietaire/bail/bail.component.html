@@ -98,14 +98,14 @@
           </section>
         }
       </div>
-    } @else if (b.locataire && !b.archive) {
+    } @else if ((b.locataire || b.reservation) && !b.archive) {
       <kp-vide icone="file-text" titre="Pas encore de bail" [texte]="'Préparez le bail de ' + nomLocataire() + ' : vous le signerez, puis il recevra un lien pour signer.'">
         <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'bail', 'nouveau']"><kp-icon name="plus" /> Créer le bail</a>
       </kp-vide>
     } @else {
       <kp-vide icone="file-text" titre="Pas de bail" texte="Choisissez d’abord le locataire de ce bien.">
         @if (!b.archive) {
-          <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'locataire']">Choisir le locataire</a>
+          <a class="kp-btn kp-btn--primary" [routerLink]="['/biens', b.id, 'locataire']">Proposer la location</a>
         }
       </kp-vide>
     }

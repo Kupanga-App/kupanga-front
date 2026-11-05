@@ -89,8 +89,6 @@ export class ExplorerComponent implements OnInit {
   ];
   readonly paysDisponibles = toSignal(this.juridictions.paysPrisEnCharge().pipe(catchError(() => of([]))), { initialValue: [] });
 
-  readonly estProprietaire = computed(() => this.auth.currentUser()?.role === 'ROLE_PROPRIETAIRE');
-
   /** Nombre de filtres actifs (hors recherche par titre et tri), affiché sur le bouton. */
   readonly nbFiltres = computed(() => {
     const f = this.filtres();

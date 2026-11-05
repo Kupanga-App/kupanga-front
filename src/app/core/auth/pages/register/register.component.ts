@@ -64,7 +64,7 @@ export class RegisterComponent {
 
   readonly form = this.fb.nonNullable.group(
     {
-      role: ['ROLE_PROPRIETAIRE' as 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE', Validators.required],
+      role: ['ROLE_LOCATAIRE' as 'ROLE_PROPRIETAIRE' | 'ROLE_LOCATAIRE', Validators.required],
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
       telephone: ['', [validateurTelephone]],

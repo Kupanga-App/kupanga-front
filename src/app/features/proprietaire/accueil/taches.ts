@@ -84,6 +84,24 @@ export function calculerTaches(d: DonneesAccueil): Tache[] {
       }
     }
 
+    // Fin de bail (2026-11-05) : congé en cours
+    const fin = b.location?.dateFinPrevue;
+    if (b.locataire && fin) {
+      const j = joursAvant(fin);
+      if (j !== null && j <= 0) {
+        taches.push({
+          cle: `fin-${b.id}`, urgence: 'urgent', icone: 'calendar',
+          titre: 'Fin du bail à enregistrer', detail: b.titre, action: 'Terminer', lien: ['/biens', b.id],
+        });
+      } else if (j !== null && j <= 30) {
+        taches.push({
+          cle: `fin-${b.id}`, urgence: 'info', icone: 'calendar',
+          titre: j === 1 ? 'Fin du bail demain' : `Fin du bail dans ${j} jours`, detail: b.titre,
+          action: 'Préparer la sortie', lien: ['/biens', b.id],
+        });
+      }
+    }
+
     if (b.locataire && bail?.statut === 'SIGNE' && !edls.some(e => e.type === 'ENTREE')) {
       taches.push({
         cle: `edl-entree-${b.id}`, urgence: 'attention', icone: 'clipboard-check',

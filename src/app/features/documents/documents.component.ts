@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { catchError, forkJoin, map, of } from 'rxjs';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { LogementContextService } from '../../core/services/logement-context.service';
 import { DonneesProprietaire, DonneesProprietaireService } from '../proprietaire/donnees-proprietaire.service';
 import { ContratService } from '../gestion-logement/services/contrat.service';
 import { EdlService } from '../gestion-logement/services/edl.service';
@@ -48,11 +49,13 @@ export class DocumentsComponent implements OnInit {
   private contrats = inject(ContratService);
   private edls = inject(EdlService);
   private notifications = inject(AppNotificationService);
+  private logement = inject(LogementContextService);
 
   private readonly montant = new MontantPipe();
   private readonly date = new DateLonguePipe();
 
-  readonly proprietaire = computed(() => this.auth.currentUser()?.role === 'ROLE_PROPRIETAIRE');
+  /** Lot 3 : le compte possède des biens (il peut aussi louer un logement : les deux listes sont réunies). */
+  readonly proprietaire = computed(() => this.logement.aDesBiens());
   readonly onglet = signal<Onglet>('baux');
   readonly chargement = signal(true);
   readonly erreur = signal(false);
@@ -63,11 +66,11 @@ export class DocumentsComponent implements OnInit {
   // Recalculées à l'arrivée d'une invitation à signer (notification en temps réel)
   readonly baux = computed<Ligne[]>(() => {
     const d = this.donneesProp();
-    return d ? this.bauxProprietaire(d) : this.bauxLocataire(this.contratsLoc());
+    return [...(d ? this.bauxProprietaire(d) : []), ...this.bauxLocataire(this.contratsLoc())];
   });
   readonly etats = computed<Ligne[]>(() => {
     const d = this.donneesProp();
-    return d ? this.etatsProprietaire(d) : this.etatsLocataire(this.edlsLoc());
+    return [...(d ? this.etatsProprietaire(d) : []), ...this.etatsLocataire(this.edlsLoc())];
   });
   readonly quittances = computed<Ligne[]>(() => {
     const d = this.donneesProp();
@@ -101,22 +104,25 @@ export class DocumentsComponent implements OnInit {
     this.chargement.set(true);
     this.erreur.set(false);
     const fin = { next: () => this.chargement.set(false), error: () => { this.chargement.set(false); this.erreur.set(true); } };
-    if (this.proprietaire()) {
-      this.donneesProprietaire.charger().subscribe({ ...fin, next: d => { this.donneesProp.set(d); fin.next(); } });
-    } else {
-      this.notifications.loadUnread();
-      forkJoin({
-        contrats: this.contrats.search({ size: 50 }).pipe(map(p => p.contenu)),
-        edls: this.edls.search({ size: 50 }).pipe(map(p => p.contenu), catchError(() => of([] as EtatDesLieuxDTO[]))),
-      }).subscribe({
-        ...fin,
-        next: d => {
-          this.contratsLoc.set(d.contrats);
-          this.edlsLoc.set(d.edls);
-          fin.next();
-        },
-      });
-    }
+    // Lot 3 : documents des biens possédés (vue propriétaire) et des logements loués (vue locataire)
+    this.notifications.loadUnread();
+    const vide: DonneesProprietaire = { biens: [], logements: [], contrats: [], edlsParBien: new Map(), quittances: [] };
+    forkJoin({
+      prop: this.proprietaire() ? this.donneesProprietaire.charger() : of(vide),
+      contrats: this.contrats.search({ size: 50 }).pipe(map(p => p.contenu)),
+      edls: this.edls.search({ size: 50 }).pipe(map(p => p.contenu), catchError(() => of([] as EtatDesLieuxDTO[]))),
+    }).subscribe({
+      ...fin,
+      next: d => {
+        // La recherche renvoie aussi les documents des biens possédés : déjà dans la vue propriétaire
+        const possedes = new Set(d.prop.biens.map(b => b.id));
+        const edlsPossedes = new Set([...d.prop.edlsParBien.values()].flat().map(e => e.id));
+        this.donneesProp.set(d.prop.biens.length ? d.prop : null);
+        this.contratsLoc.set(d.contrats.filter(c => c.bienId == null || !possedes.has(c.bienId)));
+        this.edlsLoc.set(d.edls.filter(e => !edlsPossedes.has(e.id)));
+        fin.next();
+      },
+    });
   }
 
   private titreBien(d: DonneesProprietaire, id?: number): string {

@@ -31,6 +31,21 @@
         </div>
       </section>
 
+      @if (nav.aDesDocuments()) {
+        <section class="kp-section">
+          <h2 class="kp-list-header">Mes documents</h2>
+          <div class="kp-list">
+            <a class="kp-list__item" routerLink="/documents">
+              <span class="kp-list__icon"><kp-icon name="file-text" /></span>
+              <span class="kp-list__body">
+                <span class="kp-list__title">Documents</span>
+                <span class="kp-list__sub">Baux, états des lieux et quittances</span>
+              </span>
+            </a>
+          </div>
+        </section>
+      }
+
       <section class="kp-section">
         <h2 class="kp-list-header">Préférences</h2>
         <div class="kp-list">

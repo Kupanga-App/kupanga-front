@@ -62,11 +62,4 @@ export class BienService {
       dto
     );
   }
-
-  assignerLocataire(bienId: number, userId: number): Observable<void> {
-    return this.http.post<void>(
-      `${this.apiUrl}/${bienId}/assigne-locataire/${userId}`,
-      {}
-    );
-  }
 }

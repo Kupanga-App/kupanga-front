@@ -6,6 +6,8 @@ import { BienService } from '../../biens/services/bien.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
 import { EdlService } from '../../gestion-logement/services/edl.service';
 import { QuittanceService } from '../../gestion-logement/services/quittance.service';
+import { finDeReservation } from '../../biens/models/location.model';
+import { FinDeBailComponent } from '../../biens/components/fin-de-bail.component';
 import { BienDTO, LIBELLES_EQUIPEMENT, adresseLisible, libelleTypeBien, positionApproximative } from '../../biens/models/bien.model';
 import { ContratDTO } from '../../gestion-logement/models/contrat.model';
 import { EtatDesLieuxDTO } from '../../gestion-logement/models/edl.model';
@@ -29,7 +31,7 @@ import { CarteBienComponent } from '../../../shared/components/carte-bien/carte-
 @Component({
   selector: 'kp-fiche-bien',
   standalone: true,
-  imports: [
+  imports: [FinDeBailComponent, 
     RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, SheetComponent, GalerieComponent, AvatarComponent,
     StatutComponent, VideComponent, IconComponent, CarteBienComponent,
   ],
@@ -74,6 +76,7 @@ export class FicheBienComponent implements OnInit {
     return q ? moisAnnee(q.mois, q.annee) : '';
   });
 
+  protected readonly finDeReservation = finDeReservation;
   readonly nomLocataire = computed(() => {
     const l = this.bien()?.locataire;
     return l ? `${l.firstName} ${l.lastName}` : '';

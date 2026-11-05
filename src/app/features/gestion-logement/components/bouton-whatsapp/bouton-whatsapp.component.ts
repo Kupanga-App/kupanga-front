@@ -25,7 +25,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
           <kp-icon name="smartphone" [size]="18" /> {{ libelle() }}
         </a>
         @if (!l.numeroConnu) {
-          <span class="kp-aide">Numéro du locataire inconnu : choisissez le contact dans WhatsApp.</span>
+          <span class="kp-aide">{{ aideSansNumero() }}</span>
         }
       </div>
     }
@@ -43,6 +43,7 @@ export class BoutonWhatsappComponent implements OnInit {
   readonly documentId = input.required<number>();
   readonly pays = input.required<Pays>();
   readonly libelle = input('Envoyer par WhatsApp');
+  readonly aideSansNumero = input('Numéro du locataire inconnu : choisissez le contact dans WhatsApp.');
 
   readonly lien = signal<LienWhatsApp | null>(null);
 

@@ -31,3 +31,13 @@
 [statut] {
   background: var(--kp-surface);
 }
+
+.premiers-pas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-2);
+
+  .kp-list__item {
+    text-decoration: none;
+  }
+}

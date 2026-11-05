@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { forkJoin, switchMap } from 'rxjs';
 import { BienService } from '../../biens/services/bien.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
-import { BienDTO } from '../../biens/models/bien.model';
+import { BienDTO, locataireDuBail } from '../../biens/models/bien.model';
 import { ContratDTO } from '../../gestion-logement/models/contrat.model';
 import { MontantPipe } from '../../../core/money/montant';
 import { messageErreurApi } from '../../../core/http/api-error';
@@ -49,7 +49,7 @@ export class BailComponent implements OnInit {
   readonly statut = computed(() => statutSignature(this.bail()?.statut, 'proprietaire'));
   readonly statutDe = (c: ContratDTO) => statutSignature(c.statut, 'proprietaire');
   readonly nomLocataire = computed(() => {
-    const l = this.bail()?.locataire ?? this.bien()?.locataire;
+    const l = this.bail()?.locataire ?? locataireDuBail(this.bien());
     return l ? `${l.firstName} ${l.lastName}` : '';
   });
   /** B6 : le propriétaire signe d'abord ; il peut re-signer pour renvoyer un lien au locataire (ancien lien invalidé). */
@@ -64,7 +64,7 @@ export class BailComponent implements OnInit {
   readonly peutCreer = computed(() => {
     const b = this.bien();
     const s = this.bail()?.statut;
-    return !!b?.locataire && !b.archive && (!s || s === 'ANNULE' || s === 'EXPIRE');
+    return !!locataireDuBail(b) && !b?.archive && (!s || s === 'ANNULE' || s === 'EXPIRE');
   });
 
   ngOnInit(): void {
