@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AppShellComponent } from './layouts/app-shell/app-shell.component';
-import { accueilGuard, authGuard, invitesGuard } from './core/auth/guards/auth.guard';
+import { accueilGuard, authGuard, invitesGuard, landingGuard } from './core/auth/guards/auth.guard';
 
 /**
  * Lot 3 (2026-11-05) : plus de rôle par compte. Les écrans « propriétaire » et « locataire » demandent seulement
@@ -34,6 +34,10 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'login' },
     ],
   },
+
+  // Page d'accueil publique (visiteur) ; un compte connecté va à son accueil
+  { path: '', pathMatch: 'full', canActivate: [landingGuard], title: 'Kupanga · La gestion locative, de l’annonce à la fin du bail',
+    loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent) },
 
   // Signature depuis le lien reçu par e-mail : publique, plein écran
   { path: 'contrats/signer/:token', title: 'Signer le bail · Kupanga',

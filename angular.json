@@ -76,6 +76,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "demo": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.demo.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -88,6 +99,10 @@
             },
             "development": {
               "buildTarget": "kupanga-front:build:development"
+            },
+            "demo": {
+              "buildTarget": "kupanga-front:build:demo",
+              "port": 4300
             }
           },
           "defaultConfiguration": "development"
