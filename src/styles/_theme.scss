@@ -175,12 +175,6 @@
   --kp-info: var(--kp-state-neutral-text);
   --kp-info-subtle: var(--kp-state-neutral-bg);
 
-  // Barre latérale et barre d'onglets actuelles : provisoirement claires (la phase 2 refait la navigation)
-  --kp-nav-bg: var(--kp-surface);
-  --kp-nav-text: var(--kp-text-muted);
-  --kp-nav-active: var(--kp-text);
-  --kp-nav-accent: var(--kp-accent);
-
   // Titres de la landing et des pages légales : Figtree jusqu'à la phase 5
   --kp-font-display: var(--kp-font);
 
