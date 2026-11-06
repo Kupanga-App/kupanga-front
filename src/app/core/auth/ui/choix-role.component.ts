@@ -46,7 +46,7 @@ const ROLES: { valeur: Role; titre: string; texte: string; icone: string }[] = [
       border-radius: var(--kp-radius-sm); background: var(--kp-surface-2); color: var(--kp-text-2);
     }
     .texte { display: flex; flex-direction: column; flex: 1; gap: 2px; }
-    .titre { font-weight: 700; }
+    .titre { font-weight: 600; }
     .coche { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--kp-border-strong); border-radius: 50%; }
     .role[aria-checked='true'] .coche { border: 7px solid var(--kp-primary); }
   `],

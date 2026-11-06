@@ -43,7 +43,7 @@ import { IconComponent } from '../components/icon/icon.component';
     .texte { flex: 1; overflow-wrap: anywhere; }
     .action {
       min-height: 36px; padding: 0 10px; border: 0; border-radius: var(--kp-radius-sm);
-      background: transparent; color: #b5ca8d; font-weight: 700;
+      background: transparent; color: #b5ca8d; font-weight: 600;
     }
     @keyframes kp-toast { from { opacity: 0; transform: translateY(8px); } }
   `],

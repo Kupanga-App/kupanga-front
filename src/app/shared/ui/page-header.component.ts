@@ -49,7 +49,7 @@ import { ClocheComponent } from './cloche.component';
     .barre--compacte { border-bottom-color: var(--kp-border); }
     .barre__titre {
       flex: 1; min-width: 0; padding-left: 8px;
-      font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       opacity: 0; transition: opacity var(--kp-duree);
     }
     .barre--compacte .barre__titre { opacity: 1; }

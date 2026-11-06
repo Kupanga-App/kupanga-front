@@ -17,7 +17,7 @@ import { Component, computed, input, signal } from '@angular/core';
     img { border-radius: 50%; object-fit: cover; background: var(--kp-surface-2); }
     .initiales {
       display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
-      background: var(--kp-primary-subtle); color: var(--kp-primary-text); font-weight: 700;
+      background: var(--kp-primary-subtle); color: var(--kp-primary-text); font-weight: 600;
     }
   `],
 })

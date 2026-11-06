@@ -96,13 +96,14 @@
   @include clair;
 
   // ── Typographie
-  // DM Sans en attendant le commit « police Figtree »
-  --kp-font: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  // Figtree 400 / 500 / 600 seulement ; le nom « kupanga » est le SVG du logo, jamais du texte
+  --kp-font: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --kp-fs-mention: 12px;
   --kp-fs-secondary: 13px;
   --kp-fs-body: 15px;
-  --kp-lh-body: 22px;
+  // 22 px pour un corps de 15 px, en ratio pour que les textes plus grands qui en héritent ne se chevauchent pas
+  --kp-lh-body: 1.4667;
   --kp-fs-card-title: 17px;
   --kp-fs-subtitle: 20px;
   --kp-fs-page-title: clamp(24px, 1.2rem + 1.2vw, 32px);

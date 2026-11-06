@@ -20,10 +20,10 @@ html {
 body {
   min-height: 100dvh;
   font-family: var(--kp-font);
-  font-size: var(--kp-fs-md);
-  line-height: 1.5;
+  font-size: var(--kp-fs-body);
+  line-height: var(--kp-lh-body);
   background: var(--kp-bg);
-  color: var(--kp-text-1);
+  color: var(--kp-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
@@ -60,33 +60,48 @@ button {
 }
 
 a {
-  color: var(--kp-primary-text);
+  color: var(--kp-accent);
   text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  transition: color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    color: var(--kp-accent-hover);
+  }
+}
+
+// Figtree n'est chargée qu'en 400 / 500 / 600 : pas de gras synthétique
+b,
+strong {
+  font-weight: 600;
 }
 
 h1,
 h2,
-h3 {
-  font-weight: 700;
+h3,
+h4 {
+  font-weight: 500;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
+// Titre de page : 24 à 32 px
 h1 {
-  font-size: var(--kp-fs-xl);
-
-  @include mq.tablette {
-    font-size: var(--kp-fs-2xl);
-  }
+  font-size: var(--kp-fs-page-title);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 h2 {
-  font-size: var(--kp-fs-lg);
+  font-size: var(--kp-fs-subtitle);
 }
 
 h3 {
-  font-size: var(--kp-fs-md);
+  font-size: var(--kp-fs-card-title);
+}
+
+h4 {
+  font-size: var(--kp-fs-body);
 }
 
 p {
