@@ -129,6 +129,12 @@
       <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
     }
 
+    <p class="kp-aide mention-legale">
+      En créant un compte, y compris avec Google, vous acceptez les
+      <a [href]="liens.conditions" target="_blank" rel="noopener noreferrer">conditions d'utilisation</a>
+      et la <a [href]="liens.confidentialite" target="_blank" rel="noopener noreferrer">politique de confidentialité</a>.
+    </p>
+
     <p pied>Déjà un compte ? <a routerLink="/auth/login" [queryParams]="retourParams()">Se connecter</a></p>
   </kp-auth-layout>
 }

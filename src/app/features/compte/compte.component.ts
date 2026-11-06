@@ -11,6 +11,7 @@ import { PageHeaderComponent } from '../../shared/ui/page-header.component';
 import { SheetComponent } from '../../shared/ui/sheet.component';
 import { AvatarComponent } from '../../shared/ui/avatar.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+import { LIENS_LEGAUX } from '../../core/legal/liens-legaux';
 
 /** Compte : profil, téléphone (C6), thème, mot de passe, déconnexion (AUDIT.md §8.4). */
 @Component({
@@ -39,6 +40,7 @@ export class CompteComponent {
   });
   readonly libellesTheme = LIBELLES_THEME;
   readonly themes: ChoixTheme[] = ['systeme', 'clair', 'sombre'];
+  protected readonly liens = LIENS_LEGAUX;
   readonly messageTelephone = MESSAGE_TELEPHONE_INVALIDE;
 
   readonly feuilleTelephone = signal(false);

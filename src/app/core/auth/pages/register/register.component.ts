@@ -12,6 +12,7 @@ import { BoutonGoogleComponent } from '../../ui/bouton-google.component';
 import { MOT_DE_PASSE_ROBUSTE, ReglesMotDePasseComponent, motsDePasseIdentiques } from '../../ui/mot-de-passe';
 import { ChoixRoleComponent } from '../../ui/choix-role.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { LIENS_LEGAUX } from '../../../legal/liens-legaux';
 
 type Etape = 0 | 1 | 2 | 'envoye';
 
@@ -36,6 +37,7 @@ const TITRES = ['Vous êtes', 'Votre profil', 'Vos identifiants'];
     .oeil { position: absolute; right: 2px; }
     .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
     .separateur::before, .separateur::after { content: ''; flex: 1; border-top: 1px solid var(--kp-border); }
+    .mention-legale { display: block; margin-top: 20px; text-align: center; }
     .envoye { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
     .envoye__icone {
       display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
@@ -44,6 +46,7 @@ const TITRES = ['Vous êtes', 'Votre profil', 'Vos identifiants'];
   `],
 })
 export class RegisterComponent {
+  protected readonly liens = LIENS_LEGAUX;
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);

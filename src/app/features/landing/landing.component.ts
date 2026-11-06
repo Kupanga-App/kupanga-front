@@ -3,6 +3,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { ThemeService } from '../../core/services/theme.service';
+import { LIENS_LEGAUX } from '../../core/legal/liens-legaux';
 
 /**
  * Vidéo de démonstration (kupanga-Api/video). Identifiant YouTube à renseigner après la mise en ligne
@@ -33,6 +34,7 @@ export class LandingComponent implements OnDestroy {
   readonly videoDuree = VIDEO_DUREE;
   readonly lecture = signal(false);
   readonly annee = new Date().getFullYear();
+  readonly liens = LIENS_LEGAUX;
 
   /** Sombre seulement si l'utilisateur l'a choisi ; sinon la landing page est en clair. */
   readonly sombre = computed(() => this.theme.choix() === 'sombre');

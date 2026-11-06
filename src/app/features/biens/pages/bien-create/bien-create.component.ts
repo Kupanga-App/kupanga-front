@@ -144,7 +144,8 @@ export class BienCreateComponent {
     this.valeurs();
     const e = this.etape();
     if (e === 0 && !this.config()) return false;
-    if (e === 6 && this.preparation()) return false;
+    // L'API refuse un bien sans photo (400) : au moins une photo avant de passer à la vérification
+    if (e === 6 && (this.preparation() || this.photos().length === 0)) return false;
     return this.champsParEtape[e].every(c => this.form.controls[c].valid);
   });
 
@@ -292,6 +293,11 @@ export class BienCreateComponent {
   }
 
   private publier(): void {
+    if (this.photos().length === 0) {
+      this.erreur.set('Ajoutez au moins une photo du bien.');
+      this.etape.set(6);
+      return;
+    }
     try {
       verifierLotPhotos(this.photos());
     } catch (e) {

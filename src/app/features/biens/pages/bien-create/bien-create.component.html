@@ -322,7 +322,11 @@
             </label>
           }
         </div>
-        <p class="kp-aide">{{ photos().length }} / {{ nbMaxPhotos }} photos. La première sert de couverture.</p>
+        @if (photos().length === 0) {
+          <p class="kp-aide">Au moins une photo est obligatoire pour publier le bien. La première sert de couverture.</p>
+        } @else {
+          <p class="kp-aide">{{ photos().length }} / {{ nbMaxPhotos }} photos. La première sert de couverture.</p>
+        }
       }
 
       @case (7) {
