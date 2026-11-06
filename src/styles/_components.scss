@@ -855,41 +855,80 @@ button.kp-card {
   font-size: var(--kp-fs-secondary);
 }
 
-// ── Bandeaux d'information ───────────────────────────────────────────────────
+// ── Bannières ────────────────────────────────────────────────────────────────
+// En haut du bloc concerné, pour ce qui demande une action ou reste vrai. Une erreur ne disparaît jamais seule
+// (pas de minuterie sur une bannière). Liseré gauche et icône de la couleur de l'état, texte courant en nuit.
+// Structure conseillée : kp-icon + .kp-bandeau__corps (.kp-bandeau__titre, .kp-bandeau__texte) + .kp-bandeau__action
 
 .kp-bandeau {
+  --_point: var(--kp-state-neutral);
+
   display: flex;
   align-items: flex-start;
   gap: var(--kp-space-3);
   padding: var(--kp-space-3) var(--kp-space-4);
-  border-radius: var(--kp-radius);
-  background: var(--kp-info-subtle);
-  color: var(--kp-info);
-  font-size: var(--kp-fs-sm);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-state-neutral-bg);
+  box-shadow: inset 3px 0 0 var(--_point);
+  color: var(--kp-text);
+  font-size: 14px;
+  line-height: 1.45;
 
   > kp-icon {
-    margin-top: 2px;
+    margin-top: 1px;
+    color: var(--_point);
   }
 
   &--ok {
-    background: var(--kp-success-subtle);
-    color: var(--kp-success);
+    --_point: var(--kp-state-success);
+
+    background: var(--kp-state-success-bg);
   }
 
   &--attention {
-    background: var(--kp-warning-subtle);
-    color: var(--kp-warning);
+    --_point: var(--kp-state-warning);
+
+    background: var(--kp-state-warning-bg);
   }
 
   &--danger {
-    background: var(--kp-danger-subtle);
-    color: var(--kp-danger);
+    --_point: var(--kp-state-danger);
+
+    background: var(--kp-state-danger-bg);
   }
 
   p,
   strong {
     color: inherit;
   }
+
+  strong {
+    font-weight: 500;
+  }
+}
+
+.kp-bandeau__corps {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kp-bandeau__titre {
+  font-weight: 500;
+}
+
+.kp-bandeau__texte {
+  color: var(--kp-text-muted);
+}
+
+.kp-bandeau__action {
+  flex-shrink: 0;
+  align-self: center;
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
 }
 
 // ── Chargement ───────────────────────────────────────────────────────────────

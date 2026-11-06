@@ -9,7 +9,7 @@ export interface Toast {
   action?: { libelle: string; executer: () => void };
 }
 
-/** Messages éphémères au-dessus de la barre d'onglets : confirmation d'une action, erreur réseau. */
+/** Messages éphémères (5 s, 3 au plus) au-dessus de la barre d'onglets : confirmation d'une action, erreur réseau. */
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   readonly toasts = signal<Toast[]>([]);
@@ -18,7 +18,7 @@ export class ToastService {
   afficher(texte: string, options: { ton?: TonToast; duree?: number; action?: Toast['action'] } = {}): void {
     const toast: Toast = { id: this.suivant++, texte, ton: options.ton ?? 'info', action: options.action };
     this.toasts.update(liste => [...liste.slice(-2), toast]);
-    setTimeout(() => this.fermer(toast.id), options.duree ?? (toast.action ? 6000 : 4000));
+    setTimeout(() => this.fermer(toast.id), options.duree ?? (toast.action ? 6000 : 5000));
   }
 
   ok(texte: string): void {
