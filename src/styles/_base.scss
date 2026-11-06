@@ -45,6 +45,16 @@ select {
   color: inherit;
 }
 
+// Safari iOS zoome sur un champ de moins de 16 px : le corps fait 15 px, les champs restent à 16 px sur téléphone
+@include mq.telephone {
+  input,
+  select,
+  textarea,
+  .kp-input {
+    font-size: 16px !important;
+  }
+}
+
 button {
   cursor: pointer;
 }
