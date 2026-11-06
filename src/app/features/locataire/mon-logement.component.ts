@@ -19,6 +19,7 @@ import { VideComponent } from '../../shared/ui/vide.component';
 import { TirerPourActualiserDirective } from '../../shared/ui/tirer-pour-actualiser.directive';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../shared/components/carte-bien/carte-bien.component';
+import { LieuxProchesComponent } from '../../shared/ui/lieux-proches.component';
 import { DemandesRecuesComponent } from './demandes-recues.component';
 import { FinDeBailComponent } from '../biens/components/fin-de-bail.component';
 
@@ -37,7 +38,7 @@ interface DocumentASigner {
   standalone: true,
   imports: [
     RouterLink, MontantPipe, DateLonguePipe, DateRelativePipe, PageHeaderComponent, AvatarComponent, StatutComponent,
-    VideComponent, TirerPourActualiserDirective, IconComponent, CarteBienComponent, DemandesRecuesComponent,
+    VideComponent, TirerPourActualiserDirective, IconComponent, CarteBienComponent, LieuxProchesComponent, DemandesRecuesComponent,
     FinDeBailComponent,
   ],
   templateUrl: './mon-logement.component.html',

@@ -19,6 +19,7 @@
   } @else if (bien(); as b) {
     <div class="kp-stack kp-stack--lg">
       <kp-galerie [photos]="b.images ?? []" />
+      <kp-lieux-proches [pois]="b.pois" />
 
       <section class="kp-section">
         <p class="prix">
@@ -94,14 +95,6 @@
         }
         @if (positionApprox()) {
           <p class="kp-aide">{{ positionApprox() }}</p>
-        }
-        @if (b.pois?.length) {
-          <p class="kp-small kp-strong">À proximité</p>
-          <div class="kp-row kp-row--wrap">
-            @for (p of b.pois; track p) {
-              <span class="kp-tag">{{ p }}</span>
-            }
-          </div>
         }
       </section>
 

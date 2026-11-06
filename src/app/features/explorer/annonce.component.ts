@@ -14,13 +14,14 @@ import { VideComponent } from '../../shared/ui/vide.component';
 import { GalerieComponent } from '../../shared/ui/galerie.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../shared/components/carte-bien/carte-bien.component';
+import { LieuxProchesComponent } from '../../shared/ui/lieux-proches.component';
 
 
 /** Annonce publique (sans compte) : `GET /biens/{id}`, propriétaire réduit au prénom et à l'initiale (P0-6). */
 @Component({
   selector: 'kp-annonce',
   standalone: true,
-  imports: [RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, AvatarComponent, VideComponent, GalerieComponent, IconComponent, CarteBienComponent],
+  imports: [RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, AvatarComponent, VideComponent, GalerieComponent, IconComponent, CarteBienComponent, LieuxProchesComponent],
   templateUrl: './annonce.component.html',
   styleUrl: './annonce.component.scss',
 })
