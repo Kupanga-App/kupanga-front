@@ -50,41 +50,44 @@
 }
 
 @mixin sombre {
+  // Dérivé de l'ancienne palette sombre : fond nuit profond, textes en menthe à différentes opacités
   --kp-bg: #0b181f;
   --kp-surface: #10212b;
   --kp-surface-sunken: #182c38;
   --kp-segment-bg: #213846;
-  --kp-border: #233a48;
-  --kp-border-strong: #33505f;
+  --kp-border: rgba(239, 251, 219, 0.1);
+  --kp-border-strong: rgba(239, 251, 219, 0.2);
 
-  --kp-text-1: #effbdb;
-  --kp-text-2: rgba(239, 251, 219, 0.82);
-  --kp-text-3: rgba(239, 251, 219, 0.64);
-  --kp-text-invert: #10212b;
+  --kp-text: #effbdb;
+  --kp-text-muted: rgba(239, 251, 219, 0.8);
+  --kp-text-subtle: rgba(239, 251, 219, 0.62);
+  // Texte nuit sur l'olive claire et sur la menthe pleine (élément actif) : 7,4:1 sur l'olive
+  --kp-text-on-accent: #10212b;
 
-  --kp-primary: #8fa464;
-  --kp-primary-hover: #a1b577;
-  --kp-primary-on: #10212b;
-  --kp-primary-text: #b5ca8d;
-  --kp-primary-subtle: rgba(143, 164, 100, 0.16);
+  // Olive claire : 8:1 sur le fond, 7,4:1 sur la surface
+  --kp-accent: #a1b577;
+  --kp-accent-hover: #b5ca8d;
+  --kp-accent-soft: rgba(143, 164, 100, 0.18);
 
-  --kp-success: #b5ca8d;
-  --kp-success-subtle: rgba(143, 164, 100, 0.16);
-  --kp-warning: #e8c87a;
-  --kp-warning-subtle: rgba(212, 168, 83, 0.16);
-  --kp-danger: #e8917f;
-  --kp-danger-subtle: rgba(192, 97, 74, 0.18);
-  --kp-info: #8dbad3;
-  --kp-info-subtle: rgba(90, 143, 175, 0.18);
+  --kp-state-success: #6fbf86;
+  --kp-state-success-bg: rgba(47, 138, 78, 0.22);
+  --kp-state-success-text: #a6dcb4;
+  --kp-state-warning: #e0a84a;
+  --kp-state-warning-bg: rgba(183, 121, 31, 0.22);
+  --kp-state-warning-text: #e8c87a;
+  --kp-state-danger: #ec7a6a;
+  --kp-state-danger-bg: rgba(180, 35, 24, 0.26);
+  --kp-state-danger-text: #f2a99c;
+  --kp-state-neutral: rgba(239, 251, 219, 0.55);
+  --kp-state-neutral-bg: rgba(239, 251, 219, 0.08);
+  --kp-state-neutral-text: rgba(239, 251, 219, 0.8);
 
-  --kp-nav-bg: #0e1c24;
-  --kp-nav-text: rgba(239, 251, 219, 0.66);
-  --kp-nav-active: #effbdb;
-  --kp-nav-accent: #8fa464;
+  --kp-elev-0: 0 0 0 1px rgba(239, 251, 219, 0.08);
+  --kp-elev-1: 0 0 0 1px rgba(239, 251, 219, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --kp-elev-2: 0 0 0 1px rgba(239, 251, 219, 0.08), 0 24px 48px rgba(0, 0, 0, 0.6);
 
   --kp-backdrop: rgba(0, 0, 0, 0.6);
-  --kp-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --kp-focus: 0 0 0 3px rgba(143, 164, 100, 0.6);
+  --kp-focus: 0 0 0 2px var(--kp-surface), 0 0 0 4px var(--kp-text);
 
   color-scheme: dark;
 }
