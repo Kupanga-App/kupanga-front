@@ -972,7 +972,8 @@ button.kp-card {
 .kp-skeleton {
   display: block;
   border-radius: var(--kp-radius-sm);
-  background: var(--kp-surface-sunken);
+  // Fond du contrôle segmenté : reste visible posé directement sur le fond de page
+  background: var(--kp-segment-bg);
   animation: kp-pulsation 1600ms var(--kp-ease) infinite;
 
   @media (prefers-reduced-motion: reduce) {
