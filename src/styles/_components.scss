@@ -574,7 +574,8 @@ select.kp-input {
   }
 }
 
-// ── Liste groupée (style réglages) ───────────────────────────────────────────
+// ── Lignes de liste ──────────────────────────────────────────────────────────
+// 56 px, vignette de 40 px, titre sur une ligne coupé par une ellipse (texte complet dans l'attribut title).
 
 .kp-list {
   display: flex;
@@ -582,26 +583,30 @@ select.kp-input {
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--kp-border);
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-lg);
   background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
   overflow: hidden;
 }
 
 .kp-list__item {
   display: flex;
   align-items: center;
-  gap: var(--kp-space-3);
+  gap: var(--kp-space-4);
   min-height: 56px;
   width: 100%;
-  padding: var(--kp-space-3) var(--kp-space-4);
+  padding: var(--kp-space-2) var(--kp-space-4);
   border: 0;
   border-bottom: 1px solid var(--kp-border);
   background: transparent;
-  color: var(--kp-text-1);
-  font-size: var(--kp-fs-md);
+  color: var(--kp-text);
+  font-size: var(--kp-fs-body);
   text-align: left;
   text-decoration: none;
+
+  @include mq.tablette {
+    padding-inline: var(--kp-space-5);
+  }
 
   &:last-child {
     border-bottom: 0;
@@ -611,19 +616,25 @@ select.kp-input {
 a.kp-list__item,
 button.kp-list__item {
   cursor: pointer;
+  transition: background-color var(--kp-duree) var(--kp-ease);
 
   &:hover {
-    background: var(--kp-surface-2);
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: 0;
+    box-shadow: inset 0 0 0 2px var(--kp-text);
   }
 
   &::after {
     content: '';
     flex-shrink: 0;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     margin-left: var(--kp-space-1);
-    border-right: 2px solid var(--kp-text-3);
-    border-bottom: 2px solid var(--kp-text-3);
+    border-right: 1.5px solid var(--kp-text-subtle);
+    border-bottom: 1.5px solid var(--kp-text-subtle);
     transform: rotate(-45deg);
   }
 }
@@ -633,24 +644,32 @@ button.kp-list__item {
 }
 
 .kp-list__item--danger {
-  color: var(--kp-danger);
-  font-weight: 600;
+  color: var(--kp-state-danger);
+  font-weight: 500;
 
   &::after {
     display: none;
   }
 }
 
+// Vignette : icône ou photo de 40 px
 .kp-list__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--kp-radius-sm);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-2);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-muted);
+  overflow: hidden;
+
+  > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .kp-list__body {
@@ -661,29 +680,32 @@ button.kp-list__item {
 }
 
 .kp-list__title {
-  font-weight: 600;
-  overflow-wrap: anywhere;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .kp-list__sub {
-  font-size: var(--kp-fs-sm);
-  color: var(--kp-text-3);
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-text-subtle);
   overflow-wrap: anywhere;
 }
 
 .kp-list__value {
   flex-shrink: 0;
   max-width: 55%;
-  color: var(--kp-text-2);
+  color: var(--kp-text-muted);
+  font-size: 14px;
   text-align: right;
   overflow-wrap: anywhere;
 }
 
 .kp-list-header {
   padding: 0 var(--kp-space-1);
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
-  color: var(--kp-text-3);
+  font-size: var(--kp-fs-secondary);
+  font-weight: 500;
+  color: var(--kp-text-subtle);
 }
 
 // Liste de définitions (détails d'un bail, d'un bien)
@@ -691,9 +713,9 @@ button.kp-list__item {
   display: grid;
   grid-template-columns: 1fr;
   margin: 0;
-  border: 1px solid var(--kp-border);
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-lg);
   background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
   overflow: hidden;
 
   > div {
@@ -705,65 +727,78 @@ button.kp-list__item {
     padding: var(--kp-space-3) var(--kp-space-4);
     border-bottom: 1px solid var(--kp-border);
 
+    @include mq.tablette {
+      padding-inline: var(--kp-space-5);
+    }
+
     &:last-child {
       border-bottom: 0;
     }
   }
 
   dt {
-    color: var(--kp-text-3);
+    color: var(--kp-text-subtle);
   }
 
   dd {
     margin: 0;
-    font-weight: 600;
+    font-weight: 500;
     text-align: right;
     overflow-wrap: anywhere;
   }
 }
 
 // ── Cartes ───────────────────────────────────────────────────────────────────
+// Rayon 20, élévation 0 (liseré), marge intérieure --kp-card-pad.
 
 .kp-card {
   display: flex;
   flex-direction: column;
   gap: var(--kp-space-3);
-  padding: var(--kp-space-4);
-  border: 1px solid var(--kp-border);
-  border-radius: var(--kp-radius);
+  padding: var(--kp-card-pad);
+  border: 0;
+  border-radius: var(--kp-radius-lg);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
+  box-shadow: var(--kp-elev-0);
+  color: var(--kp-text);
   text-decoration: none;
+}
 
-  @include mq.tablette {
-    padding: var(--kp-space-5);
-  }
+.kp-card__titre {
+  font-size: var(--kp-fs-card-title);
+  font-weight: 500;
 }
 
 a.kp-card,
 button.kp-card {
   cursor: pointer;
   text-align: left;
+  transition: box-shadow var(--kp-duree) var(--kp-ease);
 
   &:hover {
-    border-color: var(--kp-border-strong);
+    box-shadow: var(--kp-elev-1);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-lg);
+    box-shadow: var(--kp-focus);
   }
 }
 
-// Carte « à faire » : bordure d'accent selon l'urgence
+// Carte « à faire » : liseré gauche de la couleur de l'urgence (bordure : reste visible au survol)
 .kp-tache {
-  border-left: 4px solid var(--kp-border-strong);
+  border-left: 3px solid var(--kp-state-neutral);
 
   &--urgent {
-    border-left-color: var(--kp-danger);
+    border-left-color: var(--kp-state-danger);
   }
 
   &--attention {
-    border-left-color: var(--kp-warning);
+    border-left-color: var(--kp-state-warning);
   }
 
   &--info {
-    border-left-color: var(--kp-info);
+    border-left-color: var(--kp-accent);
   }
 }
 
@@ -932,20 +967,20 @@ button.kp-card {
 }
 
 // ── Chargement ───────────────────────────────────────────────────────────────
+// Squelettes pour les pages ; indicateur rond (.kp-spinner) seulement dans un bouton pendant un envoi.
 
 .kp-skeleton {
   display: block;
   border-radius: var(--kp-radius-sm);
-  background: linear-gradient(90deg, var(--kp-surface-2) 25%, var(--kp-surface-3) 50%, var(--kp-surface-2) 75%);
-  background-size: 200% 100%;
-  animation: kp-shimmer 1.4s ease-in-out infinite;
+  background: var(--kp-surface-sunken);
+  animation: kp-pulsation 1600ms var(--kp-ease) infinite;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
   }
 
   &--ligne {
-    height: 16px;
+    height: 12px;
   }
 
   &--titre {
@@ -955,33 +990,46 @@ button.kp-card {
 
   &--carte {
     height: 96px;
-    border-radius: var(--kp-radius);
+    border-radius: var(--kp-radius-lg);
   }
 
   &--photo {
     aspect-ratio: 4 / 3;
-    border-radius: var(--kp-radius);
+    border-radius: var(--kp-radius-md);
+  }
+
+  // Vignette de ligne de liste
+  &--vignette {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
   }
 }
 
-@keyframes kp-shimmer {
-  from {
-    background-position: 200% 0;
+@keyframes kp-pulsation {
+  0%,
+  100% {
+    opacity: 1;
   }
 
-  to {
-    background-position: -200% 0;
+  50% {
+    opacity: 0.5;
   }
 }
 
 .kp-spinner {
   display: inline-block;
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
+  border: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
   border-radius: 50%;
   animation: kp-tourne 0.8s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 2.4s;
+  }
 }
 
 @keyframes kp-tourne {
@@ -996,8 +1044,8 @@ button.kp-card {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: var(--kp-radius);
-  background: var(--kp-surface-2);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-surface-sunken);
 }
 
 .kp-photo-vide {
@@ -1006,7 +1054,174 @@ button.kp-card {
   justify-content: center;
   width: 100%;
   aspect-ratio: 4 / 3;
-  border-radius: var(--kp-radius);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-3);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-subtle);
 }
+
+// ── Tableaux ─────────────────────────────────────────────────────────────────
+// Ordinateur : en-têtes collants, actions en fin de ligne. Tablette : colonnes .kp-table__secondaire masquées.
+// Téléphone : une carte par ligne (chaque <td> peut porter data-libelle="Montant" pour rappeler sa colonne).
+// Le tri se fait à l'écran (bouton .kp-table__tri dans l'en-tête, aria-sort sur le <th>).
+//
+// <div class="kp-table-cadre"><table class="kp-table">
+//   <thead><tr><th>Quittance</th><th class="kp-table__secondaire">Locataire</th>…<th><span class="kp-sr-only">Actions</span></th></tr></thead>
+//   <tbody><tr><td class="kp-table__titre">…</td>…<td class="kp-table__actions">…</td></tr></tbody>
+// </table></div>
+
+.kp-table-cadre {
+  border-radius: 16px;
+  background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
+  overflow: clip;
+}
+
+.kp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 44px;
+    padding: 0 var(--kp-space-4);
+    background: color-mix(in srgb, var(--kp-surface-sunken) 45%, var(--kp-surface));
+    color: var(--kp-text-muted);
+    font-size: var(--kp-fs-secondary);
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 56px;
+    padding: 0 var(--kp-space-4);
+    border-top: 1px solid var(--kp-border);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color var(--kp-duree) var(--kp-ease);
+  }
+
+  tbody tr:hover {
+    background: color-mix(in srgb, var(--kp-surface-sunken) 40%, transparent);
+  }
+}
+
+.kp-table__titre {
+  max-width: 0;
+  width: 100%;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kp-table__nombre {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kp-table__discret {
+  color: var(--kp-text-muted);
+}
+
+.kp-table__actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.kp-table__tri {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.kp-table-pied {
+  padding: var(--kp-space-2) var(--kp-space-4);
+  border-top: 1px solid var(--kp-border);
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-mention);
+}
+
+// Tablette : colonnes secondaires masquées
+@media (min-width: 768px) and (max-width: 1099px) {
+  .kp-table .kp-table__secondaire {
+    display: none;
+  }
+}
+
+// Téléphone : une carte par ligne
+@include mq.telephone {
+  .kp-table-cadre {
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .kp-table {
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: var(--kp-space-2);
+    }
+
+    tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 4px var(--kp-space-2);
+      padding: var(--kp-space-3) var(--kp-space-4);
+      border-radius: 16px;
+      background: var(--kp-surface);
+      box-shadow: var(--kp-elev-0);
+    }
+
+    td {
+      height: auto;
+      padding: 0;
+      border: 0;
+    }
+
+    td[data-libelle]:not(.kp-table__titre):not(.kp-table__nombre)::before {
+      content: attr(data-libelle) ' · ';
+      color: var(--kp-text-subtle);
+    }
+
+    .kp-table__secondaire {
+      display: none;
+    }
+  }
+
+  .kp-table__titre {
+    max-width: none;
+    width: auto;
+  }
+
+  .kp-table__actions {
+    width: auto;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+

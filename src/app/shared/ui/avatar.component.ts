@@ -1,6 +1,6 @@
 import { Component, computed, input, signal } from '@angular/core';
 
-/** Photo de profil, ou initiales si absente ou illisible. */
+/** Photo de profil, ou initiales sur surface en retrait si absente ou illisible (32 px en barre, 40 px en liste). */
 @Component({
   selector: 'kp-avatar',
   standalone: true,
@@ -14,10 +14,10 @@ import { Component, computed, input, signal } from '@angular/core';
   `,
   styles: [`
     :host { display: inline-flex; flex-shrink: 0; }
-    img { border-radius: 50%; object-fit: cover; background: var(--kp-surface-2); }
+    img { border-radius: 50%; object-fit: cover; background: var(--kp-surface-sunken); }
     .initiales {
       display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
-      background: var(--kp-primary-subtle); color: var(--kp-primary-text); font-weight: 600;
+      background: var(--kp-surface-sunken); color: var(--kp-text); font-weight: 500; letter-spacing: 0.01em;
     }
   `],
 })

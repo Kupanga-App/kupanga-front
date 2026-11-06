@@ -1,13 +1,19 @@
 import { Component, input } from '@angular/core';
 import { IconComponent } from '../components/icon/icon.component';
 
-/** État vide d'une liste ou d'un écran : icône, titre court, explication, action éventuelle (contenu projeté). */
+/**
+ * État vide d'une liste ou d'un écran : illustration au trait 1,5 sur un aplat olive clair, une phrase,
+ * une première action (contenu projeté, en général un `.kp-btn--primary.kp-btn--sm`).
+ */
 @Component({
   selector: 'kp-vide',
   standalone: true,
   imports: [IconComponent],
   template: `
-    <span class="icone"><kp-icon [name]="icone()" [size]="28" /></span>
+    <span class="illustration" aria-hidden="true">
+      <span class="aplat"></span>
+      <kp-icon [name]="icone()" [size]="48" [strokeWidth]="1.5" />
+    </span>
     <h2>{{ titre() }}</h2>
     @if (texte()) {
       <p>{{ texte() }}</p>
@@ -16,17 +22,19 @@ import { IconComponent } from '../components/icon/icon.component';
   `,
   styles: [`
     :host {
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      padding: 40px 16px; text-align: center;
-      border: 1px dashed var(--kp-border-strong); border-radius: var(--kp-radius);
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 24px var(--kp-card-pad) 28px; text-align: center;
+      border-radius: var(--kp-radius-lg); background: var(--kp-surface); box-shadow: var(--kp-elev-0);
     }
-    .icone {
-      display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px;
-      margin-bottom: 4px; border-radius: 50%; background: var(--kp-surface-2); color: var(--kp-text-3);
+    .illustration { position: relative; display: grid; place-items: center; width: 120px; height: 88px; color: var(--kp-text); }
+    .aplat {
+      position: absolute; left: 50%; top: 50%; width: 64px; height: 56px; transform: translate(-36%, -40%);
+      border-radius: 14px; background: var(--kp-accent-soft);
     }
-    h2 { font-size: var(--kp-fs-md); }
-    p { max-width: 420px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
-    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+    .illustration kp-icon { position: relative; }
+    h2 { font-size: var(--kp-fs-card-title); font-weight: 500; }
+    p { max-width: 320px; margin-top: -4px; color: var(--kp-text-muted); font-size: 14px; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
     .actions:empty { display: none; }
   `],
 })
