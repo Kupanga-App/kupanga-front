@@ -119,6 +119,7 @@
           @if (photo()) {
             <img class="kp-photo" [src]="photo()" alt="" loading="lazy" />
           }
+          <kp-lieux-proches [pois]="bien()?.pois" />
           <p class="kp-strong">{{ bien()?.titre ?? typeBien() }}</p>
           <p class="kp-muted kp-small"><kp-icon name="map-pin" [size]="14" /> {{ adresse() }}</p>
           @if (bien()?.pointDeRepere) {

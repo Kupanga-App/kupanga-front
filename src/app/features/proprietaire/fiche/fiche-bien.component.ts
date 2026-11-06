@@ -23,6 +23,7 @@ import { StatutComponent } from '../../../shared/ui/statut.component';
 import { VideComponent } from '../../../shared/ui/vide.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../../shared/components/carte-bien/carte-bien.component';
+import { LieuxProchesComponent } from '../../../shared/ui/lieux-proches.component';
 
 /**
  * Fiche d'un bien du propriétaire : photos, statut, locataire et contact, raccourcis Bail / États des lieux /
@@ -31,7 +32,7 @@ import { CarteBienComponent } from '../../../shared/components/carte-bien/carte-
 @Component({
   selector: 'kp-fiche-bien',
   standalone: true,
-  imports: [FinDeBailComponent, 
+  imports: [FinDeBailComponent, LieuxProchesComponent, 
     RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, SheetComponent, GalerieComponent, AvatarComponent,
     StatutComponent, VideComponent, IconComponent, CarteBienComponent,
   ],
