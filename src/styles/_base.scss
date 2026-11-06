@@ -108,10 +108,18 @@ p {
   overflow-wrap: anywhere;
 }
 
+// Focus clavier toujours visible : anneau nuit (menthe en sombre) détaché de l'élément.
+// Contour transparent gardé pour le mode contraste élevé de Windows, qui ignore box-shadow.
 :focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   box-shadow: var(--kp-focus);
   border-radius: var(--kp-radius-sm);
+}
+
+::selection {
+  background: var(--kp-accent-soft);
+  color: var(--kp-text);
 }
 
 .kp-sr-only {

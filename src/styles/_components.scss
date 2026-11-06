@@ -122,83 +122,127 @@
 }
 
 // ── Boutons ──────────────────────────────────────────────────────────────────
+// Quatre niveaux (DS-Fondations) : principal olive plein (une action forte par écran), secondaire contour,
+// discret, danger (confirmation ensuite). Pilule, 44 px ; 40 px avec --sm et dans les barres.
+// Sans variante, un .kp-btn a le rendu du secondaire.
 
 .kp-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--kp-space-2);
-  min-height: 48px;
+  min-height: var(--kp-tap);
   padding: 0 var(--kp-space-5);
-  border: 1px solid transparent;
-  border-radius: var(--kp-radius);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-1);
-  font-size: var(--kp-fs-md);
-  font-weight: 600;
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+  color: var(--kp-text);
+  font-size: var(--kp-fs-body);
+  font-weight: 500;
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--kp-duree), border-color var(--kp-duree), opacity var(--kp-duree);
+  transition:
+    background-color var(--kp-duree) var(--kp-ease),
+    border-color var(--kp-duree) var(--kp-ease),
+    color var(--kp-duree) var(--kp-ease),
+    opacity var(--kp-duree) var(--kp-ease);
 
-  @include mq.tablette {
-    min-height: 44px;
+  &:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--kp-surface-sunken);
   }
 
   &:active:not(:disabled) {
     opacity: 0.85;
   }
 
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--kp-focus);
+    border-radius: var(--kp-radius-pill);
+  }
+
+  // Désactivé : surface en retrait, texte discret (pas d'opacité, le libellé reste lisible)
   &:disabled,
   &[aria-disabled='true'] {
-    opacity: 0.5;
+    background: var(--kp-surface-sunken);
+    border-color: transparent;
+    color: var(--kp-text-subtle);
     cursor: not-allowed;
+    text-decoration: none;
+  }
+
+  // Envoi en cours : <span class="kp-spinner"></span> dans le bouton
+  .kp-spinner {
+    width: 16px;
+    height: 16px;
+  }
+
+  &[aria-busy='true'] {
+    cursor: progress;
+    opacity: 0.85;
   }
 
   &--primary {
-    background: var(--kp-primary);
-    color: var(--kp-primary-on);
+    background: var(--kp-accent);
+    border-color: transparent;
+    color: var(--kp-text-on-accent);
 
-    &:hover:not(:disabled) {
-      background: var(--kp-primary-hover);
+    &:hover:not(:disabled):not([aria-disabled='true']) {
+      background: var(--kp-accent-hover);
+    }
+
+    // Pendant un envoi, le bouton (désactivé contre le double envoi) garde sa couleur
+    &:disabled:has(.kp-spinner) {
+      background: var(--kp-accent);
+      color: var(--kp-text-on-accent);
+      opacity: 0.85;
     }
   }
 
   &--secondary {
     background: var(--kp-surface);
     border-color: var(--kp-border-strong);
-
-    &:hover:not(:disabled) {
-      background: var(--kp-surface-2);
-    }
   }
 
+  // Discret : texte souligné, sans fond ni contour
   &--ghost {
     background: transparent;
-    color: var(--kp-primary-text);
+    border-color: transparent;
+    color: var(--kp-text);
     padding: 0 var(--kp-space-3);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
 
-    &:hover:not(:disabled) {
-      background: var(--kp-surface-2);
+    &:disabled,
+    &[aria-disabled='true'] {
+      background: transparent;
     }
   }
 
   &--danger {
-    background: transparent;
-    border-color: var(--kp-border-strong);
-    color: var(--kp-danger);
+    background: var(--kp-surface);
+    border-color: color-mix(in srgb, var(--kp-state-danger) 40%, transparent);
+    color: var(--kp-state-danger);
 
-    &:hover:not(:disabled) {
-      background: var(--kp-danger-subtle);
+    &:hover:not(:disabled):not([aria-disabled='true']) {
+      background: var(--kp-state-danger-bg);
     }
   }
 
+  // Couleur de marque WhatsApp, volontairement hors jetons
   &--whatsapp {
     background: #1f7a3f;
+    border-color: transparent;
     color: #ffffff;
+
+    &:hover:not(:disabled):not([aria-disabled='true']) {
+      background: #1a6a36;
+    }
   }
 
   &--block {
@@ -208,7 +252,7 @@
   &--sm {
     min-height: 40px;
     padding: 0 var(--kp-space-4);
-    font-size: var(--kp-fs-sm);
+    font-size: 14px;
   }
 }
 
@@ -221,19 +265,32 @@
   height: var(--kp-tap);
   padding: 0;
   border: 0;
-  border-radius: var(--kp-radius-full);
+  border-radius: var(--kp-radius-pill);
   background: transparent;
-  color: var(--kp-text-1);
+  color: var(--kp-text);
   cursor: pointer;
   position: relative;
+  text-decoration: none;
+  transition: background-color var(--kp-duree) var(--kp-ease);
 
   &:hover {
-    background: var(--kp-surface-2);
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
   }
 
   &:disabled {
-    opacity: 0.5;
+    color: var(--kp-text-subtle);
+    background: transparent;
     cursor: not-allowed;
+  }
+
+  // Dans une barre : 40 px
+  &--sm {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -244,13 +301,14 @@
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: var(--kp-radius-full);
-  background: var(--kp-danger);
-  color: #ffffff;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-state-danger);
+  color: var(--kp-text-on-accent);
   font-size: 11px;
   font-weight: 600;
   line-height: 18px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .kp-actions {
@@ -309,14 +367,18 @@
   align-items: center;
   gap: var(--kp-space-2);
   min-height: 56px;
-  padding: 0 var(--kp-space-5);
+  padding: 0 var(--kp-space-6);
   border: 0;
-  border-radius: var(--kp-radius-lg);
-  background: var(--kp-primary);
-  color: var(--kp-primary-on);
-  font-weight: 600;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-accent);
+  color: var(--kp-text-on-accent);
+  font-weight: 500;
   text-decoration: none;
-  box-shadow: var(--kp-shadow);
+  box-shadow: var(--kp-elev-1);
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
+  }
 
   @include mq.tablette {
     display: none;
@@ -324,6 +386,7 @@
 }
 
 // ── Champs de formulaire ─────────────────────────────────────────────────────
+// Rayon 12, libellé au-dessus, unité à droite (« € par mois »), aide dessous, erreur en rouge avec texte.
 
 .kp-form {
   display: flex;
@@ -349,66 +412,77 @@
 }
 
 .kp-label {
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
-  color: var(--kp-text-1);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--kp-text);
 }
 
 .kp-optionnel {
   font-weight: 400;
-  color: var(--kp-text-3);
+  color: var(--kp-text-subtle);
 }
 
 .kp-input {
   width: 100%;
-  min-height: 48px;
-  padding: 0 var(--kp-space-4);
+  min-height: var(--kp-tap);
+  padding: 0 var(--kp-space-3);
   border: 1px solid var(--kp-border-strong);
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-md);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
-  // 16 px : iOS ne zoome pas sur le champ
-  font-size: var(--kp-fs-md);
-  transition: border-color var(--kp-duree), box-shadow var(--kp-duree);
+  color: var(--kp-text);
+  // 15 px ; 16 px sur téléphone (_base.scss, zoom de Safari iOS)
+  font-size: var(--kp-fs-body);
+  transition:
+    border-color var(--kp-duree) var(--kp-ease),
+    box-shadow var(--kp-duree) var(--kp-ease);
 
   &::placeholder {
-    color: var(--kp-text-3);
-    opacity: 0.8;
+    color: var(--kp-text-subtle);
+    opacity: 1;
   }
 
-  &:focus {
+  &:hover:not(:disabled):not([readonly]) {
+    border-color: color-mix(in srgb, var(--kp-text) 30%, transparent);
+  }
+
+  &:focus,
+  &:focus-visible {
     outline: none;
-    border-color: var(--kp-primary);
-    box-shadow: var(--kp-focus);
+    border-color: var(--kp-accent);
+    box-shadow: 0 0 0 1px var(--kp-accent);
+    border-radius: var(--kp-radius-md);
   }
 
   &:disabled,
   &[readonly] {
-    background: var(--kp-surface-2);
-    color: var(--kp-text-2);
+    background: var(--kp-surface-sunken);
+    color: var(--kp-text-muted);
   }
 
+  // Erreur : contour rouge de 2 px ; le message en texte (.kp-erreur) reste obligatoire
   &--erreur,
   &.ng-invalid.ng-touched {
-    border-color: var(--kp-danger);
+    border-color: var(--kp-state-danger);
+    box-shadow: inset 0 0 0 1px var(--kp-state-danger);
   }
 }
 
 textarea.kp-input {
-  min-height: 112px;
-  padding: var(--kp-space-3) var(--kp-space-4);
+  min-height: 88px;
+  padding: 10px var(--kp-space-3);
   resize: vertical;
-  line-height: 1.5;
+  line-height: var(--kp-lh-body);
 }
 
 select.kp-input {
   appearance: none;
   padding-right: var(--kp-space-10);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235c6b74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2366737a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
 }
 
+// Unité à droite du champ : .kp-input-groupe > input.kp-input + span.kp-suffixe
 .kp-input-groupe {
   position: relative;
   display: flex;
@@ -420,22 +494,27 @@ select.kp-input {
 
   .kp-suffixe {
     position: absolute;
-    right: var(--kp-space-4);
-    color: var(--kp-text-3);
-    font-size: var(--kp-fs-sm);
-    font-weight: 600;
+    right: var(--kp-space-3);
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-body);
+    font-weight: 400;
     pointer-events: none;
+  }
+
+  // Unité longue (« € par mois »)
+  &--long .kp-input {
+    padding-right: 104px;
   }
 }
 
 .kp-aide {
-  font-size: var(--kp-fs-sm);
-  color: var(--kp-text-3);
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-text-subtle);
 }
 
 .kp-erreur {
-  font-size: var(--kp-fs-sm);
-  color: var(--kp-danger);
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-state-danger);
 }
 
 .kp-check {
@@ -443,18 +522,18 @@ select.kp-input {
   align-items: center;
   gap: var(--kp-space-3);
   min-height: var(--kp-tap);
-  font-size: var(--kp-fs-md);
+  font-size: var(--kp-fs-body);
   cursor: pointer;
 
   input {
     flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    accent-color: var(--kp-primary);
+    width: 20px;
+    height: 20px;
+    accent-color: var(--kp-accent);
   }
 }
 
-// Puces à choix (équipements, types)
+// Puces à choix (équipements, types) et filtres en pilule
 .kp-choix {
   display: flex;
   flex-wrap: wrap;
@@ -464,22 +543,34 @@ select.kp-input {
 .kp-choix-item {
   display: inline-flex;
   align-items: center;
-  gap: var(--kp-space-2);
-  min-height: 44px;
+  gap: 6px;
+  min-height: 40px;
   padding: 0 var(--kp-space-4);
   border: 1px solid var(--kp-border-strong);
-  border-radius: var(--kp-radius-full);
+  border-radius: var(--kp-radius-pill);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
+  color: var(--kp-text);
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
+  transition:
+    background-color var(--kp-duree) var(--kp-ease),
+    border-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
+  }
 
   &[aria-pressed='true'],
   &--actif {
-    border-color: var(--kp-primary);
-    background: var(--kp-primary-subtle);
-    color: var(--kp-primary-text);
+    border-color: var(--kp-accent);
+    background: var(--kp-accent-soft);
+    color: var(--kp-text);
+    font-weight: 500;
   }
 }
 
