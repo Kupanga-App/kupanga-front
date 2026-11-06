@@ -54,6 +54,40 @@ a.bien {
   }
 }
 
+// « Proposer la location » : bouton olive de l'en-tête (maquette Nav-Proprio-Messages)
+.proposer {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-accent);
+  color: var(--kp-text-on-accent);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-accent-hover);
+    color: var(--kp-text-on-accent);
+  }
+}
+
+// Téléphone : « Proposer » à l'écran, la fin du libellé reste lue par les lecteurs d'écran
+.proposer__suite {
+  @include mq.telephone {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 .reconnexion {
   margin: var(--kp-space-2) var(--kp-space-4) 0;
 }

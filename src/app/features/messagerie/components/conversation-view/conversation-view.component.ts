@@ -45,6 +45,8 @@ export class ConversationViewComponent implements OnInit, OnChanges, OnDestroy, 
   @Input() titre = '';
   @Input() photoUrl = '';
   @Input() lienBien: unknown[] | null = null;
+  /** Propriétaire du bien concerné : lien vers « Proposer la location » (/biens/:id/locataire). */
+  @Input() lienProposer: unknown[] | null = null;
   @Output() backRequested = new EventEmitter<void>();
   @Output() sent = new EventEmitter<MessageDTO>();
   /**

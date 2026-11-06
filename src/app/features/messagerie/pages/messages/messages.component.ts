@@ -93,6 +93,17 @@ export class MessagesComponent implements OnInit, OnDestroy {
     return ['/annonces', bien.id];
   });
 
+  /**
+   * « Proposer la location » dans l'en-tête de la conversation : seulement pour le propriétaire du bien
+   * (vue privée déjà chargée par loadBienContext), et comme sur la fiche du bien, s'il n'a ni locataire ni archive.
+   */
+  lienProposer = computed(() => {
+    const bien = this.bienContext();
+    const user = this.authService.currentUser();
+    if (!bien || !user || bien.proprietaire?.id !== user.id || bien.locataire || bien.archive) return null;
+    return ['/biens', bien.id, 'locataire'];
+  });
+
   constructor() {
     // Conversation déjà ouverte sur ce bien (côté candidat, l'autre participant est toujours le propriétaire, W1)
     effect(() => {
