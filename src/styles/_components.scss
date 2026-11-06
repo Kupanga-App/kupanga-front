@@ -767,48 +767,79 @@ button.kp-card {
   }
 }
 
-// ── Puces de statut ──────────────────────────────────────────────────────────
+// ── Badges d'état ────────────────────────────────────────────────────────────
+// Point + texte ; jamais la couleur seule. Badge (fond / texte) dans les tableaux et listes de documents,
+// .kp-statut--point (point coloré + texte courant) dans le corps d'une carte.
+// Tons du code → états : ok → success, attention → warning, danger → danger, info et neutre → neutral.
 
 .kp-statut {
+  --_point: var(--kp-state-neutral);
+  --_fond: var(--kp-state-neutral-bg);
+  --_texte: var(--kp-state-neutral-text);
+
   display: inline-flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  height: 26px;
+  height: 24px;
   padding: 0 10px;
-  border-radius: var(--kp-radius-full);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-2);
-  font-size: var(--kp-fs-xs);
-  font-weight: 600;
+  border-radius: var(--kp-radius-pill);
+  background: var(--_fond);
+  color: var(--_texte);
+  font-size: var(--kp-fs-secondary);
+  font-weight: 500;
+  line-height: 1;
   white-space: nowrap;
 
   &::before {
     content: '';
+    flex-shrink: 0;
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: currentColor;
+    background: var(--_point);
   }
 
   &--ok {
-    background: var(--kp-success-subtle);
-    color: var(--kp-success);
+    --_point: var(--kp-state-success);
+    --_fond: var(--kp-state-success-bg);
+    --_texte: var(--kp-state-success-text);
   }
 
   &--attention {
-    background: var(--kp-warning-subtle);
-    color: var(--kp-warning);
+    --_point: var(--kp-state-warning);
+    --_fond: var(--kp-state-warning-bg);
+    --_texte: var(--kp-state-warning-text);
   }
 
   &--danger {
-    background: var(--kp-danger-subtle);
-    color: var(--kp-danger);
+    --_point: var(--kp-state-danger);
+    --_fond: var(--kp-state-danger-bg);
+    --_texte: var(--kp-state-danger-text);
   }
 
+  // « En attente de l'autre partie » : pas d'équivalent « info » dans la table des états
   &--info {
-    background: var(--kp-info-subtle);
-    color: var(--kp-info);
+    --_point: var(--kp-state-neutral);
+    --_fond: var(--kp-state-neutral-bg);
+    --_texte: var(--kp-state-neutral-text);
+  }
+
+  // Dans le texte courant : point de 8 px + texte, sans fond
+  &--point {
+    height: auto;
+    padding: 0;
+    gap: 8px;
+    background: none;
+    color: var(--kp-text);
+    font-size: inherit;
+    font-weight: 400;
+    line-height: inherit;
+
+    &::before {
+      width: 8px;
+      height: 8px;
+    }
   }
 }
 
@@ -818,10 +849,10 @@ button.kp-card {
   gap: 6px;
   min-height: 28px;
   padding: 0 10px;
-  border-radius: var(--kp-radius-full);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-2);
-  font-size: var(--kp-fs-sm);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-muted);
+  font-size: var(--kp-fs-secondary);
 }
 
 // ── Bandeaux d'information ───────────────────────────────────────────────────
