@@ -104,7 +104,7 @@ Nouveaux noms et valeurs : `../frontend-audit/livraison-dev.md`, section « Tabl
 | `--kp-border-strong` (18) | `--kp-border-strong` `rgba(16,33,43,0.14)` | **Ajout** : champs et boutons secondaires (la doc donne 0,12 à 0,16) |
 | `--kp-text-1` (30) | `--kp-text` `#10212B` | |
 | `--kp-text-2` (21) | `--kp-text-muted` `#46545C` | |
-| `--kp-text-3` (38) | `--kp-text-subtle` `#66737A` | |
+| `--kp-text-3` (38) | `--kp-text-subtle` `#636F76` | Valeur de la doc `#66737A` foncée d'un cran : 4,72:1 sur `--kp-bg` (décision du 7 nov. 2026) |
 | `--kp-text-invert` | `--kp-text-on-accent` `#FFFFFF` | **Ajout** : texte sur olive et sur nuit plein |
 | `--kp-primary` (18) | `--kp-accent` `#4F6A2E` | L'olive devient foncée |
 | `--kp-primary-hover` (1) | `--kp-accent-hover` | **Ajout**, olive un cran plus foncé (par exemple `#435A27`) |
@@ -126,7 +126,7 @@ Nouveaux noms et valeurs : `../frontend-audit/livraison-dev.md`, section « Tabl
 | `--kp-radius-lg` 20 | `--kp-radius-lg` 20 | |
 | `--kp-radius-full` (13) | `--kp-radius-pill` 999 | |
 | `--kp-shadow` (6) | `--kp-elev-1` (barres, menus, toasts) ou `--kp-elev-2` (fenêtres) ; `--kp-elev-0` pour les cartes | |
-| `--kp-focus` | conservé, recoloré avec l'olive foncée | Focus clavier toujours visible |
+| `--kp-focus` | conservé : anneau nuit (menthe en sombre) avec liseré de surface, comme la planche `DS-Fondations` | Focus clavier toujours visible (décision du 7 nov. 2026) |
 | `--kp-backdrop` | conservé `rgba(16,33,43,0.45)` | Voile des fenêtres |
 | `--kp-duree` 220ms | `--kp-duree` 160ms, `--kp-duree-lente` 480ms, `--kp-ease` `cubic-bezier(0.22,1,0.36,1)` | À 0 si `prefers-reduced-motion` |
 | `--kp-tap`, `--kp-safe-*`, `--kp-tabbar-h`, `--kp-bottom-offset` | conservés | Mécanique de mise en page, inchangée |
@@ -143,6 +143,7 @@ Les couleurs écrites en dur hors de `_theme.scss` (environ 60 occurrences : `la
 | E3 | Image de la signature du bailleur | `Signer-Bail` (cadre « Le bailleur ») | « Signé par … le … » |
 | E4 | Favoris | `Nav-Candidat` (entrée), `Nav-Mobile` (onglet et tuile « Favoris ») | Entrée, onglet et tuile omis |
 | E5 | Alertes de recherche | `Nav-Candidat` (« Annonces, carte et alertes ») | Texte sans « alertes » |
+| E6 | Recherche des conversations par personne | `Nav-Proprio-Messages` (« Personne ou bien ») | L'API ne filtre que par `nomDuBien` : champ « Rechercher un bien » |
 
 Toute nouvelle évolution découverte pendant une phase s'ajoute à cette table, dans le commit de documentation de la phase, et figure dans le rapport de fin de phase.
 
@@ -166,7 +167,7 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 | Phase | État | Commit de fin | Écarts restants |
 | --- | --- | --- | --- |
 | 1 | faite (6 nov. 2026) : build vert, 119/119 tests | voir `git log` (« docs(refonte): bilan de la phase 1 ») | Voir « Bilan de la phase 1 » ci-dessous |
-| 2 | à faire | | |
+| 2 | faite (7 nov. 2026) : build vert, 132/132 tests | voir `git log` (« docs(refonte): bilan de la phase 2 ») | Voir « Bilan de la phase 2 » ci-dessous |
 | 3 | à faire | | |
 | 4 | à faire | | |
 | 5 | à faire | | |
@@ -197,13 +198,51 @@ Chaque session met à jour sa ligne dans le dernier commit de sa phase (`docs(re
 | Composant | Écart | Raison | Suite |
 | --- | --- | --- | --- |
 | Navigation | Ancienne barre latérale et barre d'onglets, passées en clair par les alias `--kp-nav-*` ; carré « K » + nom en texte | Refaite en phase 2 | Phase 2 |
-| Focus clavier | Anneau nuit (menthe en sombre) avec liseré de surface, comme la planche, et non olive comme l'annonçait la table des jetons | La planche montre un anneau nuit ; l'olive sur un bouton olive se distinguait mal | À valider |
-| États vides | Icône Lucide au trait 1,5 sur un aplat olive clair, pas les illustrations dessinées de la planche | Pas de jeu d'illustrations dans le code | Illustrations à fournir si souhaité |
+| Focus clavier | Anneau nuit (menthe en sombre) avec liseré de surface, comme la planche, et non olive comme l'annonçait la table des jetons | La planche montre un anneau nuit ; l'olive sur un bouton olive se distinguait mal | **Validé** (7 nov.) |
+| États vides | Icône Lucide au trait 1,5 sur un aplat olive clair, pas les illustrations dessinées de la planche | Pas de jeu d'illustrations dans le code | **Validé** en attendant des illustrations fournies (7 nov.) |
 | Lignes de liste | Titre coupé par une ellipse, mais l'attribut `title` (texte complet au survol) n'est pas encore posé dans les gabarits | Ajouté écran par écran | Phases 3 à 5 |
 | Frise, onglets de page, tableaux | Prêts mais pas encore utilisés par un écran | Les écrans viennent avec leur phase | Phases 3 et 4 |
-| Toasts en thème sombre | Toast « inversé » menthe plein avec texte nuit | Les maquettes ne couvrent pas le sombre | À valider |
-| `--kp-text-subtle` sur `--kp-bg` | 4,46:1 (juste sous 4,5:1) | Valeur imposée par la table des jetons ; 4,89:1 sur `--kp-surface` | À décider (par exemple `#636F76`, 4,72:1) |
+| Toasts en thème sombre | Toast « inversé » menthe plein avec texte nuit | Les maquettes ne couvrent pas le sombre | **Validé** tant que les maquettes ne couvrent pas le sombre (7 nov.) |
+| `--kp-text-subtle` sur `--kp-bg` | 4,46:1 (juste sous 4,5:1) | Valeur imposée par la table des jetons ; 4,89:1 sur `--kp-surface` | **Corrigé** en phase 2 : `#636F76` (4,72:1), commit « fix(ds): contraste de --kp-text-subtle » |
 | Bouton WhatsApp | Vert de marque en dur (`#1f7a3f`) | Couleur de marque, hors jetons | Aucune |
-| Bandeau « Installer l'application » | Couvre le haut de la page de connexion à l'ouverture, logo compris | Comportement existant (`app.html`), seules ses couleurs ont changé | Phase 2 (barres) |
+| Bandeau « Installer l'application » | Couvre le haut de la page de connexion à l'ouverture, logo compris | Comportement existant (`app.html`), seules ses couleurs ont changé | **Corrigé** en phase 2 : le bandeau passe en bas, au-dessus des onglets |
 
 Aucune nouvelle évolution serveur découverte en phase 1.
+
+**Décisions sur ce bilan (7 novembre 2026)** : focus clavier en anneau nuit (menthe en sombre), la table des jetons est corrigée ; `--kp-text-subtle` passe à `#636F76` ; toasts inversés en sombre validés tant que les maquettes ne couvrent pas le sombre ; `kp-logo` sur les pages légales et toasts à 5 s validés ; états vides en icône Lucide sur aplat olive clair en attendant des illustrations fournies.
+
+### Bilan de la phase 2
+
+**Ce qui est en place**
+
+| Élément | Où | Usage |
+| --- | --- | --- |
+| Profil de navigation | `core/navigation/navigation.service.ts` | `profil()` : `visiteur`, `candidat`, `locataire`, `proprietaire` (un bien possédé suffit) ; `onglets()` (ordinateur) et `ongletsMobile()` par profil ; `profilConnu()` est faux juste après une connexion, tant que l'API n'a pas répondu (aucune barre plutôt qu'une bascule candidat → propriétaire) |
+| Barre latérale | `layouts/app-shell/barre-laterale.component.ts` | Propriétaire, dès 768 px ; `view-transition-name` pour ne pas clignoter entre deux écrans |
+| Barre du haut | `layouts/app-shell/barre-haut.component.ts` | Locataire, candidat ; menu du compte (Compte, Documents si `aDesDocuments`, Messages, Déconnexion par `AuthService.logout()`) ; visiteur : barre publique fonctionnelle (style en phase 5) |
+| Téléphone | `layouts/app-shell/entete-mobile.component.ts`, onglets dans `app-shell` | En-tête fixe et onglets du bas ; `data-onglets` / `--kp-bottom-offset` conservés |
+| `--kp-top-offset` | `styles/_theme.scss` | Hauteur de la barre du haut (68 px, ordinateur) ou de l'en-tête (60 px, téléphone), posée par `data-barre` / `data-onglets` ; lue par `kp-page-header` (barre collée dessous) et la carte d'Explorer |
+| Cloche | `shared/ui/cloche.component.ts` | `variante` : `carte` (32 px), `barre`, `entete` (44 px) ; elle n'est plus dans `kp-page-header` |
+| Arrivée | `core/auth/guards/auth.guard.ts` | `accueilPour(user, { aDesBiens, aUnLogement })` : locataire sans bien → `/mon-logement` ; `accueilGuard` lui passe les valeurs relues par `charger()` |
+| Messagerie | `features/messagerie/**` | Plein écran sur téléphone seulement (`BreakpointObserver`) ; carte à la hauteur de la fenêtre et deux défilements ailleurs ; « Proposer la location » pour le propriétaire d'un bien sans locataire ni archive |
+
+**Écarts restants avec les maquettes**
+
+| Maquette | Écart | Raison | Suite |
+| --- | --- | --- | --- |
+| `Nav-Proprio-Tableau` | Pas de compteur de biens à côté de « Mes biens » | Aucun nombre de biens n'est gardé : `LogementContextService` ne retient qu'un booléen, `DonneesProprietaireService` n'est chargé que par l'accueil et les documents | À décider : garder le nombre dans `LogementContextService.charger()` (même appel `GET /users/biens`) |
+| `Nav-Proprio-*`, barres | Cloche avec la pastille rouge du nombre de non lues, et non un point olive | Le test de `kp-cloche` et l'accessibilité demandent le nombre | Aucune |
+| `Nav-Proprio-Messages` | Recherche « Rechercher un bien » au lieu de « Personne ou bien » | L'API ne cherche que par bien (E6) | Évolution E6 |
+| `Nav-Proprio-Messages` | Heure et accusé (coches) dans la bulle, pas en dessous avec « · lu » | Structure du fil existante gardée (états d'envoi, échec, réessai) | Phase 6 si besoin |
+| `Nav-Proprio-Messages` | « Non lues · N » compte les messages non lus (compteur global), comme la pastille de la barre | Seule donnée chargée sans nouvel appel | Aucune |
+| `Nav-Candidat`, `Nav-Mobile` | Pas de « Favoris » (entrée, onglet, tuile) | E4 | Évolution E4 |
+| `Nav-Mobile`, `Mon-Logement`, `Nav-Candidat` | Contenu des écrans (titres, tuiles, frise) | Phases 3 et 4 | Phases 3 et 4 |
+| Barre publique (visiteur) | Style provisoire ; le logo mène à la landing, hors barre | Phase 5 | Phase 5 |
+| Téléphone | Le titre replié de `kp-page-header` n'apparaît plus quand l'en-tête d'écran n'a ni retour ni action (sa barre vide est masquée sous l'en-tête de l'application) | Éviter une bande vide de 56 px | Phases 3 à 5, écran par écran |
+
+**Autres points**
+
+- Tablette (768 à 1099 px) : barre latérale complète au lieu de l'ancien rail d'icônes de 88 px.
+- Le budget de taille du paquet initial (avertissement à 500 ko) est dépassé de 4 ko : la mise en page est chargée d'emblée. Avertissement seulement, le build reste vert.
+- L'écran « Demandes de location » (`/demandes-location`) n'est toujours dans aucun menu ; il est repris sur l'accueil candidat en phase 4 (décision à prendre si une entrée est souhaitée avant).
+- Évolution découverte : E6 (recherche des conversations par personne).
