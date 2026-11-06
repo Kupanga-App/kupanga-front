@@ -15,6 +15,8 @@
   padding-bottom: var(--kp-bottom-offset);
 
   @include mq.tablette {
+    // Barre du haut collante : déjà dans le flux, au-dessus du contenu
+    min-height: calc(100dvh - var(--kp-top-offset));
     padding-top: 0;
     padding-bottom: 0;
   }
