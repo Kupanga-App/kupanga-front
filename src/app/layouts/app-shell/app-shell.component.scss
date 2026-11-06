@@ -14,7 +14,36 @@
   }
 }
 
-// ── Barre latérale (tablette, ordinateur) ───────────────────────────────────
+// ── Barre latérale du propriétaire (tablette, ordinateur) ───────────────────
+// Carte fixe détachée des bords ; seule sa liste d'entrées défile (barre-laterale.component.ts).
+
+:host {
+  --kp-shell-gap: clamp(8px, 0.8vw, 12px);
+}
+
+.barre-laterale {
+  display: none;
+
+  @include mq.tablette {
+    position: fixed;
+    top: calc(var(--kp-shell-gap) + var(--kp-safe-top));
+    bottom: calc(var(--kp-shell-gap) + var(--kp-safe-bottom));
+    left: calc(var(--kp-shell-gap) + var(--kp-safe-left));
+    z-index: 50;
+    display: flex;
+    width: var(--kp-sidebar-w);
+    // Reste en place pendant le fondu entre deux écrans (View Transitions du routeur)
+    view-transition-name: kp-barre-laterale;
+  }
+}
+
+:host(.avec-barre-laterale) .contenu {
+  @include mq.tablette {
+    margin-left: calc(var(--kp-sidebar-w) + var(--kp-shell-gap) + var(--kp-safe-left));
+  }
+}
+
+// ── Ancienne barre latérale (autres profils, remplacée par la barre du haut) ─
 
 .laterale {
   display: none;

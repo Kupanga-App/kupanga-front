@@ -6,6 +6,7 @@ import { ChatStoreService } from '../../features/messagerie/services/chat-store.
 import { AppNotificationService } from '../../features/notifications/services/app-notification.service';
 import { ChatNotificationComponent } from '../../features/messagerie/components/chat-notification/chat-notification.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+import { BarreLateraleComponent } from './barre-laterale.component';
 
 /**
  * Mise en page de l'application : barre d'onglets du bas (téléphone) ou barre latérale (tablette, ordinateur),
@@ -14,9 +15,10 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent, ChatNotificationComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent, ChatNotificationComponent, BarreLateraleComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
+  host: { '[class.avec-barre-laterale]': "barres() && nav.profil() === 'proprietaire'" },
 })
 export class AppShellComponent {
   protected readonly nav = inject(NavigationService);
@@ -25,12 +27,14 @@ export class AppShellComponent {
   protected readonly notifications = inject(AppNotificationService);
 
   protected readonly connecte = computed(() => !!this.auth.currentUser());
+  /** Barres de navigation affichées : hors écrans pleins, et une fois le profil du compte connu. */
+  protected readonly barres = computed(() => !this.nav.pleinEcran() && this.nav.profilConnu());
 
   constructor() {
     // Hauteur de la barre d'onglets lue par les éléments collés en bas (styles/_theme.scss : --kp-bottom-offset)
     const racine = document.documentElement;
     effect(() => {
-      if (this.nav.pleinEcran()) {
+      if (!this.barres()) {
         racine.removeAttribute('data-onglets');
       } else {
         racine.setAttribute('data-onglets', '');

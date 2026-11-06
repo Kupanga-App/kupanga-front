@@ -21,7 +21,7 @@ import { ClocheComponent } from './cloche.component';
       }
       <span class="barre__titre" aria-hidden="true">{{ titre() }}</span>
       <span class="actions"><ng-content select="[actions]" /></span>
-      <kp-cloche />
+      <span class="cloche-tel"><kp-cloche variante="entete" /></span>
     </div>
     <div class="grand" #grand>
       <h1>{{ titre() }}</h1>
@@ -55,6 +55,8 @@ import { ClocheComponent } from './cloche.component';
     .barre--compacte .barre__titre { opacity: 1; }
     .actions { display: flex; align-items: center; gap: 8px; }
     .actions:empty { display: none; }
+    .cloche-tel { display: contents; }
+    @media (min-width: 768px) { .cloche-tel { display: none; } }
     .grand { padding: 4px 0 var(--kp-space-5); }
     .sous-titre { margin-top: 4px; color: var(--kp-text-3); }
   `],

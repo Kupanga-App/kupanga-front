@@ -1,4 +1,6 @@
-@if (!nav.pleinEcran()) {
+@if (barres() && nav.profil() === 'proprietaire') {
+  <kp-barre-laterale class="barre-laterale" />
+} @else if (barres()) {
   <nav class="laterale" aria-label="Navigation principale">
     <a routerLink="/" class="logo" aria-label="Kupanga, accueil">
       <span class="logo__k" aria-hidden="true">K</span>
@@ -41,7 +43,7 @@
   <router-outlet />
 </main>
 
-@if (!nav.pleinEcran()) {
+@if (barres()) {
   <nav class="onglets" aria-label="Navigation principale">
     @for (o of nav.ongletsMobile(); track o.lien) {
       <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="onglet">
