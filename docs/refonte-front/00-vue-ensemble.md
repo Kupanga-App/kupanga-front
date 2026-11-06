@@ -165,7 +165,7 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 
 | Phase | État | Commit de fin | Écarts restants |
 | --- | --- | --- | --- |
-| 1 | à faire | | |
+| 1 | faite (6 nov. 2026) : build vert, 119/119 tests | voir `git log` (« docs(refonte): bilan de la phase 1 ») | Voir « Bilan de la phase 1 » ci-dessous |
 | 2 | à faire | | |
 | 3 | à faire | | |
 | 4 | à faire | | |
@@ -173,3 +173,37 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 | 6 | à faire | | |
 
 Chaque session met à jour sa ligne dans le dernier commit de sa phase (`docs(refonte): bilan de la phase N`).
+
+### Bilan de la phase 1
+
+**Ce qui est en place pour les phases suivantes**
+
+| Élément | Où | Usage |
+| --- | --- | --- |
+| Jetons par rôle + alias | `src/styles/_theme.scss` | Bloc `// ALIAS À RETIRER (phase 5)` ; les alias sont déclarés une fois sur `:root` et suivent le thème |
+| Interligne du corps | `--kp-lh-body` | 22 px pour 15 px, écrit en ratio (1,4667) pour ne pas écraser les textes plus grands qui en héritent |
+| `kp-logo` | `shared/ui/logo.component.ts` | `[hauteur]`, `forme="icone"` ; branché sur les pages de connexion, de signature et légales |
+| `kp-onglets` | `shared/ui/segmented.component.ts` | Onglets de page en liens : `[onglets]="[{ libelle, lien, nombre?, exact? }]"` |
+| `kp-segmented` classe `plein` | idem | Occupe toute la largeur |
+| `kp-statut forme="point"` / `.kp-statut--point` | `shared/ui/statut.component.ts` | Point + texte dans le texte courant |
+| `kp-frise` | `shared/ui/frise.component.ts` | `[etapes]="[{ libelle, detail?, etat, icone? }]"`, `titre` ; aucun calcul d'étape |
+| `kp-sheet forme="panneau"` | `shared/ui/sheet.component.ts` | Panneau latéral droit sur tablette et ordinateur |
+| `.kp-table` | `_components.scss` | `.kp-table-cadre`, `__titre`, `__nombre`, `__discret`, `__secondaire`, `__actions`, `__tri`, `.kp-table-pied`, `data-libelle` sur téléphone |
+| Bannières structurées | `_components.scss` | `.kp-bandeau__corps`, `__titre`, `__texte`, `__action` |
+| Divers | `_components.scss` | `.kp-tabulaire`, `.kp-input-groupe--long` (« € par mois »), `.kp-icon-btn--sm`, `.kp-skeleton--vignette`, `.kp-card__titre` |
+
+**Écarts restants avec `DS-Fondations` et `DS-Composants`**
+
+| Composant | Écart | Raison | Suite |
+| --- | --- | --- | --- |
+| Navigation | Ancienne barre latérale et barre d'onglets, passées en clair par les alias `--kp-nav-*` ; carré « K » + nom en texte | Refaite en phase 2 | Phase 2 |
+| Focus clavier | Anneau nuit (menthe en sombre) avec liseré de surface, comme la planche, et non olive comme l'annonçait la table des jetons | La planche montre un anneau nuit ; l'olive sur un bouton olive se distinguait mal | À valider |
+| États vides | Icône Lucide au trait 1,5 sur un aplat olive clair, pas les illustrations dessinées de la planche | Pas de jeu d'illustrations dans le code | Illustrations à fournir si souhaité |
+| Lignes de liste | Titre coupé par une ellipse, mais l'attribut `title` (texte complet au survol) n'est pas encore posé dans les gabarits | Ajouté écran par écran | Phases 3 à 5 |
+| Frise, onglets de page, tableaux | Prêts mais pas encore utilisés par un écran | Les écrans viennent avec leur phase | Phases 3 et 4 |
+| Toasts en thème sombre | Toast « inversé » menthe plein avec texte nuit | Les maquettes ne couvrent pas le sombre | À valider |
+| `--kp-text-subtle` sur `--kp-bg` | 4,46:1 (juste sous 4,5:1) | Valeur imposée par la table des jetons ; 4,89:1 sur `--kp-surface` | À décider (par exemple `#636F76`, 4,72:1) |
+| Bouton WhatsApp | Vert de marque en dur (`#1f7a3f`) | Couleur de marque, hors jetons | Aucune |
+| Bandeau « Installer l'application » | Couvre le haut de la page de connexion à l'ouverture, logo compris | Comportement existant (`app.html`), seules ses couleurs ont changé | Phase 2 (barres) |
+
+Aucune nouvelle évolution serveur découverte en phase 1.
