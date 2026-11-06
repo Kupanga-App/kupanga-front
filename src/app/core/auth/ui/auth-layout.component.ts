@@ -30,9 +30,9 @@ import { LIENS_LEGAUX } from '../../legal/liens-legaux';
     </main>
     <footer class="pied"><ng-content select="[pied]" /></footer>
     <nav class="legal" aria-label="Informations légales">
-      <a [href]="liens.confidentialite" target="_blank" rel="noopener noreferrer">Confidentialité</a>
+      <a [routerLink]="liens.confidentialite" target="_blank">Confidentialité</a>
       <span aria-hidden="true">·</span>
-      <a [href]="liens.conditions" target="_blank" rel="noopener noreferrer">Conditions d'utilisation</a>
+      <a [routerLink]="liens.conditions" target="_blank">Conditions d'utilisation</a>
     </nav>
   `,
   styles: [`

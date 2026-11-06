@@ -39,6 +39,12 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', canActivate: [landingGuard], title: 'Kupanga · La gestion locative, de l’annonce à la fin du bail',
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent) },
 
+  // Pages légales : publiques, sans compte (adresses déclarées à Google, écran de consentement)
+  { path: 'confidentialite', title: 'Politique de confidentialité · Kupanga',
+    loadComponent: () => import('./features/legal/confidentialite.component').then(m => m.ConfidentialiteComponent) },
+  { path: 'conditions', title: 'Conditions d’utilisation · Kupanga',
+    loadComponent: () => import('./features/legal/conditions.component').then(m => m.ConditionsComponent) },
+
   // Signature depuis le lien reçu par e-mail : publique, plein écran
   { path: 'contrats/signer/:token', title: 'Signer le bail · Kupanga',
     loadComponent: () => import('./features/signature/signer-contrat.component').then(m => m.SignerContratComponent) },
