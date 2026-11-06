@@ -7,6 +7,7 @@ import { AppNotificationService } from '../../features/notifications/services/ap
 import { ChatNotificationComponent } from '../../features/messagerie/components/chat-notification/chat-notification.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BarreLateraleComponent } from './barre-laterale.component';
+import { BarreHautComponent } from './barre-haut.component';
 
 /**
  * Mise en page de l'application : barre d'onglets du bas (téléphone) ou barre latérale (tablette, ordinateur),
@@ -15,7 +16,7 @@ import { BarreLateraleComponent } from './barre-laterale.component';
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent, ChatNotificationComponent, BarreLateraleComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent, ChatNotificationComponent, BarreLateraleComponent, BarreHautComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
   host: { '[class.avec-barre-laterale]': "barres() && nav.profil() === 'proprietaire'" },
@@ -40,7 +41,18 @@ export class AppShellComponent {
         racine.setAttribute('data-onglets', '');
       }
     });
-    inject(DestroyRef).onDestroy(() => racine.removeAttribute('data-onglets'));
+    // Barre affichée sur tablette et ordinateur, lue par les en-têtes collés en haut (--kp-top-offset)
+    effect(() => {
+      if (!this.barres()) {
+        racine.removeAttribute('data-barre');
+      } else {
+        racine.setAttribute('data-barre', this.nav.profil() === 'proprietaire' ? 'laterale' : 'haut');
+      }
+    });
+    inject(DestroyRef).onDestroy(() => {
+      racine.removeAttribute('data-onglets');
+      racine.removeAttribute('data-barre');
+    });
   }
 
   protected compteur(onglet: Onglet): number {

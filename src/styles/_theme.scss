@@ -147,6 +147,8 @@
   // Hauteur de la barre d'onglets du bas (0 si absente) : posée par la mise en page
   --kp-tabbar-h: 0px;
   --kp-bottom-offset: calc(var(--kp-tabbar-h) + var(--kp-safe-bottom));
+  // Hauteur occupée en haut par une barre fixe ou collante (0 si absente) : posée par la mise en page
+  --kp-top-offset: 0px;
 
   // ALIAS À RETIRER (phase 5)
   // Anciens noms → nouveaux jetons. Déclarés une seule fois, sur :root, après les mixins :
@@ -199,6 +201,13 @@
 @media (max-width: 767px) {
   :root[data-onglets] {
     --kp-tabbar-h: 64px;
+  }
+}
+
+// Barre du haut collante (locataire, candidat, visiteur) : 56 px + marge haute (app-shell, barre-haut)
+@media (min-width: 768px) {
+  :root[data-barre='haut'] {
+    --kp-top-offset: calc(68px + var(--kp-safe-top));
   }
 }
 

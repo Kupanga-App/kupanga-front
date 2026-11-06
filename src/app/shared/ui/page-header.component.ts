@@ -34,7 +34,7 @@ import { ClocheComponent } from './cloche.component';
   styles: [`
     :host { display: block; }
     .barre {
-      position: sticky; top: 0; z-index: 40;
+      position: sticky; top: var(--kp-top-offset, 0px); z-index: 40;
       display: flex; align-items: center; gap: 4px;
       min-height: calc(56px + var(--kp-safe-top));
       margin: 0 calc(-1 * var(--kp-space-4));

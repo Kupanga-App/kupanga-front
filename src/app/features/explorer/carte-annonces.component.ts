@@ -12,7 +12,7 @@ import { formatMontant } from '../../core/money/montant';
   standalone: true,
   template: `<div #carte class="carte" role="region" aria-label="Carte des annonces"></div>`,
   styles: [`
-    .carte { height: calc(100dvh - 260px - var(--kp-bottom-offset)); min-height: 320px; border-radius: var(--kp-radius); overflow: hidden; z-index: 0; }
+    .carte { height: calc(100dvh - 260px - var(--kp-bottom-offset) - var(--kp-top-offset)); min-height: 320px; border-radius: var(--kp-radius); overflow: hidden; z-index: 0; }
     :host ::ng-deep .kp-bulle { font-family: var(--kp-font); cursor: pointer; }
     :host ::ng-deep .kp-bulle strong { display: block; font-size: 15px; }
   `],
