@@ -80,7 +80,8 @@
   height: 40px;
   border-radius: var(--kp-radius);
   background: var(--kp-nav-accent);
-  color: #10212b;
+  // Provisoire (phase 2 : logo SVG) : texte lisible sur l'olive foncée
+  color: var(--kp-text-on-accent);
   font-family: var(--kp-font-display);
   font-size: 24px;
 }

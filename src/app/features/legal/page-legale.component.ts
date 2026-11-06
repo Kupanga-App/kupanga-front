@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ViewEncapsulation, inject, input } 
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { DATE_MISE_A_JOUR_LEGALE, LIENS_LEGAUX } from '../../core/legal/liens-legaux';
+import { LogoComponent } from '../../shared/ui/logo.component';
 
 /**
  * Mise en page commune des pages légales (publiques, sans compte) : logo, retour, texte en colonne de lecture,
@@ -10,7 +11,7 @@ import { DATE_MISE_A_JOUR_LEGALE, LIENS_LEGAUX } from '../../core/legal/liens-le
 @Component({
   selector: 'kp-page-legale',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, IconComponent],
+  imports: [RouterLink, RouterLinkActive, IconComponent, LogoComponent],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -20,8 +21,7 @@ import { DATE_MISE_A_JOUR_LEGALE, LIENS_LEGAUX } from '../../core/legal/liens-le
           <kp-icon name="chevron-left" [size]="24" />
         </button>
         <a routerLink="/" class="kp-legal__logo" aria-label="Kupanga, accueil">
-          <span class="kp-legal__k" aria-hidden="true">K</span>
-          <span>Kupanga</span>
+          <kp-logo [hauteur]="28" aria-hidden="true" />
         </a>
       </header>
 
@@ -45,12 +45,8 @@ import { DATE_MISE_A_JOUR_LEGALE, LIENS_LEGAUX } from '../../core/legal/liens-le
     }
     .kp-legal__haut { display: flex; align-items: center; gap: 4px; max-width: 720px; margin: 0 auto; min-height: 64px; }
     .kp-legal__logo {
-      display: inline-flex; align-items: center; gap: 10px; margin-left: 4px; color: var(--kp-text-1); text-decoration: none;
-      font-family: var(--kp-font-display); font-size: var(--kp-fs-lg);
-    }
-    .kp-legal__k {
-      display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
-      border-radius: 10px; background: var(--kp-nav-bg); color: #effbdb; font-size: 22px;
+      display: inline-flex; align-items: center; min-height: var(--kp-tap); margin-left: 4px; padding: 0 4px;
+      border-radius: var(--kp-radius-sm); text-decoration: none;
     }
     .kp-legal__texte { max-width: 720px; margin: 16px auto 0; line-height: 1.6; overflow-wrap: anywhere; }
     .kp-legal__texte h1 { font-family: var(--kp-font-display); font-size: var(--kp-fs-2xl); font-weight: 400; line-height: 1.2; }
