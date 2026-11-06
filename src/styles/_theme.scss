@@ -201,6 +201,8 @@
 @media (max-width: 767px) {
   :root[data-onglets] {
     --kp-tabbar-h: 64px;
+    // En-tête fixe du téléphone : 44 px + 2 × 8 px (entete-mobile.component.ts)
+    --kp-top-offset: calc(60px + var(--kp-safe-top));
   }
 }
 

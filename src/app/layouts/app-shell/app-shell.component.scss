@@ -1,25 +1,27 @@
 @use 'mq';
 
 :host {
+  --kp-shell-gap: clamp(8px, 0.8vw, 12px);
+
   display: block;
   min-height: 100dvh;
 }
 
+// Seul le contenu défile : les barres sont fixes (ou collantes) et le contenu passe dessous.
+// --kp-top-offset / --kp-bottom-offset : hauteur des barres, posées par app-shell.component.ts (data-onglets, data-barre)
 .contenu {
   min-height: 100dvh;
+  padding-top: var(--kp-top-offset);
   padding-bottom: var(--kp-bottom-offset);
 
   @include mq.tablette {
+    padding-top: 0;
     padding-bottom: 0;
   }
 }
 
 // ── Barre latérale du propriétaire (tablette, ordinateur) ───────────────────
 // Carte fixe détachée des bords ; seule sa liste d'entrées défile (barre-laterale.component.ts).
-
-:host {
-  --kp-shell-gap: clamp(8px, 0.8vw, 12px);
-}
 
 .barre-laterale {
   display: none;
@@ -54,17 +56,31 @@
   }
 }
 
-// ── Barre d'onglets du bas (téléphone) ──────────────────────────────────────
+// ── En-tête du téléphone ────────────────────────────────────────────────────
+
+.entete-mobile {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  view-transition-name: kp-entete-mobile;
+
+  @include mq.tablette {
+    display: none;
+  }
+}
+
+// ── Onglets du bas (téléphone) ──────────────────────────────────────────────
 
 .onglets {
   position: fixed;
   inset: auto 0 0 0;
   z-index: 50;
   display: flex;
-  height: calc(64px + var(--kp-safe-bottom));
-  padding: 0 var(--kp-safe-right) var(--kp-safe-bottom) var(--kp-safe-left);
-  background: var(--kp-nav-bg);
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.08);
+  height: calc(var(--kp-tabbar-h) + var(--kp-safe-bottom));
+  padding: 0 calc(4px + var(--kp-safe-right)) var(--kp-safe-bottom) calc(4px + var(--kp-safe-left));
+  background: var(--kp-surface);
+  box-shadow: 0 -1px 0 var(--kp-border);
+  view-transition-name: kp-onglets;
 
   @include mq.tablette {
     display: none;
@@ -78,30 +94,30 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
-  color: var(--kp-nav-text);
+  color: var(--kp-text-subtle);
   text-decoration: none;
 
   &.actif {
-    color: var(--kp-nav-active);
+    color: var(--kp-text);
+    font-weight: 500;
 
     .onglet__icone {
-      background: rgba(143, 164, 100, 0.24);
-      color: var(--kp-nav-active);
+      background: var(--kp-text);
+      color: var(--kp-text-on-accent);
     }
   }
 }
 
 .onglet__icone {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-grid;
+  place-items: center;
   width: 56px;
   height: 30px;
-  border-radius: var(--kp-radius-full);
-  transition: background-color var(--kp-duree);
+  border-radius: var(--kp-radius-pill);
+  transition: background-color var(--kp-duree) var(--kp-ease);
 
   .kp-pastille {
     top: -4px;
@@ -112,8 +128,8 @@
 .onglet__libelle {
   max-width: 100%;
   overflow: hidden;
-  font-size: var(--kp-fs-xs);
-  font-weight: 600;
+  font-size: 11px;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

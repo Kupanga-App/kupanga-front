@@ -1,17 +1,16 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../components/icon/icon.component';
-import { ClocheComponent } from './cloche.component';
 
 /**
  * En-tête d'écran : grand titre qui se replie dans la barre du haut au défilement (AUDIT.md §8.3),
- * chevron de retour vers l'écran parent, actions à droite (`<… actions>`), puis la cloche des notifications
- * (téléphone, utilisateur connecté).
+ * chevron de retour vers l'écran parent, actions à droite (`<… actions>`). La cloche des notifications est
+ * dans les barres de navigation (app-shell).
  */
 @Component({
   selector: 'kp-page-header',
   standalone: true,
-  imports: [RouterLink, IconComponent, ClocheComponent],
+  imports: [RouterLink, IconComponent],
   template: `
     <div class="barre" [class.barre--compacte]="compact()">
       @if (retour(); as url) {
@@ -21,7 +20,6 @@ import { ClocheComponent } from './cloche.component';
       }
       <span class="barre__titre" aria-hidden="true">{{ titre() }}</span>
       <span class="actions"><ng-content select="[actions]" /></span>
-      <span class="cloche-tel"><kp-cloche variante="entete" /></span>
     </div>
     <div class="grand" #grand>
       <h1>{{ titre() }}</h1>
@@ -55,8 +53,11 @@ import { ClocheComponent } from './cloche.component';
     .barre--compacte .barre__titre { opacity: 1; }
     .actions { display: flex; align-items: center; gap: 8px; }
     .actions:empty { display: none; }
-    .cloche-tel { display: contents; }
-    @media (min-width: 768px) { .cloche-tel { display: none; } }
+    /* Téléphone, sous l'en-tête fixe de l'application : sans zone sûre, et masquée si elle n'a ni retour ni action */
+    @media (max-width: 767px) {
+      :host-context(html[data-onglets]) .barre { min-height: 56px; padding-top: 0; }
+      :host-context(html[data-onglets]) .barre:not(:has(> a, .actions > *)) { display: none; }
+    }
     .grand { padding: 4px 0 var(--kp-space-5); }
     .sous-titre { margin-top: 4px; color: var(--kp-text-3); }
   `],

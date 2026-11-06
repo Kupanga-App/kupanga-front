@@ -1,7 +1,10 @@
-@if (barres() && nav.profil() === 'proprietaire') {
-  <kp-barre-laterale class="barre-laterale" />
-} @else if (barres()) {
-  <kp-barre-haut class="barre-haut" />
+@if (barres()) {
+  @if (nav.profil() === 'proprietaire') {
+    <kp-barre-laterale class="barre-laterale" />
+  } @else {
+    <kp-barre-haut class="barre-haut" />
+  }
+  <kp-entete-mobile class="entete-mobile" />
 }
 
 <main class="contenu" id="contenu">
@@ -13,7 +16,7 @@
     @for (o of nav.ongletsMobile(); track o.lien) {
       <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="onglet">
         <span class="onglet__icone">
-          <kp-icon [name]="o.icone" [size]="24" />
+          <kp-icon [name]="o.icone" [size]="20" [strokeWidth]="1.75" />
           @if (compteur(o); as n) {
             <span class="kp-pastille">{{ n > 99 ? '99+' : n }}</span>
           }

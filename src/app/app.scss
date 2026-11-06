@@ -49,10 +49,11 @@
   }
 }
 
-// Bandeau « Installer l’application », en haut, sous la zone sûre
+// Bandeau « Installer l’application », en bas, au-dessus des onglets du téléphone (ne masque plus les barres
+// de navigation ni le logo des pages de connexion)
 .installation {
   position: fixed;
-  top: var(--kp-safe-top);
+  bottom: calc(var(--kp-bottom-offset) + 8px);
   left: 50%;
   z-index: 960;
   transform: translateX(-50%);
@@ -60,7 +61,6 @@
   align-items: center;
   gap: 12px;
   width: min(560px, calc(100vw - 24px));
-  margin-top: 8px;
   padding: 10px 8px 10px 12px;
   border-radius: var(--kp-radius-lg);
   background: var(--kp-text);
