@@ -5,14 +5,22 @@ import { AuthService } from '../services/auth.service';
 import { User } from '../models/user.model';
 import { LogementContextService } from '../../services/logement-context.service';
 
+/** Espaces du compte, déjà relus par `LogementContextService.charger()`. */
+export interface EspacesCompte {
+  aDesBiens: boolean;
+  aUnLogement: boolean;
+}
+
 /**
- * Écran d'accueil : le même pour tous les comptes (lot 3, plus de rôle) ; il montre les biens possédés, les
- * logements loués, les demandes et réservations. Visiteur : les annonces. Compte Google sans profil d'accueil :
- * choix « louer / mettre en location ».
+ * Écran d'arrivée d'un compte. Lot 3 : plus de rôle, l'accueil se déduit des espaces du compte :
+ * un compte qui loue un logement et ne possède aucun bien arrive sur « Mon logement » ; tous les autres sur
+ * l'accueil (qui montre les biens possédés, les logements loués, les demandes et réservations).
+ * Visiteur : les annonces. Compte Google sans profil d'accueil : choix « louer / mettre en location ».
  */
-export function accueilPour(user: User | null): string {
+export function accueilPour(user: User | null, espaces?: EspacesCompte): string {
   if (!user) return '/explorer';
   if (!user.role) return '/auth/google-role';
+  if (espaces?.aUnLogement && !espaces.aDesBiens) return '/mon-logement';
   return '/accueil';
 }
 
@@ -37,14 +45,19 @@ export const authGuard: CanActivateFn = (_route, state) => {
   return router.createUrlTree(['/auth/login'], { queryParams: { returnUrl: state.url } });
 };
 
-/** Racine `/` : vers l'accueil (les espaces du compte sont relus une fois par session). */
+/**
+ * Racine `/` : vers l'écran d'arrivée du compte. Ses espaces (biens, logement) sont relus une fois par session
+ * par `charger()`, sans autre appel ; hors ligne, les dernières valeurs gardées servent.
+ */
 export const accueilGuard: CanActivateFn = (): Observable<UrlTree> => {
   const auth = inject(AuthService);
   const router = inject(Router);
   const logement = inject(LogementContextService);
   const user = auth.getAccessToken() ? auth.currentUser() : null;
   if (user?.role) {
-    return logement.charger(user.id).pipe(map(() => router.createUrlTree([accueilPour(user)])));
+    return logement.charger(user.id).pipe(map(() => router.createUrlTree([
+      accueilPour(user, { aDesBiens: logement.aDesBiens(), aUnLogement: logement.hasLogement() }),
+    ])));
   }
   return of(router.createUrlTree([accueilPour(user)]));
 };
