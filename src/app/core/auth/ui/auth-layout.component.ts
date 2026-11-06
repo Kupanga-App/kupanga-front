@@ -1,6 +1,7 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { LIENS_LEGAUX } from '../../legal/liens-legaux';
 
 /**
  * Mise en page des écrans de connexion et d'inscription : une colonne (logo, titre court, contenu).
@@ -28,6 +29,11 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       <div class="contenu"><ng-content /></div>
     </main>
     <footer class="pied"><ng-content select="[pied]" /></footer>
+    <nav class="legal" aria-label="Informations légales">
+      <a [href]="liens.confidentialite" target="_blank" rel="noopener noreferrer">Confidentialité</a>
+      <span aria-hidden="true">·</span>
+      <a [href]="liens.conditions" target="_blank" rel="noopener noreferrer">Conditions d'utilisation</a>
+    </nav>
   `,
   styles: [`
     :host {
@@ -46,6 +52,11 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     .contenu { margin-top: 24px; }
     .pied { width: 100%; max-width: 440px; margin-top: 24px; text-align: center; color: var(--kp-text-3); }
     .pied:empty { display: none; }
+    .legal {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: auto; padding-top: 24px;
+      font-size: var(--kp-fs-sm); color: var(--kp-text-3);
+    }
+    .legal a { color: inherit; }
     @media (min-width: 768px) {
       :host { justify-content: center; }
       .carte {
@@ -58,4 +69,5 @@ export class AuthLayoutComponent {
   readonly titre = input.required<string>();
   readonly sousTitre = input<string | null>(null);
   readonly retour = input<string | null>(null);
+  protected readonly liens = LIENS_LEGAUX;
 }
