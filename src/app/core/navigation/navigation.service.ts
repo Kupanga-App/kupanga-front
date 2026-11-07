@@ -11,6 +11,11 @@ export interface Onglet {
   /** Pastille de non-lus. */
   /** `messages` : pastille des non-lus ; `biens` : nombre de biens possédés, discret. */
   compteur?: 'messages' | 'biens';
+  /**
+   * Autres adresses où l'onglet reste marqué actif (en plus de `lien` et de ses sous-adresses) :
+   * « Mon logement » du locataire sur `/quittances`, dont l'en-tête montre les onglets de Mon logement.
+   */
+  aussi?: string[];
 }
 
 /**
@@ -31,6 +36,8 @@ const ACCUEIL: Onglet = { libelle: 'Accueil', icone: 'house', lien: '/accueil' }
 const BIENS: Onglet = { libelle: 'Mes biens', icone: 'building-2', lien: '/biens', compteur: 'biens' };
 const MON_LOGEMENT: Onglet = { libelle: 'Mon logement', icone: 'key', lien: '/mon-logement' };
 const QUITTANCES: Onglet = { libelle: 'Quittances', icone: 'receipt', lien: '/quittances' };
+/** Locataire seulement : ses quittances sont un onglet de Mon logement (un propriétaire qui loue a sa propre entrée). */
+const MON_LOGEMENT_LOCATAIRE: Onglet = { ...MON_LOGEMENT, aussi: ['/quittances'] };
 
 /**
  * Navigation par profil (docs/refonte-front/00-vue-ensemble.md, « Profils de navigation ») :
@@ -52,6 +59,20 @@ export class NavigationService {
   private readonly pleinEcranRoute = signal(false);
   readonly pleinEcranDemande = signal(false);
   readonly pleinEcran = computed(() => this.pleinEcranRoute() || this.pleinEcranDemande());
+
+  /** Adresse courante (sans paramètres ni fragment), relue à chaque navigation. */
+  private readonly chemin = signal(cheminDe(this.router.url));
+
+  /** L'adresse courante est `adresse` ou l'une de ses sous-adresses. */
+  surAdresse(adresse: string): boolean {
+    const c = this.chemin();
+    return c === adresse || c.startsWith(adresse + '/');
+  }
+
+  /** Onglet actif par l'une de ses adresses `aussi` (`routerLinkActive` couvre déjà `lien`). */
+  actifAussi(onglet: Onglet): boolean {
+    return !!onglet.aussi?.some(a => this.surAdresse(a));
+  }
 
   /** Les espaces du compte (biens, logement) ont été relus depuis l'API pendant cette session (ou hors ligne). */
   private readonly espacesLus = signal(false);
@@ -93,7 +114,7 @@ export class NavigationService {
         return onglets;
       }
       case 'locataire':
-        return [ACCUEIL, MON_LOGEMENT, EXPLORER];
+        return [ACCUEIL, MON_LOGEMENT_LOCATAIRE, EXPLORER];
       case 'candidat':
         return [ACCUEIL, EXPLORER, MESSAGES];
     }
@@ -108,7 +129,7 @@ export class NavigationService {
       case 'proprietaire':
         return [ACCUEIL, BIENS, MESSAGES, ...documents, COMPTE];
       case 'locataire':
-        return [ACCUEIL, MON_LOGEMENT, MESSAGES, ...documents, COMPTE];
+        return [ACCUEIL, MON_LOGEMENT_LOCATAIRE, MESSAGES, ...documents, COMPTE];
       case 'candidat':
         return [ACCUEIL, EXPLORER, MESSAGES, COMPTE];
     }
@@ -127,7 +148,8 @@ export class NavigationService {
         untracked(() => this.espacesLus.set(false));
       }
     });
-    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => {
+      this.chemin.set(cheminDe((e as NavigationEnd).urlAfterRedirects));
       let route: ActivatedRouteSnapshot | null = this.router.routerState.snapshot.root;
       let plein = false;
       while (route) {
@@ -137,4 +159,8 @@ export class NavigationService {
       this.pleinEcranRoute.set(plein);
     });
   }
+}
+
+function cheminDe(url: string): string {
+  return url.split(/[?#]/)[0] || '/';
 }

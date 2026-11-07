@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { Subject, of } from 'rxjs';
 import { AuthService } from '../auth/services/auth.service';
 import { User } from '../auth/models/user.model';
@@ -130,5 +130,30 @@ describe('NavigationService (profil de navigation déduit des biens et du logeme
     connecter();
     TestBed.flushEffects();
     expect(nav.profilConnu()).toBeTrue();
+  });
+  it('locataire : « Mon logement » reste actif sur /quittances (barre du haut et onglets du bas)', async () => {
+    connecter();
+    logementBienId.set(4);
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: '**', children: [] }]);
+    await router.navigateByUrl('/quittances?annee=2026');
+    const enHaut = nav.onglets().find(o => o.lien === '/mon-logement')!;
+    const enBas = nav.ongletsMobile().find(o => o.lien === '/mon-logement')!;
+    expect(nav.actifAussi(enHaut)).toBeTrue();
+    expect(nav.actifAussi(enBas)).toBeTrue();
+    await router.navigateByUrl('/messages');
+    expect(nav.actifAussi(enHaut)).toBeFalse();
+  });
+
+  it('propriétaire qui loue aussi : « Quittances » garde sa propre entrée, « Mon logement » n’est pas actif dessus', async () => {
+    connecter();
+    aDesBiens.set(true);
+    logementBienId.set(4);
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: '**', children: [] }]);
+    await router.navigateByUrl('/quittances');
+    const monLogement = nav.onglets().find(o => o.lien === '/mon-logement')!;
+    expect(nav.actifAussi(monLogement)).toBeFalse();
+    expect(liens(nav.onglets())).toContain('/quittances');
   });
 });

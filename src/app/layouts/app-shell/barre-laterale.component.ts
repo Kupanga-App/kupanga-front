@@ -21,7 +21,8 @@ import { LogoComponent } from '../../shared/ui/logo.component';
     <a routerLink="/accueil" class="logo" aria-label="Kupanga, accueil"><kp-logo [hauteur]="28" /></a>
     <nav class="entrees" aria-label="Navigation principale">
       @for (o of nav.onglets(); track o.lien) {
-        <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="entree">
+        <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="entree"
+           [class.actif]="nav.actifAussi(o)" [attr.aria-current]="nav.actifAussi(o) ? 'page' : null">
           <kp-icon [name]="o.icone" [size]="18" [strokeWidth]="1.75" />
           <span class="entree__libelle">{{ o.libelle }}</span>
           @if (o.compteur === 'messages' && nonLus(); as n) {
