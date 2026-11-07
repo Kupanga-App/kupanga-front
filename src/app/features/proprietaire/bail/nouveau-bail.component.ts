@@ -17,6 +17,16 @@ import { AssistantComponent } from '../../../shared/ui/assistant.component';
 const ETAPES = ['Début et durée du bail', 'Loyer et garantie', 'Vérifiez le bail'];
 const DUREES = [12, 24, 36];
 
+const MANQUES_BAIL: Record<string, string> = {
+  dateDebut: 'Choisissez la date de début du bail.',
+  dureeBailMois: 'Indiquez une durée de 1 à 120 mois.',
+  loyerMensuel: 'Indiquez le loyer hors charges.',
+  chargesMensuelles: 'Indiquez les charges (0 s’il n’y en a pas).',
+  depotGarantie: 'Indiquez le dépôt de garantie (0 s’il n’y en a pas).',
+  garantieMois: 'Indiquez la garantie, de 0 à 24 mois.',
+  avanceMois: 'Indiquez les loyers payés d’avance, de 0 à 24 mois.',
+};
+
 /** Création d'un bail en 3 étapes ; la juridiction du bien dit si la garantie est en montant ou en mois (C12). */
 @Component({
   selector: 'kp-nouveau-bail',
@@ -77,6 +87,21 @@ export class NouveauBailComponent implements OnInit {
     return this.champsParEtape[this.etape()].every(c => this.form.controls[c].valid);
   });
 
+  /** Ce qui empêche de continuer, d'après les mêmes contrôles que `etapeValide`. */
+  readonly manque = computed<string | null>(() => {
+    this.valeurs();
+    if (!this.bien()) return this.erreur() ? null : 'Chargement du bien…';
+    const invalide = this.champsParEtape[this.etape()].find(c => this.form.controls[c].invalid);
+    return invalide ? MANQUES_BAIL[invalide] : null;
+  });
+
+  /** Valeurs reprises du bien : la saisie commence quand elles changent. */
+  private initiales: string | null = null;
+  readonly modifie = computed(() => {
+    const v = this.valeurs();
+    return this.form.dirty || (this.initiales !== null && JSON.stringify(v) !== this.initiales);
+  });
+
   ngOnInit(): void {
     const id = Number(this.id());
     this.bienService.getPrive(id).subscribe({
@@ -89,6 +114,7 @@ export class NouveauBailComponent implements OnInit {
           garantieMois: bien.garantieMois ?? null,
           avanceMois: bien.avanceMois ?? null,
         });
+        this.initiales = JSON.stringify(this.form.getRawValue());
         this.juridictions.configuration(bien.pays).pipe(catchError(() => of(null))).subscribe(config => {
           this.appliquerGarantie(config ? !champVisible(config, 'depotGarantie') : bien.garantieMois != null);
         });

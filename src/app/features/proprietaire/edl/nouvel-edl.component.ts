@@ -101,6 +101,39 @@ export class NouvelEdlComponent implements OnInit {
     }
   });
 
+  /** Ce qui empêche de continuer, d'après les mêmes contrôles que `etapeValide`. */
+  readonly manque = computed<string | null>(() => {
+    this.changements();
+    this.changementsCompteurs();
+    this.changementsCles();
+    this.changementsInfos();
+    switch (this.etape()) {
+      case 0: return this.infos.controls.date.invalid ? 'Choisissez la date de l’état des lieux.' : null;
+      case 1: return this.compteurs.invalid ? 'Entrez le relevé de chaque compteur, ou retirez-le.' : null;
+      case 2: return this.cles.invalid ? 'Nommez chaque clé, ou retirez-la.' : null;
+      case 3:
+        if (!this.pieces.length) return 'Ajoutez au moins une pièce.';
+        return this.pieces.invalid ? 'Nommez chaque pièce ; une observation fait 1000 caractères au plus.' : null;
+      default: return this.infos.invalid ? 'Les observations font 2000 caractères au plus.' : null;
+    }
+  });
+
+  /** Saisie commencée : différente de ce qui est proposé d'office (clé d'entrée, compteurs du pays). */
+  private initiales: string | null = null;
+  readonly modifie = computed(() => {
+    this.changements();
+    this.changementsCompteurs();
+    this.changementsCles();
+    this.changementsInfos();
+    const formes = [this.infos, this.compteurs, this.cles, this.pieces];
+    return formes.some(f => f.dirty) || this.pieces.length > 0
+      || (this.initiales !== null && this.instantane() !== this.initiales);
+  });
+
+  private instantane(): string {
+    return JSON.stringify([this.infos.getRawValue(), this.compteurs.getRawValue(), this.cles.getRawValue()]);
+  }
+
   readonly nbElements = computed(() => {
     this.changements();
     return this.pieces.controls.reduce((n, p) => n + p.controls.elements.length, 0);
@@ -121,6 +154,7 @@ export class NouvelEdlComponent implements OnInit {
           }
           // Compteurs du pays proposés d'office (index à relever sur place)
           this.compteursDuPays().slice(0, 3).forEach(c => this.ajouterCompteur(c.valeur));
+          this.initiales = this.instantane();
         });
       },
       error: err => this.erreur.set(messageErreurApi(err, 'Ce bien est introuvable.')),

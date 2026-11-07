@@ -4,6 +4,8 @@
   [etape]="etape()"
   [aide]="etape() === 0 && nomLocataire() ? 'Bail de ' + nomLocataire() + ' pour ' + bien()?.titre : null"
   [peutContinuer]="etapeValide() && !!bien()"
+  [manque]="manque()"
+  [modifie]="modifie()"
   [enCours]="envoi()"
   [erreur]="erreur()"
   libelleFin="Créer le bail"

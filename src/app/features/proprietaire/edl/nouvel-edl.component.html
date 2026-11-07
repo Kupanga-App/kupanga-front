@@ -4,6 +4,8 @@
   [etape]="etape()"
   [aide]="etape() === 3 ? 'Touchez une pièce pour l’ajouter, puis notez l’état de chaque élément.' : null"
   [peutContinuer]="etapeValide() && !!bien()?.locataire"
+  [manque]="manque()"
+  [modifie]="modifie()"
   [enCours]="envoi()"
   [erreur]="erreur()"
   libelleFin="Créer l’état des lieux"
