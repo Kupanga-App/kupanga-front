@@ -144,6 +144,8 @@ Les couleurs écrites en dur hors de `_theme.scss` (environ 60 occurrences : `la
 | E4 | Favoris | `Nav-Candidat` (entrée), `Nav-Mobile` (onglet et tuile « Favoris ») | Entrée, onglet et tuile omis |
 | E5 | Alertes de recherche | `Nav-Candidat` (« Annonces, carte et alertes ») | Texte sans « alertes » |
 | E6 | Recherche des conversations par personne | `Nav-Proprio-Messages` (« Personne ou bien ») | L'API ne filtre que par `nomDuBien` : champ « Rechercher un bien » |
+| E7 | Plafonds légaux du dépôt de garantie par juridiction (meublé, vide) | `Assist-Bail` (avertissement « plafonné à deux mois ») | Avertissement non bloquant quand le dépôt diffère de celui de l'annonce |
+| E8 | Bien réservé retiré de la recherche publique | `Fiche-Bien-Vacant` (« réservé 14 jours et retiré des annonces ») | Phrase omise ; un bien réservé n'est pas compté dans « Annonces en ligne » |
 
 Toute nouvelle évolution découverte pendant une phase s'ajoute à cette table, dans le commit de documentation de la phase, et figure dans le rapport de fin de phase.
 
@@ -168,7 +170,7 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 | --- | --- | --- | --- |
 | 1 | faite (6 nov. 2026) : build vert, 119/119 tests | voir `git log` (« docs(refonte): bilan de la phase 1 ») | Voir « Bilan de la phase 1 » ci-dessous |
 | 2 | faite (7 nov. 2026) : build vert, 132/132 tests | voir `git log` (« docs(refonte): bilan de la phase 2 ») | Voir « Bilan de la phase 2 » ci-dessous |
-| 3 | à faire | | |
+| 3 | faite (7 nov. 2026) : build vert, 154/154 tests | voir `git log` (« docs(refonte): bilan de la phase 3 ») | Voir « Bilan de la phase 3 » ci-dessous |
 | 4 | à faire | | |
 | 5 | à faire | | |
 | 6 | à faire | | |
@@ -246,3 +248,57 @@ Aucune nouvelle évolution serveur découverte en phase 1.
 - Le budget de taille du paquet initial (avertissement à 500 ko) est dépassé de 4 ko : la mise en page est chargée d'emblée. Avertissement seulement, le build reste vert.
 - L'écran « Demandes de location » (`/demandes-location`) n'est toujours dans aucun menu ; il est repris sur l'accueil candidat en phase 4 (décision à prendre si une entrée est souhaitée avant).
 - Évolution découverte : E6 (recherche des conversations par personne).
+
+**Décisions sur ce bilan (7 novembre 2026)** :
+- Compteur de biens : `LogementContextService` garde le nombre de biens possédés tiré de la réponse déjà reçue de `GET /users/biens` (aucun nouvel appel), affiché à côté de « Mes biens » dans la barre latérale. **Fait** en phase 3 (« feat(nav): compteur de biens dans la barre latérale », avec test).
+- « Demandes de location » : pas d'entrée de menu ; l'écran est repris sur l'accueil candidat en phase 4.
+- Paquet initial à 504 ko : accepté, seuil de 500 ko inchangé ; à réexaminer en fin de phase 5.
+- Écarts de la phase 2 (cloche avec compteur, recherche par bien E6, non-lues en messages, en-tête téléphone masqué quand vide) : validés.
+
+### Bilan de la phase 3
+
+**Ce qui est en place**
+
+| Élément | Où | Usage |
+| --- | --- | --- |
+| Étapes de la location | `features/proprietaire/etapes-location.ts` (+ spec) | `calculerEtapesLocation({ bien, contrats, edls, quittances })` : Annonce → Réservation → Bail → État des lieux → Quittances, `courante`, `prochaine` (titre, texte, action, lien) ; `bailLePlusRecent()` (tri date de début puis id) ; `precisionEtat()` (« bail à créer ») |
+| Chiffres de l'accueil | `features/proprietaire/accueil/chiffres-accueil.ts` (+ spec) | Biens loués, occupation, loyer attendu **par devise**, quittances du mois, annonces en ligne (sans les biens réservés) |
+| En-tête de la fiche | `features/proprietaire/fiche/fiche-entete.component.ts` | Fil, titre, état, loyer, adresse, actions, menu « … » ; onglets en liens (loué, réservé) ou onglet local Vue d'ensemble · Annonce (vacant, `racine`) |
+| `kp-assistant` | `shared/ui/assistant.component.ts` (+ spec) | `manque`, `modifie` (confirmation avant « Quitter »), `sousTitre`, `libelles`, `resumes`, `note`, `disposition` (`laterale` / `haut`), `apercu` + `<… apercu>`, `<… actions>` |
+| Jetons photo | `styles/_theme.scss` | `--kp-photo-voile`, `--kp-photo-texte` : pastilles posées sur une photo, mêmes valeurs dans les deux thèmes |
+| Libellé court d'état | `models/edl-libelles.ts` | `ETATS[].court` (« H.S. ») : affichage téléphone seulement |
+| Compteur de biens | `LogementContextService.nombreBiens` | Barre latérale |
+
+**Vérifications** : build de production vert à chaque commit ; **154 tests sur 154** avec Edge ; paquet initial **508 ko** (504 ko après la phase 2 : icône `Megaphone`, `kp-sheet` dans l'assistant, compteur de biens). Parcours vérifiés par captures Edge (1440 px et 390 × 844, clair et sombre) avec Claire (France) et Patrick (RDC) : accueil, fiche louée et ses quatre onglets, fiche vacante et onglet Annonce, assistants bail, état des lieux, nouveau bien et nouvelle quittance jusqu'à la vérification (rien validé), « Quitter » avec et sans saisie, message « ce qui manque ».
+
+**Données de démo** : aucun bail, état des lieux ni quittance n'existe pour Claire ni pour Patrick. La page du bail (à signer, signé), la liste des états des lieux et le tableau des quittances ont été vérifiés avec des **réponses simulées dans le navigateur** (interception CDP `Fetch`, aucune écriture en base). À revérifier sur de vraies données quand Gédéon aura validé leur création.
+
+**Appels réseau** : accueil et fiche font les mêmes requêtes qu'avant (mêmes services, aucun appel retiré). Seul ajout : `POST /conversations/search` (déjà appelé par la messagerie) sur la fiche d'un bien **vacant**, une fois, filtré par titre puis par `bienId`, pour « la dernière personne qui a écrit ».
+
+**Écarts restants avec les maquettes**
+
+| Maquette | Écart | Raison | Suite |
+| --- | --- | --- | --- |
+| `Nav-Proprio-Tableau` | « Ajouter un bien » en olive, pas en nuit | Le bouton principal du DS est olive | À valider |
+| `Nav-Proprio-Tableau` | « 1 conversation en cours » (annonces en ligne) et « 1 personne vous a écrit » (ligne de bien) absents | L'accueil ne charge pas les conversations ; les ajouter ferait un nouvel appel | À décider |
+| `Nav-Proprio-Tableau` | « À faire aussi » ne montre pas « Répondre à Inès » ni « Créer la quittance de novembre » | Ces tâches n'existent pas dans `calculerTaches()` (règles inchangées) ; la tâche qui répète la prochaine étape de la carte n'est pas répétée | À décider (nouvelles règles de tâches) |
+| `Nav-Proprio-Tableau` | Échéance et « Pas encore déclaré reçu » absents s'il n'y a pas de quittance du mois (cas des données de démo) | Rien à calculer sans quittance | Aucune |
+| `Nav-Proprio-Tableau` | Frise de la carte : composant `kp-frise` (pastilles 36 px, texte aligné à gauche) et non la variante centrée à 46 px | Un seul composant de frise | Aucune |
+| `Fiche-Bien-Loue`, `Fiche-Bien-Vacant` | Frise à 4 étapes visibles sur les 5 calculées (Annonce → État des lieux avant le choix du locataire, Réservation → Quittances ensuite) ; libellés « Réservation » et « Annonce » au lieu de « Réservé », « Annonce en ligne », « Locataire » | Même calcul que l'accueil | Aucune |
+| `Fiche-Bien-Vacant` | Pas de « le logement lui est réservé 14 jours et **retiré des annonces** » | L'API laisse un bien réservé dans la recherche publique (seuls `locataire` et `archive` filtrent) : la phrase serait fausse | Évolution E8 |
+| `Fiche-Bien-*` | Précision d'état (« Loué · bail à créer ») sur la vue d'ensemble seulement | Les autres onglets ne chargent pas les états des lieux et quittances | Aucune |
+| `Fiche-Bien-*` | Carte en lecture seule `kp-carte-bien` (Leaflet) et non `carte-repere` (éditeur de position) | `carte-repere` sert à placer le repère dans « Modifier » | Aucune |
+| `Fiche-Bien-Loue` | « Mettre fin au bail » garde le style de `fin-de-bail.component.ts` (bouton contour, pas de lien rouge) | Composant testé, laissé tel quel | Phase 6 si besoin |
+| Onglet Annonce (vacant) | Pas de maquette : publication, texte, conditions affichées, liens | Contenu limité à `BienDTO` | À valider |
+| `Bail-A-Signer` | Titre de page = titre du bien (en-tête commun aux quatre onglets), pas « Bail de Lucas Bernard » | Consigne : même en-tête sur les quatre pages | Aucune |
+| `Assist-Bail` | Pas de « Brouillon enregistré à 14:32 » ni « Enregistrer et quitter » | Aucun brouillon côté serveur ni côté front | Évolution si souhaitée |
+| `Assist-Bail` | Avertissement sur le dépôt : « diffère de celui de l'annonce », pas le plafond légal (2 mois en meublé, 1 mois vide) | Aucun plafond n'est connu du code ni de `GET /juridictions/{pays}` | Évolution E7 |
+| `Assist-Bail` | Pas de « Résidence principale » dans l'aperçu ; lignes grises remplacées par « Le texte complet figure dans le PDF » | Pas dans les données (E2) | E2 |
+| `Assist-EDL` | Pas de « 1 sur 4 vérifiée », icônes de pièce, menu « … » de la pièce : numéro de pièce, nombre d'éléments « à noter », corbeille | « Vérifiée » n'existe pas dans les données ; jeu d'icônes limité | Aucune |
+| `Assist-EDL`, `Assist-EDL-Mobile` | Bloc photos absent | E1 | E1 |
+| `Assist-EDL-Mobile` | Le bouton retour système quitte l'assistant (sans confirmation, sans revenir à la liste des pièces) | Il faudrait un `CanDeactivate` (garde de route) ou une entrée d'historique : hors périmètre « mêmes guards » | À décider |
+| `DS-Composants` (tableau) | Colonne « Locataire » remplacée par Échéance et Paiement ; actions secondaires dans un menu « … » par ligne | Tableau d'un seul bien, un seul locataire ; toutes les actions existantes gardées | Aucune |
+
+**Évolutions découvertes** : E7 (plafonds légaux du dépôt de garantie par juridiction), E8 (retirer un bien réservé de la recherche publique, comme l'annonce la maquette).
+
+**Écrans à revérifier sur de vraies données** (création à valider par Gédéon) : un bail en attente de la signature du propriétaire puis signé (Claire, bien 1 avec Lucas), un état des lieux d'entrée, une quittance du mois en attente et une payée ; idem côté RDC (Patrick, bien 141 avec Grâce).
