@@ -50,8 +50,11 @@ test.describe('Visiteur', () => {
 
     await page.getByRole('group', { name: 'Filtres' }).getByRole('button', { name: 'Meublé' }).click();
     await expect(page).toHaveURL(/[?&]meuble=1/);
+    // La dernière recherche (filtres et tri) doit être revenue avant de relever la liste
+    const derniere = page.waitForResponse(r => r.url().endsWith('/biens/search') && r.request().postDataJSON()?.sortDirection === 'ASC', { timeout: 45_000 });
     await page.getByRole('combobox', { name: 'Trier' }).selectOption({ label: 'Loyer croissant' });
     await expect(page).toHaveURL(/[?&]tri=prix-croissant/);
+    await derniere;
     await pagePrete(page);
 
     const adresse = page.url();
@@ -61,7 +64,9 @@ test.describe('Visiteur', () => {
     expect(avant.length).toBeGreaterThan(0);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Logements à louer à Lyon');
 
+    const rechargee = page.waitForResponse(r => r.url().endsWith('/biens/search'), { timeout: 45_000 });
     await page.reload();
+    await rechargee;
     await pagePrete(page);
     expect(page.url()).toBe(adresse);
     await expect(nombreAnnonces(page)).toHaveText(compte!);
