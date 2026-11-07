@@ -271,7 +271,10 @@ Aucune nouvelle évolution serveur découverte en phase 1.
 
 **Vérifications** : build de production vert à chaque commit ; **154 tests sur 154** avec Edge ; paquet initial **508 ko** (504 ko après la phase 2 : icône `Megaphone`, `kp-sheet` dans l'assistant, compteur de biens). Parcours vérifiés par captures Edge (1440 px et 390 × 844, clair et sombre) avec Claire (France) et Patrick (RDC) : accueil, fiche louée et ses quatre onglets, fiche vacante et onglet Annonce, assistants bail, état des lieux, nouveau bien et nouvelle quittance jusqu'à la vérification (rien validé), « Quitter » avec et sans saisie, message « ce qui manque ».
 
-**Données de démo** : aucun bail, état des lieux ni quittance n'existe pour Claire ni pour Patrick. La page du bail (à signer, signé), la liste des états des lieux et le tableau des quittances ont été vérifiés avec des **réponses simulées dans le navigateur** (interception CDP `Fetch`, aucune écriture en base). À revérifier sur de vraies données quand Gédéon aura validé leur création.
+**Données de test (créées le 7 novembre 2026, avec l'accord de Gédéon)**, par les mêmes appels que le front :
+- Claire, bien 1 (Lucas) : bail n° 1 signé par les deux parties, état des lieux d'entrée n° 1 signé, quittances de septembre (en attente), octobre (déclarée reçue, virement) et novembre (créée par l'API à la signature du bail, échéance le 5 décembre) ;
+- Patrick, bien 141 (Grâce) : bail n° 2 en attente de la signature du propriétaire (garantie 2 mois, 3 mois d'avance, USD), quittance de novembre en attente.
+Page du bail (à signer et signé), états des lieux et quittances revérifiés sur ces données. Constat : l'API renvoie le mois d'une quittance **en texte** (« 10 ») ; les calculs du front le convertissent (« fix(proprietaire): mois des quittances lu en nombre »).
 
 **Appels réseau** : accueil et fiche font les mêmes requêtes qu'avant (mêmes services, aucun appel retiré). Seul ajout : `POST /conversations/search` (déjà appelé par la messagerie) sur la fiche d'un bien **vacant**, une fois, filtré par titre puis par `bienId`, pour « la dernière personne qui a écrit ».
 
@@ -301,4 +304,3 @@ Aucune nouvelle évolution serveur découverte en phase 1.
 
 **Évolutions découvertes** : E7 (plafonds légaux du dépôt de garantie par juridiction), E8 (retirer un bien réservé de la recherche publique, comme l'annonce la maquette).
 
-**Écrans à revérifier sur de vraies données** (création à valider par Gédéon) : un bail en attente de la signature du propriétaire puis signé (Claire, bien 1 avec Lucas), un état des lieux d'entrée, une quittance du mois en attente et une payée ; idem côté RDC (Patrick, bien 141 avec Grâce).
