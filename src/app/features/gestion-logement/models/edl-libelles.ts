@@ -27,9 +27,10 @@ export const ELEMENTS: { valeur: TypeElement; libelle: string }[] = [
   { valeur: 'AUTRE', libelle: 'Autre' },
 ];
 
-export const ETATS: { valeur: EtatElement; libelle: string }[] = [
-  { valeur: 'BON', libelle: 'Bon' },
-  { valeur: 'USAGE_NORMAL', libelle: 'Usé' },
-  { valeur: 'MAUVAIS', libelle: 'Mauvais' },
-  { valeur: 'HORS_SERVICE', libelle: 'Hors service' },
+/** `court` : libellé d'affichage sur téléphone (la valeur envoyée reste `valeur`). */
+export const ETATS: { valeur: EtatElement; libelle: string; court: string }[] = [
+  { valeur: 'BON', libelle: 'Bon', court: 'Bon' },
+  { valeur: 'USAGE_NORMAL', libelle: 'Usé', court: 'Usé' },
+  { valeur: 'MAUVAIS', libelle: 'Mauvais', court: 'Mauvais' },
+  { valeur: 'HORS_SERVICE', libelle: 'Hors service', court: 'H.S.' },
 ];

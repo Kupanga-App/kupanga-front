@@ -48,34 +48,38 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
           }
         </kp-vide>
       } @else {
-        <ul class="kp-stack edls">
-          @for (e of edls(); track e.id) {
-            <li class="kp-card">
-              <div class="kp-row kp-row--between">
-                <h2>État des lieux {{ e.type === 'ENTREE' ? 'd’entrée' : 'de sortie' }}</h2>
-                <kp-statut [statut]="statut(e)" />
-              </div>
-              <p class="kp-muted kp-small">
-                Réalisé le {{ e.dateRealisation | dateLongue }} · {{ e.pieces.length }} pièce{{ e.pieces.length > 1 ? 's' : '' }}
-                @if (e.nomLocataire) { · {{ e.nomLocataire }} }
-              </p>
-              <div class="kp-actions">
-                @if (!bien()?.archive && e.statut === 'EN_ATTENTE_SIGNATURE_PROPRIO') {
-                  <button type="button" class="kp-btn kp-btn--primary" (click)="ouvrir(e, false)"><kp-icon name="pen-line" [size]="18" /> Signer</button>
-                }
-                @if (!bien()?.archive && (e.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' || e.statut === 'EXPIRE')) {
-                  <button type="button" class="kp-btn kp-btn--secondary" (click)="ouvrir(e, true)"><kp-icon name="refresh-cw" [size]="18" /> Renvoyer le lien</button>
-                }
-                @if (e.urlPdf) {
-                  <a class="kp-btn kp-btn--secondary" [href]="e.urlPdf" target="_blank" rel="noopener"><kp-icon name="download" [size]="18" /> PDF</a>
-                }
-              </div>
-              @if (e.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' && bien()?.pays) {
-                <kp-bouton-whatsapp type="edl" [documentId]="e.id" [pays]="bien()!.pays" libelle="Prévenir par WhatsApp" />
-              }
-            </li>
-          }
-        </ul>
+        <section class="kp-card liste" aria-label="États des lieux du bien">
+          <ul>
+            @for (e of edls(); track e.id) {
+              <li class="edl">
+                <span class="edl__icone"><kp-icon name="clipboard-check" [size]="18" [strokeWidth]="1.5" /></span>
+                <div class="edl__texte">
+                  <div class="edl__titre">
+                    <h2>État des lieux {{ e.type === 'ENTREE' ? 'd’entrée' : 'de sortie' }}</h2>
+                    <kp-statut [statut]="statut(e)" />
+                  </div>
+                  <p class="petit">
+                    Réalisé le {{ e.dateRealisation | dateLongue }} · {{ e.pieces.length }} pièce{{ e.pieces.length > 1 ? 's' : '' }}@if (e.nomLocataire) { · {{ e.nomLocataire }}}
+                  </p>
+                  @if (e.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' && bien()?.pays) {
+                    <kp-bouton-whatsapp type="edl" [documentId]="e.id" [pays]="bien()!.pays" libelle="Prévenir par WhatsApp" />
+                  }
+                </div>
+                <div class="edl__actions">
+                  @if (!bien()?.archive && e.statut === 'EN_ATTENTE_SIGNATURE_PROPRIO') {
+                    <button type="button" class="kp-btn kp-btn--primary kp-btn--sm" (click)="ouvrir(e, false)"><kp-icon name="pen-line" [size]="16" /> Signer</button>
+                  }
+                  @if (!bien()?.archive && (e.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' || e.statut === 'EXPIRE')) {
+                    <button type="button" class="kp-btn kp-btn--secondary kp-btn--sm" (click)="ouvrir(e, true)"><kp-icon name="refresh-cw" [size]="16" /> Renvoyer le lien</button>
+                  }
+                  @if (e.urlPdf) {
+                    <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="e.urlPdf" target="_blank" rel="noopener"><kp-icon name="download" [size]="16" /> PDF</a>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
       }
     </div>
 
@@ -88,7 +92,22 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
       [erreur]="erreurSignature()"
       (valider)="signer($event)" />
   `,
-  styles: [`.edls { margin: 0; padding: 0; list-style: none; } .barre-actions { display: flex; justify-content: flex-end; margin-bottom: var(--kp-space-4); } h2 { font-size: var(--kp-fs-md); }`],
+  styles: [`
+    .barre-actions { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+    .liste { gap: 0; padding: 0; overflow: hidden; }
+    .liste ul { margin: 0; padding: 0; list-style: none; }
+    .edl { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 16px var(--kp-card-pad); }
+    .edl + .edl { border-top: 1px solid var(--kp-border); }
+    .edl__icone {
+      display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--kp-radius-md);
+      background: var(--kp-bg); color: var(--kp-text-muted);
+    }
+    .edl__texte { display: flex; flex: 1 1 280px; flex-direction: column; gap: 4px; min-width: 0; }
+    .edl__titre { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+    h2 { font-size: var(--kp-fs-body); font-weight: 500; }
+    .petit { color: var(--kp-text-subtle); font-size: var(--kp-fs-secondary); }
+    .edl__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+  `],
 })
 export class EtatsDesLieuxComponent implements OnInit {
   readonly id = input.required<string>();

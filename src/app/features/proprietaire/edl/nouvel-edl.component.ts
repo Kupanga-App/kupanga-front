@@ -19,6 +19,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 const MAX = { pieces: 50, elements: 50, compteurs: 10, cles: 20, quantiteCle: 50 } as const;
 
 const ETAPES = ['Type et date', 'Compteurs', 'Clés', 'Pièces', 'Vérifiez et créez'];
+const LIBELLES = ['Type et date', 'Compteurs', 'Clés', 'Pièces', 'Vérification'];
 
 const PIECES = ['Salon', 'Chambre', 'Cuisine', 'Salle de bain', 'WC', 'Entrée', 'Couloir', 'Balcon'];
 const CLES = ['Porte d’entrée', 'Portail', 'Boîte aux lettres'];
@@ -43,7 +44,11 @@ type CompteurForm = FormGroup<{
 }>;
 type CleForm = FormGroup<{ typeCle: FormControl<string>; quantite: FormControl<number> }>;
 
-/** État des lieux pas à pas : type et date, compteurs du pays (C13), clés, pièces et éléments, observations. */
+/**
+ * État des lieux pas à pas (`Assist-EDL`, `Assist-EDL-Mobile`) : type et date, compteurs du pays (C13), clés, puis
+ * les pièces une à une (liste et pièce ouverte côte à côte sur ordinateur, l'une après l'autre sur téléphone),
+ * observations. Pas de photos : stockage serveur absent (évolution E1).
+ */
 @Component({
   selector: 'kp-nouvel-edl',
   standalone: true,
@@ -61,6 +66,7 @@ export class NouvelEdlComponent implements OnInit {
   private toasts = inject(ToastService);
 
   readonly etapes = ETAPES;
+  readonly libelles = LIBELLES;
   readonly elementsPossibles = ELEMENTS;
   readonly etats = ETATS;
   readonly piecesProposees = PIECES;
@@ -133,6 +139,26 @@ export class NouvelEdlComponent implements OnInit {
   private instantane(): string {
     return JSON.stringify([this.infos.getRawValue(), this.compteurs.getRawValue(), this.cles.getRawValue()]);
   }
+
+  /** Pièce ouverte (téléphone : null = liste des pièces ; ordinateur : la première si aucune). */
+  readonly pieceOuverte = signal<number | null>(null);
+  readonly pieceAffichee = computed(() => {
+    this.changements();
+    const i = this.pieceOuverte();
+    return i !== null && i < this.pieces.length ? i : this.pieces.length ? 0 : null;
+  });
+  /** Éléments dont le champ « observation » est déplié. */
+  readonly observationsOuvertes = signal(new Set<ElementForm>());
+
+  readonly titreAssistant = computed(() => {
+    this.changementsInfos();
+    return this.infos.controls.type.value === 'SORTIE' ? 'État des lieux de sortie' : 'État des lieux d’entrée';
+  });
+  readonly sousTitre = computed(() => {
+    const b = this.bien();
+    const l = b?.locataire;
+    return [l ? `${l.firstName} ${l.lastName}` : '', b?.titre ?? ''].filter(Boolean).join(' · ') || null;
+  });
 
   readonly nbElements = computed(() => {
     this.changements();
@@ -211,6 +237,34 @@ export class NouvelEdlComponent implements OnInit {
     });
     ELEMENTS_PAR_DEFAUT.forEach(t => piece.controls.elements.push(this.nouvelElement(t)));
     this.pieces.push(piece);
+    this.pieceOuverte.set(this.pieces.length - 1);
+  }
+
+  ouvrirPiece(i: number | null): void {
+    this.pieceOuverte.set(i);
+  }
+
+  retirerPiece(i: number): void {
+    this.pieces.removeAt(i);
+    const ouverte = this.pieceOuverte();
+    if (ouverte !== null && ouverte >= this.pieces.length) this.pieceOuverte.set(this.pieces.length ? this.pieces.length - 1 : null);
+  }
+
+  /** Éléments qui ne sont pas en bon état dans une pièce. */
+  aNoter(piece: PieceForm): number {
+    return piece.controls.elements.controls.filter(e => e.controls.etatElement.value !== 'BON').length;
+  }
+
+  basculerObservation(e: ElementForm): void {
+    this.observationsOuvertes.update(s => {
+      const copie = new Set(s);
+      if (copie.has(e)) copie.delete(e); else copie.add(e);
+      return copie;
+    });
+  }
+
+  observationVisible(e: ElementForm): boolean {
+    return this.observationsOuvertes().has(e) || !!e.controls.observation.value;
   }
 
   ajouterElement(piece: PieceForm): void {
