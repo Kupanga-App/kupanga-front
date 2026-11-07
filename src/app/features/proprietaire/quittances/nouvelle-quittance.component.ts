@@ -13,8 +13,10 @@ import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
 import { DateLonguePipe, de, moisAnnee } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 const ETAPES = ['Mois et échéance', 'Vérifiez la quittance'];
+const LIBELLES = ['Mois et échéance', 'Vérification'];
 
 /**
  * Nouvelle quittance : avec un bail signé, loyer et charges viennent du bail (J3 : devise figée) ;
@@ -23,9 +25,10 @@ const ETAPES = ['Mois et échéance', 'Vérifiez la quittance'];
 @Component({
   selector: 'kp-nouvelle-quittance',
   standalone: true,
-  imports: [ReactiveFormsModule, MontantPipe, DateLonguePipe, AssistantComponent],
+  imports: [ReactiveFormsModule, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent],
   template: `
-    <kp-assistant titre="Nouvelle quittance" [etapes]="etapes" [etape]="etape()" [peutContinuer]="etapeValide()"
+    <kp-assistant titre="Nouvelle quittance" [sousTitre]="sousTitre()" [etapes]="etapes" [libelles]="libelles"
+                  [etape]="etape()" [peutContinuer]="etapeValide()" [manque]="manque()" [modifie]="modifie()"
                   [enCours]="envoi()" [erreur]="erreur()" libelleFin="Créer la quittance"
                   (precedent)="etape.set(0)" (suivant)="suivant()" (quitter)="quitter()">
       <form class="kp-form" [formGroup]="form" (ngSubmit)="suivant()">
@@ -54,7 +57,13 @@ const ETAPES = ['Mois et échéance', 'Vérifiez la quittance'];
             <span class="kp-aide">Date à laquelle le loyer doit être payé.</span>
           </div>
           @if (bail()) {
-            <p class="kp-bandeau">Montants du bail signé : {{ bail()!.loyerMensuel | montant: bail()!.devise }} de loyer, {{ bail()!.chargesMensuelles | montant: bail()!.devise }} de charges.</p>
+            <div class="kp-bandeau">
+              <kp-icon name="file-text" [size]="18" />
+              <div class="kp-bandeau__corps">
+                <p class="kp-bandeau__titre">Montants du bail signé</p>
+                <p class="kp-bandeau__texte">{{ bail()!.loyerMensuel | montant: bail()!.devise }} de loyer, {{ bail()!.chargesMensuelles | montant: bail()!.devise }} de charges.</p>
+              </div>
+            </div>
           } @else {
             <div class="kp-form-row">
               <div class="kp-field">
@@ -73,6 +82,10 @@ const ETAPES = ['Mois et échéance', 'Vérifiez la quittance'];
               </div>
             </div>
           }
+          <div class="total">
+            <span>Total de la quittance</span>
+            <span class="total__montant">{{ total() | montant: devise() }}</span>
+          </div>
         } @else {
           <dl class="kp-details">
             <div><dt>Locataire</dt><dd>{{ bien()?.locataire?.firstName }} {{ bien()?.locataire?.lastName }}</dd></div>
@@ -85,6 +98,13 @@ const ETAPES = ['Mois et échéance', 'Vérifiez la quittance'];
       </form>
     </kp-assistant>
   `,
+  styles: [`
+    .total {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px;
+      border-radius: var(--kp-radius-md); background: var(--kp-bg); color: var(--kp-text-muted);
+    }
+    .total__montant { color: var(--kp-text); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  `],
 })
 export class NouvelleQuittanceComponent implements OnInit {
   readonly id = input.required<string>();
@@ -97,6 +117,7 @@ export class NouvelleQuittanceComponent implements OnInit {
   private toasts = inject(ToastService);
 
   readonly etapes = ETAPES;
+  readonly libelles = LIBELLES;
   readonly etape = signal(0);
   readonly bien = signal<BienDTO | null>(null);
   readonly bail = signal<ContratDTO | null>(null);
@@ -129,6 +150,33 @@ export class NouvelleQuittanceComponent implements OnInit {
     return this.form.valid && !!this.bien()?.locataire && (!!this.bail() || !!this.form.controls.loyerMensuel.value);
   });
 
+  readonly sousTitre = computed(() => {
+    const b = this.bien();
+    const l = b?.locataire;
+    return [l ? `${l.firstName} ${l.lastName}` : '', b?.titre ?? ''].filter(Boolean).join(' · ') || null;
+  });
+
+  /** Ce qui empêche de continuer, d'après les mêmes contrôles que `etapeValide`. */
+  readonly manque = computed<string | null>(() => {
+    this.valeurs();
+    const b = this.bien();
+    if (!b) return this.erreur() ? null : 'Chargement du bien…';
+    if (!b.locataire) return 'Il faut d’abord un locataire.';
+    const c = this.form.controls;
+    if (c.mois.invalid || c.annee.invalid) return 'Choisissez le mois et l’année.';
+    if (c.dateEcheance.invalid) return 'Indiquez la date d’échéance.';
+    if (!this.bail() && (c.loyerMensuel.invalid || !c.loyerMensuel.value)) return 'Indiquez le loyer.';
+    if (c.chargesMensuelles.invalid) return 'Indiquez les charges (0 s’il n’y en a pas).';
+    return null;
+  });
+
+  /** Valeurs proposées d'office (mois en cours, montants du bien) : la saisie commence quand elles changent. */
+  private initiales: string | null = null;
+  readonly modifie = computed(() => {
+    const v = this.valeurs();
+    return this.form.dirty || (this.initiales !== null && JSON.stringify(v) !== this.initiales);
+  });
+
   ngOnInit(): void {
     const id = Number(this.id());
     forkJoin({
@@ -139,6 +187,7 @@ export class NouvelleQuittanceComponent implements OnInit {
         this.bien.set(bien);
         this.bail.set(contrats.find(c => c.statut === 'SIGNE') ?? null);
         this.form.patchValue({ loyerMensuel: bien.loyerMensuel ?? null, chargesMensuelles: bien.chargesMensuelles ?? 0 });
+        this.initiales = JSON.stringify(this.form.getRawValue());
         if (!bien.locataire) this.erreur.set('Choisissez d’abord le locataire de ce bien.');
       },
       error: err => this.erreur.set(messageErreurApi(err, 'Ce bien est introuvable.')),

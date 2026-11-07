@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -20,8 +20,11 @@ import { VideComponent } from '../../../shared/ui/vide.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouton-whatsapp/bouton-whatsapp.component';
 
+type CleTri = 'mois' | 'montant' | 'echeance';
+
 /**
- * Quittances d'un bien. Aucun paiement ne passe par l'application : le propriétaire déclare le loyer reçu
+ * Quittances d'un bien (onglet de la fiche, tableau `DS-Composants` : tri à l'écran, colonnes secondaires masquées
+ * sur tablette, une carte par ligne sur téléphone). Aucun paiement ne passe par l'application : le propriétaire déclare le loyer reçu
  * (mode de paiement du pays, date, référence) et peut joindre la photo du reçu (C8-bis).
  */
 @Component({
@@ -67,6 +70,29 @@ export class QuittancesBienComponent implements OnInit {
     }),
   });
 
+  /** Tri à l'écran (mois le plus récent d'abord par défaut). */
+  readonly tri = signal<{ cle: CleTri; sens: 1 | -1 }>({ cle: 'mois', sens: -1 });
+  readonly quittancesTriees = computed(() => {
+    const { cle, sens } = this.tri();
+    const valeur = (q: QuittanceDTO): number | string =>
+      cle === 'montant' ? Number(q.montantTotal) || 0 : cle === 'echeance' ? q.dateEcheance ?? '' : q.annee * 100 + q.mois;
+    return [...this.quittances()].sort((a, b) => {
+      const va = valeur(a), vb = valeur(b);
+      return (va < vb ? -1 : va > vb ? 1 : 0) * sens || (b.annee * 100 + b.mois) - (a.annee * 100 + a.mois);
+    });
+  });
+  /** Quittance dont le menu d'actions est ouvert. */
+  readonly actionsDe = signal<QuittanceDTO | null>(null);
+
+  trier(cle: CleTri): void {
+    this.tri.update(t => ({ cle, sens: t.cle === cle ? (t.sens === 1 ? -1 : 1) : cle === 'mois' ? -1 : 1 }));
+  }
+
+  ariaSort(cle: CleTri): 'ascending' | 'descending' | 'none' {
+    const t = this.tri();
+    return t.cle !== cle ? 'none' : t.sens === 1 ? 'ascending' : 'descending';
+  }
+
   readonly statut = (q: QuittanceDTO) => statutQuittance(q.statut);
   readonly mois = (q: QuittanceDTO) => moisAnnee(q.mois, q.annee);
   readonly titreDeclaration = () => {
@@ -103,6 +129,7 @@ export class QuittancesBienComponent implements OnInit {
   }
 
   declarer(q: QuittanceDTO): void {
+    this.actionsDe.set(null);
     this.aDeclarer.set(q);
     this.signature.set('');
     this.erreurDeclaration.set(null);
