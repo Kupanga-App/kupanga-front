@@ -218,7 +218,13 @@ test.describe('Propriétaire (Claire, France)', () => {
     const messagerie = await intercepterMessagerie(page);
     await page.goto('/messages');
     const conversations = page.getByRole('region', { name: 'Conversations' });
-    await conversations.getByRole('button', { name: /Inès Moreau/ }).click();
+    // Ouvrir la conversation, puis attendre son historique (GET /historique)
+    const ouvrir = async () => {
+      const historique = page.waitForResponse(r => r.url().startsWith(`${API}/historique`));
+      await conversations.getByRole('button', { name: /Inès Moreau/ }).click();
+      await historique;
+    };
+    await ouvrir();
 
     const champ = page.getByLabel('Message à Inès Moreau');
     await expect(champ).toBeVisible();
@@ -228,7 +234,7 @@ test.describe('Propriétaire (Claire, France)', () => {
       await expect(navigation(page)).toBeHidden();
       await page.getByRole('button', { name: 'Retour aux conversations' }).click();
       await expect(conversations.getByRole('button', { name: /Inès Moreau/ })).toBeVisible();
-      await conversations.getByRole('button', { name: /Inès Moreau/ }).click();
+      await ouvrir();
     } else {
       // La barre latérale reste quand une conversation est ouverte
       await expect(navigation(page)).toBeVisible();
