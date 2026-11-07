@@ -1,0 +1,259 @@
+@use 'mq';
+
+// Pages de signature par lien (maquettes Signer-Bail, Signer-Mobile) : aperçu du document à gauche,
+// carte de signature collante à droite (ordinateur) ; sur téléphone, résumé, aperçu, puis action collée en bas.
+
+.petit {
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+.signer {
+  display: grid;
+  gap: 12px 24px;
+  align-items: start;
+
+  @include mq.ordinateur {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+    grid-template-areas:
+      'intro .'
+      'document cote';
+  }
+}
+
+.intro {
+  grid-area: intro;
+  color: var(--kp-text-muted);
+  font-size: 14px;
+}
+
+// ── Aperçu du document ──────────────────────────────────────────────────────
+
+.document {
+  grid-area: document;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: clamp(20px, 3vw, 40px);
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-sm);
+  background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
+
+  h3 {
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  section p {
+    color: var(--kp-text);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+}
+
+.document__entete {
+  margin-bottom: 4px;
+  text-align: center;
+
+  h2 {
+    font-size: var(--kp-fs-card-title);
+    font-weight: 500;
+  }
+
+  p {
+    margin-top: 4px;
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-secondary);
+  }
+}
+
+.signatures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+
+  @include mq.telephone {
+    grid-template-columns: 1fr;
+  }
+}
+
+.signataire {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.signataire__qui {
+  color: var(--kp-text-muted);
+  font-size: 14px;
+}
+
+.cadre {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 64px;
+  padding: 8px;
+  border-radius: var(--kp-radius-sm);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-muted);
+  font-size: 14px;
+
+  &--signe {
+    color: var(--kp-state-success-text);
+    background: var(--kp-state-success-bg);
+  }
+
+  &--attente {
+    border: 1px dashed var(--kp-state-warning);
+    background: transparent;
+    color: var(--kp-state-warning-text);
+  }
+}
+
+// ── Carte de signature ──────────────────────────────────────────────────────
+
+.cote {
+  grid-area: cote;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+
+  @include mq.ordinateur {
+    position: sticky;
+    top: calc(64px + 24px);
+  }
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
+
+  h1 {
+    margin-top: -6px;
+    font-size: var(--kp-fs-subtitle);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+}
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.tuile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+
+  dt {
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-mention);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.badge {
+  align-self: flex-start;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.case {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-md);
+  font-size: 14px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--kp-text);
+  }
+}
+
+.lien-pdf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--kp-tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--kp-text);
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.7;
+  }
+}
+
+.question {
+  padding: 0 4px;
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+// ── Après la signature ──────────────────────────────────────────────────────
+
+.illustration {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--kp-accent-soft);
+  color: var(--kp-accent);
+
+  &--ok {
+    background: var(--kp-state-success-bg);
+    color: var(--kp-state-success-text);
+  }
+}
+
+.fin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}

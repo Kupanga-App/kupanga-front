@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, ElementRef, inject, output, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { IconComponent } from '../components/icon/icon.component';
 
 /** L'API refuse un PNG de plus de 2000 × 1000 px (B6) : la zone de dessin est plafonnée en dessous. */
@@ -23,13 +23,18 @@ const HAUTEUR_MAX = 800;
         <span class="invite" aria-hidden="true">Signez ici</span>
       }
       <span class="ligne" aria-hidden="true"></span>
+      @if (mention()) {
+        <span class="mention">{{ mention() }}</span>
+      }
     </div>
-    <div class="pied">
-      <span class="kp-aide">Dessinez votre signature avec le doigt ou la souris.</span>
-      <button type="button" class="kp-btn kp-btn--ghost kp-btn--sm" (click)="effacer()" [disabled]="vide()">
-        <kp-icon name="eraser" [size]="18" /> Effacer
-      </button>
-    </div>
+    @if (outils()) {
+      <div class="pied">
+        <span class="kp-aide">Dessinez votre signature avec le doigt ou la souris.</span>
+        <button type="button" class="kp-btn kp-btn--ghost kp-btn--sm" (click)="effacer()" [disabled]="vide()">
+          <kp-icon name="eraser" [size]="18" /> Effacer
+        </button>
+      </div>
+    }
   `,
   styles: [`
     :host { display: flex; flex-direction: column; gap: 8px; }
@@ -44,10 +49,19 @@ const HAUTEUR_MAX = 800;
     }
     .ligne { position: absolute; left: 24px; right: 24px; bottom: 28%; border-bottom: 1px dashed #c4cab9; pointer-events: none; }
     .pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    /* Nom et date sous le trait : texte de l'écran, pas dans l'image envoyée */
+    .mention { position: absolute; left: 24px; right: 24px; bottom: calc(28% - 22px); color: #66737a; font-size: 12px; pointer-events: none; }
   `],
 })
 export class SignatureComponent implements AfterViewInit {
   readonly signature = output<string>();
+  /** Texte sous le trait (« Lucas Bernard · 6 novembre 2026 ») ; il n'est pas dans l'image envoyée. */
+  readonly mention = input<string | null>(null);
+  /**
+   * Aide et bouton « Effacer » sous la zone ; faux quand l'écran place « Effacer » ailleurs (`effacer()`).
+   * (Pas nommé `pied` : dans une `kp-sheet`, l'attribut serait pris pour le pied de la fenêtre.)
+   */
+  readonly outils = input(true);
   readonly vide = signal(true);
 
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
