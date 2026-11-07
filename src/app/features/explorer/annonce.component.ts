@@ -14,6 +14,9 @@ import { GalerieComponent } from '../../shared/ui/galerie.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../shared/components/carte-bien/carte-bien.component';
 import { LieuxProchesComponent } from '../../shared/ui/lieux-proches.component';
+import { ClasseEnergieComponent } from '../../shared/ui/classe-energie.component';
+import { JuridictionService } from '../biens/services/juridiction.service';
+import { JuridictionConfig } from '../biens/models/juridiction.model';
 
 /** Nombre de photos de la mosaïque : une grande et quatre petites. */
 const MOSAIQUE = 5;
@@ -26,7 +29,7 @@ const MOSAIQUE = 5;
 @Component({
   selector: 'kp-annonce',
   standalone: true,
-  imports: [RouterLink, MontantPipe, DateLonguePipe, AvatarComponent, VideComponent, GalerieComponent, IconComponent, CarteBienComponent, LieuxProchesComponent],
+  imports: [RouterLink, MontantPipe, DateLonguePipe, AvatarComponent, VideComponent, GalerieComponent, IconComponent, CarteBienComponent, LieuxProchesComponent, ClasseEnergieComponent],
   templateUrl: './annonce.component.html',
   styleUrl: './annonce.component.scss',
 })
@@ -37,11 +40,14 @@ export class AnnonceComponent implements OnInit {
   private bienService = inject(BienService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private juridictions = inject(JuridictionService);
 
   readonly bien = signal<BienDTO | null>(null);
   readonly chargement = signal(true);
   readonly introuvable = signal(false);
   readonly erreur = signal(false);
+  /** Champs du pays du bien (`GET /juridictions/{pays}`, déjà lu par le formulaire du bien, gardé en cache). */
+  readonly juridiction = signal<JuridictionConfig | null>(null);
 
   readonly typeBien = computed(() => libelleTypeBien(this.bien()?.typeBien));
   /** « Appartement · loué vide », « Studio · meublé ». */
@@ -73,6 +79,26 @@ export class AnnonceComponent implements OnInit {
     return j === null || j <= 0;
   });
 
+  /** Champ prévu dans le pays du bien (sans configuration, on s'en tient aux valeurs présentes). */
+  visible(champ: string): boolean {
+    return !this.juridiction()?.champsMasques?.includes(champ);
+  }
+
+  /** RDC : « Garantie 3 mois · 12 mois d’avance ». */
+  readonly garantieEtAvance = computed(() => {
+    const b = this.bien();
+    if (!b) return '';
+    return [
+      b.garantieMois && this.visible('garantieMois') ? `Garantie ${b.garantieMois} mois` : '',
+      b.avanceMois && this.visible('avanceMois') ? `${b.avanceMois} mois d’avance` : '',
+    ].filter(Boolean).join(' · ');
+  });
+  /** Montant de la garantie en mois (loyer × mois), affiché sous les conditions. */
+  readonly montantGarantie = computed(() => {
+    const b = this.bien();
+    return b?.garantieMois && b.loyerMensuel ? b.garantieMois * b.loyerMensuel : null;
+  });
+
   readonly photos = computed(() => this.bien()?.images ?? []);
   /** Photos de la mosaïque (ordinateur) : cinq au plus, la dernière ouvre la galerie. */
   readonly mosaique = computed(() => this.photos().slice(0, MOSAIQUE));
@@ -88,6 +114,9 @@ export class AnnonceComponent implements OnInit {
       next: bien => {
         this.bien.set(bien);
         this.chargement.set(false);
+        if (bien.pays) {
+          this.juridictions.configuration(bien.pays).subscribe({ next: c => this.juridiction.set(c), error: () => undefined });
+        }
       },
       error: (err: HttpErrorResponse) => {
         // 404 : bien inconnu ou archivé (B12)

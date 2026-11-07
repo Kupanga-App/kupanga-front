@@ -83,6 +83,13 @@ kp-galerie { margin-bottom: var(--kp-space-4); @include mq.tablette { margin: 0;
   dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; }
 }
 
+.kv--deux {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  @include mq.telephone { grid-template-columns: minmax(0, 1fr); }
+  .classe { gap: var(--kp-space-2); }
+  dd { display: flex; align-items: center; min-height: 28px; }
+}
+
 .puces { display: flex; flex-wrap: wrap; gap: var(--kp-space-2); }
 .puce {
   display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--kp-space-3);
