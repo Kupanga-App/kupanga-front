@@ -4,7 +4,7 @@ import {
   Archive, Banknote, Bell, Building2, Calendar, Camera, Check, CheckCheck, ChevronDown, ChevronLeft, ChevronRight,
   Circle, CircleAlert, CircleCheck, ClipboardCheck, Clock, Compass, Download, Ellipsis, Eraser, Eye, EyeOff, FileCheck,
   FileText, House, Image, Inbox, Key, LocateFixed, Lock, LogIn, LogOut, Mail, MapPin, MessageCircle, Minus, Monitor,
-  Moon, PenLine, Pencil, Phone, Plus, Receipt, RefreshCw, Search, Send, Share, SlidersHorizontal, Smartphone, SquarePlus, Sun, SunMedium,
+  Megaphone, Moon, PenLine, Pencil, Phone, Plus, Receipt, RefreshCw, Search, Send, Share, SlidersHorizontal, Smartphone, SquarePlus, Sun, SunMedium,
   Trash2, User, UserPlus, WifiOff, X,
 } from 'lucide-angular';
 
@@ -16,7 +16,7 @@ export const ICONES = {
   Archive, Banknote, Bell, Building2, Calendar, Camera, Check, CheckCheck, ChevronDown, ChevronLeft, ChevronRight,
   Circle, CircleAlert, CircleCheck, ClipboardCheck, Clock, Compass, Download, Ellipsis, Eraser, Eye, EyeOff, FileCheck,
   FileText, House, Image, Inbox, Key, LocateFixed, Lock, LogIn, LogOut, Mail, MapPin, MessageCircle, Minus, Monitor,
-  Moon, PenLine, Pencil, Phone, Plus, Receipt, RefreshCw, Search, Send, Share, SlidersHorizontal, Smartphone, SquarePlus, Sun, SunMedium,
+  Megaphone, Moon, PenLine, Pencil, Phone, Plus, Receipt, RefreshCw, Search, Send, Share, SlidersHorizontal, Smartphone, SquarePlus, Sun, SunMedium,
   Trash2, User, UserPlus, WifiOff, X,
 };
 
