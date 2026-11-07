@@ -28,9 +28,9 @@ export const motsDePasseIdentiques: ValidatorFn = (groupe: AbstractControl): Val
     </ul>
   `,
   styles: [`
-    ul { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; font-size: var(--kp-fs-sm); color: var(--kp-text-3); }
+    ul { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; font-size: var(--kp-fs-secondary); color: var(--kp-text-subtle); }
     li { display: inline-flex; align-items: center; gap: 6px; }
-    li.ok { color: var(--kp-success); }
+    li.ok { color: var(--kp-state-success-text); }
   `],
 })
 export class ReglesMotDePasseComponent {

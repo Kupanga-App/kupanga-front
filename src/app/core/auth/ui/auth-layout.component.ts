@@ -48,11 +48,11 @@ import { LogoComponent } from '../../../shared/ui/logo.component';
     .carte { width: 100%; max-width: 440px; padding-top: 16px; }
     .sous-titre { margin-top: 8px; color: var(--kp-text-muted); }
     .contenu { margin-top: 24px; }
-    .pied { width: 100%; max-width: 440px; margin-top: 24px; text-align: center; color: var(--kp-text-3); }
+    .pied { width: 100%; max-width: 440px; margin-top: 24px; text-align: center; color: var(--kp-text-subtle); }
     .pied:empty { display: none; }
     .legal {
       display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: auto; padding-top: 24px;
-      font-size: var(--kp-fs-sm); color: var(--kp-text-3);
+      font-size: var(--kp-fs-secondary); color: var(--kp-text-subtle);
     }
     .legal a { color: inherit; }
     @media (min-width: 768px) {

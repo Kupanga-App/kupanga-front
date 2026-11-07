@@ -82,7 +82,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
   `,
   styles: [`
     .oeil { position: absolute; right: 2px; }
-    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
+    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-subtle); font-size: var(--kp-fs-secondary); }
     .separateur::before, .separateur::after { content: ''; flex: 1; border-top: 1px solid var(--kp-border); }
   `],
 })

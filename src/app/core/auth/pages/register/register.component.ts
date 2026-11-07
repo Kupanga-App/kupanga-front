@@ -26,22 +26,22 @@ const TITRES = ['Vous êtes', 'Votre profil', 'Vos identifiants'];
   templateUrl: './register.component.html',
   styles: [`
     .progression { display: flex; gap: 6px; margin-bottom: 24px; }
-    .progression span { flex: 1; height: 4px; border-radius: 2px; background: var(--kp-surface-3); }
-    .progression span.fait { background: var(--kp-primary); }
+    .progression span { flex: 1; height: 4px; border-radius: 2px; background: var(--kp-segment-bg); }
+    .progression span.fait { background: var(--kp-accent); }
     .photo { display: flex; align-items: center; gap: 16px; }
     .apercu { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
     .apercu-vide {
       display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
-      border-radius: 50%; background: var(--kp-surface-2); color: var(--kp-text-3);
+      border-radius: 50%; background: var(--kp-surface-sunken); color: var(--kp-text-subtle);
     }
     .oeil { position: absolute; right: 2px; }
-    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
+    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-subtle); font-size: var(--kp-fs-secondary); }
     .separateur::before, .separateur::after { content: ''; flex: 1; border-top: 1px solid var(--kp-border); }
     .mention-legale { display: block; margin-top: 20px; text-align: center; }
     .envoye { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
     .envoye__icone {
       display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
-      border-radius: 50%; background: var(--kp-primary-subtle); color: var(--kp-primary-text);
+      border-radius: 50%; background: var(--kp-accent-soft); color: var(--kp-accent);
     }
   `],
 })

@@ -37,18 +37,18 @@ const ROLES: { valeur: Role; titre: string; texte: string; icone: string }[] = [
     .roles { display: flex; flex-direction: column; gap: 12px; }
     .role {
       display: flex; align-items: center; gap: 16px; min-height: 80px; padding: 16px;
-      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius); background: var(--kp-surface);
-      color: var(--kp-text-1); text-align: left;
+      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-md); background: var(--kp-surface);
+      color: var(--kp-text); text-align: left;
     }
-    .role[aria-checked='true'] { border: 2px solid var(--kp-primary); padding: 15px; background: var(--kp-primary-subtle); }
+    .role[aria-checked='true'] { border: 2px solid var(--kp-accent); padding: 15px; background: var(--kp-accent-soft); }
     .icone {
       display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px;
-      border-radius: var(--kp-radius-sm); background: var(--kp-surface-2); color: var(--kp-text-2);
+      border-radius: var(--kp-radius-sm); background: var(--kp-surface-sunken); color: var(--kp-text-muted);
     }
     .texte { display: flex; flex-direction: column; flex: 1; gap: 2px; }
     .titre { font-weight: 600; }
     .coche { flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--kp-border-strong); border-radius: 50%; }
-    .role[aria-checked='true'] .coche { border: 7px solid var(--kp-primary); }
+    .role[aria-checked='true'] .coche { border: 7px solid var(--kp-accent); }
   `],
 })
 export class ChoixRoleComponent implements ControlValueAccessor {
