@@ -55,6 +55,7 @@ import { LogoComponent } from '../../shared/ui/logo.component';
                   <li role="none"><a role="menuitem" routerLink="/documents" class="menu__item"><kp-icon name="file-text" [size]="18" /> Documents</a></li>
                 }
                 <li role="none"><a role="menuitem" routerLink="/messages" class="menu__item"><kp-icon name="message-circle" [size]="18" /> Messages</a></li>
+                <li role="none"><a role="menuitem" routerLink="/demandes-location" class="menu__item"><kp-icon name="inbox" [size]="18" /> Demandes de location</a></li>
                 <li role="none" class="menu__separateur"></li>
                 <li role="none"><button type="button" role="menuitem" class="menu__item" (click)="deconnecter()"><kp-icon name="log-out" [size]="18" /> Déconnexion</button></li>
               </ul>

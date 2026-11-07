@@ -46,8 +46,8 @@ describe('NavigationService (profil de navigation déduit des biens et du logeme
     for (const role of ['ROLE_PROPRIETAIRE', 'ROLE_LOCATAIRE'] as const) {
       connecter(role);
       expect(nav.profil()).toBe('candidat');
-      expect(liens(nav.onglets())).toEqual(['/accueil', '/explorer', '/messages']);
-      expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/explorer', '/messages', '/compte']);
+      expect(liens(nav.onglets())).toEqual(['/accueil', '/explorer', '/demandes-location', '/messages']);
+      expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/explorer', '/demandes-location', '/messages', '/compte']);
       expect(nav.aDesDocuments()).toBeFalse();
     }
   });

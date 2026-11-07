@@ -35,6 +35,8 @@ const DOCUMENTS: Onglet = { libelle: 'Documents', icone: 'file-text', lien: '/do
 const ACCUEIL: Onglet = { libelle: 'Accueil', icone: 'house', lien: '/accueil' };
 const BIENS: Onglet = { libelle: 'Mes biens', icone: 'building-2', lien: '/biens', compteur: 'biens' };
 const MON_LOGEMENT: Onglet = { libelle: 'Mon logement', icone: 'key', lien: '/mon-logement' };
+/** Demandes de location reçues (propositions d'un propriétaire), décision du 7 novembre 2026. */
+const DEMANDES: Onglet = { libelle: 'Demandes', icone: 'inbox', lien: '/demandes-location' };
 const QUITTANCES: Onglet = { libelle: 'Quittances', icone: 'receipt', lien: '/quittances' };
 /** Locataire seulement : ses quittances sont un onglet de Mon logement (un propriétaire qui loue a sa propre entrée). */
 const MON_LOGEMENT_LOCATAIRE: Onglet = { ...MON_LOGEMENT, aussi: ['/quittances'] };
@@ -116,7 +118,7 @@ export class NavigationService {
       case 'locataire':
         return [ACCUEIL, MON_LOGEMENT_LOCATAIRE, EXPLORER];
       case 'candidat':
-        return [ACCUEIL, EXPLORER, MESSAGES];
+        return [ACCUEIL, EXPLORER, DEMANDES, MESSAGES];
     }
   });
 
@@ -131,7 +133,7 @@ export class NavigationService {
       case 'locataire':
         return [ACCUEIL, MON_LOGEMENT_LOCATAIRE, MESSAGES, ...documents, COMPTE];
       case 'candidat':
-        return [ACCUEIL, EXPLORER, MESSAGES, COMPTE];
+        return [ACCUEIL, EXPLORER, DEMANDES, MESSAGES, COMPTE];
     }
   });
 
