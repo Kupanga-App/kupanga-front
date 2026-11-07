@@ -32,12 +32,6 @@ export class CompteComponent {
     const u = this.user();
     return u ? `${u.firstName} ${u.lastName}`.trim() : '';
   });
-  /** Lot 3 : profil déduit des données (biens possédés, logement loué), plus du rôle choisi à l'inscription. */
-  readonly role = computed(() => {
-    const profils = [this.nav.aDesBiens() ? 'Propriétaire' : null, this.nav.aUnLogement() ? 'Locataire' : null]
-      .filter(Boolean);
-    return profils.length ? profils.join(' et ') : 'Compte Kupanga';
-  });
   readonly libellesTheme = LIBELLES_THEME;
   readonly themes: ChoixTheme[] = ['systeme', 'clair', 'sombre'];
   protected readonly liens = LIENS_LEGAUX;
