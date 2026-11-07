@@ -21,8 +21,8 @@ import { LogoComponent } from '../../shared/ui/logo.component';
     <a routerLink="/accueil" class="logo" aria-label="Kupanga, accueil"><kp-logo [hauteur]="28" /></a>
     <nav class="entrees" aria-label="Navigation principale">
       @for (o of nav.onglets(); track o.lien) {
-        <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="entree"
-           [class.actif]="nav.actifAussi(o)" [attr.aria-current]="nav.actifAussi(o) ? 'page' : null">
+        <a [routerLink]="o.lien" routerLinkActive="actif" #rla="routerLinkActive" class="entree"
+           [class.actif-aussi]="nav.actifAussi(o)" [attr.aria-current]="rla.isActive || nav.actifAussi(o) ? 'page' : null">
           <kp-icon [name]="o.icone" [size]="18" [strokeWidth]="1.75" />
           <span class="entree__libelle">{{ o.libelle }}</span>
           @if (o.compteur === 'messages' && nonLus(); as n) {
@@ -68,16 +68,16 @@ import { LogoComponent } from '../../shared/ui/logo.component';
       transition: background-color var(--kp-duree) var(--kp-ease), color var(--kp-duree) var(--kp-ease);
     }
     .entree:hover { background: var(--kp-bg); color: var(--kp-text); }
-    .entree.actif, .entree.actif:hover { background: var(--kp-text); color: var(--kp-text-on-accent); }
+    .entree.actif, .entree.actif:hover, .entree.actif-aussi, .entree.actif-aussi:hover { background: var(--kp-text); color: var(--kp-text-on-accent); }
     .entree__libelle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .entree__pastille {
       display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box;
       border-radius: var(--kp-radius-pill); background: var(--kp-accent-soft); color: var(--kp-state-success-text);
       font-size: var(--kp-fs-mention); font-weight: 500;
     }
-    .entree.actif .entree__pastille { background: var(--kp-surface); color: var(--kp-text); }
+    .entree.actif .entree__pastille, .entree.actif-aussi .entree__pastille { background: var(--kp-surface); color: var(--kp-text); }
     .entree__nombre { font-size: var(--kp-fs-mention); color: var(--kp-text-subtle); font-variant-numeric: tabular-nums; }
-    .entree.actif .entree__nombre { color: inherit; opacity: 0.72; }
+    .entree.actif .entree__nombre, .entree.actif-aussi .entree__nombre { color: inherit; opacity: 0.72; }
     .bas { flex: none; display: flex; flex-direction: column; gap: 8px; padding-top: 16px; }
     .annonces {
       display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px;

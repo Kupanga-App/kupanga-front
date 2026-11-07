@@ -14,8 +14,8 @@
 @if (barres()) {
   <nav class="onglets" aria-label="Navigation principale">
     @for (o of nav.ongletsMobile(); track o.lien) {
-      <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="onglet"
-         [class.actif]="nav.actifAussi(o)" [attr.aria-current]="nav.actifAussi(o) ? 'page' : null">
+      <a [routerLink]="o.lien" routerLinkActive="actif" #rla="routerLinkActive" class="onglet"
+         [class.actif-aussi]="nav.actifAussi(o)" [attr.aria-current]="rla.isActive || nav.actifAussi(o) ? 'page' : null">
         <span class="onglet__icone">
           <kp-icon [name]="o.icone" [size]="20" [strokeWidth]="1.75" />
           @if (compteur(o); as n) {

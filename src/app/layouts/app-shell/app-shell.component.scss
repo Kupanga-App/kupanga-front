@@ -101,7 +101,8 @@
   color: var(--kp-text-subtle);
   text-decoration: none;
 
-  &.actif {
+  &.actif,
+  &.actif-aussi {
     color: var(--kp-text);
     font-weight: 500;
 

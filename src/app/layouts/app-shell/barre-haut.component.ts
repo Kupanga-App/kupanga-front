@@ -30,8 +30,8 @@ import { LogoComponent } from '../../shared/ui/logo.component';
       @if (connecte()) {
         <nav class="entrees" aria-label="Navigation principale">
           @for (o of nav.onglets(); track o.lien) {
-            <a [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page" class="entree"
-               [class.actif]="nav.actifAussi(o)" [attr.aria-current]="nav.actifAussi(o) ? 'page' : null">
+            <a [routerLink]="o.lien" routerLinkActive="actif" #rla="routerLinkActive" class="entree"
+               [class.actif-aussi]="nav.actifAussi(o)" [attr.aria-current]="rla.isActive || nav.actifAussi(o) ? 'page' : null">
               {{ o.libelle }}
               @if (o.compteur === 'messages' && nonLus(); as n) {
                 <span class="entree__nombre" [attr.aria-label]="n + ' non lus'">{{ n > 99 ? '99+' : n }}</span>
@@ -63,8 +63,9 @@ import { LogoComponent } from '../../shared/ui/logo.component';
         </div>
       } @else {
         <nav class="entrees" aria-label="Navigation principale">
-          <a routerLink="/explorer" routerLinkActive="actif" ariaCurrentWhenActive="page" class="entree"
-             [class.actif]="nav.surAdresse('/annonces')">Annonces</a>
+          <a routerLink="/explorer" routerLinkActive="actif" #rlaAnnonces="routerLinkActive" class="entree"
+             [class.actif-aussi]="nav.surAdresse('/annonces')"
+             [attr.aria-current]="rlaAnnonces.isActive || nav.surAdresse('/annonces') ? 'page' : null">Annonces</a>
         </nav>
         <div class="droite">
           <a routerLink="/auth/login" class="kp-btn kp-btn--ghost">Se connecter</a>
@@ -92,7 +93,7 @@ import { LogoComponent } from '../../shared/ui/logo.component';
       transition: background-color var(--kp-duree) var(--kp-ease), color var(--kp-duree) var(--kp-ease);
     }
     .entree:hover { background: var(--kp-bg); color: var(--kp-text); }
-    .entree.actif, .entree.actif:hover { background: var(--kp-text); color: var(--kp-text-on-accent); }
+    .entree.actif, .entree.actif:hover, .entree.actif-aussi, .entree.actif-aussi:hover { background: var(--kp-text); color: var(--kp-text-on-accent); }
     .entree__nombre { font-size: var(--kp-fs-mention); opacity: 0.75; }
     .droite { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .compte { position: relative; }
