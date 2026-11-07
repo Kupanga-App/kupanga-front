@@ -170,6 +170,25 @@ export function calculerEtapesLocation({ bien, contrats, edls, quittances }: Don
   }
 }
 
+/**
+ * Précision de l'état d'un bien loué ou réservé dans l'en-tête de la fiche (« Loué · bail à créer ») :
+ * l'étape en cours quand c'est le bail ou l'état des lieux, sinon rien.
+ */
+export function precisionEtat({ etapes, courante }: EtapesLocation): string | null {
+  const e = etapes[courante];
+  if (!e?.detail) return null;
+  const detail = e.detail.charAt(0).toLowerCase() + e.detail.slice(1);
+  switch (e.cle) {
+    case 'bail':
+      return e.detail === 'Lien expiré' ? 'lien du bail expiré' : `bail ${detail}`;
+    case 'edl':
+      if (e.detail === 'Entrée, après le bail') return 'état des lieux à faire';
+      return e.detail === 'Lien expiré' ? 'lien de l’état des lieux expiré' : `état des lieux ${detail}`;
+    default:
+      return null;
+  }
+}
+
 function detailBail(bail: ContratDTO | null, prenom: string): string {
   return bail ? detailSignature(bail.statut, prenom) : 'À créer';
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/services/auth.service';
+import { LogementContextService } from '../../../core/services/logement-context.service';
 import { DonneesProprietaire, DonneesProprietaireService } from '../donnees-proprietaire.service';
 import { ChatStoreService } from '../../messagerie/services/chat-store.service';
 import { BienDTO, locataireDuBail, vignette } from '../../biens/models/bien.model';
@@ -42,6 +43,7 @@ export class AccueilComponent implements OnInit {
   private auth = inject(AuthService);
   private donneesProprietaire = inject(DonneesProprietaireService);
   private chat = inject(ChatStoreService);
+  private contexte = inject(LogementContextService);
 
   readonly chargement = signal(true);
   readonly erreur = signal(false);
@@ -68,6 +70,8 @@ export class AccueilComponent implements OnInit {
   })();
   readonly nomMois = new Date().toLocaleDateString('fr-FR', { month: 'long' });
 
+  /** En-tête propriétaire dès l'arrivée (profil connu par la navigation), sans attendre la liste des biens. */
+  readonly proprietaire = computed(() => this.biens().length > 0 || (this.chargement() && this.contexte.aDesBiens()));
   readonly biensActifs = computed(() => this.biens().filter(b => !b.archive));
   readonly chiffres = computed(() => calculerChiffres(this.biens(), this.donnees()?.quittances ?? []));
   /** Segments de la barre « Annonces en ligne » : un par bien actif. */

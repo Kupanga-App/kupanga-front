@@ -1,13 +1,214 @@
-.resume {
-  gap: var(--kp-space-2);
+@use 'mq';
+
+// Vue d'ensemble d'un bien (Fiche-Bien-Loue, Fiche-Bien-Vacant)
+
+.fiche {
+  --_gap: clamp(8px, 0.8vw, 12px);
 }
 
-.loyer {
-  font-size: var(--kp-fs-lg);
+.fort {
+  font-weight: 500;
+  color: var(--kp-text);
 }
+
+.secondaire {
+  color: var(--kp-text-muted);
+  font-size: 14px;
+}
+
+.petit {
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+.titre-carte {
+  font-size: var(--kp-fs-body);
+  font-weight: 500;
+}
+
+.titre-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+}
+
+.lien {
+  color: var(--kp-text);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bandeau {
+  margin-bottom: var(--_gap);
+}
+
+// ── Prochaine étape ─────────────────────────────────────────────────────────
+
+.prochaine {
+  margin-bottom: var(--_gap);
+  gap: var(--kp-space-4);
+}
+
+.prochaine__ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kp-space-4);
+
+  > .kp-btn {
+    margin-left: auto;
+  }
+}
+
+.prochaine__icone {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-accent-soft);
+  color: var(--kp-accent);
+}
+
+.prochaine__texte {
+  display: flex;
+  flex: 1 1 280px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  h2 {
+    font-size: var(--kp-fs-card-title);
+    font-weight: 500;
+  }
+}
+
+.surtitre {
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+.dernier {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: var(--kp-space-3);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+}
+
+.dernier__texte {
+  display: flex;
+  flex: 1 1 220px;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dernier__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kp-space-2);
+  margin-left: auto;
+}
+
+// ── Colonnes ────────────────────────────────────────────────────────────────
+
+.colonnes {
+  display: grid;
+  gap: var(--_gap);
+  align-items: start;
+
+  @include mq.ordinateur {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+  }
+}
+
+.colonne {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap);
+  min-width: 0;
+}
+
+// ── Photos ──────────────────────────────────────────────────────────────────
+
+.photos {
+  position: relative;
+  padding: 8px;
+}
+
+.voir-photos {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+  color: var(--kp-text);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--kp-elev-1);
+  cursor: pointer;
+}
+
+// ── Caractéristiques ────────────────────────────────────────────────────────
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+
+  @include mq.tablette {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.tuile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+
+  dt {
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-mention);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+}
+
+.groupe {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.puces .kp-tag {
+  background: var(--kp-surface-sunken);
+}
+
+// ── Locataire ───────────────────────────────────────────────────────────────
 
 .identite {
-  gap: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .contacts {
@@ -20,11 +221,97 @@
   }
 }
 
-.archivage {
-  margin-top: var(--kp-space-4);
+// ── Documents ───────────────────────────────────────────────────────────────
+
+.documents {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+
+  .titre-carte {
+    padding: var(--kp-card-pad) var(--kp-card-pad) 12px;
+  }
 }
 
-button.kp-list__item:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.document {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  min-height: 56px;
+  padding: 8px var(--kp-card-pad);
+  border-top: 1px solid var(--kp-border);
+  color: var(--kp-text);
+  text-decoration: none;
+  transition: background-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-bg);
+  }
+}
+
+.document__icone {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+  color: var(--kp-text-muted);
+}
+
+.document__texte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ligne-statut {
+  gap: 8px;
+}
+
+.document__chevron {
+  color: var(--kp-text-subtle);
+}
+
+// ── Onglet Annonce ──────────────────────────────────────────────────────────
+
+.description {
+  white-space: pre-line;
+}
+
+.lignes-cle {
+  margin: 0;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--kp-space-3);
+    padding: 10px 0;
+    border-top: 1px solid var(--kp-border);
+  }
+
+  > div:first-child {
+    border-top: 0;
+  }
+
+  dt {
+    color: var(--kp-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: right;
+  }
+}
+
+.dernier__qui {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
 }

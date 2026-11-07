@@ -1,4 +1,4 @@
-import { bailLePlusRecent, calculerEtapesLocation, DonneesLocation } from './etapes-location';
+import { bailLePlusRecent, calculerEtapesLocation, DonneesLocation, precisionEtat } from './etapes-location';
 import { BienDTO, UserDTO } from '../biens/models/bien.model';
 import { ContratDTO } from '../gestion-logement/models/contrat.model';
 import { EtatDesLieuxDTO } from '../gestion-logement/models/edl.model';
@@ -119,6 +119,19 @@ describe('calculerEtapesLocation', () => {
     expect(etats(donnees({ ...base, quittances: [q] }))).toEqual(['fait', 'fait', 'fait', 'fait', 'en-cours']);
     expect(r.etapes[4].detail).toBe('2 quittances');
     expect(r.prochaine?.action).toBe('Voir les quittances');
+  });
+
+  it('précision de l’état pour l’en-tête de la fiche', () => {
+    const loue = bien({ locataire: LUCAS });
+    const avec = (contrats: ContratDTO[], edls: EtatDesLieuxDTO[] = []) =>
+      precisionEtat(calculerEtapesLocation(donnees({ bien: loue, contrats, edls })));
+
+    expect(avec([])).toBe('bail à créer');
+    expect(avec([bail('EN_ATTENTE_SIGNATURE_LOCATAIRE')])).toBe('bail en attente de Lucas');
+    expect(avec([bail('EXPIRE')])).toBe('lien du bail expiré');
+    expect(avec([bail('SIGNE')])).toBe('état des lieux à faire');
+    expect(avec([bail('SIGNE')], [{ id: 1, type: 'ENTREE', statut: 'SIGNE' } as EtatDesLieuxDTO])).toBeNull();
+    expect(precisionEtat(calculerEtapesLocation(donnees()))).toBeNull();
   });
 
   it('bien archivé : pas de prochaine étape', () => {

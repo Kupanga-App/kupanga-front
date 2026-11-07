@@ -1,10 +1,10 @@
 <div class="kp-page accueil" kpTirerPourActualiser (actualiser)="charger()">
-  @if (biens().length) {
+  @if (proprietaire()) {
     <header class="entete">
       <div class="entete__titre">
         <h1>{{ moisCourant }}</h1>
         <p class="sous-titre">
-          {{ nomComplet() }} · {{ chiffres().actifs }} bien{{ chiffres().actifs > 1 ? 's' : '' }}
+          {{ nomComplet() }}@if (biens().length) { · {{ chiffres().actifs }} bien{{ chiffres().actifs > 1 ? 's' : '' }}}
         </p>
       </div>
       <a routerLink="/biens/nouveau" class="kp-btn kp-btn--primary"><kp-icon name="plus" [size]="18" /> Ajouter un bien</a>
