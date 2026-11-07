@@ -5,7 +5,7 @@ import { EtatDesLieuxDTO } from '../gestion-logement/models/edl.model';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { messageLienSignature } from '../../core/http/api-error';
 import { DateLonguePipe } from '../../shared/format';
-import { AuthLayoutComponent } from '../../core/auth/ui/auth-layout.component';
+import { SignatureLayoutComponent } from './signature-layout.component';
 import { SignatureComponent } from '../../shared/ui/signature.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { COMPTEURS, ELEMENTS, ETATS } from '../gestion-logement/models/edl-libelles';
@@ -14,32 +14,32 @@ import { COMPTEURS, ELEMENTS, ETATS } from '../gestion-logement/models/edl-libel
 @Component({
   selector: 'kp-signer-edl',
   standalone: true,
-  imports: [RouterLink, DateLonguePipe, AuthLayoutComponent, SignatureComponent, IconComponent],
+  imports: [RouterLink, DateLonguePipe, SignatureLayoutComponent, SignatureComponent, IconComponent],
   template: `
     @if (signe()) {
-      <kp-auth-layout titre="État des lieux signé">
+      <kp-signature-layout titre="État des lieux signé">
         <div class="kp-stack">
           <p>Merci. Votre propriétaire est prévenu ; le document signé est disponible dans vos documents.</p>
           <a [routerLink]="connecte() ? '/documents' : '/auth/login'" class="kp-btn kp-btn--primary kp-btn--block">
             {{ connecte() ? 'Mes documents' : 'Se connecter' }}
           </a>
         </div>
-      </kp-auth-layout>
+      </kp-signature-layout>
     } @else if (chargement()) {
-      <kp-auth-layout titre="Signature de l’état des lieux">
+      <kp-signature-layout titre="Signature de l’état des lieux">
         <div class="kp-stack" aria-busy="true">
           <span class="kp-skeleton kp-skeleton--carte"></span>
           <span class="kp-skeleton kp-skeleton--carte"></span>
         </div>
-      </kp-auth-layout>
+      </kp-signature-layout>
     } @else if (!edl()) {
-      <kp-auth-layout titre="Lien de signature" [sousTitre]="erreur()">
+      <kp-signature-layout titre="Lien de signature" [sousTitre]="erreur()">
         <a [routerLink]="connecte() ? '/documents' : '/auth/login'" class="kp-btn kp-btn--secondary kp-btn--block">
           {{ connecte() ? 'Mes documents' : 'Se connecter' }}
         </a>
-      </kp-auth-layout>
+      </kp-signature-layout>
     } @else {
-      <kp-auth-layout [titre]="'Signez l’état des lieux ' + (edl()!.type === 'ENTREE' ? 'd’entrée' : 'de sortie')" [sousTitre]="edl()!.adresseBien ?? null">
+      <kp-signature-layout [titre]="'Signez l’état des lieux ' + (edl()!.type === 'ENTREE' ? 'd’entrée' : 'de sortie')" [sousTitre]="edl()!.adresseBien ?? null">
         @if (edl(); as e) {
           <div class="kp-stack kp-stack--lg">
             <dl class="kp-details">
@@ -115,7 +115,7 @@ import { COMPTEURS, ELEMENTS, ETATS } from '../gestion-logement/models/edl-libel
             </button>
           </div>
         }
-      </kp-auth-layout>
+      </kp-signature-layout>
     }
   `,
   styles: [`

@@ -6,7 +6,7 @@ import { AuthService } from '../../core/auth/services/auth.service';
 import { MontantPipe } from '../../core/money/montant';
 import { messageLienSignature } from '../../core/http/api-error';
 import { DateLonguePipe } from '../../shared/format';
-import { AuthLayoutComponent } from '../../core/auth/ui/auth-layout.component';
+import { SignatureLayoutComponent } from './signature-layout.component';
 import { SignatureComponent } from '../../shared/ui/signature.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 
@@ -17,32 +17,32 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 @Component({
   selector: 'kp-signer-contrat',
   standalone: true,
-  imports: [RouterLink, MontantPipe, DateLonguePipe, AuthLayoutComponent, SignatureComponent, IconComponent],
+  imports: [RouterLink, MontantPipe, DateLonguePipe, SignatureLayoutComponent, SignatureComponent, IconComponent],
   template: `
     @if (signe()) {
-      <kp-auth-layout titre="Bail signé">
+      <kp-signature-layout titre="Bail signé">
         <div class="kp-stack">
           <p>Merci. Votre propriétaire est prévenu ; le bail signé est disponible dans vos documents.</p>
           <a [routerLink]="connecte() ? '/mon-logement' : '/auth/login'" class="kp-btn kp-btn--primary kp-btn--block">
             {{ connecte() ? 'Voir mon logement' : 'Se connecter' }}
           </a>
         </div>
-      </kp-auth-layout>
+      </kp-signature-layout>
     } @else if (chargement()) {
-      <kp-auth-layout titre="Signature du bail">
+      <kp-signature-layout titre="Signature du bail">
         <div class="kp-stack" aria-busy="true">
           <span class="kp-skeleton kp-skeleton--carte"></span>
           <span class="kp-skeleton kp-skeleton--carte"></span>
         </div>
-      </kp-auth-layout>
+      </kp-signature-layout>
     } @else if (!contrat()) {
-      <kp-auth-layout titre="Lien de signature" [sousTitre]="erreur()">
+      <kp-signature-layout titre="Lien de signature" [sousTitre]="erreur()">
         <a [routerLink]="connecte() ? '/documents' : '/auth/login'" class="kp-btn kp-btn--secondary kp-btn--block">
           {{ connecte() ? 'Mes documents' : 'Se connecter' }}
         </a>
-      </kp-auth-layout>
+      </kp-signature-layout>
     } @else {
-      <kp-auth-layout titre="Signez votre bail" [sousTitre]="contrat()!.adresseBien ?? null">
+      <kp-signature-layout titre="Signez votre bail" [sousTitre]="contrat()!.adresseBien ?? null">
         @if (contrat(); as c) {
           <div class="kp-stack kp-stack--lg">
             <dl class="kp-details">
@@ -79,7 +79,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
             </button>
           </div>
         }
-      </kp-auth-layout>
+      </kp-signature-layout>
     }
   `,
 })
