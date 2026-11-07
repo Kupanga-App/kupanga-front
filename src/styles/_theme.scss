@@ -46,6 +46,8 @@
   // Pastilles posées sur une photo (compteur, « Couverture », retirer) : mêmes valeurs dans les deux thèmes
   --kp-photo-voile: rgba(16, 33, 43, 0.8);
   --kp-photo-texte: #ffffff;
+  // Fond du plein écran des photos
+  --kp-photo-fond: #000000;
   // Focus clavier : anneau nuit séparé de l'élément par un liseré de la couleur de surface (DS-Fondations)
   --kp-focus: 0 0 0 2px var(--kp-surface), 0 0 0 4px var(--kp-text);
 
@@ -92,6 +94,8 @@
   --kp-backdrop: rgba(0, 0, 0, 0.6);
   --kp-photo-voile: rgba(16, 33, 43, 0.8);
   --kp-photo-texte: #ffffff;
+  // Fond du plein écran des photos
+  --kp-photo-fond: #000000;
   --kp-focus: 0 0 0 2px var(--kp-surface), 0 0 0 4px var(--kp-text);
 
   color-scheme: dark;

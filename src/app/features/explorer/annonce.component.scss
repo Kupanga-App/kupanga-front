@@ -1,39 +1,124 @@
 @use 'mq';
 
-.prix {
-  font-size: var(--kp-fs-xl);
+// Annonce (maquettes Annonce-France, Annonce-RDC, Annonce-Proprio) : un gabarit pour les deux pays.
+.annonce {
+  max-width: 1280px;
+  padding-top: var(--kp-page-pad);
+  @include mq.tablette { padding-left: var(--kp-page-pad); padding-right: var(--kp-page-pad); }
 }
 
-.lieu {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--kp-text-2);
+h1, h2 { margin: 0; font-weight: 500; }
+p { margin: 0; }
+.secondaire { font-size: 14px; color: var(--kp-text-muted); }
+.mention { font-size: var(--kp-fs-secondary); color: var(--kp-text-subtle); }
+.fort { font-weight: 500; }
+.par-mois { font-size: var(--kp-fs-body); font-weight: 400; color: var(--kp-text-subtle); }
+
+// ───────── En-tête
+.tete { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--kp-space-4); }
+.fil {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: var(--kp-space-1);
+  font-size: var(--kp-fs-secondary); color: var(--kp-text-muted); text-decoration: none;
+  &:hover { color: var(--kp-text); }
+}
+h1 { font-size: var(--kp-fs-page-title); line-height: 1.15; letter-spacing: -0.01em; }
+.sous-titre { display: flex; flex-wrap: wrap; gap: var(--kp-space-1) var(--kp-space-4); font-size: 14px; color: var(--kp-text-muted); }
+.lieu { display: inline-flex; align-items: center; gap: 6px; }
+
+// ───────── Photos : une grande et quatre petites (ordinateur), défilement (téléphone)
+kp-galerie { margin-bottom: var(--kp-space-4); @include mq.tablette { margin: 0; } }
+.mosaique, .mosaique-vide { display: none; }
+@include mq.tablette {
+  .mosaique {
+    display: grid; gap: var(--kp-space-2); margin-bottom: var(--kp-space-4);
+    grid-template-columns: 2fr 1fr 1fr; grid-template-rows: repeat(2, clamp(140px, 14vw, 200px));
+    &[data-nombre='1'] { grid-template-columns: 1fr; grid-template-rows: clamp(280px, 28vw, 408px); }
+    &[data-nombre='2'] { grid-template-columns: 2fr 1fr; grid-template-rows: clamp(280px, 28vw, 408px); }
+    &[data-nombre='3'] { grid-template-columns: 2fr 1fr; }
+    &[data-nombre='4'] .tuile:last-child { grid-column: span 2; }
+  }
+  .mosaique-vide {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--kp-space-2);
+    height: 240px; margin-bottom: var(--kp-space-4); border-radius: var(--kp-radius-lg);
+    background: var(--kp-surface-sunken); color: var(--kp-text-subtle);
+  }
+}
+.tuile {
+  position: relative; min-width: 0; min-height: 0; padding: 0; border: 0; overflow: hidden; cursor: zoom-in;
+  border-radius: var(--kp-radius-md); background: var(--kp-surface-sunken);
+  img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--kp-duree-lente) var(--kp-ease); }
+  &:hover img { transform: scale(1.02); }
+  &:focus-visible { outline: none; box-shadow: var(--kp-focus); }
+  &.grande { grid-row: 1 / -1; border-radius: 16px; }
+}
+.voir-tout {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--kp-photo-voile) 70%, transparent); color: var(--kp-photo-texte); font-weight: 500;
 }
 
-.description {
-  white-space: pre-line;
-  color: var(--kp-text-2);
+// ───────── Colonnes : contenu à gauche, carte collée à droite
+.colonnes {
+  display: flex; flex-direction: column; gap: clamp(8px, 0.8vw, 12px);
+  @include mq.ordinateur {
+    display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(16px, 2vw, 32px); align-items: start;
+  }
+}
+.principale { display: flex; flex-direction: column; gap: clamp(8px, 0.8vw, 12px); min-width: 0; @include mq.ordinateur { grid-column: 1; grid-row: 1; } }
+.cote {
+  @include mq.ordinateur { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--kp-top-offset) + var(--kp-space-4)); }
 }
 
+.bloc, .carte-contact {
+  display: flex; flex-direction: column; gap: var(--kp-space-3); padding: var(--kp-card-pad);
+  background: var(--kp-surface); border-radius: var(--kp-radius-lg); box-shadow: var(--kp-elev-0);
+}
+.bloc h2 { font-size: var(--kp-fs-card-title); }
+
+// Clé / valeur sur fond en retrait, trois par ligne
+.kv {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--kp-space-2); margin: 0;
+  @include mq.telephone { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  > div { display: flex; flex-direction: column; gap: 2px; padding: 10px var(--kp-space-3); border-radius: var(--kp-radius-md); background: var(--kp-bg); min-width: 0; }
+  dt { font-size: var(--kp-fs-mention); color: var(--kp-text-subtle); }
+  dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; }
+}
+
+.puces { display: flex; flex-wrap: wrap; gap: var(--kp-space-2); }
+.puce {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--kp-space-3);
+  border-radius: var(--kp-radius-pill); background: var(--kp-surface-sunken); font-size: 14px;
+  kp-icon { color: var(--kp-text-muted); }
+}
+
+.description { white-space: pre-line; color: var(--kp-text-muted); max-width: 64ch; }
+
+.repere {
+  display: flex; align-items: flex-start; gap: var(--kp-space-2); padding: var(--kp-space-3);
+  border-radius: var(--kp-radius-md); background: var(--kp-accent-soft); font-size: 14px;
+  kp-icon { color: var(--kp-accent); margin-top: 2px; }
+  strong { font-weight: 500; }
+}
+
+// ───────── Carte de contact
+.carte-contact { gap: var(--kp-space-4); @include mq.ordinateur { box-shadow: var(--kp-elev-1); } }
+.prix-bloc { display: flex; flex-direction: column; gap: 2px; }
+.prix .kp-montant { font-size: 28px; font-weight: 500; }
+.dispo { display: inline-flex; align-items: center; gap: var(--kp-space-2); font-size: 14px; }
+.proprietaire {
+  display: flex; align-items: center; gap: var(--kp-space-3); padding: var(--kp-space-3);
+  border-radius: 16px; background: var(--kp-bg);
+}
+.proprietaire__texte { display: flex; flex-direction: column; min-width: 0; }
+.contacter { min-height: 48px; }
+.note {
+  display: flex; align-items: flex-start; gap: var(--kp-space-2); font-size: var(--kp-fs-secondary); color: var(--kp-text-muted);
+  kp-icon { margin-top: 3px; color: var(--kp-accent); }
+}
+
+// Barre du bas : téléphone et tablette seulement (la carte collée prend le relais sur ordinateur)
 .contact {
   align-items: center;
-
-  .contact__prix {
-    flex: 1;
-    font-size: var(--kp-fs-lg);
-  }
-
-  > .kp-btn {
-    flex: 0 0 auto;
-    min-width: 160px;
-  }
-
-  @include mq.tablette {
-    justify-content: space-between;
-    padding: var(--kp-space-4) var(--kp-space-5);
-    border: 1px solid var(--kp-border);
-    border-radius: var(--kp-radius);
-    background: var(--kp-surface);
-  }
+  .contact__prix { flex: 1; font-size: var(--kp-fs-subtitle); font-weight: 500; }
+  > .kp-btn { flex: 0 0 auto; min-width: 160px; }
+  @include mq.ordinateur { display: none; }
 }

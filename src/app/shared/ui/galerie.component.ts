@@ -5,6 +5,7 @@ import { IconComponent } from '../components/icon/icon.component';
 /**
  * Galerie photo : balayage horizontal avec compteur « 3 / 12 », plein écran au toucher.
  * Photos chargées à la demande (seule la première l'est tout de suite).
+ * Classe `plein-ecran-seul` : pas d'aperçu à partir de 768 px, `ouvrir(i)` est appelé par une mosaïque.
  */
 @Component({
   selector: 'kp-galerie',
@@ -73,12 +74,14 @@ import { IconComponent } from '../components/icon/icon.component';
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; aspect-ratio: 16 / 9;
       border-radius: var(--kp-radius-md); background: var(--kp-surface-sunken); color: var(--kp-text-subtle);
     }
-    .plein { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: #000; color: #fff; }
+    .plein { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: var(--kp-photo-fond); color: var(--kp-photo-texte); }
     .plein__haut {
       display: flex; align-items: center; justify-content: space-between;
       padding: calc(8px + var(--kp-safe-top)) 8px 8px 20px;
     }
-    .fermer { color: #fff; }
+    .fermer { color: var(--kp-photo-texte); }
+    /* Aperçu remplacé par une mosaïque sur tablette et ordinateur (page annonce) : seul le plein écran reste */
+    @media (min-width: 768px) { :host(.plein-ecran-seul) .galerie, :host(.plein-ecran-seul) .vide { display: none; } }
     .plein__defilement { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
     .plein__defilement::-webkit-scrollbar { display: none; }
     .plein__diapo { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; padding-bottom: var(--kp-safe-bottom); }

@@ -1,10 +1,8 @@
-<div class="kp-page kp-page--etroite">
-  <kp-page-header [titre]="bien()?.titre ?? 'Annonce'" retour="/explorer" />
-
+<div class="kp-page annonce">
   @if (chargement()) {
     <div class="kp-stack" aria-busy="true">
-      <span class="kp-skeleton kp-skeleton--photo"></span>
       <span class="kp-skeleton kp-skeleton--titre"></span>
+      <span class="kp-skeleton kp-skeleton--photo"></span>
       <span class="kp-skeleton kp-skeleton--ligne"></span>
       <span class="kp-skeleton kp-skeleton--carte"></span>
     </div>
@@ -17,103 +15,128 @@
       <button type="button" class="kp-btn kp-btn--secondary" (click)="ngOnInit()">Réessayer</button>
     </kp-vide>
   } @else if (bien(); as b) {
-    <div class="kp-stack kp-stack--lg">
-      <kp-galerie [photos]="b.images ?? []" />
-      <kp-lieux-proches [pois]="b.pois" />
+    <header class="tete">
+      <a routerLink="/explorer" class="fil"><kp-icon name="chevron-left" [size]="14" [strokeWidth]="1.5" /> Retour aux annonces</a>
+      <h1>{{ b.titre }}</h1>
+      <p class="sous-titre">
+        <span class="lieu"><kp-icon name="map-pin" [size]="16" [strokeWidth]="1.5" /> {{ lieu() }}</span>
+        <span>{{ typeEtLocation() }}</span>
+      </p>
+    </header>
 
-      <section class="kp-section">
-        <p class="prix">
-          <span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
-          <span class="kp-muted"> / mois</span>
-        </p>
-        @if (b.chargesMensuelles) {
-          <p class="kp-muted kp-small">+ {{ b.chargesMensuelles | montant: b.devise : 0 }} de charges</p>
+    <!-- Photos : mosaïque sur ordinateur, défilement sur téléphone ; plein écran dans les deux cas -->
+    <kp-galerie #galerie class="plein-ecran-seul" [photos]="photos()" />
+    @if (mosaique().length) {
+      <div class="mosaique" [attr.data-nombre]="mosaique().length">
+        @for (p of mosaique(); track $index; let i = $index; let dernier = $last) {
+          <button type="button" class="tuile" [class.grande]="i === 0" (click)="galerie.ouvrir(i)"
+                  [attr.aria-label]="dernier && photos().length > 1 ? 'Voir les ' + photos().length + ' photos' : 'Agrandir la photo ' + (i + 1)">
+            <img [src]="p" alt="" [attr.loading]="i === 0 ? 'eager' : 'lazy'" decoding="async" />
+            @if (dernier && photos().length > 1) {
+              <span class="voir-tout" aria-hidden="true">Voir les {{ photos().length }} photos</span>
+            }
+          </button>
         }
-        <p class="lieu"><kp-icon name="map-pin" [size]="18" /> {{ lieu() }}</p>
-        <div class="kp-row kp-row--wrap">
-          <span class="kp-tag">{{ typeBien() }}</span>
-          @if (b.meuble) { <span class="kp-tag">Meublé</span> }
-          @if (b.colocation) { <span class="kp-tag">Colocation</span> }
-          <span class="kp-tag">
-            <kp-icon name="calendar" [size]="16" />
-            @if (disponibleMaintenant()) { Disponible } @else { Disponible le {{ b.disponibleDe | dateLongue: true }} }
-          </span>
-        </div>
-      </section>
+      </div>
+    } @else {
+      <div class="mosaique-vide"><kp-icon name="image" [size]="32" [strokeWidth]="1.5" /><span>Pas de photo</span></div>
+    }
 
-      <section class="kp-section">
-        <h2 class="kp-section-title">Caractéristiques</h2>
-        <dl class="kp-details">
-          @if (b.surfaceHabitable) { <div><dt>Surface</dt><dd>{{ b.surfaceHabitable }} m²</dd></div> }
-          @if (b.nombrePieces) { <div><dt>Pièces</dt><dd>{{ b.nombrePieces }}</dd></div> }
-          @if (b.nombreChambres) { <div><dt>Chambres</dt><dd>{{ b.nombreChambres }}</dd></div> }
-          @if (b.etage != null) { <div><dt>Étage</dt><dd>{{ b.etage === 0 ? 'Rez-de-chaussée' : b.etage }}</dd></div> }
-          @if (b.ascenseur != null) { <div><dt>Ascenseur</dt><dd>{{ b.ascenseur ? 'Oui' : 'Non' }}</dd></div> }
-          @if (b.anneeConstruction) { <div><dt>Construction</dt><dd>{{ b.anneeConstruction }}</dd></div> }
-          @if (b.modeChauffage) { <div><dt>Chauffage</dt><dd>{{ chauffage(b.modeChauffage) }}</dd></div> }
-          @if (b.heuresElectriciteParJour != null) { <div><dt>Courant</dt><dd>{{ b.heuresElectriciteParJour }} h par jour</dd></div> }
-          @if (b.classeEnergie) { <div><dt>Classe énergie (DPE)</dt><dd>{{ b.classeEnergie }}</dd></div> }
-          @if (b.classeGes) { <div><dt>Émissions (GES)</dt><dd>{{ b.classeGes }}</dd></div> }
-        </dl>
-      </section>
-
-      <section class="kp-section">
-        <h2 class="kp-section-title">Conditions</h2>
-        <dl class="kp-details">
-          <div><dt>Loyer</dt><dd>{{ b.loyerMensuel | montant: b.devise : 0 }}</dd></div>
-          @if (b.chargesMensuelles) { <div><dt>Charges</dt><dd>{{ b.chargesMensuelles | montant: b.devise : 0 }}</dd></div> }
-          @if (b.garantieMois) { <div><dt>Garantie</dt><dd>{{ b.garantieMois }} mois de loyer</dd></div> }
-          @if (b.avanceMois) { <div><dt>Loyers d’avance</dt><dd>{{ b.avanceMois }} mois</dd></div> }
-          @if (b.depotGarantie) { <div><dt>Dépôt de garantie</dt><dd>{{ b.depotGarantie | montant: b.devise : 0 }}</dd></div> }
-        </dl>
-      </section>
-
-      @if (equipements().length) {
-        <section class="kp-section">
-          <h2 class="kp-section-title">Équipements</h2>
-          <div class="kp-row kp-row--wrap">
-            @for (e of equipements(); track e) {
-              <span class="kp-tag"><kp-icon name="check" [size]="16" /> {{ e }}</span>
+    <div class="colonnes">
+      <aside class="cote">
+        <div class="carte-contact">
+          <div class="prix-bloc">
+            <p class="prix"><span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span><span class="par-mois"> par mois</span></p>
+            @if (b.chargesMensuelles) {
+              <p class="secondaire">+ {{ b.chargesMensuelles | montant: b.devise : 0 }} de charges</p>
             }
           </div>
-        </section>
-      }
-
-      @if (b.description) {
-        <section class="kp-section">
-          <h2 class="kp-section-title">Description</h2>
-          <p class="description">{{ b.description }}</p>
-        </section>
-      }
-
-      <section class="kp-section">
-        <h2 class="kp-section-title">Adresse</h2>
-        <p>{{ adresse() }}</p>
-        <kp-carte-bien [latitude]="b.latitude" [longitude]="b.longitude" [precision]="b.precisionLocalisation" [publique]="true" />
-        @if (b.pointDeRepere) {
-          <p class="kp-muted">Repère : {{ b.pointDeRepere }}</p>
-        }
-        @if (positionApprox()) {
-          <p class="kp-aide">{{ positionApprox() }}</p>
-        }
-      </section>
-
-      <section class="kp-section">
-        <h2 class="kp-section-title">Propriétaire</h2>
-        <div class="kp-row">
-          <kp-avatar [photo]="b.proprietaire.urlProfile" [nom]="nomProprietaire()" [taille]="48" />
-          <p class="kp-strong">{{ nomProprietaire() }}</p>
+          <p class="dispo">
+            <kp-icon name="calendar" [size]="16" [strokeWidth]="1.5" />
+            @if (disponibleMaintenant()) { Disponible maintenant } @else { Disponible le {{ b.disponibleDe | dateLongue: true }} }
+          </p>
+          <div class="proprietaire">
+            <kp-avatar [photo]="b.proprietaire.urlProfile" [nom]="nomProprietaire()" [taille]="40" />
+            <span class="proprietaire__texte"><span class="fort">{{ nomProprietaire() }}</span><span class="mention">Propriétaire sur Kupanga</span></span>
+          </div>
+          <button type="button" class="kp-btn kp-btn--primary kp-btn--block contacter" (click)="contacter()">
+            <kp-icon name="message-circle" [size]="18" [strokeWidth]="1.5" /> Contacter
+          </button>
+          <p class="note"><kp-icon name="lock" [size]="14" [strokeWidth]="1.5" /> Votre e-mail n’est pas affiché : vous échangez par la messagerie de Kupanga.</p>
         </div>
-      </section>
+      </aside>
+
+      <div class="principale">
+        <section class="bloc" aria-labelledby="t-carac">
+          <h2 id="t-carac">Caractéristiques</h2>
+          <dl class="kv">
+            @if (b.surfaceHabitable) { <div><dt>Surface</dt><dd>{{ b.surfaceHabitable }} m²</dd></div> }
+            @if (b.nombrePieces) { <div><dt>Pièces</dt><dd>{{ b.nombrePieces }}</dd></div> }
+            @if (b.nombreChambres) { <div><dt>Chambres</dt><dd>{{ b.nombreChambres }}</dd></div> }
+            @if (b.etage != null) { <div><dt>Étage</dt><dd>{{ b.etage === 0 ? 'Rez-de-chaussée' : b.etage }}</dd></div> }
+            @if (b.ascenseur != null) { <div><dt>Ascenseur</dt><dd>{{ b.ascenseur ? 'Oui' : 'Non' }}</dd></div> }
+            @if (b.anneeConstruction) { <div><dt>Construction</dt><dd>{{ b.anneeConstruction }}</dd></div> }
+            @if (b.modeChauffage) { <div><dt>Chauffage</dt><dd>{{ chauffage(b.modeChauffage) }}</dd></div> }
+            @if (b.heuresElectriciteParJour != null) { <div><dt>Courant</dt><dd>{{ b.heuresElectriciteParJour }} h par jour</dd></div> }
+            @if (b.classeEnergie) { <div><dt>Classe énergie (DPE)</dt><dd>{{ b.classeEnergie }}</dd></div> }
+            @if (b.classeGes) { <div><dt>Émissions (GES)</dt><dd>{{ b.classeGes }}</dd></div> }
+          </dl>
+        </section>
+
+        <section class="bloc" aria-labelledby="t-cond">
+          <h2 id="t-cond">Conditions</h2>
+          <dl class="kv">
+            <div><dt>Loyer</dt><dd>{{ b.loyerMensuel | montant: b.devise : 0 }}</dd></div>
+            @if (b.chargesMensuelles) { <div><dt>Charges</dt><dd>{{ b.chargesMensuelles | montant: b.devise : 0 }}</dd></div> }
+            @if (b.garantieMois) { <div><dt>Garantie</dt><dd>{{ b.garantieMois }} mois de loyer</dd></div> }
+            @if (b.avanceMois) { <div><dt>Loyers d’avance</dt><dd>{{ b.avanceMois }} mois</dd></div> }
+            @if (b.depotGarantie) { <div><dt>Dépôt de garantie</dt><dd>{{ b.depotGarantie | montant: b.devise : 0 }}</dd></div> }
+          </dl>
+        </section>
+
+        @if (equipements().length || b.pois?.length) {
+          <section class="bloc" aria-labelledby="t-equip">
+            <h2 id="t-equip">Équipements</h2>
+            @if (equipements().length) {
+              <div class="puces">
+                @for (e of equipements(); track e) {
+                  <span class="puce"><kp-icon name="check" [size]="14" [strokeWidth]="1.5" /> {{ e }}</span>
+                }
+              </div>
+            }
+            <kp-lieux-proches [pois]="b.pois" />
+          </section>
+        }
+
+        @if (b.description) {
+          <section class="bloc" aria-labelledby="t-desc">
+            <h2 id="t-desc">Description</h2>
+            <p class="description">{{ b.description }}</p>
+          </section>
+        }
+
+        <section class="bloc" aria-labelledby="t-adresse">
+          <h2 id="t-adresse">Adresse</h2>
+          <p class="secondaire">{{ adresse() }}</p>
+          @if (b.pointDeRepere) {
+            <p class="repere"><kp-icon name="map-pin" [size]="16" [strokeWidth]="1.5" /><span><strong>Repère :</strong> {{ b.pointDeRepere }}</span></p>
+          }
+          <kp-carte-bien [latitude]="b.latitude" [longitude]="b.longitude" [precision]="b.precisionLocalisation" [publique]="true" />
+          @if (positionApprox()) {
+            <p class="kp-aide">{{ positionApprox() }}</p>
+          }
+        </section>
+      </div>
     </div>
 
+    <!-- Téléphone : prix et « Contacter » toujours à portée -->
     <div class="kp-bottom-bar contact">
       <p class="contact__prix">
         <span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
-        <span class="kp-muted kp-small"> / mois</span>
+        <span class="par-mois"> par mois</span>
       </p>
       <button type="button" class="kp-btn kp-btn--primary" (click)="contacter()">
-        <kp-icon name="message-circle" [size]="20" /> Contacter
+        <kp-icon name="message-circle" [size]="20" [strokeWidth]="1.5" /> Contacter
       </button>
     </div>
   }

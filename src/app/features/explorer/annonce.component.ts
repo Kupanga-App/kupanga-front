@@ -8,7 +8,6 @@ import {
 } from '../biens/models/bien.model';
 import { MontantPipe } from '../../core/money/montant';
 import { DateLonguePipe, joursAvant } from '../../shared/format';
-import { PageHeaderComponent } from '../../shared/ui/page-header.component';
 import { AvatarComponent } from '../../shared/ui/avatar.component';
 import { VideComponent } from '../../shared/ui/vide.component';
 import { GalerieComponent } from '../../shared/ui/galerie.component';
@@ -16,12 +15,18 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../shared/components/carte-bien/carte-bien.component';
 import { LieuxProchesComponent } from '../../shared/ui/lieux-proches.component';
 
+/** Nombre de photos de la mosaïque : une grande et quatre petites. */
+const MOSAIQUE = 5;
 
-/** Annonce publique (sans compte) : `GET /biens/{id}`, propriétaire réduit au prénom et à l'initiale (P0-6). */
+/**
+ * Annonce publique (sans compte) : `GET /biens/{id}`, propriétaire réduit au prénom et à l'initiale (P0-6).
+ * Maquettes `Annonce-France` et `Annonce-RDC` : même gabarit pour les deux pays (mosaïque de photos, colonne
+ * principale, carte collée à droite avec le prix et « Contacter »).
+ */
 @Component({
   selector: 'kp-annonce',
   standalone: true,
-  imports: [RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, AvatarComponent, VideComponent, GalerieComponent, IconComponent, CarteBienComponent, LieuxProchesComponent],
+  imports: [RouterLink, MontantPipe, DateLonguePipe, AvatarComponent, VideComponent, GalerieComponent, IconComponent, CarteBienComponent, LieuxProchesComponent],
   templateUrl: './annonce.component.html',
   styleUrl: './annonce.component.scss',
 })
@@ -39,6 +44,13 @@ export class AnnonceComponent implements OnInit {
   readonly erreur = signal(false);
 
   readonly typeBien = computed(() => libelleTypeBien(this.bien()?.typeBien));
+  /** « Appartement · loué vide », « Studio · meublé ». */
+  readonly typeEtLocation = computed(() => {
+    const b = this.bien();
+    if (!b) return '';
+    const location = b.meuble ? 'meublé' : b.pays === 'FR' || b.pays === 'BE' ? 'loué vide' : '';
+    return [this.typeBien(), location, b.colocation ? 'colocation' : ''].filter(Boolean).join(' · ');
+  });
   readonly equipements = computed(() => (this.bien()?.equipements ?? []).map(e => LIBELLES_EQUIPEMENT[e] ?? e));
   readonly adresse = computed(() => {
     const b = this.bien();
@@ -49,14 +61,21 @@ export class AnnonceComponent implements OnInit {
     return b ? [b.quartier, b.commune, b.ville].filter(v => v && v.trim()).join(', ') : '';
   });
   readonly positionApprox = computed(() => positionApproximative(this.bien()?.precisionLocalisation));
+  /** « Claire M. » : prénom et initiale de la vue publique (l'initiale arrive avec ou sans point). */
   readonly nomProprietaire = computed(() => {
     const p = this.bien()?.proprietaire;
-    return p ? `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim() : '';
+    if (!p) return '';
+    const initiale = (p.lastName ?? '').replace(/\.+$/, '').trim();
+    return [p.firstName ?? '', initiale ? `${initiale}.` : ''].filter(Boolean).join(' ');
   });
   readonly disponibleMaintenant = computed(() => {
     const j = joursAvant(this.bien()?.disponibleDe);
     return j === null || j <= 0;
   });
+
+  readonly photos = computed(() => this.bien()?.images ?? []);
+  /** Photos de la mosaïque (ordinateur) : cinq au plus, la dernière ouvre la galerie. */
+  readonly mosaique = computed(() => this.photos().slice(0, MOSAIQUE));
 
   ngOnInit(): void {
     const id = Number(this.id());
