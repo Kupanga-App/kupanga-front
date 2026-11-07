@@ -123,13 +123,13 @@ Nouveaux noms et valeurs : `../frontend-audit/livraison-dev.md`, section « Tabl
 | `--kp-surface-2` (28) | `--kp-surface-sunken` `#EDEFE8` | |
 | `--kp-surface-3` (4) | `--kp-segment-bg` `#E6EAE0` | |
 | `--kp-border` (28) | `--kp-border` `rgba(16,33,43,0.08)` | Contour des cartes |
-| `--kp-border-strong` (18) | `--kp-border-strong` `rgba(16,33,43,0.14)` | **Ajout** : champs et boutons secondaires (la doc donne 0,12 à 0,16) |
+| `--kp-border-strong` (18) | `--kp-border-strong` `rgba(16,33,43,0.12)` | **Ajout** : champs et boutons secondaires (la doc donne 0,12 à 0,16) |
 | `--kp-text-1` (30) | `--kp-text` `#10212B` | |
 | `--kp-text-2` (21) | `--kp-text-muted` `#46545C` | |
 | `--kp-text-3` (38) | `--kp-text-subtle` `#636F76` | Valeur de la doc `#66737A` foncée d'un cran : 4,72:1 sur `--kp-bg` (décision du 7 nov. 2026) |
 | `--kp-text-invert` | `--kp-text-on-accent` `#FFFFFF` | **Ajout** : texte sur olive et sur nuit plein |
 | `--kp-primary` (18) | `--kp-accent` `#4F6A2E` | L'olive devient foncée |
-| `--kp-primary-hover` (1) | `--kp-accent-hover` | **Ajout**, olive un cran plus foncé (par exemple `#435A27`) |
+| `--kp-primary-hover` (1) | `--kp-accent-hover` | **Ajout**, olive un cran plus foncé `#3A5122` (écrans d'auth, 2026-11-07) |
 | `--kp-primary-on` (7) | `--kp-text-on-accent` `#FFFFFF` | Le texte sur l'olive passe de nuit à blanc |
 | `--kp-primary-text` (13) | `--kp-accent` | |
 | `--kp-primary-subtle` (7) | `--kp-accent-soft` `#EDF3E0` | |
