@@ -2,7 +2,7 @@ import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angula
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { Subscription, catchError, map, of } from 'rxjs';
 import { BienService } from '../biens/services/bien.service';
 import { JuridictionService } from '../biens/services/juridiction.service';
 import { AuthService } from '../../core/auth/services/auth.service';
@@ -73,6 +73,8 @@ export class ExplorerComponent implements OnInit {
   readonly page = signal(0);
   readonly derniere = signal(true);
   readonly chargement = signal(false);
+  /** Recherche en cours : annulée par la suivante, sinon une réponse en retard remplace la plus récente. */
+  private recherche: Subscription | null = null;
   readonly erreur = signal(false);
   readonly filtres = signal<Filtres>({ ...VIDES });
   /** Téléphone (< 768 px) : bascule Liste / Carte ; ailleurs, « Liste et carte » par défaut. */
@@ -208,7 +210,8 @@ export class ExplorerComponent implements OnInit {
 
     this.chargement.set(true);
     this.erreur.set(false);
-    this.bienService.search(dto).subscribe({
+    this.recherche?.unsubscribe();
+    this.recherche = this.bienService.search(dto).subscribe({
       next: resultat => {
         this.biens.set(page === 0 ? resultat.contenu : [...this.biens(), ...resultat.contenu]);
         this.total.set(resultat.totalElements);
