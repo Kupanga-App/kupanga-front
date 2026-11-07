@@ -153,6 +153,9 @@
                 <div class="tuile tuile--accent"><dt>Total par mois</dt><dd class="kp-tabulaire">{{ m.loyer + m.charges | montant: m.devise : 0 }}</dd></div>
               </dl>
               <p class="secondaire">
+                @if (m.debut) {
+                  Début du bail : {{ m.debut | dateLongue }}@if (m.fin) {, fin : {{ m.fin | dateLongue }}}.
+                }
                 @if (m.garantieMois != null) {
                   Garantie : {{ m.garantieMois }} mois de loyer@if (m.depot) { ({{ m.depot | montant: m.devise : 0 }})}.
                 } @else if (m.depot) {

@@ -51,6 +51,9 @@ interface MonLoyer {
   depot: number | null;
   garantieMois: number | null;
   avanceMois: number | null;
+  /** Bail signé : début et fin (bloc « Votre bail » d'avant la refonte). */
+  debut?: string | null;
+  fin?: string | null;
 }
 
 /**
@@ -187,6 +190,7 @@ export class MonLogementComponent implements OnInit {
       return {
         source: null, loyer: signe.loyerMensuel, charges: signe.charges ?? 0, devise: signe.devise,
         depot: signe.depotGarantie ?? null, garantieMois: bailSigne?.garantieMois ?? null, avanceMois: bailSigne?.avanceMois ?? null,
+        debut: signe.dateDebut || null, fin: signe.dateFin || null,
       };
     }
     if (bail && bail.statut !== 'BROUILLON') {
