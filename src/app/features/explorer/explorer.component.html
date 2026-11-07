@@ -1,36 +1,52 @@
-<div class="kp-page" kpTirerPourActualiser (actualiser)="charger(0)">
-  <kp-page-header titre="Logements à louer" />
-
-  <div class="outils">
+<div class="kp-page explorer" kpTirerPourActualiser (actualiser)="charger(0)">
+  <div class="tete">
+    <div class="tete__titres">
+      <h1>{{ titre() }}</h1>
+      <p class="sous-titre" aria-live="polite">
+        @if (!chargement() || biens().length) { {{ sousTitre() }} }
+      </p>
+    </div>
     <form class="recherche" (submit)="$event.preventDefault(); rechercher(champ.value)" role="search">
-      <kp-icon name="search" [size]="18" />
+      <kp-icon name="search" [size]="18" [strokeWidth]="1.5" />
       <label class="kp-sr-only" for="q">Rechercher une annonce</label>
-      <input #champ id="q" class="kp-input" type="search" placeholder="Rechercher" enterkeyhint="search"
+      <input #champ id="q" type="search" placeholder="Rechercher" enterkeyhint="search"
              [value]="filtres().q" (search)="rechercher(champ.value)" maxlength="100" />
     </form>
-    <button type="button" class="kp-btn kp-btn--secondary filtres" (click)="ouvrirFiltres()">
-      <kp-icon name="sliders-horizontal" [size]="18" />
-      <span>Filtres</span>
-      @if (nbFiltres()) {
-        <span class="nombre">{{ nbFiltres() }}</span>
-      }
-    </button>
   </div>
 
-  <div class="barre">
-    <p class="kp-small kp-muted" aria-live="polite">
-      @if (!chargement() || biens().length) {
-        {{ total() }} annonce{{ total() > 1 ? 's' : '' }}
-      }
-    </p>
-    <div class="kp-row">
-      <label class="kp-sr-only" for="tri">Trier</label>
-      <select id="tri" class="kp-input tri" [value]="filtres().tri" (change)="changerTri($any($event.target).value)">
-        @for (t of tris; track t.valeur) {
-          <option [value]="t.valeur">{{ t.libelle }}</option>
+  <div class="outils">
+    <div class="pilules" role="group" aria-label="Filtres">
+      <button type="button" class="pilule" [class.active]="!!filtres().type" (click)="ouvrirFiltres()">
+        Type de bien <kp-icon name="chevron-down" [size]="16" [strokeWidth]="1.5" />
+      </button>
+      <button type="button" class="pilule cache-mobile" [class.active]="!!filtres().loyerMax" (click)="ouvrirFiltres()">
+        Loyer <kp-icon name="chevron-down" [size]="16" [strokeWidth]="1.5" />
+      </button>
+      <button type="button" class="pilule cache-mobile" [class.active]="!!filtres().piecesMin" (click)="ouvrirFiltres()">
+        Pièces <kp-icon name="chevron-down" [size]="16" [strokeWidth]="1.5" />
+      </button>
+      <button type="button" class="pilule" [class.active]="filtres().meuble" [attr.aria-pressed]="filtres().meuble" (click)="basculerMeuble()">
+        Meublé
+      </button>
+      <button type="button" class="pilule" [class.active]="nbFiltres() > 0" (click)="ouvrirFiltres()">
+        <kp-icon name="sliders-horizontal" [size]="16" [strokeWidth]="1.5" />
+        Filtres
+        @if (nbFiltres()) {
+          <span class="nombre" [attr.aria-label]="nbFiltres() + ' actifs'">{{ nbFiltres() }}</span>
         }
-      </select>
-      <kp-segmented [options]="vues" [(valeur)]="vue" libelle="Affichage" />
+      </button>
+    </div>
+    <div class="droite">
+      <label class="kp-sr-only" for="tri">Trier</label>
+      <span class="pilule tri">
+        <select id="tri" [value]="filtres().tri" (change)="changerTri($any($event.target).value)">
+          @for (t of tris; track t.valeur) {
+            <option [value]="t.valeur">{{ t.libelle }}</option>
+          }
+        </select>
+        <kp-icon name="chevron-down" [size]="16" [strokeWidth]="1.5" />
+      </span>
+      <kp-segmented [options]="vues()" [valeur]="vue()" (valeurChange)="vueChoisie.set($event)" libelle="Affichage" />
     </div>
   </div>
 
@@ -55,8 +71,32 @@
       }
     </kp-vide>
   } @else if (vue() === 'carte') {
-    <kp-carte-annonces [biens]="biens()" (ouvrir)="ouvrirAnnonce($event)" />
-    <p class="kp-aide carte-aide">Positions approchées à environ 100 m. {{ biens().length }} annonce{{ biens().length > 1 ? 's' : '' }} chargée{{ biens().length > 1 ? 's' : '' }}.</p>
+    <kp-carte-annonces [biens]="biens()" [selection]="selection()" (choisir)="selection.set($event)"
+                       (ouvrir)="ouvrirAnnonce($event)" />
+    <p class="kp-aide carte-aide">{{ biens().length }} annonce{{ biens().length > 1 ? 's' : '' }} chargée{{ biens().length > 1 ? 's' : '' }}.</p>
+  } @else if (vue() === 'liste-carte') {
+    <div class="cote-a-cote">
+      <div class="liste">
+        @for (b of biens(); track b.id) {
+          <kp-carte-bien [id]="'annonce-' + b.id" [bien]="b" [lien]="['/annonces', b.id]" disposition="ligne"
+                         [selectionne]="selection() === b.id"
+                         (mouseenter)="selection.set(b.id)" (focusin)="selection.set(b.id)" />
+        }
+        @if (!derniere()) {
+          <button type="button" class="kp-btn kp-btn--secondary kp-btn--block" (click)="suite()" [disabled]="chargement()">
+            @if (chargement()) {
+              <span class="kp-spinner"></span>
+            }
+            Voir plus d’annonces
+          </button>
+        }
+      </div>
+      <div class="colonne-carte">
+        <kp-carte-annonces class="remplir" [biens]="biens()" [selection]="selection()"
+                           (survol)="$event !== null && selection.set($event)" (choisir)="choisirSurCarte($event)"
+                           (ouvrir)="ouvrirAnnonce($event)" />
+      </div>
+    </div>
   } @else {
     <div class="kp-grid">
       @for (b of biens(); track b.id) {
@@ -65,7 +105,7 @@
     </div>
   }
 
-  @if (!derniere() && biens().length) {
+  @if (!derniere() && biens().length && vue() !== 'liste-carte') {
     <button type="button" class="kp-btn kp-btn--secondary kp-btn--block suite" (click)="suite()" [disabled]="chargement()">
       @if (chargement()) {
         <span class="kp-spinner"></span>

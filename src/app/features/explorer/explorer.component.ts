@@ -1,14 +1,14 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { catchError, of } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { BienService } from '../biens/services/bien.service';
 import { JuridictionService } from '../biens/services/juridiction.service';
 import { AuthService } from '../../core/auth/services/auth.service';
 import {
   BienDTO, BienSearchDTO, BienType, LIBELLES_POI, Pays, PoiType, TYPES_BIEN,
 } from '../biens/models/bien.model';
-import { PageHeaderComponent } from '../../shared/ui/page-header.component';
 import { SheetComponent } from '../../shared/ui/sheet.component';
 import { SegmentedComponent, OptionSegment } from '../../shared/ui/segmented.component';
 import { VideComponent } from '../../shared/ui/vide.component';
@@ -18,7 +18,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteAnnoncesComponent } from './carte-annonces.component';
 
 type Tri = 'recent' | 'prix-croissant' | 'prix-decroissant' | 'surface';
-type Vue = 'liste' | 'carte';
+type Vue = 'liste-carte' | 'liste' | 'carte';
 
 /** Filtres de la recherche, gardés dans l'URL (retour depuis une annonce, lien partagé). */
 interface Filtres {
@@ -40,11 +40,11 @@ const VIDES: Filtres = {
   meuble: false, colocation: false, pois: [], tri: 'recent',
 };
 
-const TRIS: { valeur: Tri; libelle: string }[] = [
-  { valeur: 'recent', libelle: 'Plus récentes' },
-  { valeur: 'prix-croissant', libelle: 'Loyer croissant' },
-  { valeur: 'prix-decroissant', libelle: 'Loyer décroissant' },
-  { valeur: 'surface', libelle: 'Plus grandes' },
+const TRIS: { valeur: Tri; libelle: string; phrase: string }[] = [
+  { valeur: 'recent', libelle: 'Plus récentes', phrase: 'les plus récentes d’abord' },
+  { valeur: 'prix-croissant', libelle: 'Loyer croissant', phrase: 'par loyer croissant' },
+  { valeur: 'prix-decroissant', libelle: 'Loyer décroissant', phrase: 'par loyer décroissant' },
+  { valeur: 'surface', libelle: 'Plus grandes', phrase: 'les plus grandes d’abord' },
 ];
 
 const TAILLE_PAGE = 20;
@@ -54,7 +54,7 @@ const TAILLE_PAGE = 20;
   selector: 'kp-explorer',
   standalone: true,
   imports: [
-    PageHeaderComponent, SheetComponent, SegmentedComponent, VideComponent, CarteBienComponent,
+    SheetComponent, SegmentedComponent, VideComponent, CarteBienComponent,
     TirerPourActualiserDirective, IconComponent, CarteAnnoncesComponent,
   ],
   templateUrl: './explorer.component.html',
@@ -75,7 +75,19 @@ export class ExplorerComponent implements OnInit {
   readonly chargement = signal(false);
   readonly erreur = signal(false);
   readonly filtres = signal<Filtres>({ ...VIDES });
-  readonly vue = signal<Vue>('liste');
+  /** Téléphone (< 768 px) : bascule Liste / Carte ; ailleurs, « Liste et carte » par défaut. */
+  readonly telephone = toSignal(
+    inject(BreakpointObserver).observe('(max-width: 767px)').pipe(map(r => r.matches)),
+    { initialValue: typeof matchMedia === 'function' && matchMedia('(max-width: 767px)').matches },
+  );
+  /** Affichage choisi par la personne (pas dans l'adresse, comme avant) ; `null` = valeur par défaut de l'écran. */
+  readonly vueChoisie = signal<Vue | null>(null);
+  readonly vue = computed<Vue>(() => {
+    const v = this.vueChoisie() ?? (this.telephone() ? 'liste' : 'liste-carte');
+    return this.telephone() && v === 'liste-carte' ? 'liste' : v;
+  });
+  /** Annonce mise en avant : survolée dans la liste, ou touchée sur la carte. */
+  readonly selection = signal<number | null>(null);
   readonly feuilleOuverte = signal(false);
   /** Copie modifiée dans la feuille, appliquée par « Voir les annonces ». */
   readonly brouillon = signal<Filtres>({ ...VIDES });
@@ -83,10 +95,21 @@ export class ExplorerComponent implements OnInit {
   readonly tris = TRIS;
   readonly typesBien = TYPES_BIEN;
   readonly pois = Object.entries(LIBELLES_POI) as [PoiType, string][];
-  readonly vues: OptionSegment<Vue>[] = [
+  readonly vues = computed<OptionSegment<Vue>[]>(() => [
+    ...(this.telephone() ? [] : [{ valeur: 'liste-carte' as Vue, libelle: 'Liste et carte' }]),
     { valeur: 'liste', libelle: 'Liste' },
     { valeur: 'carte', libelle: 'Carte' },
-  ];
+  ]);
+
+  readonly titre = computed(() => {
+    const ville = this.filtres().ville.trim();
+    return ville ? `Logements à louer à ${ville}` : 'Logements à louer';
+  });
+  readonly sousTitre = computed(() => {
+    const n = this.total();
+    const tri = TRIS.find(t => t.valeur === this.filtres().tri)?.phrase ?? '';
+    return `${n} annonce${n > 1 ? 's' : ''}${n > 1 ? ', ' + tri : ''}`;
+  });
   readonly paysDisponibles = toSignal(this.juridictions.paysPrisEnCharge().pipe(catchError(() => of([]))), { initialValue: [] });
 
   /** Nombre de filtres actifs (hors recherche par titre et tri), affiché sur le bouton. */
@@ -148,6 +171,16 @@ export class ExplorerComponent implements OnInit {
 
   suite(): void {
     this.charger(this.page() + 1);
+  }
+
+  basculerMeuble(): void {
+    this.appliquer({ ...this.filtres(), meuble: !this.filtres().meuble });
+  }
+
+  /** Étiquette touchée sur la carte : l'annonce est cerclée et amenée dans la liste. */
+  choisirSurCarte(id: number): void {
+    this.selection.set(id);
+    document.getElementById(`annonce-${id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 
   ouvrirAnnonce(id: number): void {

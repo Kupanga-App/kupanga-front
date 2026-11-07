@@ -141,6 +141,17 @@
   --kp-duree-lente: 480ms;
   --kp-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
+  // Classes énergie (DPE) et émissions (GES) : couleurs réglementaires de l'échelle A à G, mêmes valeurs dans les
+  // deux thèmes (lettre toujours en nuit). Maquettes Annonce-France et O1v2-Explorer.
+  --kp-classe-a: #3e8e56;
+  --kp-classe-b: #6fae5a;
+  --kp-classe-c: #b5cc5a;
+  --kp-classe-d: #e8d35a;
+  --kp-classe-e: #edb255;
+  --kp-classe-f: #e28a4a;
+  --kp-classe-g: #d2573c;
+  --kp-classe-texte: #10212b;
+
   --kp-tap: 44px;
 
   // Zones sûres (encoche, barre de geste) : viewport-fit=cover dans index.html
