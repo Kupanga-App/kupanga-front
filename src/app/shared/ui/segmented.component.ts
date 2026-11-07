@@ -15,6 +15,8 @@ export interface OngletPage {
   nombre?: number | null;
   /** Actif seulement sur l'adresse exacte (onglet « Vue d'ensemble » à la racine de la fiche). */
   exact?: boolean;
+  /** Paramètres de l'adresse (onglet Messages de Mon logement : conversation avec le propriétaire). */
+  queryParams?: Record<string, unknown> | null;
 }
 
 /**
@@ -111,7 +113,7 @@ export class SegmentedComponent<T extends string = string> {
   template: `
     <nav class="segments" [attr.aria-label]="libelle()">
       @for (o of onglets(); track o.libelle) {
-        <a class="segment" [routerLink]="o.lien" routerLinkActive="actif" ariaCurrentWhenActive="page"
+        <a class="segment" [routerLink]="o.lien" [queryParams]="o.queryParams" routerLinkActive="actif" ariaCurrentWhenActive="page"
            [routerLinkActiveOptions]="{ exact: !!o.exact }" #lien
            (isActiveChange)="$event && montrer(lien)">
           {{ o.libelle }}

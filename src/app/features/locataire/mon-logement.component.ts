@@ -25,6 +25,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 import { CarteBienComponent } from '../../shared/components/carte-bien/carte-bien.component';
 import { LieuxProchesComponent } from '../../shared/ui/lieux-proches.component';
 import { DemandesRecuesComponent } from './demandes-recues.component';
+import { LogementEnteteComponent } from './logement-entete.component';
 import { FinDeBailComponent } from '../biens/components/fin-de-bail.component';
 import { bailCourant, calculerEtapesLocataire } from './etapes-locataire';
 import { nomCourt } from './nom-court';
@@ -63,7 +64,7 @@ interface MonLoyer {
   imports: [
     RouterLink, MontantPipe, DateLonguePipe, DateRelativePipe, PageHeaderComponent, AvatarComponent, StatutComponent,
     VideComponent, FriseComponent, GalerieComponent, TirerPourActualiserDirective, IconComponent, CarteBienComponent,
-    LieuxProchesComponent, DemandesRecuesComponent, FinDeBailComponent,
+    LieuxProchesComponent, DemandesRecuesComponent, FinDeBailComponent, LogementEnteteComponent,
   ],
   templateUrl: './mon-logement.component.html',
   styleUrl: './mon-logement.component.scss',

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
 import { QuittanceService } from '../gestion-logement/services/quittance.service';
 import { LIBELLES_MODE_PAIEMENT, QuittanceDTO } from '../gestion-logement/models/quittance.model';
 import { MontantPipe } from '../../core/money/montant';
@@ -8,15 +8,24 @@ import { StatutComponent } from '../../shared/ui/statut.component';
 import { VideComponent } from '../../shared/ui/vide.component';
 import { TirerPourActualiserDirective } from '../../shared/ui/tirer-pour-actualiser.directive';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+import { BienService } from '../biens/services/bien.service';
+import { BienDTO } from '../biens/models/bien.model';
+import { LogementContextService } from '../../core/services/logement-context.service';
+import { LogementEnteteComponent } from './logement-entete.component';
 
 /** Quittances du locataire : statut de chaque loyer, PDF de la quittance une fois le loyer déclaré reçu. */
 @Component({
   selector: 'kp-mes-quittances',
   standalone: true,
-  imports: [MontantPipe, DateLonguePipe, PageHeaderComponent, StatutComponent, VideComponent, TirerPourActualiserDirective, IconComponent],
+  imports: [MontantPipe, DateLonguePipe, PageHeaderComponent, StatutComponent, VideComponent, TirerPourActualiserDirective, IconComponent,
+    LogementEnteteComponent],
   template: `
     <div class="kp-page kp-page--etroite" kpTirerPourActualiser (actualiser)="charger()">
-      <kp-page-header titre="Mes quittances" />
+      @if (logementId() !== null) {
+        <kp-logement-entete [bien]="bien()" [chargement]="chargementBien()" titreDefaut="Mes quittances" />
+      } @else {
+        <kp-page-header titre="Mes quittances" />
+      }
 
       @if (chargement() && !quittances().length) {
         <div class="kp-stack kp-stack--sm" aria-busy="true">
@@ -70,6 +79,13 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 })
 export class MesQuittancesComponent implements OnInit {
   private quittanceService = inject(QuittanceService);
+  private bienService = inject(BienService);
+  private logement = inject(LogementContextService);
+
+  /** Logement loué (en-tête et onglets de Mon logement), lu comme sur Mon logement. */
+  readonly logementId = this.logement.logementBienId;
+  readonly bien = signal<BienDTO | null>(null);
+  readonly chargementBien = signal(false);
 
   readonly quittances = signal<QuittanceDTO[]>([]);
   readonly chargement = signal(true);
@@ -80,6 +96,26 @@ export class MesQuittancesComponent implements OnInit {
 
   ngOnInit(): void {
     this.charger();
+  }
+
+  constructor() {
+    // Le logement loué peut n'être connu qu'après l'ouverture de la page (espaces du compte relus à la connexion)
+    effect(() => {
+      const id = this.logementId();
+      if (id !== null && id !== untracked(() => this.bien()?.id)) untracked(() => this.chargerBien(id));
+    });
+  }
+
+  private chargerBien(id: number): void {
+    this.chargementBien.set(true);
+    this.bienService.getPrive(id).subscribe({
+      next: b => {
+        this.bien.set(b);
+        this.chargementBien.set(false);
+      },
+      // Hors ligne : onglets sans le titre du logement
+      error: () => this.chargementBien.set(false),
+    });
   }
 
   charger(): void {

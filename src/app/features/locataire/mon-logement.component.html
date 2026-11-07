@@ -1,5 +1,9 @@
 <div class="kp-page mon-logement" kpTirerPourActualiser (actualiser)="charger()">
-  <kp-page-header titre="Mon logement" />
+  @if (bienId() !== null || chargement()) {
+    <kp-logement-entete [bien]="bien()" [chargement]="chargement() && !bien()" />
+  } @else {
+    <kp-page-header titre="Mon logement" />
+  }
 
   <!-- Demandes de location en attente : le logement n'est attribué qu'après acceptation -->
   <kp-demandes-recues [integre]="true" (acceptee)="charger()" />
