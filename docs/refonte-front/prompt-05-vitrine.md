@@ -16,11 +16,11 @@ Tu réalises la **phase 5 sur 6** de la refonte UX/UI du front Kupanga (Angular 
 
 ## Branche
 
-Continue sur `refonte-front` : `git checkout refonte-front`. Le dernier commit doit être `docs(refonte): bilan de la phase 4` et l'arbre doit être propre. Sinon, arrête-toi et signale-le.
+Continue sur `refonte-front` : `git checkout refonte-front`. Le dernier commit doit être `docs(refonte): préparation de la phase 5` et l'arbre doit être propre. Sinon, arrête-toi et signale-le.
 
 ## À lire avant de commencer
 
-1. `docs/refonte-front/00-vue-ensemble.md` : décisions « Thomas Petit » → « Inès Moreau » et « RDC par défaut », table des jetons (alias à retirer), évolutions, suivi.
+1. `docs/refonte-front/00-vue-ensemble.md` : décisions « Thomas Petit » → « Inès Moreau » et « RDC par défaut », **points tranchés avant la phase 5**, table des jetons (alias à retirer), évolutions, suivi.
 2. `../frontend-audit/livraison-dev.md` : lignes « Landing », « Explorer », « Annonce » et paragraphe « Sans maquette ».
 3. Maquettes (PNG puis HTML dans `../frontend-audit/maquettes/`) : `O1v2-Landing`, `O1v2-Explorer`, `Annonce-France`, `Annonce-RDC`, `Annonce-Proprio`.
 4. L'existant : `../frontend-audit/documentation/cartographie-ecrans.md` (landing, Explorer, annonce, connexion, compte, documents, notifications, pages légales, page introuvable), `../frontend-audit/documentation/synthese-recommandations.md` (restes de l'ancien modèle à rôles) et `../frontend-audit/screenshots/`.
@@ -43,7 +43,7 @@ Fichiers : `features/landing/landing.component.{ts,html,scss,spec.ts}`.
 - **Bascule France / RDC** (contrôle segmenté) qui change l'annonce d'exemple et les champs mentionnés (DPE et code postal en France ; commune, quartier, point de repère en RDC). **La RDC est sélectionnée par défaut** (décision).
 - Le contact d'exemple « Thomas Petit » devient **« Inès Moreau »**, avec les initiales **IM** (décision).
 - Le nom « kupanga » n'est jamais écrit en texte dans l'en-tête : c'est `kp-logo`.
-- **Vidéo de démo** : la landing actuelle a une vidéo (dernier commit de `feature/pret-pour-la-prod`, façade `.affiche` qui ne charge YouTube qu'au clic, testée dans la spec). **La maquette n'en montre pas.** Ne la supprime pas sans décision : garde-la dans une section cohérente avec le nouveau style, et pose-moi la question dans ton rapport.
+- **Vidéo de démo** : la landing actuelle a une vidéo (dernier commit de `feature/pret-pour-la-prod`, façade `.affiche` qui ne charge YouTube qu'au clic, testée dans la spec). **La maquette n'en montre pas.** Décision : elle est **gardée**, dans une section restylée cohérente avec la maquette (façade `.affiche` et chargement de YouTube au clic inchangés).
 - **Spec** `landing.component.spec.ts` :
   - le test du `h1` attend « De l'annonce à la fin du bail ». Le titre change d'après la maquette : mets le test à jour avec le nouveau texte et **signale-le** ;
   - les liens `a[href="/auth/register"]` et `a[href="/explorer"]` doivent rester ;
@@ -56,7 +56,7 @@ Fichiers : `features/explorer/explorer.component.{ts,html,scss}`, `carte-annonce
 
 - Liste et carte côte à côte. **La carte reste fixe pendant que la liste défile** (`position: sticky` sur la colonne carte, hauteur calée sur la fenêtre moins la barre).
 - Filtres en pilules. Les filtres actifs et le nombre de filtres sont ceux du code actuel (`filtres`, `VIDES`, compteur de filtres actifs).
-- Affichage **Liste et carte / Liste / Carte** en contrôle segmenté. Le code a déjà `vue = signal<Vue>('liste')` et `vues: OptionSegment<Vue>[]` : vérifie les valeurs existantes, ajoute « Liste et carte » si elle manque, et fais-en la valeur par défaut sur ordinateur seulement si la maquette le montre. Sur téléphone, garde la bascule actuelle.
+- Affichage **Liste et carte / Liste / Carte** en contrôle segmenté. Le code a déjà `vue = signal<Vue>('liste')` et `vues: OptionSegment<Vue>[]` : le code n'a que `'liste' | 'carte'`. Décision : ajoute « Liste et carte » et fais-en la valeur par défaut **sur ordinateur** ; sur téléphone, garde la bascule actuelle. Les filtres restent dans l'adresse ; n'y ajoute la vue que si elle y est déjà.
 - Annonce sélectionnée **cerclée d'olive** dans la liste ; **prix en nuit** sur les marqueurs de la carte (`carte-annonces.component.ts`, divIcon Leaflet). Survoler une carte de la liste met en avant son marqueur, et l'inverse si le code le permet sans changer les appels.
 - Position publique arrondie à 100 m : déjà faite par l'API (`BienMapper.arrondiPublic`), aucun calcul côté front.
 
@@ -70,7 +70,7 @@ Fichiers : `features/explorer/annonce.component.{ts,html,scss}`.
 - **Annonce vue par son propriétaire** (`Annonce-Proprio`) :
   - bannière nuit « C'est votre annonce, telle que la voient les visiteurs », avec « Retour à la fiche » (`/biens/:id`) et « Modifier le bien » (`/biens/:id/modifier`) ;
   - à la place de « Contacter », « Voir les messages reçus » (`/messages`), et la mention « Les visiteurs voient ici le bouton « Contacter » ».
-  - Cela corrige le point de l'audit « le propriétaire voit Contacter sur sa propre annonce ». La détection s'appuie sur ce que le code sait déjà : `bien().proprietaire` et `auth.currentUser()` (`annonce.component.ts:53` et `:87-91`). Vérifie que l'identifiant du propriétaire est bien présent dans la vue publique ; sinon, signale-le.
+  - Cela corrige le point de l'audit « le propriétaire voit Contacter sur sa propre annonce ». **Piège** : la vue publique (`BienService.getPublic`) n'a ni l'identifiant ni l'e-mail du propriétaire, on ne peut pas comparer `bien().proprietaire` au compte. Décision : pour un compte connecté qui possède des biens (`LogementContextService.aDesBiens()`), appelle aussi `BienService.getPrive(id)` (déjà utilisé par `messages.component.ts`) en ignorant son erreur (403 si le bien n'est pas à lui). Réponse reçue et `proprietaire.id` égal à `auth.currentUser().id` : vue propriétaire, avec l'adresse complète de la vue privée. Visiteur, candidat, locataire : aucun appel de plus. Signale cet appel dans le rapport.
 - « Contacter » : comportement inchangé (`contacter()`, connexion demandée si visiteur).
 
 ### 4. Écrans sans maquette
@@ -93,13 +93,14 @@ Points particuliers :
 - Remplace dans tout `src/` les anciens noms de jetons par les nouveaux (table de `00-vue-ensemble.md`), puis **supprime le bloc d'alias** de `_theme.scss`, dans le clair comme dans le sombre.
 - Supprime `--kp-font-display` et les derniers `--kp-space-5` / `--kp-space-10` s'ils peuvent passer sur la grille (20 → 16 ou 24, 40 → 32 ou 48, selon la maquette la plus proche).
 - Grep final : aucune couleur hexadécimale hors de `_theme.scss`, sauf exceptions justifiées (tuiles de carte, couleurs DPE et GES réglementaires si tu en fais des jetons dédiés), et aucune occurrence de `DM Sans` ou `DM Serif`.
-- Mets à jour `design-system.yml` à la racine (palette « Olive #8FA464 ») ou indique en tête qu'il est remplacé par la table des jetons. Demande-moi lequel je préfère si ce n'est pas évident.
+- `design-system.yml` à la racine (palette « Olive #8FA464 ») : décision, **les deux**. Mets-le à jour avec les nouveaux jetons (couleurs clair et sombre, Figtree, tailles, rayons, espacements, ombres) et ajoute en tête une mention : la table des jetons de `00-vue-ensemble.md` et `src/styles/_theme.scss` font foi.
 
 ## Pièges et risques de régression repérés
 
 - **Thème forcé** : la landing s'affiche en clair même si l'appareil est en sombre, puis rend la main en partant (test existant). Garde ce comportement.
 - **Leaflet** : `leaflet.css`, `invalidateSize()` quand la carte change de taille (bascule de vue, colonne collante), marqueurs `divIcon` avec couleurs en dur (`carte-annonces.component.ts`, `carte-repere.component.ts`) à passer en jetons, sans casser les tests de `carte-repere.component.spec.ts` et `carte-bien.component.spec.ts`.
 - **Vue publique** (P0-6) : pas d'e-mail ni de téléphone du propriétaire dans l'annonce.
+- **Bouton principal** : olive partout (décision du 7 novembre), même quand une maquette montre un bouton nuit.
 - **Visiteur** : Explorer et Annonce sont publics. « Contacter » renvoie à la connexion avec `returnUrl`, comportement à garder.
 - **Pages légales** : adresses déclarées à Google (écran de consentement OAuth). Elles ne changent pas, et `pages-legales.spec.ts` doit passer.
 - **SEO et titres** : `title` des routes inchangés.
@@ -148,7 +149,7 @@ Messages en français, format Conventional Commits. Ajoute la ligne `Co-Authored
 - Commits (hash court + message).
 - Build (et taille), tests (X sur Y), parcours vérifiés.
 - Écarts avec les maquettes et pourquoi.
-- Décisions à prendre : vidéo de la landing, `design-system.yml`, entrée « Demandes de location ».
+- Décisions à prendre : entrée « Demandes de location », et tout nouveau point découvert.
 - Évolutions découvertes (ajoutées dans `00-vue-ensemble.md`).
 - Ce que fera la phase 6.
 

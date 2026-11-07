@@ -76,6 +76,19 @@ Comparaison aux maquettes (phases 1 à 5, sans rien installer) : Edge headless p
 
 **Note sur la redirection du locataire.** Aujourd'hui, tous les comptes connectés vont sur `/accueil` : `accueilPour()` (`src/app/core/auth/guards/auth.guard.ts`) ne connaît plus de rôle depuis le lot 3. Envoyer le locataire sur `/mon-logement` demande donc une petite modification de cette fonction de navigation, sans nouvelle route ni nouvel appel API. On s'appuie sur les données déjà chargées par `accueilGuard` via `LogementContextService.charger()` : un logement loué et aucun bien possédé mène à `/mon-logement` ; tous les autres cas restent sur `/accueil`. La phase 2 réalise ce changement.
 
+### Points tranchés par Gédéon avant la phase 5 (7 novembre 2026)
+
+| Point | Décision |
+| --- | --- |
+| Annonce vue par son propriétaire (`Annonce-Proprio`) | La vue publique n'a ni l'identifiant ni l'e-mail du propriétaire (P0-6). Pour un compte connecté qui possède des biens (`LogementContextService.aDesBiens()`), l'annonce appelle aussi `BienService.getPrive(id)` (déjà utilisé par la messagerie ; 403 si le bien n'est pas à lui). Réponse reçue et `proprietaire.id` égal au compte : bannière « C'est votre annonce », « Voir les messages reçus » à la place de « Contacter », adresse complète. Un seul appel ajouté, pour les propriétaires seulement. |
+| Vidéo de démo de la landing | **Gardée**, dans une section restylée (façade `.affiche`, YouTube chargé au clic seulement, tests inchangés). |
+| `design-system.yml` | **Les deux** : mis à jour avec les nouveaux jetons (olive `#4F6A2E`, Figtree, rayons, espacements), et une mention en tête renvoie à la table des jetons de ce fichier, qui fait foi. |
+| Vue par défaut d'Explorer | « Liste et carte » ajoutée, valeur par défaut sur ordinateur ; le téléphone garde la bascule Liste / Carte. |
+| Couleur du bouton principal | **Olive** partout, y compris « Ajouter un bien » (écart `Nav-Proprio-Tableau` validé). |
+| Paquet initial (510 ko pour un seuil de 500 ko) | Avertissement accepté, seuil inchangé ; réexamen en fin de phase 5, après le retrait des alias. |
+
+Restent ouverts (hors vitrine, non traités en phase 5 sauf demande) : lien « Mon logement » actif sur `/quittances` dans la barre du haut, conversations et nouvelles règles de tâches sur l'accueil propriétaire, retour système dans l'assistant d'état des lieux sur téléphone, onglet Annonce d'un bien vacant (à valider), données de test d'une demande Claire → Inès.
+
 ### Profils de navigation (pas de rôle par compte)
 
 Depuis le lot 3, un compte n'a plus de rôle. Le profil de navigation se **déduit** de `LogementContextService`, qui est déjà en place :
@@ -287,7 +300,7 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 
 | Maquette | Écart | Raison | Suite |
 | --- | --- | --- | --- |
-| `Nav-Proprio-Tableau` | « Ajouter un bien » en olive, pas en nuit | Le bouton principal du DS est olive | À valider |
+| `Nav-Proprio-Tableau` | « Ajouter un bien » en olive, pas en nuit | Le bouton principal du DS est olive | **Validé** (7 nov.) |
 | `Nav-Proprio-Tableau` | « 1 conversation en cours » (annonces en ligne) et « 1 personne vous a écrit » (ligne de bien) absents | L'accueil ne charge pas les conversations ; les ajouter ferait un nouvel appel | À décider |
 | `Nav-Proprio-Tableau` | « À faire aussi » ne montre pas « Répondre à Inès » ni « Créer la quittance de novembre » | Ces tâches n'existent pas dans `calculerTaches()` (règles inchangées) ; la tâche qui répète la prochaine étape de la carte n'est pas répétée | À décider (nouvelles règles de tâches) |
 | `Nav-Proprio-Tableau` | Échéance et « Pas encore déclaré reçu » absents s'il n'y a pas de quittance du mois (cas des données de démo) | Rien à calculer sans quittance | Aucune |
