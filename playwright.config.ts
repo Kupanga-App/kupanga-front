@@ -19,7 +19,8 @@ export default defineConfig({
   workers: 4,
   timeout: 60_000,
   expect: {
-    timeout: 10_000,
+    // L'API de démo répond plus lentement quand quatre onglets la sollicitent
+    timeout: 15_000,
     toHaveScreenshot: { animations: 'disabled', caret: 'hide', scale: 'css', maxDiffPixelRatio: 0.01 },
     toMatchSnapshot: { maxDiffPixelRatio: 0.01 },
   },
