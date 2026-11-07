@@ -1,5 +1,15 @@
 <div class="kp-page accueil" kpTirerPourActualiser (actualiser)="charger()">
-  @if (proprietaire()) {
+  @if (candidat()) {
+    <!-- Candidat : ni bien ni logement (maquette Nav-Candidat) -->
+    <header class="entete">
+      <div class="entete__titre">
+        <h1>Votre recherche de logement</h1>
+        <p class="sous-titre">
+          {{ nomComplet() }}@if (nbConversations() !== null) { · {{ nbConversations() }} conversation{{ nbConversations()! > 1 ? 's' : '' }} en cours}
+        </p>
+      </div>
+    </header>
+  } @else if (proprietaire()) {
     <header class="entete">
       <div class="entete__titre">
         <h1>{{ moisCourant }}</h1>
@@ -31,6 +41,65 @@
     <kp-vide icone="wifi-off" titre="Accueil indisponible" texte="Vérifiez votre connexion puis réessayez.">
       <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
     </kp-vide>
+  } @else if (candidat()) {
+    <div class="candidat">
+      <!-- Conversations en cours (même recherche que la messagerie) -->
+      <section class="kp-card conversations" aria-labelledby="titre-conversations">
+        <div class="conversations__haut">
+          <h2 id="titre-conversations">Conversations en cours</h2>
+          <a class="lien" routerLink="/messages">Tout voir</a>
+        </div>
+        @if (conversations(); as liste) {
+          <ul class="lignes">
+            @for (c of liste; track c.id) {
+              <li>
+                <a class="conversation" routerLink="/messages" [queryParams]="{ bienId: c.bienId, interlocuteur: interlocuteur(c).email }">
+                  <kp-avatar [photo]="interlocuteur(c).photo" [nom]="interlocuteur(c).nom" [taille]="40" />
+                  <span class="conversation__texte">
+                    <span class="conversation__ligne">
+                      <span class="fort kp-ellipsis">{{ nomCourt(interlocuteur(c).nom) }}</span>
+                      <span class="petit">{{ heureMessage(c.lastMessageAt) }}</span>
+                    </span>
+                    <span class="petit kp-ellipsis" [title]="c.bienTitre">{{ c.bienTitre }}</span>
+                    <span class="secondaire kp-ellipsis" [title]="c.lastMessage">{{ c.lastMessage }}</span>
+                  </span>
+                  @if (c.nonLuCount) {
+                    <span class="non-lu"><span class="kp-sr-only">{{ c.nonLuCount }} non lu{{ c.nonLuCount > 1 ? 's' : '' }}</span></span>
+                  }
+                </a>
+              </li>
+            } @empty {
+              <li class="conversations__vide secondaire">Aucune conversation pour l’instant : écrivez à un propriétaire depuis une annonce.</li>
+            }
+          </ul>
+        } @else {
+          <div class="conversations__chargement" aria-busy="true">
+            <span class="kp-skeleton kp-skeleton--ligne"></span>
+            <span class="kp-skeleton kp-skeleton--ligne"></span>
+          </div>
+        }
+      </section>
+
+      <!-- Raccourcis (pas de « Favoris » ni d'« alertes » : E4, E5) -->
+      <nav class="raccourcis" aria-label="Raccourcis">
+        <a routerLink="/explorer" class="kp-card raccourci">
+          <span class="raccourci__icone"><kp-icon name="search" [size]="18" [strokeWidth]="1.5" /></span>
+          <span class="raccourci__texte">
+            <span class="fort">Trouver un logement</span>
+            <span class="secondaire">Annonces et carte</span>
+          </span>
+          <kp-icon name="chevron-right" [size]="18" class="raccourci__chevron" />
+        </a>
+        <a routerLink="/biens/nouveau" class="kp-card raccourci">
+          <span class="raccourci__icone"><kp-icon name="plus" [size]="18" [strokeWidth]="1.5" /></span>
+          <span class="raccourci__texte">
+            <span class="fort">Mettre un bien en location</span>
+            <span class="secondaire">Avec le même compte</span>
+          </span>
+          <kp-icon name="chevron-right" [size]="18" class="raccourci__chevron" />
+        </a>
+      </nav>
+    </div>
   } @else {
     <div class="kp-stack grille">
       @if (biens().length) {
@@ -200,21 +269,23 @@
       @if (!logements().length || !biens().length) {
         <section class="kp-section premiers-pas" aria-label="Pour commencer">
           @if (!logements().length && !biens().length) {
-            <a routerLink="/explorer" class="kp-card kp-list__item">
-              <span class="kp-list__icon"><kp-icon name="compass" /></span>
-              <span class="kp-list__body">
-                <span class="kp-list__title">Trouver un logement</span>
-                <span class="kp-list__sub">Parcourez les annonces et écrivez aux propriétaires.</span>
+            <a routerLink="/explorer" class="kp-card raccourci">
+              <span class="raccourci__icone"><kp-icon name="compass" [size]="18" [strokeWidth]="1.5" /></span>
+              <span class="raccourci__texte">
+                <span class="fort">Trouver un logement</span>
+                <span class="secondaire">Parcourez les annonces et écrivez aux propriétaires.</span>
               </span>
+              <kp-icon name="chevron-right" [size]="18" class="raccourci__chevron" />
             </a>
           }
           @if (!biens().length) {
-            <a routerLink="/biens/nouveau" class="kp-card kp-list__item">
-              <span class="kp-list__icon"><kp-icon name="plus" /></span>
-              <span class="kp-list__body">
-                <span class="kp-list__title">Mettre un bien en location</span>
-                <span class="kp-list__sub">Publiez l’annonce, choisissez votre locataire, puis gérez bail, état des lieux et quittances.</span>
+            <a routerLink="/biens/nouveau" class="kp-card raccourci">
+              <span class="raccourci__icone"><kp-icon name="plus" [size]="18" [strokeWidth]="1.5" /></span>
+              <span class="raccourci__texte">
+                <span class="fort">Mettre un bien en location</span>
+                <span class="secondaire">Publiez l’annonce, choisissez votre locataire, puis gérez bail, état des lieux et quittances.</span>
               </span>
+              <kp-icon name="chevron-right" [size]="18" class="raccourci__chevron" />
             </a>
           }
         </section>

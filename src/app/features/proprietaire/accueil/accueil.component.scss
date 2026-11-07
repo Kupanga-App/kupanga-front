@@ -464,13 +464,137 @@
 .premiers-pas {
   display: flex;
   flex-direction: column;
-  gap: var(--kp-space-2);
-
-  .kp-list__item {
-    text-decoration: none;
-  }
+  gap: var(--_gap);
 }
 
 [statut] {
   background: var(--kp-surface);
+}
+
+// ── Candidat (Nav-Candidat) ─────────────────────────────────────────────────
+
+.candidat {
+  display: grid;
+  gap: var(--_gap);
+  align-items: start;
+
+  @include mq.ordinateur {
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+}
+
+.lien {
+  color: var(--kp-text);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.conversations {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.conversations__haut {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+  padding: 16px var(--kp-card-pad) 12px;
+
+  h2 {
+    font-size: var(--kp-fs-body);
+    font-weight: 500;
+  }
+}
+
+.conversation {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: 12px var(--kp-card-pad);
+  border-top: 1px solid var(--kp-border);
+  color: var(--kp-text);
+  text-decoration: none;
+  transition: background-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-bg);
+  }
+}
+
+.conversation__texte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.conversation__ligne {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+}
+
+.non-lu {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--kp-accent);
+}
+
+.conversations__vide {
+  padding: 16px var(--kp-card-pad);
+  border-top: 1px solid var(--kp-border);
+}
+
+.conversations__chargement {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px var(--kp-card-pad);
+}
+
+.raccourcis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap);
+}
+
+.raccourci {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: 16px;
+  transition: background-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-bg);
+  }
+}
+
+.raccourci__icone {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+  color: var(--kp-text-muted);
+}
+
+.raccourci__texte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.raccourci__chevron {
+  color: var(--kp-text-subtle);
 }

@@ -1,12 +1,17 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { LogementContextService } from '../../../core/services/logement-context.service';
 import { DonneesProprietaire, DonneesProprietaireService } from '../donnees-proprietaire.service';
 import { ChatStoreService } from '../../messagerie/services/chat-store.service';
+import { ChatService } from '../../messagerie/services/chat.service';
+import { ConversationDTO } from '../../messagerie/models/chat.models';
+import { NavigationService } from '../../../core/navigation/navigation.service';
+import { nomCourt } from '../../locataire/nom-court';
+import { AvatarComponent } from '../../../shared/ui/avatar.component';
 import { BienDTO, locataireDuBail, vignette } from '../../biens/models/bien.model';
 import { MontantPipe } from '../../../core/money/montant';
-import { DateLonguePipe } from '../../../shared/format';
+import { DateLonguePipe, heureMessage } from '../../../shared/format';
 import { VideComponent } from '../../../shared/ui/vide.component';
 import { CarteBienComponent } from '../../../shared/ui/carte-bien.component';
 import { FriseComponent } from '../../../shared/ui/frise.component';
@@ -28,14 +33,15 @@ interface EtatBien {
 
 /**
  * Accueil, le même pour tous les comptes (lot 3, plus de rôle). Propriétaire (`Nav-Proprio-Tableau`) : chiffres du
- * mois, bien dont la location avance, autres tâches, liste des biens filtrable. Un compte qui loue ou cherche garde
- * ses demandes, réservations et logements loués ; un même compte peut louer et mettre en location.
+ * mois, bien dont la location avance, autres tâches, liste des biens filtrable. Candidat (`Nav-Candidat`) : demande
+ * à traiter en tête, conversations en cours, raccourcis. Un compte qui loue garde ses demandes, réservations et
+ * logements loués ; un même compte peut louer et mettre en location.
  */
 @Component({
   selector: 'kp-accueil',
   standalone: true,
   imports: [RouterLink, MontantPipe, DateLonguePipe, VideComponent, CarteBienComponent, FriseComponent, SegmentedComponent,
-    TirerPourActualiserDirective, IconComponent, DemandesRecuesComponent],
+    TirerPourActualiserDirective, IconComponent, DemandesRecuesComponent, AvatarComponent],
   templateUrl: './accueil.component.html',
   styleUrl: './accueil.component.scss',
 })
@@ -44,6 +50,8 @@ export class AccueilComponent implements OnInit {
   private donneesProprietaire = inject(DonneesProprietaireService);
   private chat = inject(ChatStoreService);
   private contexte = inject(LogementContextService);
+  private nav = inject(NavigationService);
+  private chatService = inject(ChatService);
 
   readonly chargement = signal(true);
   readonly erreur = signal(false);
@@ -105,6 +113,18 @@ export class AccueilComponent implements OnInit {
     return this.taches().filter(t => JSON.stringify(t.lien) !== cle);
   });
 
+  /**
+   * Candidat (ni bien ni logement, profil de la navigation) : accueil « Votre recherche de logement ».
+   * Les données de l'accueil sont lues comme pour tous les comptes ; elles tranchent une fois chargées.
+   */
+  readonly candidat = computed(() =>
+    this.nav.profil() === 'candidat' && !this.biens().length && !this.logements().length);
+  /** Dernières conversations (null tant qu'elles ne sont pas lues) et leur nombre total. */
+  readonly conversations = signal<ConversationDTO[] | null>(null);
+  readonly nbConversations = signal<number | null>(null);
+  protected readonly nomCourt = nomCourt;
+  protected readonly heureMessage = heureMessage;
+
   readonly filtre = signal<Filtre>('tous');
   readonly optionsFiltre = computed<OptionSegment<Filtre>[]>(() => {
     const actifs = this.biensActifs();
@@ -122,6 +142,15 @@ export class AccueilComponent implements OnInit {
 
   protected readonly vignette = vignette;
 
+  constructor() {
+    // Conversations lues seulement pour un candidat, une fois son profil établi (pas d'appel pour un propriétaire)
+    effect(() => {
+      if (this.candidat() && !this.chargement() && untracked(() => this.conversations() === null)) {
+        untracked(() => this.chargerConversations());
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.charger();
   }
@@ -130,6 +159,8 @@ export class AccueilComponent implements OnInit {
     this.chargement.set(true);
     this.erreur.set(false);
     this.chat.loadUnreadCount();
+    // Actualisation : les conversations sont relues (la première lecture se fait dès que le profil est connu)
+    if (this.conversations() !== null) this.chargerConversations();
     this.donneesProprietaire.charger().subscribe({
       next: donnees => {
         this.biens.set(donnees.biens);
@@ -142,6 +173,28 @@ export class AccueilComponent implements OnInit {
         this.erreur.set(true);
       },
     });
+  }
+
+  /** Même recherche que la liste de la messagerie (`POST /conversations/search`), cinq dernières. */
+  private chargerConversations(): void {
+    this.chatService.searchConversations({ page: 0, size: 5, lu: null, sortBy: 'lastMessageAt', sortDirection: 'DESC' }).subscribe({
+      next: page => {
+        this.conversations.set(page.contenu);
+        this.nbConversations.set(page.totalElements);
+      },
+      error: () => {
+        this.conversations.set([]);
+        this.nbConversations.set(null);
+      },
+    });
+  }
+
+  /** L'autre personne de la conversation. */
+  interlocuteur(c: ConversationDTO): { nom: string; email: string; photo: string | null } {
+    const moi = this.auth.currentUser()?.email;
+    return c.emailExpediteur === moi
+      ? { nom: c.destinataireName, email: c.emailDestinataire, photo: c.destinatairePhotoUrl || null }
+      : { nom: c.expediteurName, email: c.emailExpediteur, photo: c.expediteurPhotoUrl || null };
   }
 
   etat(b: BienDTO): EtatBien {

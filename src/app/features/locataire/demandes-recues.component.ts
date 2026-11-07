@@ -6,7 +6,7 @@ import { DemandeLocationService } from '../biens/services/demande-location.servi
 import { DemandeLocation, echeance } from '../biens/models/demande-location.model';
 import { LocationService } from '../biens/services/location.service';
 import { Location, finDeReservation } from '../biens/models/location.model';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { messageErreurApi } from '../../core/http/api-error';
 import { ToastService } from '../../core/ui/toast.service';
 import { PageHeaderComponent } from '../../shared/ui/page-header.component';
@@ -17,6 +17,10 @@ import { EtapeFrise, FriseComponent } from '../../shared/ui/frise.component';
 import { CompteARebours, compteARebours } from './compte-a-rebours';
 import { calculerEtapesLocataire } from './etapes-locataire';
 import { nomCourt } from './nom-court';
+import { BienService } from '../biens/services/bien.service';
+import { BienDTO, vignette } from '../biens/models/bien.model';
+import { MontantPipe } from '../../core/money/montant';
+import { de } from '../../shared/format';
 
 /**
  * Demandes de location reçues et logements réservés (décision du 2026-11-05) : accepter réserve le logement ;
@@ -27,7 +31,7 @@ import { nomCourt } from './nom-court';
 @Component({
   selector: 'kp-demandes-recues',
   standalone: true,
-  imports: [NgTemplateOutlet, RouterLink, PageHeaderComponent, SheetComponent, VideComponent, IconComponent, FriseComponent],
+  imports: [NgTemplateOutlet, RouterLink, PageHeaderComponent, SheetComponent, VideComponent, IconComponent, FriseComponent, MontantPipe],
   template: `
     @if (!integre()) {
       <div class="kp-page kp-page--etroite">
@@ -106,13 +110,33 @@ import { nomCourt } from './nom-court';
             </section>
           }
           @for (d of demandes(); track d.id) {
-            <article class="kp-card demande">
-              <p class="kp-muted surtitre">Demande de location</p>
-              <h2 class="kp-section-title">{{ d.titreBien }}</h2>
-              <p>{{ d.adresseBien }}</p>
-              <p><strong>{{ d.nomProprietaire }}</strong> vous propose de devenir locataire de ce logement.</p>
-              <p class="kp-muted">Répondez avant le {{ echeance(d.dateExpiration) }}.</p>
-              <div class="kp-row actions">
+            <!-- Demande à traiter (maquette Nav-Candidat) -->
+            <article class="kp-card demande" [attr.aria-labelledby]="'demande-' + d.id">
+              @if (annonces()[d.bienId]; as a) {
+                @if (vignette(a, 0); as v) {
+                  <img class="demande__photo" [src]="v" alt="" loading="lazy" />
+                } @else {
+                  <span class="demande__photo demande__photo--vide" aria-hidden="true"><kp-icon name="house" [size]="24" [strokeWidth]="1.5" /></span>
+                }
+              } @else {
+                <span class="demande__photo demande__photo--vide" aria-hidden="true"><kp-icon name="house" [size]="24" [strokeWidth]="1.5" /></span>
+              }
+              <div class="demande__texte">
+                <span class="surtitre">Demande de location à traiter</span>
+                <h2 [id]="'demande-' + d.id">{{ nomCourt(d.nomProprietaire) }} vous propose la location {{ de(d.titreBien) }}</h2>
+                <p class="secondaire">
+                  @if (annonces()[d.bienId]; as a) {
+                    @if (a.loyerMensuel != null) { {{ a.loyerMensuel | montant: a.devise : 0 }} par mois · }
+                    @if (a.nombrePieces) { {{ a.nombrePieces }} pièce{{ a.nombrePieces > 1 ? 's' : '' }} · }
+                    @if (a.surfaceHabitable) { {{ a.surfaceHabitable }} m². }
+                  } @else {
+                    {{ d.adresseBien }}.
+                  }
+                  Si vous acceptez, le logement vous est réservé 14 jours.
+                </p>
+                <p class="petit">Répondez avant le {{ echeance(d.dateExpiration) }}.</p>
+              </div>
+              <div class="demande__actions">
                 <button type="button" class="kp-btn kp-btn--secondary" (click)="aRefuser.set(d)" [disabled]="envoi()">
                   Refuser
                 </button>
@@ -177,8 +201,17 @@ import { nomCourt } from './nom-court';
     }
     .prochaine kp-icon { margin-top: 1px; color: var(--kp-text); }
     .prochaine strong { color: var(--kp-text); font-weight: 500; }
-    .demande p { margin-bottom: 8px; }
-    .actions { justify-content: flex-end; gap: 8px; margin-top: 12px; }
+    .demande { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--kp-space-4) var(--kp-space-5); }
+    .demande__photo { flex: none; width: 160px; height: 112px; border-radius: var(--kp-radius-md); object-fit: cover; }
+    .demande__photo--vide { display: grid; place-items: center; background: var(--kp-accent-soft); color: var(--kp-accent); }
+    .demande__texte { display: flex; flex: 1 1 300px; flex-direction: column; gap: 4px; min-width: 0; }
+    .demande__texte h2 { font-size: var(--kp-fs-card-title); font-weight: 500; }
+    .demande__actions { display: flex; gap: 8px; margin-left: auto; }
+    @media (max-width: 767px) {
+      .demande__photo { width: 100%; height: 160px; }
+      .demande__actions { width: 100%; }
+      .demande__actions .kp-btn { flex: 1; }
+    }
   `],
 })
 export class DemandesRecuesComponent implements OnInit {
@@ -192,6 +225,7 @@ export class DemandesRecuesComponent implements OnInit {
   private service = inject(DemandeLocationService);
   private locations = inject(LocationService);
   private toasts = inject(ToastService);
+  private biens = inject(BienService);
 
   readonly demandes = signal<DemandeLocation[]>([]);
   readonly reservations = signal<Location[]>([]);
@@ -201,10 +235,15 @@ export class DemandesRecuesComponent implements OnInit {
   /** Id de la demande en cours de réponse. */
   readonly envoi = signal<number | null>(null);
   readonly aRefuser = signal<DemandeLocation | null>(null);
+  /** Annonce de chaque bien proposé (`BienService.getPublic`, comme la page d'une annonce), par id de bien. */
+  readonly annonces = signal<Record<number, BienDTO>>({});
 
   protected readonly echeance = echeance;
   protected readonly finDeReservation = finDeReservation;
   protected readonly Math = Math;
+  protected readonly nomCourt = nomCourt;
+  protected readonly vignette = vignette;
+  protected readonly de = de;
 
   /** Jours restants et part écoulée, calculés à l'écran à partir de `dateExpiration`. */
   rebours(r: Location): CompteARebours | null {
@@ -232,12 +271,23 @@ export class DemandesRecuesComponent implements OnInit {
         this.reservations.set(reservations);
         this.chargement.set(false);
         this.contenu.emit({ demandes: demandes.length, reservations: reservations.length });
+        this.chargerAnnonces(demandes);
       },
       error: () => {
         this.chargement.set(false);
         this.erreur.set(true);
       },
     });
+  }
+
+  /** Photo, loyer, pièces et surface des biens proposés ; sans réponse, la carte garde l'adresse. */
+  private chargerAnnonces(demandes: DemandeLocation[]): void {
+    for (const id of new Set(demandes.map(d => d.bienId))) {
+      if (this.annonces()[id]) continue;
+      this.biens.getPublic(id).pipe(catchError(() => of(null))).subscribe(b => {
+        if (b) this.annonces.update(a => ({ ...a, [id]: b }));
+      });
+    }
   }
 
   accepter(d: DemandeLocation): void {
