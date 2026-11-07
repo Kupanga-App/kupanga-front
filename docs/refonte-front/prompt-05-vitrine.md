@@ -16,7 +16,7 @@ Tu réalises la **phase 5 sur 6** de la refonte UX/UI du front Kupanga (Angular 
 
 ## Branche
 
-Continue sur `refonte-front` : `git checkout refonte-front`. Le dernier commit doit être `docs(refonte): préparation de la phase 5` et l'arbre doit être propre. Sinon, arrête-toi et signale-le.
+Continue sur `refonte-front` : `git checkout refonte-front`. Le dernier commit doit être `docs(refonte): points ouverts des phases 3 et 4 tranchés` et l'arbre doit être propre. Sinon, arrête-toi et signale-le.
 
 ## À lire avant de commencer
 
@@ -88,7 +88,12 @@ Points particuliers :
 - **Compte** : la carte du compte affiche encore le rôle (« Propriétaire », `compte.component.html:11`, `role()`), un reste du modèle à rôles relevé par l'audit. Retire cet **affichage** et garde le reste. Le champ `role` reste dans les modèles et dans l'inscription (choix « louer / mettre en location »), où il sert toujours.
 - **Compte → Thème** : la feuille Clair / Sombre / Système reste.
 
-### 5. Retrait des alias et nettoyage
+### 5. Compléments décidés le 7 novembre 2026
+
+- **« Mon logement » actif sur `/quittances`** (barre du haut du locataire, ordinateur, et onglets du bas sur téléphone). Aujourd'hui, `routerLinkActive` ne marque l'onglet que sur `/mon-logement`, alors que l'en-tête de Mon logement montre « Quittances » actif. Ajoute à `Onglet` (`core/navigation/navigation.service.ts`) une liste facultative d'adresses où l'onglet reste actif (par exemple `aussi: ['/quittances']` pour `MON_LOGEMENT`, **profil locataire seulement** : pour un propriétaire qui loue aussi, « Quittances » a sa propre entrée). Aucune route ni aucun appel nouveaux ; ajoute un test au `navigation.service.spec.ts` (ou au composant de barre).
+- **Conversations sur l'accueil propriétaire** (`Nav-Proprio-Tableau`) : une lecture `ChatService.searchConversations({ page: 0, size: 20, lu: null, sortBy: 'lastMessageAt', sortDirection: 'DESC' })`, comme l'accueil candidat (phase 4), **seulement pour le profil propriétaire**. « N conversations en cours » sous « Annonces en ligne », et « N personnes vous ont écrit » sur la ligne d'un bien vacant (regroupement par `bienId`, une personne = un interlocuteur) ; au-delà de 20 conversations, « plus de 20 », comme la fiche du bien. Erreur de lecture : rien d'affiché, pas de message. Aucun changement de `calculerTaches()` (règles de tâches : évolution F1).
+
+### 6. Retrait des alias et nettoyage
 
 - Remplace dans tout `src/` les anciens noms de jetons par les nouveaux (table de `00-vue-ensemble.md`), puis **supprime le bloc d'alias** de `_theme.scss`, dans le clair comme dans le sombre.
 - Supprime `--kp-font-display` et les derniers `--kp-space-5` / `--kp-space-10` s'ils peuvent passer sur la grille (20 → 16 ou 24, 40 → 32 ou 48, selon la maquette la plus proche).
@@ -116,9 +121,11 @@ Points particuliers :
 6. `style(auth): jetons et composants sur la connexion, l'inscription et le mot de passe`
 7. `style(app): jetons et composants sur Documents, Compte, Notifications, pages légales et page introuvable`
 8. `fix(compte): retrait de l'affichage du rôle hérité de l'ancien modèle`
-9. `refactor(ds): anciens noms de jetons remplacés dans tout le code`
-10. `refactor(ds): suppression des alias et des couleurs en dur restantes`
-11. `docs(refonte): bilan de la phase 5`
+9. `fix(nav): « Mon logement » actif sur les quittances du locataire`
+10. `feat(proprietaire): conversations en cours sur l'accueil`
+11. `refactor(ds): anciens noms de jetons remplacés dans tout le code`
+12. `refactor(ds): suppression des alias et des couleurs en dur restantes`
+13. `docs(refonte): bilan de la phase 5`
 
 Messages en français, format Conventional Commits. Ajoute la ligne `Co-Authored-By` si ton environnement en demande une. Avant chaque commit : `npm run build -- --configuration production`.
 

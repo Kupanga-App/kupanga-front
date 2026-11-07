@@ -87,7 +87,16 @@ Comparaison aux maquettes (phases 1 à 5, sans rien installer) : Edge headless p
 | Couleur du bouton principal | **Olive** partout, y compris « Ajouter un bien » (écart `Nav-Proprio-Tableau` validé). |
 | Paquet initial (510 ko pour un seuil de 500 ko) | Avertissement accepté, seuil inchangé ; réexamen en fin de phase 5, après le retrait des alias. |
 
-Restent ouverts (hors vitrine, non traités en phase 5 sauf demande) : lien « Mon logement » actif sur `/quittances` dans la barre du haut, conversations et nouvelles règles de tâches sur l'accueil propriétaire, retour système dans l'assistant d'état des lieux sur téléphone, onglet Annonce d'un bien vacant (à valider), données de test d'une demande Claire → Inès.
+Points restés ouverts après les phases 3 et 4, tranchés le même jour :
+
+| Point | Décision | Phase |
+| --- | --- | --- |
+| « Mon logement » pas actif dans la barre du haut sur `/quittances` | Corrigé : un onglet de navigation peut rester actif sur d'autres adresses (« Mon logement » sur `/quittances`), ordinateur et téléphone, sans route ni appel nouveaux | 5 |
+| Conversations sur l'accueil propriétaire | Ajoutées : une lecture `ChatService.searchConversations()` (page de 20, comme l'accueil candidat), « N conversations en cours » sur « Annonces en ligne » et « N personnes vous ont écrit » sur la ligne d'un bien vacant, « plus de 20 » au-delà | 5 |
+| Nouvelles règles de tâches (« Répondre à … », « Créer la quittance du mois ») | **Non pendant la refonte** : `calculerTaches()` ne change pas. Évolution du front F1, à décider après la phase 6 | — |
+| Retour système dans l'assistant d'état des lieux (téléphone) | Garde de sortie (`CanDeactivate`) sur la route de l'assistant d'état des lieux : confirmation seulement si l'assistant est modifié (`modifie`). Garde **nouvelle** acceptée par Gédéon : elle ne change aucun droit d'accès. Avec un test Playwright du retour | 6 |
+| Onglet Annonce d'un bien vacant (sans maquette) | **Validé** tel quel ; revu seulement si l'écart avec la nouvelle page d'annonce est trop grand | — |
+| Données de test « demande de Claire à Inès » | **Accepté**, au début de la phase 6 : Claire propose le bien 2 à Inès par les mêmes appels que le front, vérification de l'accueil candidat, Inès accepte, vérification du logement réservé, puis Inès se désiste en fin de phase. Effets : bien 2 réservé, notifications et e-mails vers le Mailpit local | 6 |
 
 ### Profils de navigation (pas de rôle par compte)
 
@@ -164,6 +173,12 @@ Les couleurs écrites en dur hors de `_theme.scss` (environ 60 occurrences : `la
 | E11 | Titre du bien et type de bail (meublé, vide) dans le contrat et l'état des lieux lus par le jeton | `Signer-Bail`, `Signer-Mobile` (« Studio proche transports », « Logement meublé · résidence principale ») | Adresse du bien en titre ; sous-titre « Résumé des conditions » |
 | E12 | PDF signé téléchargeable depuis la confirmation (le jeton est effacé à la signature) | `Signer-Mobile` étape 3 (« Télécharger le PDF ») | Bouton omis : le document est dans l'espace du compte |
 | E13 | Auteur du dernier message d'une conversation | `Nav-Candidat` (« Vous : Bonjour… ») | Dernier message sans « Vous : » |
+
+## Évolutions du front après la refonte (non construites)
+
+| # | Évolution | Origine |
+| --- | --- | --- |
+| F1 | Nouvelles règles de tâches de l'accueil propriétaire (« Répondre à … » pour une conversation non lue, « Créer la quittance du mois » pour un bail signé sans quittance du mois), avec leurs tests | `Nav-Proprio-Tableau`, décision du 7 novembre 2026 |
 
 Toute nouvelle évolution découverte pendant une phase s'ajoute à cette table, dans le commit de documentation de la phase, et figure dans le rapport de fin de phase.
 
@@ -301,8 +316,8 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 | Maquette | Écart | Raison | Suite |
 | --- | --- | --- | --- |
 | `Nav-Proprio-Tableau` | « Ajouter un bien » en olive, pas en nuit | Le bouton principal du DS est olive | **Validé** (7 nov.) |
-| `Nav-Proprio-Tableau` | « 1 conversation en cours » (annonces en ligne) et « 1 personne vous a écrit » (ligne de bien) absents | L'accueil ne charge pas les conversations ; les ajouter ferait un nouvel appel | À décider |
-| `Nav-Proprio-Tableau` | « À faire aussi » ne montre pas « Répondre à Inès » ni « Créer la quittance de novembre » | Ces tâches n'existent pas dans `calculerTaches()` (règles inchangées) ; la tâche qui répète la prochaine étape de la carte n'est pas répétée | À décider (nouvelles règles de tâches) |
+| `Nav-Proprio-Tableau` | « 1 conversation en cours » (annonces en ligne) et « 1 personne vous a écrit » (ligne de bien) absents | L'accueil ne charge pas les conversations ; les ajouter ferait un nouvel appel | **Décidé** (7 nov.) : ajoutés en phase 5 |
+| `Nav-Proprio-Tableau` | « À faire aussi » ne montre pas « Répondre à Inès » ni « Créer la quittance de novembre » | Ces tâches n'existent pas dans `calculerTaches()` (règles inchangées) ; la tâche qui répète la prochaine étape de la carte n'est pas répétée | **Décidé** (7 nov.) : évolution du front F1, après la refonte |
 | `Nav-Proprio-Tableau` | Échéance et « Pas encore déclaré reçu » absents s'il n'y a pas de quittance du mois (cas des données de démo) | Rien à calculer sans quittance | Aucune |
 | `Nav-Proprio-Tableau` | Frise de la carte : composant `kp-frise` (pastilles 36 px, texte aligné à gauche) et non la variante centrée à 46 px | Un seul composant de frise | Aucune |
 | `Fiche-Bien-Loue`, `Fiche-Bien-Vacant` | Frise à 4 étapes visibles sur les 5 calculées (Annonce → État des lieux avant le choix du locataire, Réservation → Quittances ensuite) ; libellés « Réservation » et « Annonce » au lieu de « Réservé », « Annonce en ligne », « Locataire » | Même calcul que l'accueil | Aucune |
@@ -310,14 +325,14 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 | `Fiche-Bien-*` | Précision d'état (« Loué · bail à créer ») sur la vue d'ensemble seulement | Les autres onglets ne chargent pas les états des lieux et quittances | Aucune |
 | `Fiche-Bien-*` | Carte en lecture seule `kp-carte-bien` (Leaflet) et non `carte-repere` (éditeur de position) | `carte-repere` sert à placer le repère dans « Modifier » | Aucune |
 | `Fiche-Bien-Loue` | « Mettre fin au bail » garde le style de `fin-de-bail.component.ts` (bouton contour, pas de lien rouge) | Composant testé, laissé tel quel | Phase 6 si besoin |
-| Onglet Annonce (vacant) | Pas de maquette : publication, texte, conditions affichées, liens | Contenu limité à `BienDTO` | À valider |
+| Onglet Annonce (vacant) | Pas de maquette : publication, texte, conditions affichées, liens | Contenu limité à `BienDTO` | **Validé** (7 nov.) |
 | `Bail-A-Signer` | Titre de page = titre du bien (en-tête commun aux quatre onglets), pas « Bail de Lucas Bernard » | Consigne : même en-tête sur les quatre pages | Aucune |
 | `Assist-Bail` | Pas de « Brouillon enregistré à 14:32 » ni « Enregistrer et quitter » | Aucun brouillon côté serveur ni côté front | Évolution si souhaitée |
 | `Assist-Bail` | Avertissement sur le dépôt : « diffère de celui de l'annonce », pas le plafond légal (2 mois en meublé, 1 mois vide) | Aucun plafond n'est connu du code ni de `GET /juridictions/{pays}` | Évolution E7 |
 | `Assist-Bail` | Pas de « Résidence principale » dans l'aperçu ; lignes grises remplacées par « Le texte complet figure dans le PDF » | Pas dans les données (E2) | E2 |
 | `Assist-EDL` | Pas de « 1 sur 4 vérifiée », icônes de pièce, menu « … » de la pièce : numéro de pièce, nombre d'éléments « à noter », corbeille | « Vérifiée » n'existe pas dans les données ; jeu d'icônes limité | Aucune |
 | `Assist-EDL`, `Assist-EDL-Mobile` | Bloc photos absent | E1 | E1 |
-| `Assist-EDL-Mobile` | Le bouton retour système quitte l'assistant (sans confirmation, sans revenir à la liste des pièces) | Il faudrait un `CanDeactivate` (garde de route) ou une entrée d'historique : hors périmètre « mêmes guards » | À décider |
+| `Assist-EDL-Mobile` | Le bouton retour système quitte l'assistant (sans confirmation, sans revenir à la liste des pièces) | Il faudrait un `CanDeactivate` (garde de route) ou une entrée d'historique : hors périmètre « mêmes guards » | **Décidé** (7 nov.) : garde de sortie en phase 6 |
 | `DS-Composants` (tableau) | Colonne « Locataire » remplacée par Échéance et Paiement ; actions secondaires dans un menu « … » par ligne | Tableau d'un seul bien, un seul locataire ; toutes les actions existantes gardées | Aucune |
 
 **Évolutions découvertes** : E7 (plafonds légaux du dépôt de garantie par juridiction), E8 (retirer un bien réservé de la recherche publique, comme l'annonce la maquette).
@@ -355,7 +370,7 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 | `Mon-Logement` | WhatsApp : lien `wa.me` vers le numéro du propriétaire, pas `kp-bouton-whatsapp` | Ce composant envoie un document du propriétaire au locataire (`/contrats/{id}/lien-whatsapp`) | Aucune |
 | `Mon-Logement` | « Lire et signer » absent si la notification a été lue | `GET /notifications` ne renvoie que les non lues | E9 |
 | `Mon-Logement` | Sans document à signer, « À faire » montre le loyer du mois (statut, échéance) | Information existante de l'écran gardée | Aucune |
-| `Mon-Logement`, `-Quittances` | « Mon logement » n'est pas actif dans la barre du haut sur `/quittances` | Lien actif de la barre (phase 2) sur `/mon-logement` seulement | À décider |
+| `Mon-Logement`, `-Quittances` | « Mon logement » n'est pas actif dans la barre du haut sur `/quittances` | Lien actif de la barre (phase 2) sur `/mon-logement` seulement | **Décidé** (7 nov.) : corrigé en phase 5 |
 | `Mon-Logement` | Documents et Messages : pages communes, sans l'en-tête ni les onglets | Elles servent aussi au propriétaire | Aucune |
 | `Mon-Logement-Quittances` | Badges « En attente » / « Loyer reçu » (et non « En attente du propriétaire » / « Signée ») ; colonne « Détail » (échéance ou réception) ; « Reçu » quand le propriétaire a joint le reçu | Libellés existants de `statutQuittance` ; informations de l'ancienne liste gardées | Aucune |
 | `Mon-Logement-Reserve` | Icône au lieu de la photo, adresse au lieu du loyer, pas de « Message à Claire M. », pas de « retiré des annonces » ; actions Notifications et Se désister | `Location` n'a ni photo, ni loyer, ni e-mail ; E8 | E10, E8 |

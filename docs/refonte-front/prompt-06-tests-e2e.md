@@ -13,10 +13,11 @@ Tu réalises la **phase 6 sur 6** de la refonte UX/UI du front Kupanga (Angular 
 ## Règles (non négociables)
 
 - **Ne touche pas au back.** Aucun fichier de `../kupanga-Api/`.
+- **Exception décidée le 7 novembre 2026** : la garde de sortie de l'assistant d'état des lieux (voir « Garde de sortie » ci-dessous) est une modification prévue du code, dans son propre commit `feat(edl)`.
 - **Ne modifie pas le code de l'application** pour faire passer un test. Si un test révèle un bug, note-le dans le rapport ; corrige-le seulement si la correction est petite, sûre et dans l'esprit de la refonte, dans un commit `fix(...)` séparé, et signale-le.
 - Tu peux ajouter des attributs `data-testid` dans les gabarits quand aucun rôle ou libellé accessible ne suffit (commit séparé `test(...)`). Préfère `getByRole` et `getByLabel`.
 - **Installation autorisée : `@playwright/test` uniquement**, en dépendance de développement (décision). **Ne lance pas `npx playwright install`** : les tests utilisent l'Edge du poste (`channel: 'msedge'`). Rien d'autre à installer. Si un besoin apparaît (comparaison d'images, par exemple), demande-moi d'abord.
-- **Données** : les tests **ne créent, ne modifient ni ne suppriment aucune donnée métier** dans la base de démo. Les actions finales (signer, accepter, envoyer un message, donner congé, créer un bail…) sont **interceptées** avec `page.route()` : le test vérifie la requête (adresse, méthode, corps) et répond lui-même, sans atteindre l'API. Les états impossibles à obtenir sans données (lien de signature valide, expiré, déjà signé ; demande reçue ; logement réservé) sont simulés de la même façon, avec des réponses conformes aux DTO de `src/app/**/models/*.ts`. Si tu juges indispensable une suite sur données réelles, demande-moi avant.
+- **Données** : les tests **ne créent, ne modifient ni ne suppriment aucune donnée métier** dans la base de démo. Les actions finales (signer, accepter, envoyer un message, donner congé, créer un bail…) sont **interceptées** avec `page.route()` : le test vérifie la requête (adresse, méthode, corps) et répond lui-même, sans atteindre l'API. Les états impossibles à obtenir sans données (lien de signature valide, expiré, déjà signé ; demande reçue ; logement réservé) sont simulés de la même façon, avec des réponses conformes aux DTO de `src/app/**/models/*.ts`. Si tu juges indispensable une suite sur données réelles, demande-moi avant. **Seule exception accordée** : la demande de Claire à Inès (voir « Données réelles : demande et réservation » ci-dessous).
 - Pas de `git push`. N'ajoute pas les e2e à la CI (`.github/workflows/deploy.yml`) sans accord : ils demandent l'API et la base.
 
 ## Branche
@@ -51,6 +52,31 @@ Continue sur `refonte-front` : `git checkout refonte-front`. Le dernier commit d
    - **connexion** par l'écran `/auth/login`, pour tester le vrai parcours une fois, puis **état de session réutilisé** (`storageState`) par compte : `claire`, `patrick`, `lucas`, `grace`, `ines` ;
    - **journal des appels API** : fixture qui enregistre chaque requête vers `localhost:8089` (méthode, chemin normalisé avec les identifiants remplacés par `:id` et les jetons par `:token`, clés du corps JSON) ;
    - **fabriques de réponses** typées avec les modèles du front (`ContratDTO`, `EtatDesLieuxDTO`, `DemandeLocation`…) pour les états simulés.
+
+## Décisions du 7 novembre 2026
+
+### Garde de sortie de l'assistant d'état des lieux
+
+Sur téléphone, le bouton ou le geste « retour » du système quitte l'assistant d'état des lieux sans confirmation : la saisie pièce par pièce est perdue. Ajoute une garde `CanDeactivate` sur la route de cet assistant (`/biens/:id/etats-des-lieux/nouveau`) :
+
+- elle ne demande confirmation **que si l'assistant est modifié** (signal `modifie` déjà utilisé par `kp-assistant` pour « Quitter ») ;
+- elle reprend le texte et la fenêtre de confirmation de « Quitter » (pas de `window.confirm`) ;
+- après une création réussie, la sortie n'est plus bloquée ;
+- elle ne change aucun droit d'accès : les autres guards de la route sont inchangés.
+
+Commit séparé, avant les tests du propriétaire : `feat(edl): confirmation avant de quitter l'assistant par le retour du navigateur`, avec un test unitaire de la garde et un test Playwright (téléphone : saisie, `page.goBack()`, fenêtre « Quitter sans enregistrer ? », « Continuer la saisie » garde la saisie). Si d'autres assistants (bail, nouveau bien, quittance) ont le même défaut, signale-le dans le rapport sans les modifier.
+
+### Données réelles : demande et réservation
+
+Accord de Gédéon pour **une** suite de données réelles, au début de la phase, par les mêmes appels que le front (pas d'écriture directe en base) :
+
+1. Claire (`claire.martin@kupanga.dev`) propose le bien 2 (« Appartement T3 avec parking, Brotteaux ») à Inès (`ines.moreau@kupanga.dev`), comme l'écran « Proposer la location » (`/biens/2/locataire`).
+2. Vérifier l'accueil candidat d'Inès avec la demande réelle (sans cliquer).
+3. Inès accepte (`DemandeLocationService.accepter`) : le bien 2 lui est réservé 14 jours.
+4. Vérifier le logement réservé d'Inès (compte à rebours, frise) et la fiche du bien 2 chez Claire (« Réservé »).
+5. **En fin de phase**, Inès se désiste (`LocationService.desister`) pour revenir à l'état de départ.
+
+Effets attendus : notifications et e-mails envoyés au Mailpit local. Les tests Playwright eux-mêmes restent sur réponses simulées ; ces vérifications réelles sont décrites dans le rapport, avec l'état final de la base.
 
 ## Tests à écrire
 
@@ -111,16 +137,17 @@ Deux niveaux.
 
 1. `build(e2e): ajout de Playwright avec Edge`
 2. `test(e2e): outils de connexion, journal des appels API et réponses simulées`
-3. `test(e2e): parcours visiteur`
-4. `test(e2e): parcours propriétaire`
-5. `test(e2e): parcours locataire`
-6. `test(e2e): parcours candidat`
-7. `test(e2e): signature par lien (valide, expiré, inconnu, déjà signé)`
-8. `test(e2e): thème, clavier, toasts et hors ligne`
-9. `test(e2e): non-régression des appels API par rapport à la branche d'origine`
-10. `test(e2e): conformité visuelle aux maquettes et instantanés de référence`
-11. `docs(e2e): lancer les tests e2e et lire les rapports`
-12. `docs(refonte): rapport final de la refonte`
+3. `feat(edl): confirmation avant de quitter l'assistant par le retour du navigateur`
+4. `test(e2e): parcours visiteur`
+5. `test(e2e): parcours propriétaire`
+6. `test(e2e): parcours locataire`
+7. `test(e2e): parcours candidat`
+8. `test(e2e): signature par lien (valide, expiré, inconnu, déjà signé)`
+9. `test(e2e): thème, clavier, toasts et hors ligne`
+10. `test(e2e): non-régression des appels API par rapport à la branche d'origine`
+11. `test(e2e): conformité visuelle aux maquettes et instantanés de référence`
+12. `docs(e2e): lancer les tests e2e et lire les rapports`
+13. `docs(refonte): rapport final de la refonte`
 
 Ajoute éventuellement des commits `test(...)` pour des `data-testid`, et des `fix(...)` pour des bugs révélés, séparés et signalés. Messages en français, format Conventional Commits. Ajoute la ligne `Co-Authored-By` si ton environnement en demande une.
 
