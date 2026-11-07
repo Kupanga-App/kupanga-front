@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { ConfidentialiteComponent } from './confidentialite.component';
 import { ConditionsComponent } from './conditions.component';
 import { routes } from '../../app.routes';
+import { libelleACompleter } from './champ-editeur.component';
 
 describe('Pages légales', () => {
   beforeEach(() => TestBed.configureTestingModule({ providers: [provideRouter([])] }));
@@ -30,6 +31,22 @@ describe('Pages légales', () => {
     const fixture = TestBed.createComponent(ConfidentialiteComponent);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('mark.kp-legal__a-completer').length).toBeGreaterThan(0);
+  });
+
+  it('nomme ce qui reste à compléter dans les badges', () => {
+    expect(libelleACompleter('[ADRESSE À COMPLÉTER]')).toBe('adresse');
+    expect(libelleACompleter('[À COMPLÉTER : nom et pays de l’hébergeur]')).toBe('nom et pays de l’hébergeur');
+    expect(libelleACompleter('[NOM OU RAISON SOCIALE À COMPLÉTER]')).toBe('nom ou raison sociale');
+  });
+
+  it('construit un sommaire à partir des sections numérotées', async () => {
+    const fixture = TestBed.createComponent(ConditionsComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const liens = fixture.nativeElement.querySelectorAll('.kp-legal__sommaire a');
+    expect(liens.length).toBe(10);
+    expect(liens[0].textContent).toContain('Objet');
   });
 
   it('déclare les deux routes publiques, sans garde', () => {
