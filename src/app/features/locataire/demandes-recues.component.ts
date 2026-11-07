@@ -35,7 +35,7 @@ import { de } from '../../shared/format';
   template: `
     @if (!integre()) {
       <div class="kp-page kp-page--etroite">
-        <kp-page-header titre="Demandes de location" [retour]="['/mon-logement']" />
+        <kp-page-header titre="Demandes de location" />
         <ng-container *ngTemplateOutlet="liste" />
       </div>
     } @else if (demandes().length || reservations().length) {
