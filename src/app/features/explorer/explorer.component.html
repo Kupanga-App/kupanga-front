@@ -41,7 +41,7 @@
       <span class="pilule tri">
         <select id="tri" [value]="filtres().tri" (change)="changerTri($any($event.target).value)">
           @for (t of tris; track t.valeur) {
-            <option [value]="t.valeur">{{ t.libelle }}</option>
+            <option [value]="t.valeur" [selected]="t.valeur === filtres().tri">{{ t.libelle }}</option>
           }
         </select>
         <kp-icon name="chevron-down" [size]="16" [strokeWidth]="1.5" />
@@ -122,7 +122,7 @@
       <select id="f-pays" class="kp-input" [value]="brouillon().pays" (change)="modifier('pays', $any($event.target).value)">
         <option value="">Tous les pays</option>
         @for (p of paysDisponibles(); track p.pays) {
-          <option [value]="p.pays">{{ p.libelle }}</option>
+          <option [value]="p.pays" [selected]="p.pays === brouillon().pays">{{ p.libelle }}</option>
         }
       </select>
     </div>
