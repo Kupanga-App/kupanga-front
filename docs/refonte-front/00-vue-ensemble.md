@@ -416,12 +416,12 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 | Maquette | Écart | Raison | Suite |
 | --- | --- | --- | --- |
 | `O1v2-Landing` | Bouton clair / sombre dans la barre ; section vidéo entre les étapes et « Les mêmes écrans » | Fonction existante (testée) ; vidéo gardée (décision) | Aucune |
-| `O1v2-Landing` | « Lucas Bernard » à la place de « Thomas Petit » (second candidat de « Proposer la location ») | Décision « Thomas Petit → Inès Moreau » : Inès est déjà la première candidate de la maquette | À valider |
+| `O1v2-Landing` | « Lucas Bernard » à la place de « Thomas Petit » (second candidat de « Proposer la location ») | Décision « Thomas Petit → Inès Moreau » : Inès est déjà la première candidate de la maquette | **Validé** (7 nov.) |
 | `O1v2-Landing` | Étape 3 : « Le bail se prépare depuis la fiche du bien » au lieu de « L'annonce est retirée de la recherche pendant la réservation » | Phrase fausse aujourd'hui (E8) | E8 |
 | `O1v2-Landing` | Ligne « Logement » ajoutée dans la bascule (DPE et GES / heures de courant) ; photos d'exemple `france.jpg` et `rdc.jpg` | Consigne « DPE … en France ; … en RDC » ; images de la maquette non fournies | Aucune |
 | `O1v2-Explorer` | Pas de « Favoris » ni de « Créer une alerte » ; « Type de bien », « Loyer », « Pièces » ouvrent la feuille des filtres | E4, E5 ; mêmes filtres que le code | E4, E5, F2 |
 | `O1v2-Explorer` | Liste déroulante de tri à côté de l'affichage | Tri existant gardé | Aucune |
-| `Annonce-*` | « Votre e-mail n'est pas affiché : vous échangez par la messagerie de Kupanga » au lieu de « Votre e-mail et votre numéro restent privés jusqu'à ce que vous les partagiez » | Le téléphone d'un compte est visible de son propriétaire ou locataire : la promesse de la maquette serait fausse | À valider |
+| `Annonce-*` | « Votre e-mail n'est pas affiché : vous échangez par la messagerie de Kupanga » au lieu de « Votre e-mail et votre numéro restent privés jusqu'à ce que vous les partagiez » | Le téléphone d'un compte est visible de son propriétaire ou locataire : la promesse de la maquette serait fausse | **Validé** (7 nov.) |
 | `Annonce-France` | Échelle GES aux couleurs du DPE | Couleurs de la maquette | F3 |
 | `Annonce-Proprio` | Barre latérale du propriétaire au lieu de la barre publique (« Mon espace ») | Navigation par profil (phase 2) | Aucune |
 | `Annonce-Proprio` | Adresse de la vue privée, identique à la vue publique pour les biens de démo | La vue publique renvoie déjà rue, ville et code postal | Aucune |
@@ -430,6 +430,6 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 
 **Défauts corrigés en passant** : initiale du propriétaire affichée « M.. » sur l'annonce (l'API envoie « M. », le service ajoute un point) ; liste « Trier » d'Explorer qui ne reprenait pas le tri d'une adresse partagée (défaut antérieur) ; correctif du commit « Mon logement actif » fait dans un commit séparé (conflit avec `routerLinkActive`).
 
-**Décisions à prendre** : entrée de menu « Demandes de location » (toujours aucune) ; « Lucas Bernard » sur la landing ; mention de confidentialité de l'annonce ; F2 et F3.
+**Décisions sur ce bilan (7 novembre 2026)** : « Lucas Bernard » sur la landing et mention de confidentialité de l'annonce validés. Entrée « Demandes de location » **ajoutée** (« feat(nav): entrée Demandes de location ») : onglet « Demandes » du candidat, entre Explorer et Messages, dans la barre du haut et dans les onglets du bas (5 onglets) ; « Demandes de location » dans le menu du compte de la barre du haut (candidat et locataire). Restent à décider : F2 et F3.
 
 **Évolutions découvertes** : F2 (filtres d'Explorer en menus séparés), F3 (couleurs GES réglementaires). Aucune nouvelle évolution serveur.
