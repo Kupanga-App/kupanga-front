@@ -1,4 +1,4 @@
-<div class="kp-page kp-page--etroite" kpTirerPourActualiser (actualiser)="charger()">
+<div class="kp-page mon-logement" kpTirerPourActualiser (actualiser)="charger()">
   <kp-page-header titre="Mon logement" />
 
   <!-- Demandes de location en attente : le logement n'est attribué qu'après acceptation -->
@@ -18,8 +18,10 @@
   @if (chargement() && !tableau() && !bien()) {
     <div class="kp-stack" aria-busy="true">
       <span class="kp-skeleton kp-skeleton--carte"></span>
-      <span class="kp-skeleton kp-skeleton--carte"></span>
-      <span class="kp-skeleton kp-skeleton--carte"></span>
+      <div class="colonnes">
+        <span class="kp-skeleton kp-skeleton--photo"></span>
+        <span class="kp-skeleton kp-skeleton--carte"></span>
+      </div>
     </div>
   } @else if (bienId() === null && !erreur()) {
     <kp-vide icone="house" titre="Pas encore de logement"
@@ -31,7 +33,7 @@
       <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
     </kp-vide>
   } @else {
-    <div class="kp-stack kp-stack--lg">
+    <div class="contenu">
       @if (bien()?.archive) {
         <div class="kp-bandeau kp-bandeau--attention">
           <kp-icon name="archive" [size]="18" />
@@ -39,113 +41,175 @@
         </div>
       }
 
-      @if (loyer(); as l) {
-        <section class="kp-card loyer" [class.kp-tache]="l.aPayer" [class.kp-tache--urgent]="enRetard()" [class.kp-tache--attention]="l.aPayer && !enRetard()">
-          <div class="kp-row kp-row--between">
-            <h2>{{ titreLoyer() }}</h2>
-            <kp-statut [statut]="statutLoyer()" />
-          </div>
-          <p class="kp-montant montant">{{ l.q.montantTotal | montant: l.q.devise }}</p>
-          @if (l.aPayer) {
-            <p class="kp-muted">
-              À payer {{ l.q.dateEcheance | dateRelative }} à {{ nomProprietaire() }}.
-              Le statut passera à « Loyer reçu » quand votre propriétaire l’aura déclaré.
+      <!-- À faire : le premier document à signer, sinon le loyer du mois -->
+      @if (premierASigner(); as d) {
+        <section class="kp-card a-faire" aria-labelledby="titre-a-faire">
+          <span class="a-faire__icone"><kp-icon name="signature" [size]="20" [strokeWidth]="1.5" /></span>
+          <div class="a-faire__texte">
+            <span class="surtitre">À faire</span>
+            <h2 id="titre-a-faire">Signer {{ d.quoi }} envoyé par {{ proprietaireCourt() }}</h2>
+            <p class="secondaire">
+              @if (d.cle.startsWith('c') && proprioASigne()) {
+                {{ proprietaireCourt().split(' ')[0] }} l’a déjà signé.
+              }
+              @if (d.lien) {
+                Vous recevez aussi le lien par e-mail ; la signature se fait au doigt.
+              } @else {
+                Vous recevez le lien par e-mail ; ouvrez-le pour signer, au doigt ou à la souris.
+              }
             </p>
-          } @else {
-            <p class="kp-muted">Reçu le {{ l.q.datePaiement | dateLongue }}. Vos loyers sont à jour.</p>
-          }
-          <a routerLink="/quittances" class="kp-btn kp-btn--secondary kp-btn--sm lien">
-            <kp-icon name="receipt" [size]="18" /> Mes quittances
-          </a>
-        </section>
-      }
-
-      @if (aSigner().length) {
-        <section class="kp-section" aria-labelledby="titre-signer">
-          <h2 class="kp-section-title" id="titre-signer">À signer</h2>
-          <ul class="kp-list">
-            @for (d of aSigner(); track d.cle) {
-              <li class="kp-list__item kp-list__item--sans-chevron">
-                <span class="kp-list__icon"><kp-icon name="pen-line" /></span>
-                <span class="kp-list__body">
-                  <span class="kp-list__title">{{ d.titre }}</span>
-                  @if (!d.lien) {
-                    <span class="kp-list__sub">Ouvrez le lien de signature reçu par e-mail.</span>
-                  }
-                </span>
-                @if (d.lien) {
-                  <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="d.lien">Signer</a>
-                }
-              </li>
+            @if (aSigner().length > 1) {
+              <p class="petit">Ensuite : signer {{ aSigner()[1].quoi }}.</p>
             }
-          </ul>
+          </div>
+          @if (d.lien) {
+            <a class="kp-btn kp-btn--primary" [routerLink]="d.lien">Lire et signer</a>
+          }
+        </section>
+      } @else if (loyer(); as l) {
+        <section class="kp-card a-faire" aria-labelledby="titre-a-faire">
+          <span class="a-faire__icone" [class.a-faire__icone--attention]="l.aPayer && !enRetard()" [class.a-faire__icone--danger]="enRetard()">
+            <kp-icon name="receipt" [size]="20" [strokeWidth]="1.5" />
+          </span>
+          <div class="a-faire__texte">
+            <span class="surtitre">{{ l.aPayer ? 'À faire' : 'Loyers' }}</span>
+            <h2 id="titre-a-faire" class="kp-row kp-row--wrap ligne-titre">
+              <span>{{ titreLoyer() }} · <span class="kp-montant">{{ l.q.montantTotal | montant: l.q.devise }}</span></span>
+              <kp-statut [statut]="statutLoyer()" />
+            </h2>
+            @if (l.aPayer) {
+              <p class="secondaire">
+                À payer {{ l.q.dateEcheance | dateRelative }} à {{ proprietaireCourt() }} : le statut passera à
+                « Loyer reçu » quand votre propriétaire l’aura déclaré.
+              </p>
+            } @else {
+              <p class="secondaire">Reçu le {{ l.q.datePaiement | dateLongue }}. Vos loyers sont à jour.</p>
+            }
+          </div>
+          <a routerLink="/quittances" class="kp-btn kp-btn--secondary">Mes quittances</a>
         </section>
       }
 
-      <section class="kp-section" aria-labelledby="titre-proprietaire">
-        <h2 class="kp-section-title" id="titre-proprietaire">Votre propriétaire</h2>
-        <div class="kp-card">
-          <div class="kp-row">
-            <kp-avatar [photo]="proprietaire()?.urlProfile" [nom]="nomProprietaire()" [taille]="48" />
-            <div class="kp-stack kp-stack--sm identite">
-              <span class="kp-strong">{{ nomProprietaire() }}</span>
-              @if (proprietaire()?.telephone) {
-                <span class="kp-small kp-muted">{{ proprietaire()?.telephone }}</span>
+      <div class="colonnes">
+        <div class="colonne colonne--large">
+          <!-- Où en est votre location -->
+          @if (etapes(); as e) {
+            <section class="kp-card" aria-labelledby="titre-frise">
+              <h2 class="titre-carte" id="titre-frise">Où en est votre location</h2>
+              <kp-frise titre="Où en est votre location" [etapes]="e.etapes" />
+            </section>
+          }
+
+          <!-- Photos -->
+          @if (photos().length) {
+            <section class="kp-card photos" aria-label="Photos">
+              <kp-galerie #galerie [photos]="photos()" />
+              <button type="button" class="voir-photos" (click)="galerie.ouvrir(0)">
+                <kp-icon name="image" [size]="16" /> Voir {{ photos().length > 1 ? 'les ' + photos().length + ' photos' : 'la photo' }}
+              </button>
+            </section>
+          }
+
+          <!-- Caractéristiques : le locataire ne modifie pas le bien (pas de lien « Modifier ») -->
+          <section class="kp-card" aria-labelledby="titre-caracteristiques">
+            <h2 class="titre-carte" id="titre-caracteristiques">Caractéristiques</h2>
+            <dl class="tuiles">
+              @for (t of tuiles(); track t.libelle) {
+                <div class="tuile"><dt>{{ t.libelle }}</dt><dd>{{ t.valeur }}</dd></div>
+              }
+            </dl>
+            @if (equipements().length) {
+              <div class="groupe">
+                <span class="petit">Équipements</span>
+                <div class="kp-row kp-row--wrap puces">
+                  @for (e of equipements(); track e) {
+                    <span class="kp-tag">{{ e }}</span>
+                  }
+                </div>
+              </div>
+            }
+            <kp-lieux-proches [pois]="bien()?.pois" />
+          </section>
+        </div>
+
+        <div class="colonne">
+          <!-- Mon loyer -->
+          @if (monLoyer(); as m) {
+            <section class="kp-card" aria-labelledby="titre-loyer">
+              <div class="titre-ligne">
+                <h2 class="titre-carte" id="titre-loyer">Mon loyer</h2>
+                @if (m.source) { <span class="petit">{{ m.source }}</span> }
+              </div>
+              <dl class="tuiles tuiles--3">
+                <div class="tuile"><dt>Loyer</dt><dd class="kp-tabulaire">{{ m.loyer | montant: m.devise : 0 }}</dd></div>
+                <div class="tuile"><dt>Charges</dt><dd class="kp-tabulaire">{{ m.charges | montant: m.devise : 0 }}</dd></div>
+                <div class="tuile tuile--accent"><dt>Total par mois</dt><dd class="kp-tabulaire">{{ m.loyer + m.charges | montant: m.devise : 0 }}</dd></div>
+              </dl>
+              <p class="secondaire">
+                @if (m.garantieMois != null) {
+                  Garantie : {{ m.garantieMois }} mois de loyer@if (m.depot) { ({{ m.depot | montant: m.devise : 0 }})}.
+                } @else if (m.depot) {
+                  Dépôt de garantie : {{ m.depot | montant: m.devise : 0 }}.
+                }
+                @if (m.avanceMois) {
+                  Loyers d’avance : {{ m.avanceMois }} mois.
+                }
+                Le loyer se paie directement à votre propriétaire, hors de l’application.
+              </p>
+            </section>
+          }
+
+          <!-- Votre propriétaire -->
+          <section class="kp-card" aria-labelledby="titre-proprietaire">
+            <h2 class="titre-carte" id="titre-proprietaire">Votre propriétaire</h2>
+            <div class="kp-row">
+              <kp-avatar [photo]="proprietaire()?.urlProfile" [nom]="nomProprietaire()" [taille]="44" />
+              <div class="identite">
+                <span class="fort">{{ proprietaireCourt() }}</span>
+                <span class="petit">Propriétaire sur Kupanga</span>
+              </div>
+            </div>
+            <div class="contacts">
+              @if (lienMessage(); as q) {
+                <a class="kp-btn kp-btn--secondary kp-btn--sm" routerLink="/messages" [queryParams]="q"><kp-icon name="message-circle" [size]="16" /> Message</a>
+              }
+              @if (proprietaire()?.telephone; as tel) {
+                <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="lienAppel(tel)"><kp-icon name="phone" [size]="16" /> Appeler</a>
+              }
+              @if (lienWhatsapp(); as wa) {
+                <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="wa" target="_blank" rel="noopener noreferrer"><kp-icon name="smartphone" [size]="16" /> WhatsApp</a>
               }
             </div>
-          </div>
-          <div class="contacts">
-            @if (lienMessage(); as q) {
-              <a class="kp-btn kp-btn--secondary kp-btn--sm" routerLink="/messages" [queryParams]="q"><kp-icon name="message-circle" [size]="18" /> Message</a>
-            }
-            @if (proprietaire()?.telephone; as tel) {
-              <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="lienAppel(tel)"><kp-icon name="phone" [size]="18" /> Appeler</a>
-            }
-            @if (lienWhatsapp(); as wa) {
-              <a class="kp-btn kp-btn--secondary kp-btn--sm" [href]="wa" target="_blank" rel="noopener noreferrer"><kp-icon name="smartphone" [size]="18" /> WhatsApp</a>
-            }
-          </div>
-          @if (bien(); as b) {
-            @if (b.location && !b.archive) {
-              <kp-fin-de-bail [bien]="b" cote="locataire" (modifie)="choisir(b.id)" />
-            }
-          }
-        </div>
-      </section>
+          </section>
 
-      <section class="kp-section" aria-labelledby="titre-logement">
-        <h2 class="kp-section-title" id="titre-logement">Le logement</h2>
-        <div class="kp-card logement">
-          @if (photo()) {
-            <img class="kp-photo" [src]="photo()" alt="" loading="lazy" />
-          }
-          <kp-lieux-proches [pois]="bien()?.pois" />
-          <p class="kp-strong">{{ bien()?.titre ?? typeBien() }}</p>
-          <p class="kp-muted kp-small"><kp-icon name="map-pin" [size]="14" /> {{ adresse() }}</p>
-          @if (bien()?.pointDeRepere) {
-            <p class="kp-small">Repère : {{ bien()?.pointDeRepere }}</p>
-          }
-          @if (bien(); as b) {
-            <kp-carte-bien [latitude]="b.latitude" [longitude]="b.longitude" [precision]="b.precisionLocalisation" />
-          }
+          <!-- Localisation -->
+          <section class="kp-card" aria-labelledby="titre-localisation">
+            <h2 class="titre-carte" id="titre-localisation">Localisation</h2>
+            <p class="secondaire">{{ adresse() }}</p>
+            @if (bien()?.pointDeRepere) {
+              <p class="secondaire"><span class="petit">Repère :</span> {{ bien()?.pointDeRepere }}</p>
+            }
+            @if (bien(); as b) {
+              <kp-carte-bien [latitude]="b.latitude" [longitude]="b.longitude" [precision]="b.precisionLocalisation" />
+            }
+          </section>
         </div>
-      </section>
+      </div>
 
-      @if (tableau()?.contrat; as c) {
-        <section class="kp-section" aria-labelledby="titre-bail">
-          <h2 class="kp-section-title" id="titre-bail">
-            Votre bail
-            <kp-statut [statut]="statutBail()" />
-          </h2>
-          <dl class="kp-details">
-            <div><dt>Début</dt><dd>{{ c.dateDebut | dateLongue }}</dd></div>
-            @if (c.dateFin) { <div><dt>Fin</dt><dd>{{ c.dateFin | dateLongue }}</dd></div> }
-            <div><dt>Loyer</dt><dd>{{ c.loyerMensuel | montant: c.devise }}</dd></div>
-            <div><dt>Charges</dt><dd>{{ c.charges | montant: c.devise }}</dd></div>
-            @if (c.depotGarantie) { <div><dt>Garantie</dt><dd>{{ c.depotGarantie | montant: c.devise }}</dd></div> }
-          </dl>
-          <a routerLink="/documents" class="kp-btn kp-btn--ghost">Voir le bail et les états des lieux</a>
-        </section>
+      <!-- Fin de location -->
+      @if (bien(); as b) {
+        @if (b.location && !b.archive) {
+          <section class="kp-card fin-location" aria-labelledby="titre-fin">
+            <div class="fin-location__texte">
+              <h2 class="titre-carte" id="titre-fin">Fin de location</h2>
+              <p class="secondaire">
+                Respectez le préavis prévu par votre bail : l’application ne le calcule pas.
+                {{ proprietaireCourt() }} sera prévenu par notification et par e-mail.
+              </p>
+            </div>
+            <kp-fin-de-bail [bien]="b" cote="locataire" [danger]="true" (modifie)="choisir(b.id)" />
+          </section>
+        }
       }
     </div>
   }

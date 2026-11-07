@@ -65,8 +65,9 @@ function aujourdhui(decalageAnnees = 0): string {
           <p class="kp-small kp-muted">Vous pourrez enregistrer la fin du bail à partir du {{ l.dateFinPrevue | dateLongue }}.</p>
         }
       } @else {
-        <button type="button" class="kp-btn kp-btn--secondary kp-btn--sm" (click)="feuilleConge.set(true)">
-          <kp-icon name="calendar" [size]="18" /> {{ cote() === 'proprietaire' ? 'Mettre fin au bail' : 'Donner congé' }}
+        <button type="button" class="kp-btn kp-btn--sm" [class.kp-btn--secondary]="!danger()" [class.kp-btn--danger]="danger()"
+                (click)="feuilleConge.set(true)">
+          @if (!danger()) { <kp-icon name="calendar" [size]="18" /> }{{ cote() === 'proprietaire' ? 'Mettre fin au bail' : 'Donner congé' }}
         </button>
       }
     }
@@ -124,6 +125,8 @@ function aujourdhui(decalageAnnees = 0): string {
 export class FinDeBailComponent {
   readonly bien = input.required<BienDTO>();
   readonly cote = input.required<'proprietaire' | 'locataire'>();
+  /** Bouton « Donner congé » en danger contour, sans icône (bloc « Fin de location » de Mon logement). */
+  readonly danger = input(false);
   /** Émis après un congé, un retrait ou la fin du bail : l'écran relit le bien. */
   readonly modifie = output<void>();
 

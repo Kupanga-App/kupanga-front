@@ -1,40 +1,236 @@
-.choix {
-  margin-bottom: var(--kp-space-5);
+@use 'mq';
+
+// Mon logement (maquette Mon-Logement) : miroir de la fiche du bien côté propriétaire
+
+.mon-logement {
+  --_gap: clamp(8px, 0.8vw, 12px);
 }
 
-.loyer {
-  gap: var(--kp-space-2);
+.choix {
+  max-width: 420px;
+  margin-bottom: var(--_gap);
+}
+
+.contenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap);
+}
+
+.fort {
+  font-weight: 500;
+  color: var(--kp-text);
+}
+
+.secondaire {
+  color: var(--kp-text-muted);
+  font-size: 14px;
+}
+
+.petit {
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+.surtitre {
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+.titre-carte {
+  font-size: var(--kp-fs-body);
+  font-weight: 500;
+}
+
+.titre-ligne {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+}
+
+// ── À faire ─────────────────────────────────────────────────────────────────
+
+.a-faire {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kp-space-4);
+
+  > .kp-btn {
+    margin-left: auto;
+
+    @include mq.telephone {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.a-faire__icone {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-accent-soft);
+  color: var(--kp-accent);
+
+  &--attention {
+    background: var(--kp-state-warning-bg);
+    color: var(--kp-state-warning-text);
+  }
+
+  &--danger {
+    background: var(--kp-state-danger-bg);
+    color: var(--kp-state-danger-text);
+  }
+}
+
+.a-faire__texte {
+  display: flex;
+  flex: 1 1 280px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 
   h2 {
-    font-size: var(--kp-fs-md);
-  }
-
-  .lien {
-    align-self: flex-start;
-    margin-top: var(--kp-space-2);
+    font-size: var(--kp-fs-card-title);
+    font-weight: 500;
   }
 }
 
-.montant {
-  font-size: var(--kp-fs-2xl);
+.ligne-titre {
+  gap: var(--kp-space-2);
 }
+
+// ── Colonnes ────────────────────────────────────────────────────────────────
+
+.colonnes {
+  display: grid;
+  gap: var(--_gap);
+  align-items: start;
+
+  @include mq.ordinateur {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+}
+
+.colonne {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap);
+  min-width: 0;
+}
+
+// ── Photos ──────────────────────────────────────────────────────────────────
+
+.photos {
+  position: relative;
+  padding: 8px;
+}
+
+.voir-photos {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+  color: var(--kp-text);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--kp-elev-1);
+  cursor: pointer;
+}
+
+// ── Tuiles (caractéristiques, loyer) ────────────────────────────────────────
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+
+  @include mq.tablette {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.tuile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+
+  dt {
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-mention);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  &--accent {
+    background: var(--kp-accent-soft);
+  }
+}
+
+.groupe {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.puces .kp-tag {
+  background: var(--kp-surface-sunken);
+}
+
+// ── Propriétaire ────────────────────────────────────────────────────────────
 
 .identite {
-  gap: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .contacts {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: var(--kp-space-2);
+}
 
-  .kp-btn {
-    flex: 1 1 auto;
+// ── Fin de location ─────────────────────────────────────────────────────────
+
+.fin-location {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kp-space-3) var(--kp-space-4);
+
+  kp-fin-de-bail {
+    margin: 0 0 0 auto;
   }
 }
 
-.logement p {
+.fin-location__texte {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  flex: 1 1 320px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
