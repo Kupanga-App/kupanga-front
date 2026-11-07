@@ -10,6 +10,7 @@ import { SheetComponent } from './sheet.component';
  *
  * Le parent garde l'étape courante et la validité ; ce composant affiche et émet. `manque` dit ce qui bloque
  * « Continuer » ; `modifie` (formulaire `dirty`) fait confirmer « Quitter » avant d'émettre `quitter`.
+ * `confirmerSortie()` pose la même question pour une sortie par le retour du navigateur (garde `sortieAssistantGuard`).
  */
 @Component({
   selector: 'kp-assistant',
@@ -115,10 +116,10 @@ import { SheetComponent } from './sheet.component';
       }
     </div>
 
-    <kp-sheet [(ouvert)]="confirmation" titre="Quitter sans enregistrer ?">
+    <kp-sheet [ouvert]="confirmation()" (ouvertChange)="fermerConfirmation($event)" titre="Quitter sans enregistrer ?">
       <p>Ce que vous avez saisi sera perdu : rien n’est enregistré avant la dernière étape.</p>
       <div pied>
-        <button type="button" class="kp-btn kp-btn--secondary" (click)="confirmation.set(false)">Continuer la saisie</button>
+        <button type="button" class="kp-btn kp-btn--secondary" (click)="fermerConfirmation(false)">Continuer la saisie</button>
         <button type="button" class="kp-btn kp-btn--danger" (click)="confirmerQuitter()">Quitter</button>
       </div>
     </kp-sheet>
@@ -260,6 +261,8 @@ export class AssistantComponent {
   readonly quitter = output<void>();
 
   readonly confirmation = signal(false);
+  /** Sortie par le retour du navigateur en attente de réponse (`confirmerSortie`). */
+  private reponseSortie: ((quitter: boolean) => void) | null = null;
 
   readonly derniere = computed(() => this.etape() >= this.etapes().length - 1);
   readonly pourcentage = computed(() => ((this.etape() + 1) / this.etapes().length) * 100);
@@ -280,6 +283,35 @@ export class AssistantComponent {
 
   confirmerQuitter(): void {
     this.confirmation.set(false);
+    if (this.reponseSortie) {
+      // La navigation demandée par le navigateur reprend : pas de second `quitter`
+      this.repondreSortie(true);
+      return;
+    }
     this.quitter.emit();
+  }
+
+  /** « Continuer la saisie », ✕, Échap ou voile : la fenêtre se ferme et la sortie demandée est annulée. */
+  fermerConfirmation(ouvert: boolean): void {
+    if (ouvert) return;
+    this.confirmation.set(false);
+    this.repondreSortie(false);
+  }
+
+  /**
+   * Sortie de l'écran sans passer par « Quitter » (retour du navigateur ou geste du téléphone) : même fenêtre que
+   * « Quitter » si la saisie est commencée. Vrai si la sortie peut se faire.
+   */
+  confirmerSortie(): Promise<boolean> {
+    if (!this.modifie() || this.enCours()) return Promise.resolve(true);
+    this.repondreSortie(false);
+    this.confirmation.set(true);
+    return new Promise(resolve => (this.reponseSortie = resolve));
+  }
+
+  private repondreSortie(quitter: boolean): void {
+    const reponse = this.reponseSortie;
+    this.reponseSortie = null;
+    reponse?.(quitter);
   }
 }

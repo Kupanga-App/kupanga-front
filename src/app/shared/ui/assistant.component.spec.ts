@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AssistantComponent } from './assistant.component';
 
@@ -14,6 +14,7 @@ import { AssistantComponent } from './assistant.component';
   `,
 })
 class HoteComponent {
+  readonly assistant = viewChild.required(AssistantComponent);
   readonly etape = signal(0);
   readonly peutContinuer = signal(false);
   readonly manque = signal<string | null>('Indiquez le loyer hors charges.');
@@ -92,5 +93,52 @@ describe('AssistantComponent (kp-assistant)', () => {
     fixture.detectChanges();
     expect(bouton('Valider')).toBeDefined();
     expect(bouton('Retour')).toBeDefined();
+  });
+
+  describe('confirmerSortie (retour du navigateur)', () => {
+    it('sans saisie : sortie permise sans fenêtre', async () => {
+      expect(await hote.assistant().confirmerSortie()).toBeTrue();
+      fixture.detectChanges();
+      expect(el().querySelector('[role="dialog"]')).toBeNull();
+    });
+
+    it('après saisie : « Continuer la saisie » retient la sortie', async () => {
+      hote.modifie.set(true);
+      fixture.detectChanges();
+
+      const reponse = hote.assistant().confirmerSortie();
+      fixture.detectChanges();
+      expect(el().querySelector('[role="dialog"]')?.getAttribute('aria-label')).toBe('Quitter sans enregistrer ?');
+
+      bouton('Continuer la saisie')!.click();
+      fixture.detectChanges();
+      expect(await reponse).toBeFalse();
+      expect(el().querySelector('[role="dialog"]')).toBeNull();
+    });
+
+    it('après saisie : « Quitter » laisse partir, sans émettre un second `quitter`', async () => {
+      hote.modifie.set(true);
+      fixture.detectChanges();
+
+      const reponse = hote.assistant().confirmerSortie();
+      fixture.detectChanges();
+      bouton('Quitter')!.click();
+      fixture.detectChanges();
+
+      expect(await reponse).toBeTrue();
+      expect(hote.quittes).toBe(0);
+    });
+
+    it('fenêtre fermée par ✕ : la sortie est annulée', async () => {
+      hote.modifie.set(true);
+      fixture.detectChanges();
+
+      const reponse = hote.assistant().confirmerSortie();
+      fixture.detectChanges();
+      el().querySelector<HTMLButtonElement>('[role="dialog"] .fermer')!.click();
+      fixture.detectChanges();
+
+      expect(await reponse).toBeFalse();
+    });
   });
 });

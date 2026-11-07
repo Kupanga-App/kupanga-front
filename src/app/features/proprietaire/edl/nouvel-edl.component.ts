@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, signal, viewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,6 +13,7 @@ import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
 import { aujourdhuiIso } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
+import { SortieProtegee } from '../../../shared/ui/sortie-assistant.guard';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
 import { ChampHeureComponent } from '../../../shared/ui/champ-heure.component';
@@ -58,8 +59,11 @@ type CleForm = FormGroup<{ typeCle: FormControl<string>; quantite: FormControl<n
   templateUrl: './nouvel-edl.component.html',
   styleUrl: './nouvel-edl.component.scss',
 })
-export class NouvelEdlComponent implements OnInit {
+export class NouvelEdlComponent implements OnInit, SortieProtegee {
   readonly id = input.required<string>();
+  private readonly assistant = viewChild(AssistantComponent);
+  /** « Quitter » déjà confirmé, ou état des lieux créé : la sortie n'est plus retenue. */
+  private sortieAutorisee = false;
 
   private router = inject(Router);
   private bienService = inject(BienService);
@@ -304,7 +308,15 @@ export class NouvelEdlComponent implements OnInit {
   }
 
   quitter(): void {
+    this.sortieAutorisee = true;
     void this.router.navigate(['/biens', this.id(), 'etats-des-lieux']);
+  }
+
+  /** Retour du navigateur : confirmation si la saisie est commencée (`sortieAssistantGuard`). */
+  peutQuitter(): boolean | Promise<boolean> {
+    const assistant = this.assistant();
+    if (this.sortieAutorisee || !this.modifie() || !assistant) return true;
+    return assistant.confirmerSortie();
   }
 
   private creer(): void {
@@ -335,6 +347,7 @@ export class NouvelEdlComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.toasts.ok('État des lieux créé. Signez-le pour l’envoyer au locataire.');
+        this.sortieAutorisee = true;
         void this.router.navigate(['/biens', bien.id, 'etats-des-lieux'], { replaceUrl: true });
       },
       error: err => {
