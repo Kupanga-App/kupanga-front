@@ -43,6 +43,9 @@
   --kp-elev-2: 0 0 0 1px rgba(16, 33, 43, 0.06), 0 24px 48px rgba(16, 33, 43, 0.16);
 
   --kp-backdrop: rgba(16, 33, 43, 0.45);
+  // Pastilles posées sur une photo (compteur, « Couverture », retirer) : mêmes valeurs dans les deux thèmes
+  --kp-photo-voile: rgba(16, 33, 43, 0.8);
+  --kp-photo-texte: #ffffff;
   // Focus clavier : anneau nuit séparé de l'élément par un liseré de la couleur de surface (DS-Fondations)
   --kp-focus: 0 0 0 2px var(--kp-surface), 0 0 0 4px var(--kp-text);
 
@@ -87,6 +90,8 @@
   --kp-elev-2: 0 0 0 1px rgba(239, 251, 219, 0.08), 0 24px 48px rgba(0, 0, 0, 0.6);
 
   --kp-backdrop: rgba(0, 0, 0, 0.6);
+  --kp-photo-voile: rgba(16, 33, 43, 0.8);
+  --kp-photo-texte: #ffffff;
   --kp-focus: 0 0 0 2px var(--kp-surface), 0 0 0 4px var(--kp-text);
 
   color-scheme: dark;

@@ -59,7 +59,7 @@ type Filtre = 'tous' | 'loues' | 'vacants' | 'archives';
   `,
   styles: [`
     .liste { margin-top: 16px; }
-    .locataire { display: flex; align-items: center; gap: 4px; margin-top: 4px; color: var(--kp-text-2); }
+    .locataire { display: flex; align-items: center; gap: 4px; margin-top: 4px; color: var(--kp-text-muted); }
     [statut] { background: var(--kp-surface); }
     @media (max-width: 767px) { .ajouter { display: none; } }
   `],
@@ -76,11 +76,11 @@ export class BiensComponent implements OnInit {
     const b = this.biens();
     const archives = b.filter(x => x.archive).length;
     const options: OptionSegment<Filtre>[] = [
-      { valeur: 'tous', libelle: 'Tous' },
-      { valeur: 'loues', libelle: `Loués (${b.filter(x => !x.archive && x.locataire).length})` },
-      { valeur: 'vacants', libelle: `Vacants (${b.filter(x => !x.archive && !x.locataire).length})` },
+      { valeur: 'tous', libelle: 'Tous', nombre: b.filter(x => !x.archive).length },
+      { valeur: 'loues', libelle: 'Loués', nombre: b.filter(x => !x.archive && x.locataire).length },
+      { valeur: 'vacants', libelle: 'Vacants', nombre: b.filter(x => !x.archive && !x.locataire).length },
     ];
-    if (archives) options.push({ valeur: 'archives', libelle: `Archivés (${archives})` });
+    if (archives) options.push({ valeur: 'archives', libelle: 'Archivés', nombre: archives });
     return options;
   });
 

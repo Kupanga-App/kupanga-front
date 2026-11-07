@@ -51,19 +51,19 @@ import { IconComponent } from '../components/icon/icon.component';
   `,
   styles: [`
     :host { display: block; }
-    .galerie { position: relative; border-radius: var(--kp-radius); overflow: hidden; background: var(--kp-surface-2); }
+    .galerie { position: relative; border-radius: var(--kp-radius-md); overflow: hidden; background: var(--kp-surface-sunken); }
     .defilement { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
     .defilement::-webkit-scrollbar { display: none; }
     .diapo { flex: 0 0 100%; aspect-ratio: 4 / 3; padding: 0; border: 0; background: none; scroll-snap-align: center; }
     .diapo img { width: 100%; height: 100%; object-fit: cover; }
     @media (min-width: 768px) { .diapo { aspect-ratio: 16 / 9; } }
     .compteur {
-      position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: var(--kp-radius-full);
-      background: rgba(16, 33, 43, 0.75); color: #fff; font-size: var(--kp-fs-xs); font-weight: 600;
+      position: absolute; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: var(--kp-radius-pill);
+      background: var(--kp-photo-voile); color: var(--kp-photo-texte); font-size: var(--kp-fs-mention); font-weight: 500;
     }
     .fleche {
       position: absolute; top: 50%; transform: translateY(-50%); display: none; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #10212b;
+      width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--kp-surface); color: var(--kp-text); box-shadow: var(--kp-elev-1);
     }
     .fleche:disabled { opacity: 0; pointer-events: none; }
     .fleche--g { left: 12px; }
@@ -71,7 +71,7 @@ import { IconComponent } from '../components/icon/icon.component';
     @media (hover: hover) and (pointer: fine) { .fleche { display: inline-flex; } }
     .vide {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; aspect-ratio: 16 / 9;
-      border-radius: var(--kp-radius); background: var(--kp-surface-2); color: var(--kp-text-3);
+      border-radius: var(--kp-radius-md); background: var(--kp-surface-sunken); color: var(--kp-text-subtle);
     }
     .plein { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: #000; color: #fff; }
     .plein__haut {

@@ -6,8 +6,8 @@
   border-width: 1px;
 
   &[aria-checked='true'] {
-    border: 2px solid var(--kp-primary);
-    background: var(--kp-primary-subtle);
+    border: 2px solid var(--kp-accent);
+    background: var(--kp-accent-soft);
   }
 }
 
@@ -19,7 +19,7 @@
   border-radius: 50%;
 
   [aria-checked='true'] > & {
-    border: 7px solid var(--kp-primary);
+    border: 7px solid var(--kp-accent);
   }
 }
 
@@ -32,9 +32,9 @@
 .photo {
   position: relative;
   aspect-ratio: 1;
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-md);
   overflow: hidden;
-  background: var(--kp-surface-2);
+  background: var(--kp-surface-sunken);
 
   img {
     width: 100%;
@@ -48,11 +48,11 @@
   left: 8px;
   bottom: 8px;
   padding: 2px 8px;
-  border-radius: var(--kp-radius-full);
-  background: rgba(16, 33, 43, 0.8);
-  color: #ffffff;
-  font-size: var(--kp-fs-xs);
-  font-weight: 600;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-photo-voile);
+  color: var(--kp-photo-texte);
+  font-size: var(--kp-fs-mention);
+  font-weight: 500;
 }
 
 .photo__retirer {
@@ -66,8 +66,8 @@
   height: 36px;
   border: 0;
   border-radius: 50%;
-  background: rgba(16, 33, 43, 0.8);
-  color: #ffffff;
+  background: var(--kp-photo-voile);
+  color: var(--kp-photo-texte);
 }
 
 .ajout {
@@ -78,10 +78,10 @@
   gap: var(--kp-space-2);
   aspect-ratio: 1;
   border: 2px dashed var(--kp-border-strong);
-  border-radius: var(--kp-radius);
-  color: var(--kp-text-2);
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
+  border-radius: var(--kp-radius-md);
+  color: var(--kp-text-muted);
+  font-size: var(--kp-fs-secondary);
+  font-weight: 500;
   text-align: center;
   cursor: pointer;
 
