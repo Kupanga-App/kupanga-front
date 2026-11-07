@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { IconComponent } from '../components/icon/icon.component';
 
 /**
- * État vide d'une liste ou d'un écran : illustration au trait 1,5 sur un aplat olive clair, une phrase,
+ * État vide d'une liste ou d'un écran : illustration au trait 1,5 centrée sur un aplat olive clair, une phrase,
  * une première action (contenu projeté, en général un `.kp-btn--primary.kp-btn--sm`).
  */
 @Component({
@@ -27,9 +27,10 @@ import { IconComponent } from '../components/icon/icon.component';
       border-radius: var(--kp-radius-lg); background: var(--kp-surface); box-shadow: var(--kp-elev-0);
     }
     .illustration { position: relative; display: grid; place-items: center; width: 120px; height: 88px; color: var(--kp-text); }
+    /* Aplat centré sous l'icône */
     .aplat {
-      position: absolute; left: 50%; top: 50%; width: 64px; height: 56px; transform: translate(-36%, -40%);
-      border-radius: 14px; background: var(--kp-accent-soft);
+      position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; transform: translate(-50%, -50%);
+      border-radius: 18px; background: var(--kp-accent-soft);
     }
     .illustration kp-icon { position: relative; }
     h2 { font-size: var(--kp-fs-card-title); font-weight: 500; }
