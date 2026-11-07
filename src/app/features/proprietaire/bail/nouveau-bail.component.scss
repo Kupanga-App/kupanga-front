@@ -1,0 +1,143 @@
+// Assistant de bail (Assist-Bail) : total mensuel, récapitulatif, aperçu du document
+
+.total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kp-space-3);
+  padding: 12px 16px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-bg);
+  color: var(--kp-text-muted);
+}
+
+.total__montant {
+  color: var(--kp-text);
+  font-size: 22px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.recap {
+  margin: 0;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--kp-space-3);
+    padding: 12px 0;
+    border-top: 1px solid var(--kp-border);
+  }
+
+  > div:first-child {
+    border-top: 0;
+  }
+
+  dt {
+    color: var(--kp-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: right;
+  }
+}
+
+.apercu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.apercu__haut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--kp-text-muted);
+  font-size: 14px;
+}
+
+.legende {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--kp-fs-secondary);
+}
+
+.legende__carre {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--kp-accent-soft);
+  box-shadow: inset 0 0 0 1px var(--kp-accent);
+}
+
+.apercu-telephone {
+  margin-top: var(--kp-space-4);
+
+  @media (min-width: 1100px) {
+    display: none;
+  }
+}
+
+.papier {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px;
+  border-radius: 4px;
+  background: var(--kp-surface);
+  box-shadow: var(--kp-elev-1);
+  color: var(--kp-text);
+  font-size: 13px;
+  line-height: 1.6;
+
+  h2 {
+    margin-bottom: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  mark {
+    padding: 0 4px;
+    border-radius: 4px;
+    background: var(--kp-accent-soft);
+    color: var(--kp-text);
+  }
+}
+
+.papier__suite {
+  padding-top: 8px;
+  border-top: 1px dashed var(--kp-border-strong);
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-mention);
+}
+
+.signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+
+  span {
+    display: grid;
+    place-items: center;
+    min-height: 56px;
+    border: 1px dashed var(--kp-border-strong);
+    border-radius: var(--kp-radius-sm);
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-mention);
+    text-align: center;
+  }
+}
