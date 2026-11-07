@@ -4,7 +4,8 @@ import { ContratService } from '../gestion-logement/services/contrat.service';
 import { ContratDTO } from '../gestion-logement/models/contrat.model';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { MontantPipe } from '../../core/money/montant';
-import { messageLienSignature } from '../../core/http/api-error';
+import { CodeLienSignature, codeLienSignature, messageLienSignature } from '../../core/http/api-error';
+import { LienInvalideComponent } from './lien-invalide.component';
 import { DateLonguePipe, dateLongue } from '../../shared/format';
 import { SignatureLayoutComponent } from './signature-layout.component';
 import { FenetreSignatureComponent } from './fenetre-signature.component';
@@ -23,7 +24,8 @@ import { ouvrirPdfFrais } from './pdf-frais';
 @Component({
   selector: 'kp-signer-contrat',
   standalone: true,
-  imports: [RouterLink, MontantPipe, DateLonguePipe, SignatureLayoutComponent, FenetreSignatureComponent, IconComponent],
+  imports: [RouterLink, MontantPipe, DateLonguePipe, SignatureLayoutComponent, FenetreSignatureComponent, IconComponent,
+    LienInvalideComponent],
   template: `
     @if (signe()) {
       <kp-signature-layout titre="Bail signé"
@@ -44,11 +46,7 @@ import { ouvrirPdfFrais } from './pdf-frais';
         </div>
       </kp-signature-layout>
     } @else if (!contrat()) {
-      <kp-signature-layout titre="Lien de signature" [sousTitre]="erreur()">
-        <a [routerLink]="connecte() ? '/documents' : '/auth/login'" class="kp-btn kp-btn--secondary kp-btn--block">
-          {{ connecte() ? 'Mes documents' : 'Se connecter' }}
-        </a>
-      </kp-signature-layout>
+      <kp-lien-invalide [code]="codeErreur()" [message]="erreur()" [connecte]="connecte()" document="le bail" (reessayer)="charger()" />
     } @else {
       @if (contrat(); as c) {
       <kp-signature-layout [contexte]="'Bail à signer · envoyé par ' + proprietaireCourt()">
@@ -201,6 +199,8 @@ export class SignerContratComponent implements OnInit {
   readonly envoi = signal(false);
   readonly signe = signal(false);
   readonly erreur = signal<string | null>(null);
+  /** Lien refusé : 404, 410 ou 409 (illustration et titre de l'écran dédié). */
+  readonly codeErreur = signal<CodeLienSignature | null>(null);
   readonly connecte = computed(() => !!this.auth.currentUser());
 
   /** Case « J'ai lu… » : côté écran seulement, rien n'est envoyé à l'API. */
@@ -225,13 +225,21 @@ export class SignerContratComponent implements OnInit {
   readonly mention = computed(() => `${this.nomLocataire()} · ${dateLongue(new Date())}`);
 
   ngOnInit(): void {
+    this.charger();
+  }
+
+  charger(): void {
+    this.chargement.set(true);
+    this.erreur.set(null);
+    this.codeErreur.set(null);
     this.contratService.getByToken(this.token()).subscribe({
       next: c => {
         this.contrat.set(c);
         this.chargement.set(false);
       },
       error: err => {
-        this.erreur.set(messageLienSignature(err, 'Ce lien de signature n’est plus valable.'));
+        this.erreur.set(messageLienSignature(err, 'Le lien n’a pas pu être vérifié. Vérifiez votre connexion, puis réessayez.'));
+        this.codeErreur.set(codeLienSignature(err));
         this.chargement.set(false);
       },
     });

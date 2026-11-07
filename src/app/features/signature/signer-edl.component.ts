@@ -3,7 +3,8 @@ import { RouterLink } from '@angular/router';
 import { EdlService } from '../gestion-logement/services/edl.service';
 import { EtatDesLieuxDTO } from '../gestion-logement/models/edl.model';
 import { AuthService } from '../../core/auth/services/auth.service';
-import { messageLienSignature } from '../../core/http/api-error';
+import { CodeLienSignature, codeLienSignature, messageLienSignature } from '../../core/http/api-error';
+import { LienInvalideComponent } from './lien-invalide.component';
 import { DateLonguePipe } from '../../shared/format';
 import { SignatureLayoutComponent } from './signature-layout.component';
 import { SignatureComponent } from '../../shared/ui/signature.component';
@@ -14,7 +15,7 @@ import { COMPTEURS, ELEMENTS, ETATS } from '../gestion-logement/models/edl-libel
 @Component({
   selector: 'kp-signer-edl',
   standalone: true,
-  imports: [RouterLink, DateLonguePipe, SignatureLayoutComponent, SignatureComponent, IconComponent],
+  imports: [RouterLink, DateLonguePipe, SignatureLayoutComponent, SignatureComponent, IconComponent, LienInvalideComponent],
   template: `
     @if (signe()) {
       <kp-signature-layout titre="État des lieux signé">
@@ -33,11 +34,7 @@ import { COMPTEURS, ELEMENTS, ETATS } from '../gestion-logement/models/edl-libel
         </div>
       </kp-signature-layout>
     } @else if (!edl()) {
-      <kp-signature-layout titre="Lien de signature" [sousTitre]="erreur()">
-        <a [routerLink]="connecte() ? '/documents' : '/auth/login'" class="kp-btn kp-btn--secondary kp-btn--block">
-          {{ connecte() ? 'Mes documents' : 'Se connecter' }}
-        </a>
-      </kp-signature-layout>
+      <kp-lien-invalide [code]="codeErreur()" [message]="erreur()" [connecte]="connecte()" document="l’état des lieux" (reessayer)="charger()" />
     } @else {
       <kp-signature-layout [titre]="'Signez l’état des lieux ' + (edl()!.type === 'ENTREE' ? 'd’entrée' : 'de sortie')" [sousTitre]="edl()!.adresseBien ?? null">
         @if (edl(); as e) {
@@ -137,17 +134,27 @@ export class SignerEdlComponent implements OnInit {
   readonly envoi = signal(false);
   readonly signe = signal(false);
   readonly erreur = signal<string | null>(null);
+  /** Lien refusé : 404, 410 ou 409 (illustration et titre de l'écran dédié). */
+  readonly codeErreur = signal<CodeLienSignature | null>(null);
   readonly signature = signal('');
   readonly connecte = computed(() => !!this.auth.currentUser());
 
   ngOnInit(): void {
+    this.charger();
+  }
+
+  charger(): void {
+    this.chargement.set(true);
+    this.erreur.set(null);
+    this.codeErreur.set(null);
     this.edlService.getByToken(this.token()).subscribe({
       next: e => {
         this.edl.set(e);
         this.chargement.set(false);
       },
       error: err => {
-        this.erreur.set(messageLienSignature(err, 'Ce lien de signature n’est plus valable.'));
+        this.erreur.set(messageLienSignature(err, 'Le lien n’a pas pu être vérifié. Vérifiez votre connexion, puis réessayez.'));
+        this.codeErreur.set(codeLienSignature(err));
         this.chargement.set(false);
       },
     });

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { messageErreurApi, messageLienSignature } from './api-error';
+import { codeLienSignature, messageErreurApi, messageLienSignature } from './api-error';
 
 describe('messageErreurApi', () => {
   it('lit le message de l’API (corps JSON)', () => {
@@ -39,5 +39,27 @@ describe('messageLienSignature', () => {
     expect(messageLienSignature(new HttpErrorResponse({ status: 410 }), 'd')).toContain('expiré');
     const conflit = new HttpErrorResponse({ status: 409, error: { message: 'Ce contrat ne peut plus être signé' } });
     expect(messageLienSignature(conflit, 'd')).toBe('Ce contrat ne peut plus être signé');
+  });
+});
+
+describe('codeLienSignature', () => {
+  it('donne le code des trois refus d’un lien de signature', () => {
+    expect(codeLienSignature(new HttpErrorResponse({ status: 404 }))).toBe(404);
+    expect(codeLienSignature(new HttpErrorResponse({ status: 410 }))).toBe(410);
+    expect(codeLienSignature(new HttpErrorResponse({ status: 409, error: { message: 'Ce contrat ne peut plus être signé' } }))).toBe(409);
+  });
+
+  it('null pour une autre erreur (réseau, serveur, erreur non HTTP)', () => {
+    expect(codeLienSignature(new HttpErrorResponse({ status: 0 }))).toBeNull();
+    expect(codeLienSignature(new HttpErrorResponse({ status: 500 }))).toBeNull();
+    expect(codeLienSignature(new Error('x'))).toBeNull();
+  });
+
+  it('le message de 409 reste celui de l’API (déjà signé ou réservation terminée)', () => {
+    const fin = new HttpErrorResponse({
+      status: 409, error: { message: 'La réservation de ce logement a pris fin : ce bail ne peut plus être signé' },
+    });
+    expect(messageLienSignature(fin, 'd')).toBe('La réservation de ce logement a pris fin : ce bail ne peut plus être signé');
+    expect(messageLienSignature(new HttpErrorResponse({ status: 409 }), 'défaut')).toBe('défaut');
   });
 });

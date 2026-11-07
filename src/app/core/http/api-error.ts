@@ -68,3 +68,19 @@ export function messageLienSignature(err: unknown, parDefaut: string): string {
   }
   return messageErreurApi(err, parDefaut);
 }
+
+/** Cas d'un lien de signature refusé par l'API (B7). */
+export type CodeLienSignature = 404 | 410 | 409;
+
+/**
+ * Code d'un lien de signature refusé : 404 lien inconnu (ou jeton effacé après la signature), 410 lien expiré,
+ * 409 document qui n'attend plus la signature du locataire (déjà signé, figé, réservation terminée).
+ * Null pour toute autre erreur (réseau, serveur) : l'écran propose alors de réessayer.
+ * Sert à choisir l'illustration et le titre ; le texte reste celui de `messageLienSignature`.
+ */
+export function codeLienSignature(err: unknown): CodeLienSignature | null {
+  if (err instanceof HttpErrorResponse && (err.status === 404 || err.status === 410 || err.status === 409)) {
+    return err.status;
+  }
+  return null;
+}
