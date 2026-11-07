@@ -13,6 +13,7 @@ import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
 import { DateLonguePipe, aujourdhuiIso, dateLongue } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
+import { libelleDuree } from './duree';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { NgTemplateOutlet } from '@angular/common';
 
@@ -29,14 +30,6 @@ const MANQUES_BAIL: Record<string, string> = {
   garantieMois: 'Indiquez la garantie, de 0 à 24 mois.',
   avanceMois: 'Indiquez les loyers payés d’avance, de 0 à 24 mois.',
 };
-
-/** « 1 an », « 18 mois », « 2 ans ». */
-export function libelleDuree(mois: number | null | undefined): string {
-  const n = Number(mois);
-  if (!Number.isFinite(n) || n <= 0) return '';
-  if (n % 12 === 0) return n === 12 ? '1 an' : `${n / 12} ans`;
-  return `${n} mois`;
-}
 
 /**
  * Création d'un bail en 3 étapes (`Assist-Bail`) ; la juridiction du bien dit si la garantie est en montant ou en
