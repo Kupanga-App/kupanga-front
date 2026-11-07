@@ -12,6 +12,7 @@ export default defineConfig({
   testDir: 'e2e',
   outputDir: 'test-results',
   globalSetup: './e2e/outils/global-setup.ts',
+  globalTeardown: './e2e/outils/global-teardown.ts',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: 0,
@@ -79,6 +80,8 @@ export default defineConfig({
       name: 'conformite',
       dependencies: ['connexion'],
       testMatch: /visuel\/maquettes\.spec\.ts/,
+      // Instantané attendu = PNG de la maquette (copié ou découpé dans e2e/visuel/maquettes/)
+      snapshotPathTemplate: '{testDir}/visuel/maquettes/{arg}{ext}',
       use: { viewport: ORDINATEUR },
     },
   ],
