@@ -181,6 +181,7 @@ Les couleurs écrites en dur hors de `_theme.scss` (environ 60 occurrences : `la
 | F1 | Nouvelles règles de tâches de l'accueil propriétaire (« Répondre à … » pour une conversation non lue, « Créer la quittance du mois » pour un bail signé sans quittance du mois), avec leurs tests | `Nav-Proprio-Tableau`, décision du 7 novembre 2026 |
 | F2 | Filtres d'Explorer « Type de bien », « Loyer », « Pièces » en menus déroulants séparés (aujourd'hui, ils ouvrent la feuille des filtres, comme « Filtres ») | `O1v2-Explorer`, phase 5 |
 | F3 | Échelle GES aux couleurs réglementaires (violets) au lieu de celles du DPE reprises par la maquette | `Annonce-France`, phase 5 |
+| F4 | Garde de sortie (`sortieAssistantGuard`, `peutQuitter()`) sur les assistants de bail, de nouveau bien et de quittance : le retour du navigateur y perd encore la saisie | Phase 6 |
 
 Toute nouvelle évolution découverte pendant une phase s'ajoute à cette table, dans le commit de documentation de la phase, et figure dans le rapport de fin de phase.
 
@@ -208,7 +209,7 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 | 3 | faite (7 nov. 2026) : build vert, 154/154 tests | voir `git log` (« docs(refonte): bilan de la phase 3 ») | Voir « Bilan de la phase 3 » ci-dessous |
 | 4 | faite (7 nov. 2026) : build vert, 189/189 tests | voir `git log` (« docs(refonte): bilan de la phase 4 ») | Voir « Bilan de la phase 4 » ci-dessous |
 | 5 | faite (7 nov. 2026) : build vert, 198/198 tests | voir `git log` (« docs(refonte): bilan de la phase 5 ») | Voir « Bilan de la phase 5 » ci-dessous |
-| 6 | à faire | | |
+| 6 | faite (8 nov. 2026) : build vert, 207/207 tests unitaires, e2e Playwright 205 passés, 0 échec (5 projets, 7 min 34 s) | voir `git log` (« docs(refonte): rapport final de la refonte ») | Voir `rapport-final.md` |
 
 Chaque session met à jour sa ligne dans le dernier commit de sa phase (`docs(refonte): bilan de la phase N`).
 
