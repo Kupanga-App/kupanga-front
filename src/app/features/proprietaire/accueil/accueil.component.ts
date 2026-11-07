@@ -122,6 +122,31 @@ export class AccueilComponent implements OnInit {
   /** Dernières conversations (null tant qu'elles ne sont pas lues) et leur nombre total. */
   readonly conversations = signal<ConversationDTO[] | null>(null);
   readonly nbConversations = signal<number | null>(null);
+  /**
+   * Propriétaire : conversations sur ses biens (`Nav-Proprio-Tableau`), lues une fois (page de 20, comme la fiche du
+   * bien). `null` tant qu'elles ne sont pas lues ou si la lecture échoue (rien n'est alors affiché).
+   */
+  private readonly conversationsProprio = signal<ConversationDTO[] | null>(null);
+  /** Moins de 20 conversations : le compte est exact ; sinon « plus de ». */
+  readonly conversationsProprioCompletes = signal(true);
+  /** Conversations au sujet des biens du compte. */
+  private readonly conversationsSurMesBiens = computed(() => {
+    const liste = this.conversationsProprio();
+    if (!liste) return null;
+    const mesBiens = new Set(this.biens().map(b => b.id));
+    return liste.filter(c => mesBiens.has(c.bienId));
+  });
+  readonly nbConversationsProprio = computed(() => this.conversationsSurMesBiens()?.length ?? null);
+  /** Nombre de personnes (interlocuteurs distincts) qui ont écrit, par bien. */
+  readonly personnesParBien = computed(() => {
+    const parBien = new Map<number, Set<string>>();
+    for (const c of this.conversationsSurMesBiens() ?? []) {
+      const personne = this.interlocuteur(c).email;
+      if (!parBien.has(c.bienId)) parBien.set(c.bienId, new Set());
+      parBien.get(c.bienId)!.add(personne);
+    }
+    return new Map([...parBien].map(([id, personnes]) => [id, personnes.size]));
+  });
   protected readonly nomCourt = nomCourt;
   protected readonly heureMessage = heureMessage;
 
@@ -147,6 +172,12 @@ export class AccueilComponent implements OnInit {
     effect(() => {
       if (this.candidat() && !this.chargement() && untracked(() => this.conversations() === null)) {
         untracked(() => this.chargerConversations());
+      }
+    });
+    // Propriétaire seulement : une lecture des conversations, une fois ses biens chargés
+    effect(() => {
+      if (this.biens().length && untracked(() => this.conversationsProprio() === null)) {
+        untracked(() => this.chargerConversationsProprio());
       }
     });
   }
@@ -187,6 +218,22 @@ export class AccueilComponent implements OnInit {
         this.nbConversations.set(null);
       },
     });
+  }
+
+  /** Même recherche que la messagerie (`POST /conversations/search`), vingt dernières ; erreur : rien d'affiché. */
+  private chargerConversationsProprio(): void {
+    this.chatService.searchConversations({ page: 0, size: 20, lu: null, sortBy: 'lastMessageAt', sortDirection: 'DESC' }).subscribe({
+      next: page => {
+        this.conversationsProprio.set(page.contenu);
+        this.conversationsProprioCompletes.set(page.dernierepage !== false);
+      },
+      error: () => undefined,
+    });
+  }
+
+  /** Bien vacant : ni locataire ni réservation. */
+  vacant(b: BienDTO): boolean {
+    return !b.locataire && !b.reservation;
   }
 
   /** L'autre personne de la conversation. */

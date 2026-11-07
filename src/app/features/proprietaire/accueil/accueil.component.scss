@@ -124,6 +124,19 @@
   color: var(--kp-text-muted);
 }
 
+// « 2 conversations en cours » sous « Annonces en ligne »
+.chiffre__lien {
+  text-decoration: none;
+
+  &:hover { color: var(--kp-text); text-decoration: underline; }
+}
+
+// « 2 personnes vous ont écrit » sur la ligne d'un bien vacant
+.ecrit {
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-accent);
+}
+
 .barre {
   display: block;
   height: 6px;

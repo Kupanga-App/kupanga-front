@@ -155,6 +155,11 @@
               <span class="chiffre__libelle">Annonces en ligne</span>
               <span class="chiffre__valeur">{{ chiffres().annonces }}</span>
             </div>
+            @if (nbConversationsProprio(); as n) {
+              <a class="chiffre__etat chiffre__lien" routerLink="/messages">
+                {{ conversationsProprioCompletes() ? '' : 'plus de ' }}{{ n }} conversation{{ n > 1 ? 's' : '' }} en cours
+              </a>
+            }
             <span class="segments-annonces" aria-hidden="true">
               @for (s of segmentsAnnonces(); track $index) { <span [class.plein]="s"></span> }
             </span>
@@ -237,6 +242,9 @@
                   <span class="ligne-bien__texte">
                     <span class="fort kp-ellipsis" [title]="b.titre">{{ b.titre }}</span>
                     <span class="secondaire kp-ellipsis petit">{{ sousTitre(b) }}</span>
+                    @if (vacant(b) && personnesParBien().get(b.id); as n) {
+                      <span class="ecrit petit">{{ conversationsProprioCompletes() ? '' : 'plus de ' }}{{ n }} personne{{ n > 1 ? 's vous ont' : ' vous a' }} écrit</span>
+                    }
                   </span>
                   <span class="ligne-bien__etat" [class]="'ligne-bien__etat kp-statut--point kp-statut kp-statut--' + etat(b).ton">{{ etat(b).libelle }}</span>
                   <span class="ligne-bien__loyer kp-tabulaire">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
