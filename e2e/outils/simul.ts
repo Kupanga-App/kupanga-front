@@ -126,6 +126,20 @@ export function location(surcharge: Partial<Location> = {}): Location {
 
 // ── Interception ────────────────────────────────────────────────────────────────
 
+/** Corps d'une requête en texte ; les transports `jsonp` de SockJS l'encodent en formulaire (`d=…`). */
+export function corpsLisible(requete: Request): string {
+  const brut = requete.postData() ?? '';
+  if (!brut.startsWith('d=')) return brut;
+  try {
+    return decodeURIComponent(brut.slice(2).replace(/\+/g, ' '));
+  } catch {
+    return brut;
+  }
+}
+
+/** Requête de SockJS qui transporte des trames du navigateur vers le serveur (`xhr_send`, `jsonp_send`). */
+export const ENVOI_SOCKJS = /^\/ws\/[^/]+\/[^/]+\/\w+_send$/;
+
 type Methode = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 /** Adresse de l'API qui correspond exactement à `chemin` (paramètres d'URL ignorés). */
@@ -214,10 +228,92 @@ export async function bloquerEcritures(page: Page, permis: RegExp[] = []): Promi
     const chemin = new URL(r.url()).pathname;
     if (r.method() === 'GET' || r.method() === 'OPTIONS') return route.fallback();
     if ([...LECTURES, ...permis].some(p => p.test(chemin))) return route.fallback();
-    // Transports XHR de SockJS (repli du WebSocket) : seul l'envoi d'un message est une écriture
-    if (chemin.startsWith('/ws/') && !(r.postData() ?? '').includes('destination:/app/chat.send')) return route.fallback();
+    // Transports de repli de SockJS : seul l'envoi d'un message est une écriture
+    if (chemin.startsWith('/ws/') && !corpsLisible(r).includes('destination:/app/chat.send')) return route.fallback();
     bloquees.push(`${r.method()} ${chemin}`);
     await route.fulfill({ status: 418, contentType: 'application/json', body: JSON.stringify(erreurApi(418, 'Écriture bloquée par le test e2e')) });
   });
   return bloquees;
+}
+
+// ── Messagerie (STOMP sur SockJS, /ws) ─────────────────────────────────────────
+
+export interface MessageIntercepte {
+  destination: string;
+  corps: { contenu: string; emailDestinataire?: string; bienId: number };
+}
+
+/** Lit une trame STOMP SEND dans un message SockJS (`["SEND\ndestination:…\n\n{…}\u0000"]`). */
+function lireEnvoi(brut: string): MessageIntercepte | null {
+  let trames: string[];
+  try {
+    trames = brut.startsWith('[') ? JSON.parse(brut) : [brut];
+  } catch {
+    return null;
+  }
+  const trame = trames.find(t => typeof t === 'string' && t.startsWith('SEND') && t.includes('destination:/app/chat.send'));
+  if (!trame) return null;
+  const [entete, ...reste] = trame.split('\n\n');
+  const destination = /destination:([^\n]+)/.exec(entete)?.[1] ?? '';
+  return { destination, corps: JSON.parse(reste.join('\n\n').replace(/\0$/, '')) };
+}
+
+/**
+ * Messagerie temps réel relayée vers l'API (WebSocket SockJS, ou son repli XHR), sauf l'envoi d'un message
+ * (`SEND /app/chat.send`) : retenu, il n'atteint pas l'API. `connecte()` attend la trame STOMP CONNECTED (WebSocket)
+ * ou l'envoi de CONNECT (repli XHR) ; dans une conversation, le bandeau « Reconnexion… » disparaît à la connexion.
+ */
+export async function intercepterMessagerie(page: Page): Promise<{
+  connecte: () => Promise<void>;
+  envoi: () => Promise<MessageIntercepte>;
+  nombreEnvois: () => number;
+}> {
+  const envois: MessageIntercepte[] = [];
+  let reveilEnvoi: (() => void) | null = null;
+  let estConnecte = false;
+  let reveilConnexion: (() => void) | null = null;
+  const garder = (brut: string): boolean => {
+    const envoi = lireEnvoi(brut);
+    if (!envoi) return false;
+    envois.push(envoi);
+    reveilEnvoi?.();
+    return true;
+  };
+  const voirConnexion = (brut: string) => {
+    if (!estConnecte && brut.includes('CONNECTED')) {
+      estConnecte = true;
+      reveilConnexion?.();
+    }
+  };
+
+  await page.routeWebSocket(/:8089\/ws\//, ws => {
+    const serveur = ws.connectToServer();
+    ws.onMessage(m => {
+      if (garder(typeof m === 'string' ? m : m.toString('utf8'))) return;
+      serveur.send(m);
+    });
+    serveur.onMessage(m => {
+      if (typeof m === 'string') voirConnexion(m);
+      ws.send(m);
+    });
+  });
+  // Repli de SockJS : l'envoi part dans un POST …/xhr_send ou …/jsonp_send (les flux ne se terminent jamais)
+  await page.route(url => url.origin === API && ENVOI_SOCKJS.test(url.pathname), async route => {
+    const corps = corpsLisible(route.request());
+    if (garder(corps)) return route.fulfill({ status: 204, body: '' });
+    const reponse = await route.fetch();
+    if (corps.includes('CONNECT')) voirConnexion('CONNECTED');
+    return route.fulfill({ response: reponse });
+  });
+
+  return {
+    nombreEnvois: () => envois.length,
+    connecte: async () => {
+      if (!estConnecte) await new Promise<void>(r => (reveilConnexion = r));
+    },
+    envoi: async () => {
+      if (!envois.length) await new Promise<void>(r => (reveilEnvoi = r));
+      return envois[0];
+    },
+  };
 }
