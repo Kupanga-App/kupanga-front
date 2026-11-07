@@ -1,13 +1,30 @@
-<div class="kp-page" kpTirerPourActualiser (actualiser)="charger()">
-  <kp-page-header [titre]="prenom() ? 'Bonjour ' + prenom() : 'Accueil'" />
+<div class="kp-page accueil" kpTirerPourActualiser (actualiser)="charger()">
+  @if (biens().length) {
+    <header class="entete">
+      <div class="entete__titre">
+        <h1>{{ moisCourant }}</h1>
+        <p class="sous-titre">
+          {{ nomComplet() }} · {{ chiffres().actifs }} bien{{ chiffres().actifs > 1 ? 's' : '' }}
+        </p>
+      </div>
+      <a routerLink="/biens/nouveau" class="kp-btn kp-btn--primary"><kp-icon name="plus" [size]="18" /> Ajouter un bien</a>
+    </header>
+  } @else {
+    <header class="entete">
+      <h1>{{ prenom() ? 'Bonjour ' + prenom() : 'Accueil' }}</h1>
+    </header>
+  }
 
   <!-- Demandes de location reçues et logements réservés (on devient locataire en signant le bail) -->
   <kp-demandes-recues [integre]="true" (acceptee)="charger()" />
 
   @if (chargement() && !biens().length && !logements().length) {
     <div class="kp-stack" aria-busy="true">
-      <span class="kp-skeleton kp-skeleton--titre"></span>
-      <span class="kp-skeleton kp-skeleton--carte"></span>
+      <div class="chiffres">
+        <span class="kp-skeleton kp-skeleton--carte"></span>
+        <span class="kp-skeleton kp-skeleton--carte"></span>
+        <span class="kp-skeleton kp-skeleton--carte"></span>
+      </div>
       <span class="kp-skeleton kp-skeleton--carte"></span>
     </div>
   } @else if (erreur()) {
@@ -15,7 +32,154 @@
       <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>
     </kp-vide>
   } @else {
-    <div class="kp-stack kp-stack--lg">
+    <div class="kp-stack grille">
+      @if (biens().length) {
+        <!-- Chiffres du mois -->
+        <section class="chiffres" aria-label="Chiffres du mois">
+          <div class="kp-card chiffre">
+            <div class="chiffre__haut">
+              <span class="chiffre__icone"><kp-icon name="key" [size]="18" [strokeWidth]="1.5" /></span>
+              <span class="chiffre__note">{{ chiffres().occupation }} % d’occupation</span>
+            </div>
+            <div class="chiffre__corps">
+              <span class="chiffre__libelle">Biens loués</span>
+              <span class="chiffre__valeur">{{ chiffres().loues }} <small>sur {{ chiffres().actifs }}</small></span>
+            </div>
+            <span class="barre" role="progressbar" aria-label="Taux d’occupation" [attr.aria-valuenow]="chiffres().occupation"
+                  aria-valuemin="0" aria-valuemax="100"><span [style.width.%]="chiffres().occupation"></span></span>
+          </div>
+
+          <div class="kp-card chiffre">
+            <div class="chiffre__haut">
+              <span class="chiffre__icone"><kp-icon name="banknote" [size]="18" [strokeWidth]="1.5" /></span>
+              @if (chiffres().quittancesDuMois?.echeance; as echeance) {
+                <span class="chiffre__note">Échéance le {{ echeance | dateLongue: true }}</span>
+              }
+            </div>
+            <div class="chiffre__corps">
+              <span class="chiffre__libelle">Loyer attendu en {{ nomMois }}</span>
+              @for (l of chiffres().loyers; track l.devise) {
+                <span class="chiffre__valeur">
+                  {{ l.total | montant: l.devise : 0 }}
+                  @if (l.charges) { <small>dont {{ l.charges | montant: l.devise : 0 }} de charges</small> }
+                </span>
+              } @empty {
+                <span class="chiffre__valeur">—</span>
+              }
+            </div>
+            @if (chiffres().quittancesDuMois; as q) {
+              @if (q.recues === q.nombre) {
+                <span class="kp-statut--point kp-statut kp-statut--ok chiffre__etat">Déclaré reçu</span>
+              } @else if (q.recues === 0) {
+                <span class="kp-statut--point kp-statut kp-statut--attention chiffre__etat">Pas encore déclaré reçu</span>
+              } @else {
+                <span class="kp-statut--point kp-statut kp-statut--attention chiffre__etat">{{ q.recues }} sur {{ q.nombre }} déclarés reçus</span>
+              }
+            }
+          </div>
+
+          <div class="kp-card chiffre">
+            <div class="chiffre__haut">
+              <span class="chiffre__icone"><kp-icon name="megaphone" [size]="18" [strokeWidth]="1.5" /></span>
+            </div>
+            <div class="chiffre__corps">
+              <span class="chiffre__libelle">Annonces en ligne</span>
+              <span class="chiffre__valeur">{{ chiffres().annonces }}</span>
+            </div>
+            <span class="segments-annonces" aria-hidden="true">
+              @for (s of segmentsAnnonces(); track $index) { <span [class.plein]="s"></span> }
+            </span>
+          </div>
+        </section>
+
+        <div class="milieu">
+          @if (enCours(); as c) {
+            <section class="kp-card en-cours" aria-labelledby="titre-en-cours">
+              <div class="en-cours__haut">
+                <div class="en-cours__bien">
+                  @if (vignette(c.bien, 0); as v) {
+                    <img class="vignette vignette--grande" [src]="v" alt="" loading="lazy" />
+                  } @else {
+                    <span class="vignette vignette--grande vignette--vide"><kp-icon name="building-2" [strokeWidth]="1.5" /></span>
+                  }
+                  <div class="en-cours__texte">
+                    <a class="en-cours__titre" id="titre-en-cours" [routerLink]="['/biens', c.bien.id]" [title]="c.bien.titre">{{ c.bien.titre }}</a>
+                    <span class="secondaire">
+                      {{ c.bien.locataire ? 'Loué à' : 'Réservé par' }} {{ nomDuLocataire(c.bien) }} ·
+                      {{ c.bien.loyerMensuel | montant: c.bien.devise : 0 }}@if (c.bien.chargesMensuelles) { + {{ c.bien.chargesMensuelles | montant: c.bien.devise : 0 }}}
+                    </span>
+                  </div>
+                </div>
+                <span class="pastille-etape">Étape {{ c.etapes.courante + 1 }} sur {{ c.etapes.etapes.length }}</span>
+              </div>
+              <kp-frise titre="Où en est la location" [etapes]="c.etapes.etapes" />
+              @if (c.etapes.prochaine; as p) {
+                <div class="prochaine">
+                  <span class="prochaine__icone"><kp-icon [name]="c.etapes.etapes[c.etapes.courante].icone ?? 'circle'" [size]="16" [strokeWidth]="1.5" /></span>
+                  <div class="prochaine__texte">
+                    <span class="fort">Prochaine étape : {{ p.titre.charAt(0).toLowerCase() + p.titre.slice(1) }}</span>
+                    <span class="secondaire">{{ p.texte }}</span>
+                  </div>
+                  <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="p.lien">{{ p.action }} <kp-icon name="chevron-right" [size]="18" /></a>
+                </div>
+              }
+            </section>
+          }
+
+          <section class="kp-card a-faire" [class.a-faire--seule]="!enCours()" aria-labelledby="titre-taches">
+            <h2 class="a-faire__titre" id="titre-taches">{{ enCours() ? 'À faire aussi' : 'À faire' }}</h2>
+            @if (autresTaches().length) {
+              <ul class="lignes">
+                @for (t of autresTaches(); track t.cle) {
+                  <li>
+                    <a class="tache" [routerLink]="t.lien">
+                      <span class="tache__icone" [class]="'tache__icone tache__icone--' + t.urgence"><kp-icon [name]="t.icone" [size]="18" [strokeWidth]="1.5" /></span>
+                      <span class="tache__texte">
+                        <span class="fort kp-ellipsis" [title]="t.titre">{{ t.titre }}</span>
+                        <span class="secondaire kp-ellipsis" [title]="t.detail">{{ t.detail }}</span>
+                      </span>
+                      <span class="kp-sr-only">{{ t.action }}</span>
+                      <kp-icon name="chevron-right" [size]="18" class="tache__chevron" />
+                    </a>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="a-faire__vide"><kp-icon name="circle-check" [size]="18" /> Rien {{ enCours() ? 'd’autre ' : '' }}à faire pour l’instant.</p>
+            }
+          </section>
+        </div>
+
+        <!-- Mes biens -->
+        <section class="kp-card mes-biens" aria-labelledby="titre-biens">
+          <div class="mes-biens__haut">
+            <h2 id="titre-biens"><a routerLink="/biens">Mes biens</a></h2>
+            <kp-segmented libelle="Filtrer les biens" [options]="optionsFiltre()" [(valeur)]="filtre" />
+          </div>
+          <ul class="lignes">
+            @for (b of biensFiltres(); track b.id) {
+              <li>
+                <a class="ligne-bien" [routerLink]="['/biens', b.id]">
+                  @if (vignette(b, 0); as v) {
+                    <img class="vignette" [src]="v" alt="" loading="lazy" />
+                  } @else {
+                    <span class="vignette vignette--vide"><kp-icon name="building-2" [size]="18" [strokeWidth]="1.5" /></span>
+                  }
+                  <span class="ligne-bien__texte">
+                    <span class="fort kp-ellipsis" [title]="b.titre">{{ b.titre }}</span>
+                    <span class="secondaire kp-ellipsis petit">{{ sousTitre(b) }}</span>
+                  </span>
+                  <span class="ligne-bien__etat" [class]="'ligne-bien__etat kp-statut--point kp-statut kp-statut--' + etat(b).ton">{{ etat(b).libelle }}</span>
+                  <span class="ligne-bien__loyer kp-tabulaire">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
+                </a>
+              </li>
+            } @empty {
+              <li class="mes-biens__vide secondaire">Aucun bien dans cette catégorie.</li>
+            }
+          </ul>
+        </section>
+      }
+
       @if (logements().length) {
         <section class="kp-section" aria-labelledby="titre-logements">
           <h2 class="kp-section-title" id="titre-logements">
@@ -32,75 +196,29 @@
         </section>
       }
 
-      @if (biens().length) {
-        <section class="kp-section" aria-labelledby="titre-taches">
-          <h2 class="kp-section-title" id="titre-taches">À faire</h2>
-          @if (taches().length) {
-            <ul class="taches">
-              @for (t of taches(); track t.cle) {
-                <li>
-                  <a class="kp-card kp-tache tache" [class.kp-tache--urgent]="t.urgence === 'urgent'"
-                     [class.kp-tache--attention]="t.urgence === 'attention'" [class.kp-tache--info]="t.urgence === 'info'"
-                     [routerLink]="t.lien">
-                    <span class="kp-list__icon"><kp-icon [name]="t.icone" /></span>
-                    <span class="tache__texte">
-                      <span class="kp-strong">{{ t.titre }}</span>
-                      <span class="kp-small kp-muted kp-ellipsis">{{ t.detail }}</span>
-                    </span>
-                    <span class="tache__action">{{ t.action }}</span>
-                  </a>
-                </li>
-              }
-            </ul>
-          } @else {
-            <div class="kp-bandeau kp-bandeau--ok">
-              <kp-icon name="circle-check" [size]="18" />
-              <p>Rien à faire pour l’instant.</p>
-            </div>
+      <!-- Un même compte peut louer un logement et mettre ses biens en location -->
+      @if (!logements().length || !biens().length) {
+        <section class="kp-section premiers-pas" aria-label="Pour commencer">
+          @if (!logements().length && !biens().length) {
+            <a routerLink="/explorer" class="kp-card kp-list__item">
+              <span class="kp-list__icon"><kp-icon name="compass" /></span>
+              <span class="kp-list__body">
+                <span class="kp-list__title">Trouver un logement</span>
+                <span class="kp-list__sub">Parcourez les annonces et écrivez aux propriétaires.</span>
+              </span>
+            </a>
+          }
+          @if (!biens().length) {
+            <a routerLink="/biens/nouveau" class="kp-card kp-list__item">
+              <span class="kp-list__icon"><kp-icon name="plus" /></span>
+              <span class="kp-list__body">
+                <span class="kp-list__title">Mettre un bien en location</span>
+                <span class="kp-list__sub">Publiez l’annonce, choisissez votre locataire, puis gérez bail, état des lieux et quittances.</span>
+              </span>
+            </a>
           }
         </section>
-
-        <section class="kp-section" aria-labelledby="titre-biens">
-          <h2 class="kp-section-title" id="titre-biens">
-            Mes biens
-            <a routerLink="/biens">Tout voir ({{ biensActifs().length }})</a>
-          </h2>
-          <p class="kp-small kp-muted">{{ nbLoues() }} loué{{ nbLoues() > 1 ? 's' : '' }} sur {{ biensActifs().length }}</p>
-          <div class="kp-grid">
-            @for (b of apercu(); track b.id) {
-              <kp-carte-bien [bien]="b" [lien]="['/biens', b.id]">
-                <span statut [class]="b.locataire ? 'kp-statut kp-statut--ok' : b.reservation ? 'kp-statut kp-statut--attention' : 'kp-statut kp-statut--attention'">
-                  {{ b.locataire ? 'Loué' : b.reservation ? 'Réservé' : 'Vacant' }}
-                </span>
-              </kp-carte-bien>
-            }
-          </div>
-        </section>
       }
-
-      <!-- Un même compte peut louer un logement et mettre ses biens en location -->
-      <section class="kp-section premiers-pas" aria-label="Pour commencer">
-        @if (!logements().length) {
-          <a routerLink="/explorer" class="kp-card kp-list__item">
-            <span class="kp-list__icon"><kp-icon name="compass" /></span>
-            <span class="kp-list__body">
-              <span class="kp-list__title">Trouver un logement</span>
-              <span class="kp-list__sub">Parcourez les annonces et écrivez aux propriétaires.</span>
-            </span>
-          </a>
-        }
-        @if (!biens().length) {
-          <a routerLink="/biens/nouveau" class="kp-card kp-list__item">
-            <span class="kp-list__icon"><kp-icon name="plus" /></span>
-            <span class="kp-list__body">
-              <span class="kp-list__title">Mettre un bien en location</span>
-              <span class="kp-list__sub">Publiez l’annonce, choisissez votre locataire, puis gérez bail, état des lieux et quittances.</span>
-            </span>
-          </a>
-        } @else {
-          <a routerLink="/biens/nouveau" class="kp-btn kp-btn--secondary"><kp-icon name="plus" /> Ajouter un bien</a>
-        }
-      </section>
     </div>
   }
 </div>
