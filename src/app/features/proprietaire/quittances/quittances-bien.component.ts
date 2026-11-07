@@ -19,6 +19,7 @@ import { StatutComponent } from '../../../shared/ui/statut.component';
 import { VideComponent } from '../../../shared/ui/vide.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouton-whatsapp/bouton-whatsapp.component';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
 
 type CleTri = 'mois' | 'montant' | 'echeance';
 
@@ -34,7 +35,7 @@ const rang = (q: QuittanceDTO) => Number(q.annee) * 100 + Number(q.mois);
   selector: 'kp-quittances-bien',
   standalone: true,
   imports: [
-    ReactiveFormsModule, RouterLink, MontantPipe, DateLonguePipe, FicheEnteteComponent, SheetComponent, SignatureComponent,
+    ReactiveFormsModule, ChampDateComponent, RouterLink, MontantPipe, DateLonguePipe, FicheEnteteComponent, SheetComponent, SignatureComponent,
     StatutComponent, VideComponent, IconComponent, BoutonWhatsappComponent,
   ],
   templateUrl: './quittances-bien.component.html',

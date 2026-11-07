@@ -149,7 +149,7 @@
     <div class="kp-form-row">
       <div class="kp-field">
         <label class="kp-label" for="datePaiement">Reçu le <span class="kp-optionnel">(aujourd’hui si vide)</span></label>
-        <input id="datePaiement" class="kp-input" type="date" formControlName="datePaiement" [max]="aujourdhui" />
+        <kp-champ-date idChamp="datePaiement" formControlName="datePaiement" [max]="aujourdhui" [effacable]="true" placeholder="Aujourd’hui" />
       </div>
       <div class="kp-field">
         <label class="kp-label" for="reference">Référence <span class="kp-optionnel">(facultatif)</span></label>

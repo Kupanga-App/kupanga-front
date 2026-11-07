@@ -11,6 +11,7 @@ import { MontantPipe } from '../../../core/money/montant';
 import { DateLonguePipe, joursAvant } from '../../../shared/format';
 import { SheetComponent } from '../../../shared/ui/sheet.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
 
 /** Aujourd'hui au format `aaaa-mm-jj` (heure locale). */
 function aujourdhui(decalageAnnees = 0): string {
@@ -29,7 +30,7 @@ function aujourdhui(decalageAnnees = 0): string {
 @Component({
   selector: 'kp-fin-de-bail',
   standalone: true,
-  imports: [RouterLink, FormsModule, MontantPipe, DateLonguePipe, SheetComponent, IconComponent],
+  imports: [RouterLink, ChampDateComponent, FormsModule, MontantPipe, DateLonguePipe, SheetComponent, IconComponent],
   template: `
     @if (bien().location; as l) {
       @if (l.dateFinPrevue) {
@@ -73,7 +74,7 @@ function aujourdhui(decalageAnnees = 0): string {
     <kp-sheet [(ouvert)]="feuilleConge" [titre]="cote() === 'proprietaire' ? 'Mettre fin au bail' : 'Donner congé'">
       <div class="kp-field">
         <label class="kp-label" for="date-fin">Dernier jour de la location</label>
-        <input id="date-fin" class="kp-input" type="date" [min]="min" [max]="max" [(ngModel)]="dateFin" />
+        <kp-champ-date idChamp="date-fin" [min]="min" [max]="max" [(ngModel)]="dateFin" />
       </div>
       <p class="kp-aide">
         {{ cote() === 'proprietaire' ? 'Le locataire' : 'Le propriétaire' }} sera prévenu par notification et par

@@ -14,6 +14,8 @@ import { ToastService } from '../../../core/ui/toast.service';
 import { aujourdhuiIso } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
+import { ChampHeureComponent } from '../../../shared/ui/champ-heure.component';
 
 /** B8 : bornes de l'API (au-delà : 400). */
 const MAX = { pieces: 50, elements: 50, compteurs: 10, cles: 20, quantiteCle: 50 } as const;
@@ -52,7 +54,7 @@ type CleForm = FormGroup<{ typeCle: FormControl<string>; quantite: FormControl<n
 @Component({
   selector: 'kp-nouvel-edl',
   standalone: true,
-  imports: [ReactiveFormsModule, AssistantComponent, IconComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, ChampHeureComponent, AssistantComponent, IconComponent],
   templateUrl: './nouvel-edl.component.html',
   styleUrl: './nouvel-edl.component.scss',
 })

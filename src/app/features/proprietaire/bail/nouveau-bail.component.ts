@@ -16,6 +16,7 @@ import { AssistantComponent } from '../../../shared/ui/assistant.component';
 import { libelleDuree } from './duree';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { NgTemplateOutlet } from '@angular/common';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
 
 const ETAPES = ['Début et durée du bail', 'Loyer et garantie', 'Vérifiez le bail'];
 const LIBELLES = ['Début et durée', 'Loyer et garantie', 'Vérification'];
@@ -39,7 +40,7 @@ const MANQUES_BAIL: Record<string, string> = {
 @Component({
   selector: 'kp-nouveau-bail',
   standalone: true,
-  imports: [ReactiveFormsModule, NgTemplateOutlet, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, NgTemplateOutlet, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent],
   templateUrl: './nouveau-bail.component.html',
   styleUrl: './nouveau-bail.component.scss',
 })

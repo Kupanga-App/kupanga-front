@@ -18,6 +18,7 @@ import { DateLonguePipe, aujourdhuiIso } from '../../../../shared/format';
 import { AssistantComponent } from '../../../../shared/ui/assistant.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { CarteRepereComponent, Repere } from '../../../../shared/components/carte-repere/carte-repere.component';
+import { ChampDateComponent } from '../../../../shared/ui/champ-date.component';
 
 const ETAPES = [
   'Dans quel pays ?',
@@ -77,7 +78,7 @@ const MANQUES: Record<string, string> = {
 @Component({
   selector: 'app-bien-create',
   standalone: true,
-  imports: [ReactiveFormsModule, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent, CarteRepereComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent, CarteRepereComponent],
   templateUrl: './bien-create.component.html',
   styleUrl: './bien-create.component.scss',
 })

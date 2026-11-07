@@ -38,11 +38,11 @@
         <div class="kp-form-row">
           <div class="kp-field">
             <label class="kp-label" for="date">Date</label>
-            <input id="date" class="kp-input" type="date" formControlName="date" />
+            <kp-champ-date idChamp="date" formControlName="date" />
           </div>
           <div class="kp-field">
             <label class="kp-label" for="heure">Heure <span class="kp-optionnel">(facultatif)</span></label>
-            <input id="heure" class="kp-input" type="time" formControlName="heure" />
+            <kp-champ-heure idChamp="heure" formControlName="heure" [effacable]="true" />
           </div>
         </div>
       </form>

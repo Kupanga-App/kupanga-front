@@ -482,6 +482,80 @@ select.kp-input {
   background-position: right 12px center;
 }
 
+// Liste ouverte d'un <select> au style Kupanga (Edge et Chrome 135 et plus : `appearance: base-select`).
+// Ailleurs, la liste reste celle du navigateur ; le champ fermé garde le style ci-dessus. Le <select> reste natif :
+// mêmes valeurs, mêmes formulaires, clavier et lecteurs d'écran du navigateur.
+@supports (appearance: base-select) {
+  // select.kp-input : plus spécifique que `select.kp-input { appearance: none }` ci-dessus
+  select,
+  select.kp-input,
+  ::picker(select) {
+    appearance: base-select;
+  }
+
+  select {
+    cursor: pointer;
+  }
+
+  // En base-select, le champ fermé devient une boîte flexible : texte centré verticalement
+  select.kp-input {
+    display: flex;
+    align-items: center;
+  }
+
+  // Le chevron de .kp-input est déjà dessiné en image de fond
+  select.kp-input::picker-icon {
+    display: none;
+  }
+
+  select:not(.kp-input)::picker-icon {
+    color: var(--kp-text-subtle);
+  }
+
+  ::picker(select) {
+    max-height: min(320px, 50dvh);
+    margin-block: 6px;
+    padding: 6px;
+    border: 0;
+    border-radius: var(--kp-radius-md);
+    background: var(--kp-surface);
+    color: var(--kp-text);
+    box-shadow: var(--kp-elev-2), 0 0 0 1px var(--kp-border);
+    overscroll-behavior: contain;
+  }
+
+  select option {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: var(--kp-radius-sm);
+    font-size: var(--kp-fs-body);
+    cursor: pointer;
+
+    &::checkmark {
+      display: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      outline: none;
+      background: var(--kp-bg);
+    }
+
+    &:checked {
+      background: var(--kp-text);
+      color: var(--kp-text-on-accent);
+      font-weight: 500;
+    }
+
+    &:disabled {
+      color: var(--kp-text-subtle);
+      cursor: not-allowed;
+    }
+  }
+}
+
 // Unité à droite du champ : .kp-input-groupe > input.kp-input + span.kp-suffixe
 .kp-input-groupe {
   position: relative;

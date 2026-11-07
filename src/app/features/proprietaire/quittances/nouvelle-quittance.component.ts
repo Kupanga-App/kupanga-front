@@ -14,6 +14,7 @@ import { ToastService } from '../../../core/ui/toast.service';
 import { DateLonguePipe, de, moisAnnee } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
 
 const ETAPES = ['Mois et échéance', 'Vérifiez la quittance'];
 const LIBELLES = ['Mois et échéance', 'Vérification'];
@@ -25,7 +26,7 @@ const LIBELLES = ['Mois et échéance', 'Vérification'];
 @Component({
   selector: 'kp-nouvelle-quittance',
   standalone: true,
-  imports: [ReactiveFormsModule, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent],
   template: `
     <kp-assistant titre="Nouvelle quittance" [sousTitre]="sousTitre()" [etapes]="etapes" [libelles]="libelles"
                   [etape]="etape()" [peutContinuer]="etapeValide()" [manque]="manque()" [modifie]="modifie()"
@@ -53,7 +54,7 @@ const LIBELLES = ['Mois et échéance', 'Vérification'];
           </div>
           <div class="kp-field">
             <label class="kp-label" for="echeance">Date d’échéance</label>
-            <input id="echeance" class="kp-input" type="date" formControlName="dateEcheance" />
+            <kp-champ-date idChamp="echeance" formControlName="dateEcheance" />
             <span class="kp-aide">Date à laquelle le loyer doit être payé.</span>
           </div>
           @if (bail()) {

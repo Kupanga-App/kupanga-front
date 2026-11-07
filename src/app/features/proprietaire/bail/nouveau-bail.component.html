@@ -24,7 +24,7 @@
       @case (0) {
         <div class="kp-field">
           <label class="kp-label" for="dateDebut">Date de début</label>
-          <input id="dateDebut" class="kp-input" type="date" formControlName="dateDebut" [min]="aujourdhui" />
+          <kp-champ-date idChamp="dateDebut" formControlName="dateDebut" [min]="aujourdhui" />
           @if (form.controls.dateDebut.touched && form.controls.dateDebut.invalid) {
             <span class="kp-erreur">Choisissez la date d’entrée dans le logement.</span>
           }

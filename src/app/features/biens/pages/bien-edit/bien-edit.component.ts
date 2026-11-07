@@ -17,6 +17,7 @@ import { PageHeaderComponent } from '../../../../shared/ui/page-header.component
 import { VideComponent } from '../../../../shared/ui/vide.component';
 import { CarteRepereComponent, Repere } from '../../../../shared/components/carte-repere/carte-repere.component';
 import { MOTIF_TITRE } from '../../models/motifs';
+import { ChampDateComponent } from '../../../../shared/ui/champ-date.component';
 
 /**
  * Modification d'un bien. L'adresse et le pays ne sont pas modifiables (géocodage, juridiction figée sur les baux) ;
@@ -25,7 +26,7 @@ import { MOTIF_TITRE } from '../../models/motifs';
 @Component({
   selector: 'app-bien-edit',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, PageHeaderComponent, VideComponent, CarteRepereComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, RouterLink, PageHeaderComponent, VideComponent, CarteRepereComponent],
   templateUrl: './bien-edit.component.html',
 })
 export class BienEditComponent implements OnInit {
