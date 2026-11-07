@@ -22,7 +22,10 @@
 }
 
 .intro {
-  grid-area: intro;
+
+  @include mq.ordinateur {
+    grid-area: intro;
+  }
   color: var(--kp-text-muted);
   font-size: 14px;
 }
@@ -30,7 +33,10 @@
 // ── Aperçu du document ──────────────────────────────────────────────────────
 
 .document {
-  grid-area: document;
+
+  @include mq.ordinateur {
+    grid-area: document;
+  }
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -121,7 +127,10 @@
 // ── Carte de signature ──────────────────────────────────────────────────────
 
 .cote {
-  grid-area: cote;
+
+  @include mq.ordinateur {
+    grid-area: cote;
+  }
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -256,4 +265,68 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+}
+
+// ── Téléphone (Signer-Mobile) : 3 étapes ────────────────────────────────────
+// 1. Relire : résumé, aperçu, puis case « J'ai lu » et bouton collés en bas, au-dessus de la zone sûre.
+// 2. Signer : la fenêtre « Votre signature » monte du bas (kp-sheet).
+// 3. Confirmation : carte « Bail signé ».
+
+.resume {
+  display: none;
+}
+
+@include mq.telephone {
+  .signer {
+    // Place pour la barre d'action collée en bas
+    padding-bottom: calc(150px + var(--kp-safe-bottom));
+  }
+
+  .intro {
+    display: none;
+  }
+
+  .resume {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    border-radius: var(--kp-radius-lg);
+    background: var(--kp-surface);
+    box-shadow: var(--kp-elev-0);
+  }
+
+  .resume__titre {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  // Le résumé remplace l'en-tête et les tuiles de la carte
+  .carte > .petit,
+  .carte > h1,
+  .carte > .tuiles {
+    display: none;
+  }
+
+  .carte {
+    padding: 16px;
+  }
+
+  .action {
+    position: fixed;
+    z-index: 60;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    gap: 8px;
+    padding: 12px calc(16px + var(--kp-safe-right)) calc(12px + var(--kp-safe-bottom)) calc(16px + var(--kp-safe-left));
+    border-top: 1px solid var(--kp-border);
+    background: var(--kp-surface);
+    box-shadow: var(--kp-elev-1);
+  }
+
+  .case {
+    padding: 4px 0;
+    border: 0;
+  }
 }

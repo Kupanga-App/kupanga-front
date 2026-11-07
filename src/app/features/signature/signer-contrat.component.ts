@@ -17,7 +17,8 @@ import { ouvrirPdfFrais } from './pdf-frais';
  * Signature du bail par le locataire depuis le lien reçu (page publique, le jeton sert d'autorisation ;
  * maquette `Signer-Bail`). Aperçu construit avec les champs du contrat (le texte complet est dans le PDF, E2),
  * case « J'ai lu… » côté écran seulement, PDF relu au clic (adresse signée de quelques minutes).
- * 404 lien inconnu, 410 lien expiré, 409 déjà signé (B7).
+ * Téléphone (`Signer-Mobile`) en 3 étapes : relire (résumé, aperçu, case et bouton collés en bas), signer au doigt
+ * dans le panneau qui monte, confirmation. 404 lien inconnu, 410 lien expiré, 409 déjà signé (B7).
  */
 @Component({
   selector: 'kp-signer-contrat',
@@ -55,6 +56,14 @@ import { ouvrirPdfFrais } from './pdf-frais';
           <p class="intro">
             Lisez le bail en entier avant de signer.@if (proprioASigne()) { Le bailleur, {{ proprietaireCourt() }}, l’a déjà signé.}
           </p>
+
+          <!-- Téléphone, étape 1 « Relire » : résumé au-dessus de l'aperçu -->
+          <section class="resume" aria-label="Résumé du bail">
+            <span class="resume__titre">{{ c.adresseBien }}</span>
+            <span class="petit">
+              Dès le {{ c.dateDebut | dateLongue: true }}@if (duree()) { · {{ duree() }}} · {{ total() | montant: c.devise : 0 }} par mois
+            </span>
+          </section>
 
           <!-- Aperçu du bail, construit avec les champs du contrat -->
           <article class="document" aria-labelledby="titre-document">
