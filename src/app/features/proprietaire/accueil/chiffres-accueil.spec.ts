@@ -50,6 +50,11 @@ describe('calculerChiffres (accueil du propriétaire)', () => {
     ], NOV).quittancesDuMois).toEqual({ nombre: 2, recues: 1, echeance: '2026-11-05' });
   });
 
+  it('mois renvoyé en texte par l’API (« 11 ») : la quittance du mois est reconnue', () => {
+    const q = { ...quittance(1), mois: '11' as unknown as number };
+    expect(calculerChiffres([bien(1, { locataire: LUCAS })], [q], NOV).quittancesDuMois?.nombre).toBe(1);
+  });
+
   it('aucun bien : zéro partout', () => {
     expect(calculerChiffres([], [], NOV)).toEqual({ actifs: 0, loues: 0, occupation: 0, loyers: [], quittancesDuMois: null, annonces: 0 });
   });

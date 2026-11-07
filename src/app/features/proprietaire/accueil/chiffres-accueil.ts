@@ -47,7 +47,8 @@ export function calculerChiffres(biens: readonly BienDTO[], quittances: readonly
   const mois = maintenant.getMonth() + 1;
   const annee = maintenant.getFullYear();
   const idsLoues = new Set(loues.map(b => b.id));
-  const duMois = quittances.filter(q => q.bienId != null && idsLoues.has(q.bienId) && q.mois === mois && q.annee === annee);
+  // L'API renvoie le mois en texte (« 10 ») malgré le type du modèle : comparaison en nombre
+  const duMois = quittances.filter(q => q.bienId != null && idsLoues.has(q.bienId) && Number(q.mois) === mois && Number(q.annee) === annee);
   const echeances = duMois.map(q => q.dateEcheance).filter(Boolean).sort();
 
   return {

@@ -22,6 +22,9 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
 
 type CleTri = 'mois' | 'montant' | 'echeance';
 
+/** Rang chronologique (l'API renvoie le mois en texte : « 10 »). */
+const rang = (q: QuittanceDTO) => Number(q.annee) * 100 + Number(q.mois);
+
 /**
  * Quittances d'un bien (onglet de la fiche, tableau `DS-Composants` : tri à l'écran, colonnes secondaires masquées
  * sur tablette, une carte par ligne sur téléphone). Aucun paiement ne passe par l'application : le propriétaire déclare le loyer reçu
@@ -75,10 +78,10 @@ export class QuittancesBienComponent implements OnInit {
   readonly quittancesTriees = computed(() => {
     const { cle, sens } = this.tri();
     const valeur = (q: QuittanceDTO): number | string =>
-      cle === 'montant' ? Number(q.montantTotal) || 0 : cle === 'echeance' ? q.dateEcheance ?? '' : q.annee * 100 + q.mois;
+      cle === 'montant' ? Number(q.montantTotal) || 0 : cle === 'echeance' ? q.dateEcheance ?? '' : rang(q);
     return [...this.quittances()].sort((a, b) => {
       const va = valeur(a), vb = valeur(b);
-      return (va < vb ? -1 : va > vb ? 1 : 0) * sens || (b.annee * 100 + b.mois) - (a.annee * 100 + a.mois);
+      return (va < vb ? -1 : va > vb ? 1 : 0) * sens || rang(b) - rang(a);
     });
   });
   /** Quittance dont le menu d'actions est ouvert. */

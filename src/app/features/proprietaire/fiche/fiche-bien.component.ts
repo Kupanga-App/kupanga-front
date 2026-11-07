@@ -88,9 +88,9 @@ export class FicheBienComponent implements OnInit {
     const e = this.edls()[0];
     return e ? statutSignature(e.statut, 'proprietaire') : null;
   });
-  /** L'API trie par année puis date de création : le mois est départagé ici. */
+  /** L'API trie par année puis date de création : le mois (texte dans la réponse) est départagé ici. */
   readonly derniereQuittance = computed(() =>
-    [...this.quittances()].sort((a, b) => b.annee - a.annee || b.mois - a.mois)[0] ?? null);
+    [...this.quittances()].sort((a, b) => Number(b.annee) - Number(a.annee) || Number(b.mois) - Number(a.mois))[0] ?? null);
   readonly statutDerniereQuittance = computed<Statut | null>(() => {
     const q = this.derniereQuittance();
     return q ? statutQuittance(q.statut) : null;
