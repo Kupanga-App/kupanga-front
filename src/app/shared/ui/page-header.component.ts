@@ -58,7 +58,7 @@ import { IconComponent } from '../components/icon/icon.component';
       :host-context(html[data-onglets]) .barre { min-height: 56px; padding-top: 0; }
       :host-context(html[data-onglets]) .barre:not(:has(> a, .actions > *)) { display: none; }
     }
-    .grand { padding: 4px 0 var(--kp-space-5); }
+    .grand { padding: 4px 0 var(--kp-space-4); }
     .sous-titre { margin-top: 4px; color: var(--kp-text-subtle); }
   `],
 })

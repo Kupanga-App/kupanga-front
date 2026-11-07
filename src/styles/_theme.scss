@@ -126,9 +126,8 @@
   --kp-space-6: 24px;
   --kp-space-8: 32px;
   --kp-space-12: 48px;
-  // Hors grille de la doc, conservés le temps de reprendre les écrans
+  // Hors grille : seulement le retrait horizontal des boutons (0 20px dans toutes les maquettes)
   --kp-space-5: 20px;
-  --kp-space-10: 40px;
 
   --kp-page-pad: clamp(12px, 1.6vw, 24px);
   --kp-card-pad: clamp(16px, 1.4vw, 20px);
@@ -156,6 +155,18 @@
   --kp-classe-g: #d2573c;
   --kp-classe-texte: #10212b;
 
+  // Bouton WhatsApp : vert de la marque, hors palette, mêmes valeurs dans les deux thèmes
+  --kp-whatsapp: #1f7a3f;
+  --kp-whatsapp-hover: #1a6a36;
+  --kp-whatsapp-texte: #ffffff;
+
+  // Zone de signature : l'image envoyée à l'API est sur fond blanc, quel que soit le thème
+  --kp-signature-fond: #ffffff;
+  --kp-signature-trait: #10212b;
+  --kp-signature-aide: #9aa4a9;
+  --kp-signature-ligne: #c4cab9;
+  --kp-signature-mention: #66737a;
+
   --kp-tap: 44px;
 
   // Zones sûres (encoche, barre de geste) : viewport-fit=cover dans index.html
@@ -169,46 +180,6 @@
   --kp-bottom-offset: calc(var(--kp-tabbar-h) + var(--kp-safe-bottom));
   // Hauteur occupée en haut par une barre fixe ou collante (0 si absente) : posée par la mise en page
   --kp-top-offset: 0px;
-
-  // ALIAS À RETIRER (phase 5)
-  // Anciens noms → nouveaux jetons. Déclarés une seule fois, sur :root, après les mixins :
-  // ils suivent donc le thème actif sans être recopiés dans `sombre`.
-  --kp-surface-2: var(--kp-surface-sunken);
-  --kp-surface-3: var(--kp-segment-bg);
-  --kp-text-1: var(--kp-text);
-  --kp-text-2: var(--kp-text-muted);
-  --kp-text-3: var(--kp-text-subtle);
-  --kp-text-invert: var(--kp-text-on-accent);
-
-  --kp-primary: var(--kp-accent);
-  --kp-primary-hover: var(--kp-accent-hover);
-  --kp-primary-on: var(--kp-text-on-accent);
-  --kp-primary-text: var(--kp-accent);
-  --kp-primary-subtle: var(--kp-accent-soft);
-
-  --kp-success: var(--kp-state-success-text);
-  --kp-success-subtle: var(--kp-state-success-bg);
-  --kp-warning: var(--kp-state-warning-text);
-  --kp-warning-subtle: var(--kp-state-warning-bg);
-  --kp-danger: var(--kp-state-danger);
-  --kp-danger-subtle: var(--kp-state-danger-bg);
-  --kp-info: var(--kp-state-neutral-text);
-  --kp-info-subtle: var(--kp-state-neutral-bg);
-
-  // Titres de la landing et des pages légales : Figtree jusqu'à la phase 5
-  --kp-font-display: var(--kp-font);
-
-  --kp-fs-xs: var(--kp-fs-mention);
-  --kp-fs-sm: var(--kp-fs-secondary);
-  --kp-fs-md: var(--kp-fs-body);
-  --kp-fs-lg: var(--kp-fs-subtitle);
-  --kp-fs-xl: var(--kp-fs-page-title);
-  --kp-fs-2xl: var(--kp-fs-page-title);
-
-  --kp-radius: var(--kp-radius-md);
-  --kp-radius-full: var(--kp-radius-pill);
-  --kp-shadow: var(--kp-elev-1);
-  // FIN DES ALIAS
 }
 
 // Barre d'onglets du bas affichée (téléphone, hors écrans pleins) : posé par AppShellComponent

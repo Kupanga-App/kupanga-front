@@ -129,7 +129,7 @@ export class CarteRepereComponent implements AfterViewInit, OnDestroy {
     } else if (this.carte) {
       // Cercle plutôt que l'icône par défaut (images à copier dans les assets)
       this.marqueur = L.circleMarker([repere.latitude, repere.longitude], {
-        radius: 10, color: '#10212B', weight: 3, fillColor: '#8FA464', fillOpacity: 0.9,
+        radius: 10, weight: 3, fillOpacity: 0.9, className: 'kp-carte-point',
       }).addTo(this.carte);
     }
     this.repere.set(repere);

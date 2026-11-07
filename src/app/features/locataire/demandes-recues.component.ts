@@ -201,7 +201,7 @@ import { de } from '../../shared/format';
     }
     .prochaine kp-icon { margin-top: 1px; color: var(--kp-text); }
     .prochaine strong { color: var(--kp-text); font-weight: 500; }
-    .demande { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--kp-space-4) var(--kp-space-5); }
+    .demande { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--kp-space-4) var(--kp-space-6); }
     .demande__photo { flex: none; width: 160px; height: 112px; border-radius: var(--kp-radius-md); object-fit: cover; }
     .demande__photo--vide { display: grid; place-items: center; background: var(--kp-accent-soft); color: var(--kp-accent); }
     .demande__texte { display: flex; flex: 1 1 300px; flex-direction: column; gap: 4px; min-width: 0; }

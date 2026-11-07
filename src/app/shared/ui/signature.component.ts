@@ -40,17 +40,17 @@ const HAUTEUR_MAX = 800;
     :host { display: flex; flex-direction: column; gap: 8px; }
     .zone {
       position: relative; height: clamp(180px, 40dvh, 320px);
-      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-md); background: #ffffff; overflow: hidden;
+      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-md); background: var(--kp-signature-fond); overflow: hidden;
     }
     canvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
     .invite {
       position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%);
-      color: #9aa4a9; font-size: var(--kp-fs-subtitle); pointer-events: none;
+      color: var(--kp-signature-aide); font-size: var(--kp-fs-subtitle); pointer-events: none;
     }
-    .ligne { position: absolute; left: 24px; right: 24px; bottom: 28%; border-bottom: 1px dashed #c4cab9; pointer-events: none; }
+    .ligne { position: absolute; left: 24px; right: 24px; bottom: 28%; border-bottom: 1px dashed var(--kp-signature-ligne); pointer-events: none; }
     .pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     /* Nom et date sous le trait : texte de l'écran, pas dans l'image envoyée */
-    .mention { position: absolute; left: 24px; right: 24px; bottom: calc(28% - 22px); color: #66737a; font-size: 12px; pointer-events: none; }
+    .mention { position: absolute; left: 24px; right: 24px; bottom: calc(28% - 22px); color: var(--kp-signature-mention); font-size: 12px; pointer-events: none; }
   `],
 })
 export class SignatureComponent implements AfterViewInit {
@@ -95,7 +95,8 @@ export class SignatureComponent implements AfterViewInit {
       this.ctx.lineWidth = 2.5 * ratio;
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
-      this.ctx.strokeStyle = '#10212b';
+      // Trait de l'image envoyée à l'API : jeton --kp-signature-trait (nuit, identique dans les deux thèmes)
+      this.ctx.strokeStyle = getComputedStyle(canvas).getPropertyValue('--kp-signature-trait').trim() || 'black';
     }
     this.marquerVide();
   }

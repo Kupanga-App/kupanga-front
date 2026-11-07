@@ -81,10 +81,10 @@ export class CarteBienComponent implements AfterViewInit, OnDestroy {
 
     const rayon = this.rayon();
     if (rayon == null) {
-      L.circleMarker(point, { radius: 10, color: '#10212B', weight: 3, fillColor: '#8FA464', fillOpacity: 0.95 })
+      L.circleMarker(point, { radius: 10, weight: 3, fillOpacity: 0.95, className: 'kp-carte-point' })
         .addTo(this.carte);
     } else {
-      const zone = L.circle(point, { radius: rayon, color: '#10212B', weight: 2, fillColor: '#8FA464', fillOpacity: 0.25 })
+      const zone = L.circle(point, { radius: rayon, weight: 2, fillOpacity: 0.25, className: 'kp-carte-zone' })
         .addTo(this.carte);
       this.carte.fitBounds(zone.getBounds(), { padding: [16, 16] });
     }
