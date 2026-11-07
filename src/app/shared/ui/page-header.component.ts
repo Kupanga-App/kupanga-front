@@ -59,7 +59,7 @@ import { IconComponent } from '../components/icon/icon.component';
       :host-context(html[data-onglets]) .barre:not(:has(> a, .actions > *)) { display: none; }
     }
     .grand { padding: 4px 0 var(--kp-space-5); }
-    .sous-titre { margin-top: 4px; color: var(--kp-text-3); }
+    .sous-titre { margin-top: 4px; color: var(--kp-text-subtle); }
   `],
 })
 export class PageHeaderComponent implements AfterViewInit {

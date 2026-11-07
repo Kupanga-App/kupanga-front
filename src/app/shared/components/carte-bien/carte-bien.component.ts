@@ -35,7 +35,7 @@ const RAYON_PUBLIC = 150;
   `,
   styles: [`
     .kp-carte-bien { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-    .kp-carte-bien__map { height: clamp(200px, 35dvh, 300px); width: 100%; border-radius: var(--kp-radius); overflow: hidden; z-index: 0; }
+    .kp-carte-bien__map { height: clamp(200px, 35dvh, 300px); width: 100%; border-radius: var(--kp-radius-md); overflow: hidden; z-index: 0; }
   `],
 })
 export class CarteBienComponent implements AfterViewInit, OnDestroy {

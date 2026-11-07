@@ -71,13 +71,13 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--kp-space-3);
-  font-size: var(--kp-fs-md);
+  font-size: var(--kp-fs-body);
   font-weight: 600;
-  color: var(--kp-text-1);
+  color: var(--kp-text);
 
   a,
   button {
-    font-size: var(--kp-fs-sm);
+    font-size: var(--kp-fs-secondary);
     font-weight: 600;
   }
 }
@@ -85,15 +85,15 @@
 // ── Texte ────────────────────────────────────────────────────────────────────
 
 .kp-muted {
-  color: var(--kp-text-3);
+  color: var(--kp-text-subtle);
 }
 
 .kp-small {
-  font-size: var(--kp-fs-sm);
+  font-size: var(--kp-fs-secondary);
 }
 
 .kp-xs {
-  font-size: var(--kp-fs-xs);
+  font-size: var(--kp-fs-mention);
 }
 
 .kp-strong {

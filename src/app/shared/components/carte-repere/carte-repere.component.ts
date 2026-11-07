@@ -50,7 +50,7 @@ const VUE_PAR_PAYS: Record<string, { centre: L.LatLngTuple; zoom: number }> = {
   `,
   styles: [`
     .kp-carte { display: flex; flex-direction: column; gap: 8px; }
-    .kp-carte-map { height: clamp(240px, 45dvh, 380px); width: 100%; border-radius: var(--kp-radius); overflow: hidden; z-index: 0; }
+    .kp-carte-map { height: clamp(240px, 45dvh, 380px); width: 100%; border-radius: var(--kp-radius-md); overflow: hidden; z-index: 0; }
   `],
 })
 export class CarteRepereComponent implements AfterViewInit, OnDestroy {

@@ -42,7 +42,7 @@
   padding: 8px 16px;
   border-radius: var(--kp-radius-sm);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
+  color: var(--kp-text);
 
   &:focus {
     left: 8px;
@@ -104,7 +104,7 @@
   width: 40px;
   height: 40px;
   border: 0;
-  border-radius: var(--kp-radius-full);
+  border-radius: var(--kp-radius-pill);
   background: transparent;
   color: inherit;
 }

@@ -40,12 +40,12 @@ const HAUTEUR_MAX = 800;
     :host { display: flex; flex-direction: column; gap: 8px; }
     .zone {
       position: relative; height: clamp(180px, 40dvh, 320px);
-      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius); background: #ffffff; overflow: hidden;
+      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-md); background: #ffffff; overflow: hidden;
     }
     canvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
     .invite {
       position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%);
-      color: #9aa4a9; font-size: var(--kp-fs-lg); pointer-events: none;
+      color: #9aa4a9; font-size: var(--kp-fs-subtitle); pointer-events: none;
     }
     .ligne { position: absolute; left: 24px; right: 24px; bottom: 28%; border-bottom: 1px dashed #c4cab9; pointer-events: none; }
     .pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
