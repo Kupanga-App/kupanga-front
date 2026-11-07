@@ -1,0 +1,482 @@
+// Coquille des écrans d'authentification (sans encapsulation : règles toutes préfixées par kp-auth-shell / kp-auth-,
+// pour atteindre aussi le contenu projeté : boutons de 48 px sur téléphone, séparateur, œil, téléphone…).
+@use 'mq';
+
+kp-auth-shell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kp-page-pad);
+  min-height: 100dvh;
+  padding: calc(var(--kp-safe-top) + var(--kp-page-pad)) calc(var(--kp-safe-right) + var(--kp-page-pad))
+    calc(var(--kp-safe-bottom) + var(--kp-page-pad)) calc(var(--kp-safe-left) + var(--kp-page-pad));
+  background: var(--kp-bg);
+  color: var(--kp-text);
+}
+
+// ── Colonne du formulaire
+
+.kp-auth__colonne {
+  display: flex;
+  flex: 1 1 480px;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kp-auth__entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.kp-auth__retour {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+  color: var(--kp-text);
+  transition: background-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
+  }
+}
+
+.kp-auth__logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: var(--kp-radius-sm);
+  text-decoration: none;
+}
+
+.kp-auth__etapes-entete {
+  display: none;
+}
+
+.kp-auth__defile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.kp-auth__corps {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 32px 0;
+}
+
+.kp-auth__etapes {
+  margin-bottom: 20px;
+}
+
+.kp-auth__illustration {
+  margin-bottom: 16px;
+}
+
+.kp-auth__titre {
+  margin: 0;
+  font-size: var(--kp-fs-page-title);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.kp-auth__sous-titre {
+  margin: 8px 0 0;
+  color: var(--kp-text-muted);
+}
+
+.kp-auth__contenu {
+  margin-top: 28px;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.kp-auth__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+
+  &:not(:has(*)) {
+    display: none;
+  }
+
+  > .kp-btn {
+    flex: 0 0 auto;
+  }
+
+  // Le bouton principal (ou un bouton seul) prend la largeur restante
+  > .kp-btn--primary,
+  > .kp-btn:only-child {
+    flex: 1 1 auto;
+  }
+}
+
+.kp-auth__pied {
+  margin-top: 28px;
+  color: var(--kp-text-muted);
+  text-align: center;
+
+  &:not(:has(*)) {
+    display: none;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.kp-auth__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 20px;
+  padding-top: 16px;
+  font-size: var(--kp-fs-secondary);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--kp-text-muted);
+  }
+}
+
+// ── Panneau photo (ordinateur seulement)
+
+.kp-auth__panneau {
+  display: none;
+}
+
+.kp-auth__carte-panneau {
+  animation: kp-auth-fondu 240ms var(--kp-ease);
+}
+
+@keyframes kp-auth-fondu {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@include mq.ordinateur {
+  .kp-auth__panneau {
+    position: relative;
+    display: block;
+    flex: 1 1 520px;
+    min-height: calc(100dvh - 2 * var(--kp-page-pad));
+    overflow: hidden;
+    border-radius: var(--kp-radius-lg);
+    background: var(--kp-surface-sunken);
+  }
+
+  .kp-auth__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .kp-auth__carte-panneau {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    width: min(400px, calc(100% - 48px));
+    padding: 24px;
+    border: 1px solid var(--kp-border);
+    border-radius: var(--kp-radius-lg);
+    background: var(--kp-surface);
+  }
+
+  .kp-auth__phrase {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .kp-auth__promesses {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--kp-text-muted);
+    }
+  }
+
+  .kp-auth__pastille {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--kp-accent-soft);
+    color: var(--kp-accent);
+  }
+}
+
+// ── Téléphone (forme « colonnes ») : en-tête, contenu défilant, barre d'actions collée en bas
+
+@include mq.telephone {
+  kp-auth-shell.kp-auth--colonnes {
+    position: fixed;
+    top: var(--kp-auth-haut, 0px);
+    right: 0;
+    left: 0;
+    flex-flow: column nowrap;
+    gap: 0;
+    height: var(--kp-auth-hauteur, 100dvh);
+    padding: 0;
+
+    .kp-auth__colonne {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .kp-auth__entete {
+      flex: none;
+      height: calc(56px + var(--kp-safe-top));
+      min-height: 0;
+      padding: var(--kp-safe-top) calc(var(--kp-safe-right) + var(--kp-page-pad)) 0
+        calc(var(--kp-safe-left) + var(--kp-page-pad));
+    }
+
+    .kp-auth__defile {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 0 calc(var(--kp-safe-right) + var(--kp-page-pad)) calc(var(--kp-auth-barre, 0px) + 8px)
+        calc(var(--kp-safe-left) + var(--kp-page-pad));
+      scroll-padding-bottom: calc(var(--kp-auth-barre, 0px) + 16px);
+    }
+
+    .kp-auth__corps {
+      margin: 0 auto;
+      padding: 12px 0 8px;
+    }
+
+    // Sur téléphone, la barre d'étapes est dans l'en-tête, à la place du logo
+    .kp-auth__logo--avec-etapes {
+      display: none;
+    }
+
+    .kp-auth__etapes-entete {
+      display: flex;
+      flex: 1;
+    }
+
+    .kp-auth__etapes .barre {
+      display: none;
+    }
+
+    .kp-auth__actions {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      margin: 0;
+      padding: 12px calc(var(--kp-safe-right) + var(--kp-page-pad)) calc(12px + var(--kp-safe-bottom))
+        calc(var(--kp-safe-left) + var(--kp-page-pad));
+      border-top: 1px solid var(--kp-border);
+      background: var(--kp-surface);
+    }
+  }
+
+  // Cibles de 48 px sur téléphone
+  kp-auth-shell {
+    .kp-btn,
+    .kp-input,
+    .kp-auth-telephone {
+      min-height: 48px;
+    }
+
+    .kp-auth__retour {
+      width: 48px;
+      height: 48px;
+    }
+  }
+}
+
+// ── Forme « carte » : carte centrée seule
+
+kp-auth-shell.kp-auth--carte {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  .kp-auth__colonne {
+    flex: 1;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .kp-auth__entete {
+    justify-content: center;
+  }
+
+  .kp-auth__retour {
+    position: absolute;
+    left: calc(var(--kp-safe-left) + var(--kp-page-pad));
+  }
+
+  .kp-auth__corps {
+    align-items: center;
+    max-width: 480px;
+    padding: clamp(28px, 4vw, 40px) clamp(20px, 4vw, 40px);
+    border: 1px solid var(--kp-border);
+    border-radius: var(--kp-radius-lg);
+    background: var(--kp-surface);
+    text-align: center;
+  }
+
+  .kp-auth__illustration {
+    margin-bottom: 20px;
+  }
+
+  .kp-auth__contenu {
+    align-self: stretch;
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .kp-auth__actions {
+    flex-direction: column;
+    align-self: stretch;
+    margin-top: 24px;
+
+    > .kp-btn {
+      flex: none;
+      width: 100%;
+    }
+  }
+}
+
+// ── Pièces partagées par les pages
+
+.kp-auth-separateur {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+
+  &::before,
+  &::after {
+    flex: 1;
+    border-top: 1px solid var(--kp-border-strong);
+    content: '';
+  }
+}
+
+.kp-auth-mention {
+  margin: 12px 0 0;
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+  text-align: center;
+
+  a {
+    color: var(--kp-text-muted);
+  }
+}
+
+.kp-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.kp-auth-oeil {
+  position: absolute;
+  right: 2px;
+}
+
+// Indicatif + numéro dans un même cadre
+.kp-auth-telephone {
+  display: flex;
+  min-height: var(--kp-tap);
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-surface);
+  transition: border-color var(--kp-duree) var(--kp-ease);
+
+  &:focus-within {
+    border-color: var(--kp-accent);
+    box-shadow: 0 0 0 1px var(--kp-accent);
+  }
+
+  .kp-auth-indicatif {
+    position: relative;
+    display: flex;
+    flex: none;
+    border-right: 1px solid var(--kp-border-strong);
+
+    kp-icon {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      color: var(--kp-text-muted);
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+  }
+
+  select {
+    padding: 0 30px 0 12px;
+    border: 0;
+    border-radius: var(--kp-radius-md) 0 0 var(--kp-radius-md);
+    appearance: none;
+    background: transparent;
+    color: var(--kp-text);
+    font: inherit;
+    cursor: pointer;
+
+    &:focus-visible {
+      border-radius: var(--kp-radius-md) 0 0 var(--kp-radius-md);
+    }
+  }
+
+  .kp-input {
+    min-height: 0;
+    border: 0;
+    border-radius: 0 var(--kp-radius-md) var(--kp-radius-md) 0;
+
+    &:focus,
+    &:focus-visible {
+      box-shadow: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kp-auth__carte-panneau {
+    animation: none;
+  }
+}
