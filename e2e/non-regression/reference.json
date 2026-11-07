@@ -1,0 +1,1540 @@
+{
+  "enregistreLe": "2026-11-07T22:14:38.967Z",
+  "branche": "feature/pret-pour-la-prod",
+  "ecrans": {
+    "claire /accueil": [
+      {
+        "methode": "GET",
+        "chemin": "/demandes-location/recues",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locations/reservations",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "2a6573c01f1dc318"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /annonces/2": [
+      {
+        "methode": "GET",
+        "chemin": "/biens/:id",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "54c806dd48dcac84"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      }
+    ],
+    "claire /biens": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      }
+    ],
+    "claire /biens/1": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "2a6573c01f1dc318"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "20b6f5facd9a08b8"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /biens/1/bail": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "20b6f5facd9a08b8"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /biens/1/etats-des-lieux": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "20b6f5facd9a08b8"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /biens/1/quittances": [
+      {
+        "methode": "GET",
+        "chemin": "/juridictions/FR",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "586d73fe414bbf51"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "2a6573c01f1dc318"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "20b6f5facd9a08b8"
+      }
+    ],
+    "claire /biens/2": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "794d9d940aab2ced"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /compte": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      }
+    ],
+    "claire /documents": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "2a6573c01f1dc318"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /explorer": [
+      {
+        "methode": "GET",
+        "chemin": "/juridictions",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "a2350faf67272fd3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/biens/search",
+        "parametres": [],
+        "corps": [
+          "page",
+          "size",
+          "sortBy",
+          "sortDirection"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /messages": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/conversations/search",
+        "parametres": [],
+        "corps": [
+          "lu",
+          "page",
+          "size",
+          "sortBy",
+          "sortDirection"
+        ],
+        "statut": 200
+      }
+    ],
+    "claire /notifications": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3bed24484654cc27"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "aa3aadbb06bc7da3"
+      }
+    ],
+    "grace /mon-logement": [
+      {
+        "methode": "GET",
+        "chemin": "/demandes-location/recues",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locataire/dashboard/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "09e807b2c4b0ba7a"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locations/reservations",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "cd9b7d9258d8eb3d"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "ffe467d67a94ac02"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "200f12f61a37c6ed"
+      }
+    ],
+    "grace /quittances": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "cd9b7d9258d8eb3d"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/mes-quittances",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "b476ae8612e5bcca"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "ffe467d67a94ac02"
+      }
+    ],
+    "ines /accueil": [
+      {
+        "methode": "GET",
+        "chemin": "/demandes-location/recues",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locations/reservations",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "d4735e3a265e16ee"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "41ffaf69a2fcf3df"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "ines /annonces/2": [
+      {
+        "methode": "GET",
+        "chemin": "/biens/:id",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "54c806dd48dcac84"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "d4735e3a265e16ee"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "41ffaf69a2fcf3df"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      }
+    ],
+    "ines /demandes-location": [
+      {
+        "methode": "GET",
+        "chemin": "/demandes-location/recues",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locations/reservations",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "d4735e3a265e16ee"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "41ffaf69a2fcf3df"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      }
+    ],
+    "ines /explorer": [
+      {
+        "methode": "GET",
+        "chemin": "/juridictions",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "a2350faf67272fd3"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "d4735e3a265e16ee"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "41ffaf69a2fcf3df"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/biens/search",
+        "parametres": [],
+        "corps": [
+          "page",
+          "size",
+          "sortBy",
+          "sortDirection"
+        ],
+        "statut": 200
+      }
+    ],
+    "lucas /compte": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "fc2458a3a9e88c86"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6361ac92ae4f1266"
+      }
+    ],
+    "lucas /documents": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "fc2458a3a9e88c86"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6361ac92ae4f1266"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "lucas /messages": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "fc2458a3a9e88c86"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6361ac92ae4f1266"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/conversations/search",
+        "parametres": [],
+        "corps": [
+          "lu",
+          "page",
+          "size",
+          "sortBy",
+          "sortDirection"
+        ],
+        "statut": 200
+      }
+    ],
+    "lucas /mon-logement": [
+      {
+        "methode": "GET",
+        "chemin": "/demandes-location/recues",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locataire/dashboard/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5beff1ad47317f5d"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locations/reservations",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "fc2458a3a9e88c86"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6361ac92ae4f1266"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "20b6f5facd9a08b8"
+      }
+    ],
+    "lucas /notifications": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "fc2458a3a9e88c86"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6361ac92ae4f1266"
+      }
+    ],
+    "lucas /quittances": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "5feceb66ffc86f38"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "fc2458a3a9e88c86"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/mes-quittances",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "2a6573c01f1dc318"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6361ac92ae4f1266"
+      }
+    ],
+    "patrick /accueil": [
+      {
+        "methode": "GET",
+        "chemin": "/demandes-location/recues",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/locations/reservations",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6b86b273ff34fce1"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "b476ae8612e5bcca"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6ac211eff097da76"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "patrick /biens/141": [
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6b86b273ff34fce1"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "b476ae8612e5bcca"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6ac211eff097da76"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "200f12f61a37c6ed"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      },
+      {
+        "methode": "POST",
+        "chemin": "/etats-des-lieux/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "patrick /biens/141/bail": [
+      {
+        "methode": "GET",
+        "chemin": "/contrats/:id/lien-whatsapp",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "3c8ce7885860dc8d"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/juridictions/CD",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "27665e12fc7bf0b4"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6b86b273ff34fce1"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6ac211eff097da76"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "200f12f61a37c6ed"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/contrats/search",
+        "parametres": [],
+        "corps": [
+          "bienId",
+          "size"
+        ],
+        "statut": 200
+      }
+    ],
+    "patrick /biens/141/quittances": [
+      {
+        "methode": "GET",
+        "chemin": "/juridictions/CD",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "27665e12fc7bf0b4"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/messages/non-lus",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6b86b273ff34fce1"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/notifications",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "4f53cda18c2baa0c"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/:id/lien-whatsapp",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "af779257174641f6"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/quittances/bien/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "b476ae8612e5bcca"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "6ac211eff097da76"
+      },
+      {
+        "methode": "GET",
+        "chemin": "/users/biens/:id",
+        "parametres": [
+          "c"
+        ],
+        "corps": null,
+        "statut": 200,
+        "reponse": "200f12f61a37c6ed"
+      }
+    ],
+    "visiteur /": [],
+    "visiteur /annonces/142": [
+      {
+        "methode": "GET",
+        "chemin": "/biens/:id",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "2caa9cec47aab5a7"
+      }
+    ],
+    "visiteur /annonces/2": [
+      {
+        "methode": "GET",
+        "chemin": "/biens/:id",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "54c806dd48dcac84"
+      }
+    ],
+    "visiteur /explorer": [
+      {
+        "methode": "GET",
+        "chemin": "/juridictions",
+        "parametres": [],
+        "corps": null,
+        "statut": 200,
+        "reponse": "a2350faf67272fd3"
+      },
+      {
+        "methode": "POST",
+        "chemin": "/biens/search",
+        "parametres": [],
+        "corps": [
+          "page",
+          "size",
+          "sortBy",
+          "sortDirection"
+        ],
+        "statut": 200
+      }
+    ]
+  }
+}

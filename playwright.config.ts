@@ -67,7 +67,12 @@ export default defineConfig({
       name: 'reference',
       dependencies: ['connexion'],
       testMatch: /non-regression\/.*\.spec\.ts/,
-      use: { viewport: ORDINATEUR },
+      use: {
+        viewport: ORDINATEUR,
+        // La référence est servie par Playwright (route.fulfill) : sans ce drapeau, Edge refuse ses appels vers
+        // localhost:8089 (contrôle « Local Network Access » d'une page sans espace d'adresse connu)
+        launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests'] },
+      },
     },
     {
       // Comparaison aux maquettes : non bloquante (tableau de ratios), lancée à la demande

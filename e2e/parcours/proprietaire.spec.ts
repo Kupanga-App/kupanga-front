@@ -296,4 +296,14 @@ test.describe('Propriétaire (Patrick, RDC)', () => {
     await expect(conditions.getByRole('term').filter({ hasText: /^Garantie$/ })).toBeVisible();
     await expect(conditions.getByRole('term').filter({ hasText: 'Loyers d’avance' })).toBeVisible();
   });
+
+  test('quittances en dollars : le rappel WhatsApp est dans les actions de la quittance', async ({ page }) => {
+    await page.goto(`/biens/${DEMO.bienLouePatrick}/quittances`);
+    const lignes = page.getByRole('table', { name: 'Quittances du bien' }).getByRole('rowgroup').nth(1).getByRole('row');
+    await expect(lignes.first()).toContainText(/480,00\s\$US/);
+    const lien = page.waitForResponse(r => /\/quittances\/\d+\/lien-whatsapp$/.test(new URL(r.url()).pathname));
+    await lignes.first().getByRole('button', { name: /^Actions sur la quittance/ }).click();
+    expect((await lien).status()).toBe(200);
+    await expect(page.getByRole('dialog').getByRole('link', { name: /Rappel par WhatsApp/ })).toBeVisible();
+  });
 });

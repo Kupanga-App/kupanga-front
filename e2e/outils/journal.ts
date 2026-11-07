@@ -51,10 +51,14 @@ function clesDuCorps(requete: Request): Appel['corps'] {
 
 /**
  * Retire d'une réponse ce qui change à chaque appel sans que les données changent :
- * URL présignées (`urlPdf`, `urlRecu`, photos de profil : signature `X-Amz-*`), dates relatives à l'instant présent.
+ * URL présignées (`urlPdf`, `urlRecu`, photos de profil : signature `X-Amz-*`), dates relatives à l'instant présent,
+ * ordre des listes (l'API renvoie par exemple les lieux proches et les équipements dans un ordre variable ; l'ordre
+ * des résultats d'une recherche suit le tri demandé, comparé avec le corps de la requête).
  */
 export function stabiliser(valeur: unknown): unknown {
-  if (Array.isArray(valeur)) return valeur.map(stabiliser);
+  if (Array.isArray(valeur)) {
+    return valeur.map(stabiliser).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  }
   if (valeur && typeof valeur === 'object') {
     const sortie: Record<string, unknown> = {};
     for (const k of Object.keys(valeur as object).sort()) {
