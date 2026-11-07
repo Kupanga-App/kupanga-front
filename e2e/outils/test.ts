@@ -62,6 +62,11 @@ export const test = base.extend<Options & Fixtures>({
     { auto: true },
   ],
 
+  page: async ({ page }, use) => {
+    suivreReseau(page);
+    await use(page);
+  },
+
   journal: async ({ page }, use) => {
     await use(new Journal(page));
   },
@@ -69,9 +74,35 @@ export const test = base.extend<Options & Fixtures>({
 
 export { expect };
 
-/** Attend la fin du réseau et des polices (Figtree) : captures et relevés stables. */
-export async function pagePrete(page: Page): Promise<void> {
-  await page.waitForLoadState('networkidle');
+const enVol = new WeakMap<Page, Set<unknown>>();
+
+/** Suit les requêtes en cours d'une page, sauf la messagerie temps réel (SockJS garde une requête ouverte). */
+export function suivreReseau(page: Page): void {
+  if (enVol.has(page)) return;
+  const enCours = new Set<unknown>();
+  enVol.set(page, enCours);
+  const ignore = (url: string) => /:8089\/ws\/|\/@vite\/|sockjs-node|\.(woff2?|png|jpe?g|webp)(\?|$)/.test(url);
+  page.on('request', r => !ignore(r.url()) && enCours.add(r));
+  const fin = (r: unknown) => enCours.delete(r);
+  page.on('requestfinished', fin);
+  page.on('requestfailed', fin);
+}
+
+/**
+ * Attend la fin du réseau (aucune requête pendant 500 ms, `/ws` exclu : `networkidle` n'arrive jamais quand
+ * SockJS se rabat sur `xhr_streaming`), puis les polices (Figtree) : captures et relevés stables.
+ */
+export async function pagePrete(page: Page, delaiMax = 15_000): Promise<void> {
+  suivreReseau(page);
+  await page.waitForLoadState('load');
+  const enCours = enVol.get(page)!;
+  const limite = Date.now() + delaiMax;
+  let calmeDepuis = Date.now();
+  while (Date.now() < limite) {
+    if (enCours.size) calmeDepuis = Date.now();
+    else if (Date.now() - calmeDepuis >= 500) break;
+    await page.waitForTimeout(100);
+  }
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
 }
 
