@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { NavigationService } from '../../core/navigation/navigation.service';
+import { LogementContextService } from '../../core/services/logement-context.service';
 import { ChatStoreService } from '../../features/messagerie/services/chat-store.service';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { AvatarComponent } from '../../shared/ui/avatar.component';
@@ -25,6 +26,9 @@ import { LogoComponent } from '../../shared/ui/logo.component';
           <span class="entree__libelle">{{ o.libelle }}</span>
           @if (o.compteur === 'messages' && nonLus(); as n) {
             <span class="entree__pastille" [attr.aria-label]="n + ' non lus'">{{ n > 99 ? '99+' : n }}</span>
+          }
+          @if (o.compteur === 'biens' && nombreBiens(); as n) {
+            <span class="entree__nombre" [attr.aria-label]="n + ' bien' + (n > 1 ? 's' : '')">{{ n }}</span>
           }
         </a>
       }
@@ -71,6 +75,8 @@ import { LogoComponent } from '../../shared/ui/logo.component';
       font-size: var(--kp-fs-mention); font-weight: 500;
     }
     .entree.actif .entree__pastille { background: var(--kp-surface); color: var(--kp-text); }
+    .entree__nombre { font-size: var(--kp-fs-mention); color: var(--kp-text-subtle); font-variant-numeric: tabular-nums; }
+    .entree.actif .entree__nombre { color: inherit; opacity: 0.72; }
     .bas { flex: none; display: flex; flex-direction: column; gap: 8px; padding-top: 16px; }
     .annonces {
       display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px;
@@ -99,6 +105,7 @@ export class BarreLateraleComponent {
   private readonly chat = inject(ChatStoreService);
 
   protected readonly nonLus = computed(() => this.chat.unreadTotal());
+  protected readonly nombreBiens = inject(LogementContextService).nombreBiens;
   protected readonly nom = computed(() => {
     const u = this.auth.currentUser();
     return u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() : '';

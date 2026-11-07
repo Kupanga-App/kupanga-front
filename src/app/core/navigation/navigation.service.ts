@@ -9,7 +9,8 @@ export interface Onglet {
   icone: string;
   lien: string;
   /** Pastille de non-lus. */
-  compteur?: 'messages';
+  /** `messages` : pastille des non-lus ; `biens` : nombre de biens possédés, discret. */
+  compteur?: 'messages' | 'biens';
 }
 
 /**
@@ -27,7 +28,7 @@ const MESSAGES: Onglet = { libelle: 'Messages', icone: 'message-circle', lien: '
 const COMPTE: Onglet = { libelle: 'Compte', icone: 'user', lien: '/compte' };
 const DOCUMENTS: Onglet = { libelle: 'Documents', icone: 'file-text', lien: '/documents' };
 const ACCUEIL: Onglet = { libelle: 'Accueil', icone: 'house', lien: '/accueil' };
-const BIENS: Onglet = { libelle: 'Mes biens', icone: 'building-2', lien: '/biens' };
+const BIENS: Onglet = { libelle: 'Mes biens', icone: 'building-2', lien: '/biens', compteur: 'biens' };
 const MON_LOGEMENT: Onglet = { libelle: 'Mon logement', icone: 'key', lien: '/mon-logement' };
 const QUITTANCES: Onglet = { libelle: 'Quittances', icone: 'receipt', lien: '/quittances' };
 

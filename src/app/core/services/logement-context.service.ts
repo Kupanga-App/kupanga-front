@@ -6,6 +6,7 @@ import { BienDTO } from '../../features/biens/models/bien.model';
 
 const CLE = 'kp_logement_bien_id';
 const CLE_BIENS = 'kp_a_des_biens';
+const CLE_NOMBRE = 'kp_nombre_biens';
 
 /** Biens dont le compte est le propriétaire (`GET /users/biens` renvoie aussi les logements qu'il loue). */
 export function biensPossedes(biens: BienDTO[], userId: number | null | undefined): BienDTO[] {
@@ -31,6 +32,8 @@ export class LogementContextService {
   readonly hasLogement = computed(() => this.logementBienId() !== null);
   /** Le compte possède au moins un bien. */
   readonly aDesBiens = signal<boolean>(lireNombre(CLE_BIENS) === 1);
+  /** Nombre de biens possédés non archivés (barre latérale), tiré de la même réponse ; null tant qu'inconnu. */
+  readonly nombreBiens = signal<number | null>(lireNombre(CLE_NOMBRE));
   private charge = false;
 
   /** Relit les espaces du compte une fois par session ; renvoie le logement loué (ou null). */
@@ -41,7 +44,9 @@ export class LogementContextService {
     return this.http.get<BienDTO[]>(`${environment.apiUrl}/users/biens`).pipe(
       map(biens => {
         const loues = logementsLoues(biens, userId);
-        this.setADesBiens(biensPossedes(biens, userId).length > 0);
+        const possedes = biensPossedes(biens, userId);
+        this.setADesBiens(possedes.length > 0);
+        this.setNombreBiens(possedes.filter(b => !b.archive).length);
         return (loues.find(b => !b.archive) ?? loues[0])?.id ?? null;
       }),
       tap(id => {
@@ -67,10 +72,16 @@ export class LogementContextService {
     ecrire(CLE_BIENS, valeur ? 1 : null);
   }
 
+  setNombreBiens(valeur: number | null): void {
+    this.nombreBiens.set(valeur);
+    ecrire(CLE_NOMBRE, valeur);
+  }
+
   clear(): void {
     this.charge = false;
     this.set(null);
     this.setADesBiens(false);
+    this.setNombreBiens(null);
   }
 }
 
