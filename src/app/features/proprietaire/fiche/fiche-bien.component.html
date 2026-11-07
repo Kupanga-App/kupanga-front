@@ -1,11 +1,7 @@
-<div class="kp-page kp-page--etroite">
-  <kp-page-header [titre]="bien()?.titre ?? 'Bien'" retour="/biens">
-    @if (bien()) {
-      <button actions type="button" class="kp-icon-btn" (click)="actionsOuvertes.set(true)" aria-label="Actions sur le bien">
-        <kp-icon name="ellipsis" />
-      </button>
-    }
-  </kp-page-header>
+<div class="kp-page fiche">
+  @if (!erreur()) {
+    <kp-fiche-entete [bien]="bien()" [racine]="true" [(ongletVacant)]="ongletVacant" />
+  }
 
   @if (chargement() && !bien()) {
     <div class="kp-stack" aria-busy="true">
@@ -170,36 +166,5 @@
       </section>
     </div>
 
-    <kp-sheet [(ouvert)]="actionsOuvertes" titre="Actions">
-      <div class="kp-list">
-        @if (!b.archive) {
-          <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'modifier'])">
-            <span class="kp-list__icon"><kp-icon name="pencil" /></span>
-            <span class="kp-list__body"><span class="kp-list__title">Modifier le bien</span></span>
-          </button>
-          @if (!b.locataire) {
-            <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'locataire'])">
-              <span class="kp-list__icon"><kp-icon name="user-plus" /></span>
-              <span class="kp-list__body"><span class="kp-list__title">{{ b.reservation ? 'Gérer la réservation' : 'Proposer la location' }}</span></span>
-            </button>
-          }
-          <button type="button" class="kp-list__item" (click)="aller(['/annonces', b.id])">
-            <span class="kp-list__icon"><kp-icon name="eye" /></span>
-            <span class="kp-list__body">
-              <span class="kp-list__title">Voir l’annonce</span>
-              <span class="kp-list__sub">Telle que la voient les visiteurs</span>
-            </span>
-          </button>
-        }
-        <button type="button" class="kp-list__item" (click)="aller(['/biens', b.id, 'quittances', 'nouvelle'])" [disabled]="b.archive || !b.locataire">
-          <span class="kp-list__icon"><kp-icon name="receipt" /></span>
-          <span class="kp-list__body">
-            <span class="kp-list__title">Nouvelle quittance</span>
-            @if (!b.locataire) { <span class="kp-list__sub">Il faut d’abord un locataire</span> }
-          </span>
-        </button>
-      </div>
-      <p class="kp-aide archivage">L’archivage d’un bien se fait par l’administrateur de Kupanga.</p>
-    </kp-sheet>
   }
 </div>

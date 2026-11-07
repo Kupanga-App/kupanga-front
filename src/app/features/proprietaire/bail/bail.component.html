@@ -1,5 +1,5 @@
-<div class="kp-page kp-page--etroite">
-  <kp-page-header titre="Bail" [sousTitre]="bien()?.titre" [retour]="['/biens', id()]" />
+<div class="kp-page">
+  <kp-fiche-entete [bien]="bien()" />
 
   @if (chargement() && !bien()) {
     <div class="kp-stack" aria-busy="true">

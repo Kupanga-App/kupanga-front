@@ -12,7 +12,7 @@ import { messageErreurApi } from '../../../core/http/api-error';
 import { ACCEPT_PHOTOS, preparerPhoto } from '../../../core/media/photos';
 import { ToastService } from '../../../core/ui/toast.service';
 import { DateLonguePipe, aujourdhuiIso, de, moisAnnee, statutQuittance } from '../../../shared/format';
-import { PageHeaderComponent } from '../../../shared/ui/page-header.component';
+import { FicheEnteteComponent } from '../fiche/fiche-entete.component';
 import { SheetComponent } from '../../../shared/ui/sheet.component';
 import { SignatureComponent } from '../../../shared/ui/signature.component';
 import { StatutComponent } from '../../../shared/ui/statut.component';
@@ -28,7 +28,7 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
   selector: 'kp-quittances-bien',
   standalone: true,
   imports: [
-    ReactiveFormsModule, RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, SheetComponent, SignatureComponent,
+    ReactiveFormsModule, RouterLink, MontantPipe, DateLonguePipe, FicheEnteteComponent, SheetComponent, SignatureComponent,
     StatutComponent, VideComponent, IconComponent, BoutonWhatsappComponent,
   ],
   templateUrl: './quittances-bien.component.html',

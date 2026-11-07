@@ -1,11 +1,12 @@
-<div class="kp-page kp-page--etroite">
-  <kp-page-header titre="Quittances" [sousTitre]="bien()?.titre" [retour]="['/biens', id()]">
-    @if (bien()?.locataire && !bien()?.archive) {
-      <a actions class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'quittances', 'nouvelle']">
-        <kp-icon name="plus" [size]="18" /> Nouvelle
+<div class="kp-page">
+  <kp-fiche-entete [bien]="bien()" />
+  @if (bien()?.locataire && !bien()?.archive && quittances().length) {
+    <div class="barre-actions">
+      <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'quittances', 'nouvelle']">
+        <kp-icon name="plus" [size]="18" /> Nouvelle quittance
       </a>
-    }
-  </kp-page-header>
+    </div>
+  }
 
   @if (chargement() && !bien()) {
     <div class="kp-stack" aria-busy="true">

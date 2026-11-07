@@ -9,7 +9,7 @@ import { MontantPipe } from '../../../core/money/montant';
 import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
 import { DateLonguePipe, statutSignature } from '../../../shared/format';
-import { PageHeaderComponent } from '../../../shared/ui/page-header.component';
+import { FicheEnteteComponent } from '../fiche/fiche-entete.component';
 import { StatutComponent } from '../../../shared/ui/statut.component';
 import { VideComponent } from '../../../shared/ui/vide.component';
 import { FeuilleSignatureComponent } from '../../../shared/ui/feuille-signature.component';
@@ -24,7 +24,7 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
   selector: 'kp-bail',
   standalone: true,
   imports: [
-    RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, StatutComponent, VideComponent,
+    RouterLink, MontantPipe, DateLonguePipe, FicheEnteteComponent, StatutComponent, VideComponent,
     FeuilleSignatureComponent, IconComponent, BoutonWhatsappComponent,
   ],
   templateUrl: './bail.component.html',

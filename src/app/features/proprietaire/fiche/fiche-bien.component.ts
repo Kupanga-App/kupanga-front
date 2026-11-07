@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { BienService } from '../../biens/services/bien.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
@@ -15,8 +15,7 @@ import { QuittanceDTO } from '../../gestion-logement/models/quittance.model';
 import { MontantPipe } from '../../../core/money/montant';
 import { lienAppel } from '../../../core/telephone/telephone';
 import { DateLonguePipe, Statut, moisAnnee, statutQuittance, statutSignature } from '../../../shared/format';
-import { PageHeaderComponent } from '../../../shared/ui/page-header.component';
-import { SheetComponent } from '../../../shared/ui/sheet.component';
+import { FicheEnteteComponent, OngletVacant } from './fiche-entete.component';
 import { GalerieComponent } from '../../../shared/ui/galerie.component';
 import { AvatarComponent } from '../../../shared/ui/avatar.component';
 import { StatutComponent } from '../../../shared/ui/statut.component';
@@ -33,7 +32,7 @@ import { LieuxProchesComponent } from '../../../shared/ui/lieux-proches.componen
   selector: 'kp-fiche-bien',
   standalone: true,
   imports: [FinDeBailComponent, LieuxProchesComponent, 
-    RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, SheetComponent, GalerieComponent, AvatarComponent,
+    RouterLink, MontantPipe, DateLonguePipe, FicheEnteteComponent, GalerieComponent, AvatarComponent,
     StatutComponent, VideComponent, IconComponent, CarteBienComponent,
   ],
   templateUrl: './fiche-bien.component.html',
@@ -46,7 +45,6 @@ export class FicheBienComponent implements OnInit {
   private contratService = inject(ContratService);
   private edlService = inject(EdlService);
   private quittanceService = inject(QuittanceService);
-  private router = inject(Router);
 
   readonly bien = signal<BienDTO | null>(null);
   readonly contrats = signal<ContratDTO[]>([]);
@@ -54,7 +52,7 @@ export class FicheBienComponent implements OnInit {
   readonly quittances = signal<QuittanceDTO[]>([]);
   readonly chargement = signal(true);
   readonly erreur = signal<string | null>(null);
-  readonly actionsOuvertes = signal(false);
+  readonly ongletVacant = signal<OngletVacant>('apercu');
 
   readonly lienAppel = lienAppel;
 
@@ -132,10 +130,5 @@ export class FicheBienComponent implements OnInit {
         this.chargement.set(false);
       },
     });
-  }
-
-  aller(chemin: unknown[]): void {
-    this.actionsOuvertes.set(false);
-    void this.router.navigate(chemin);
   }
 }

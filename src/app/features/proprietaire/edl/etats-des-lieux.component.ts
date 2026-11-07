@@ -8,7 +8,7 @@ import { EtatDesLieuxDTO } from '../../gestion-logement/models/edl.model';
 import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
 import { DateLonguePipe, statutSignature } from '../../../shared/format';
-import { PageHeaderComponent } from '../../../shared/ui/page-header.component';
+import { FicheEnteteComponent } from '../fiche/fiche-entete.component';
 import { StatutComponent } from '../../../shared/ui/statut.component';
 import { VideComponent } from '../../../shared/ui/vide.component';
 import { FeuilleSignatureComponent } from '../../../shared/ui/feuille-signature.component';
@@ -19,16 +19,17 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
 @Component({
   selector: 'kp-etats-des-lieux',
   standalone: true,
-  imports: [RouterLink, DateLonguePipe, PageHeaderComponent, StatutComponent, VideComponent, FeuilleSignatureComponent, IconComponent, BoutonWhatsappComponent],
+  imports: [RouterLink, DateLonguePipe, FicheEnteteComponent, StatutComponent, VideComponent, FeuilleSignatureComponent, IconComponent, BoutonWhatsappComponent],
   template: `
-    <div class="kp-page kp-page--etroite">
-      <kp-page-header titre="États des lieux" [sousTitre]="bien()?.titre" [retour]="['/biens', id()]">
-        @if (bien()?.locataire && !bien()?.archive) {
-          <a actions class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'etats-des-lieux', 'nouveau']">
-            <kp-icon name="plus" [size]="18" /> Nouveau
+    <div class="kp-page">
+      <kp-fiche-entete [bien]="bien()" />
+      @if (bien()?.locataire && !bien()?.archive && edls().length) {
+        <div class="barre-actions">
+          <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'etats-des-lieux', 'nouveau']">
+            <kp-icon name="plus" [size]="18" /> Nouvel état des lieux
           </a>
-        }
-      </kp-page-header>
+        </div>
+      }
 
       @if (chargement() && !bien()) {
         <div class="kp-stack" aria-busy="true">
@@ -87,7 +88,7 @@ import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouto
       [erreur]="erreurSignature()"
       (valider)="signer($event)" />
   `,
-  styles: [`.edls { margin: 0; padding: 0; list-style: none; } h2 { font-size: var(--kp-fs-md); }`],
+  styles: [`.edls { margin: 0; padding: 0; list-style: none; } .barre-actions { display: flex; justify-content: flex-end; margin-bottom: var(--kp-space-4); } h2 { font-size: var(--kp-fs-md); }`],
 })
 export class EtatsDesLieuxComponent implements OnInit {
   readonly id = input.required<string>();
