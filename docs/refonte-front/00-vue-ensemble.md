@@ -146,6 +146,11 @@ Les couleurs écrites en dur hors de `_theme.scss` (environ 60 occurrences : `la
 | E6 | Recherche des conversations par personne | `Nav-Proprio-Messages` (« Personne ou bien ») | L'API ne filtre que par `nomDuBien` : champ « Rechercher un bien » |
 | E7 | Plafonds légaux du dépôt de garantie par juridiction (meublé, vide) | `Assist-Bail` (avertissement « plafonné à deux mois ») | Avertissement non bloquant quand le dépôt diffère de celui de l'annonce |
 | E8 | Bien réservé retiré de la recherche publique | `Fiche-Bien-Vacant` (« réservé 14 jours et retiré des annonces ») | Phrase omise ; un bien réservé n'est pas compté dans « Annonces en ligne » |
+| E9 | Lien de signature lisible par le locataire connecté (aujourd'hui seulement dans la notification **non lue** et l'e-mail) | `Mon-Logement`, `Nav-Mobile` (« Lire et signer ») | Bouton seulement si la notification non lue porte le lien ; sinon « Vous recevez le lien par e-mail » |
+| E10 | Photo, loyer et e-mail du propriétaire dans la réservation (`Location`) | `Mon-Logement-Reserve` (vignette, « 965 € par mois », « Message à Claire M. ») | Icône à la place de la photo, adresse à la place du loyer, pas de bouton Message |
+| E11 | Titre du bien et type de bail (meublé, vide) dans le contrat et l'état des lieux lus par le jeton | `Signer-Bail`, `Signer-Mobile` (« Studio proche transports », « Logement meublé · résidence principale ») | Adresse du bien en titre ; sous-titre « Résumé des conditions » |
+| E12 | PDF signé téléchargeable depuis la confirmation (le jeton est effacé à la signature) | `Signer-Mobile` étape 3 (« Télécharger le PDF ») | Bouton omis : le document est dans l'espace du compte |
+| E13 | Auteur du dernier message d'une conversation | `Nav-Candidat` (« Vous : Bonjour… ») | Dernier message sans « Vous : » |
 
 Toute nouvelle évolution découverte pendant une phase s'ajoute à cette table, dans le commit de documentation de la phase, et figure dans le rapport de fin de phase.
 
@@ -171,7 +176,7 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 | 1 | faite (6 nov. 2026) : build vert, 119/119 tests | voir `git log` (« docs(refonte): bilan de la phase 1 ») | Voir « Bilan de la phase 1 » ci-dessous |
 | 2 | faite (7 nov. 2026) : build vert, 132/132 tests | voir `git log` (« docs(refonte): bilan de la phase 2 ») | Voir « Bilan de la phase 2 » ci-dessous |
 | 3 | faite (7 nov. 2026) : build vert, 154/154 tests | voir `git log` (« docs(refonte): bilan de la phase 3 ») | Voir « Bilan de la phase 3 » ci-dessous |
-| 4 | à faire | | |
+| 4 | faite (7 nov. 2026) : build vert, 189/189 tests | voir `git log` (« docs(refonte): bilan de la phase 4 ») | Voir « Bilan de la phase 4 » ci-dessous |
 | 5 | à faire | | |
 | 6 | à faire | | |
 
@@ -303,4 +308,54 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 | `DS-Composants` (tableau) | Colonne « Locataire » remplacée par Échéance et Paiement ; actions secondaires dans un menu « … » par ligne | Tableau d'un seul bien, un seul locataire ; toutes les actions existantes gardées | Aucune |
 
 **Évolutions découvertes** : E7 (plafonds légaux du dépôt de garantie par juridiction), E8 (retirer un bien réservé de la recherche publique, comme l'annonce la maquette).
+
+### Bilan de la phase 4
+
+**Ce qui est en place**
+
+| Élément | Où | Usage |
+| --- | --- | --- |
+| Étapes du locataire | `features/locataire/etapes-locataire.ts` (+ spec) | `calculerEtapesLocataire({ reserve, proprietaire, baux, bailSigne, invitationsBail, etatsDesLieux, nombreQuittances })` : Demande acceptée → Bail créé → Votre signature → État des lieux → Quittances ; `bailCourant()` |
+| Compte à rebours | `features/locataire/compte-a-rebours.ts` (+ spec) | Jours restants et part écoulée, lus dans `dateReservation` / `dateExpiration` |
+| Nom court | `features/locataire/nom-court.ts` (+ spec) | « Claire M. » |
+| En-tête de Mon logement | `features/locataire/logement-entete.component.ts` | Titre, adresse, propriétaire, onglets Logement · Documents · Quittances · Messages ; sur `/mon-logement` et `/quittances` |
+| `kp-onglets` | `shared/ui/segmented.component.ts` | `queryParams` facultatif par onglet |
+| `kp-fin-de-bail` | `features/biens/components/fin-de-bail.component.ts` | `[danger]` : bouton contour rouge, textes inchangés |
+| `kp-signature` | `shared/ui/signature.component.ts` | `mention` (nom et date sous le trait, hors image) ; `outils` (aide et Effacer) — pas nommé `pied`, sinon une `kp-sheet` le projette dans son pied |
+| Gabarit de signature | `features/signature/signature-layout.component.ts` | Barre « Lien personnel, sans compte », carte centrée (`titre`) ou page libre (`<… page>`), `contexte` sur téléphone |
+| Fenêtre de signature | `features/signature/fenetre-signature.component.ts` | « Votre signature », Effacer, « Valider ma signature » |
+| PDF frais | `features/signature/pdf-frais.ts` (+ spec) | Onglet ouvert au clic, adresse renseignée à la réponse ; lien proposé si l'onglet est bloqué |
+| Liens invalides | `features/signature/lien-invalide.component.ts`, `codeLienSignature()` dans `core/http/api-error.ts` (+ spec) | Titre et illustration par code (404, 410, 409, autre) ; message de `messageLienSignature` inchangée |
+| Icônes | `core/icones.ts` | `signature`, `link-2-off`, `hourglass` |
+
+**Vérifications** : build de production vert à chaque commit ; **189 tests sur 189** avec Edge (174 → 189 : étapes du locataire, nom court, compte à rebours, PDF frais, code des liens) ; paquet initial **510 ko**. Captures Edge (1440 px et 390 × 844, clair et sombre) avec Lucas (France, tout signé), Grâce (RDC, bail et état des lieux à signer) et Inès (candidate) : Mon logement, onglets, quittances, « Donner congé » ouvert puis annulé, accueil candidat ; signature sans compte du bail et de l'état des lieux de Grâce jusqu'à la case cochée et au tracé dans la fenêtre, **sans valider** (les deux jetons répondent toujours 200) ; 404 réels (`jeton-inconnu`, lien utilisé de Lucas).
+
+**Réponses simulées** (interception CDP `Fetch`, rien en base) : 410 et 409 sur les liens de signature ; 500 (écran « Réessayer ») ; logement réservé (`GET /locations/reservations`) ; demande reçue sur l'accueil candidat (`GET /demandes-location/recues`) ; confirmation « Bail signé » sur un **faux jeton** (`jeton-simule`, `GET` et `POST` simulés : sans interception, l'API aurait répondu 404). Le clic réel (souris CDP) sur « Télécharger le PDF » ouvre un onglet qui reçoit l'adresse fraîche après un second `GET`.
+
+**Appels réseau** : mêmes appels qu'avant, plus trois méthodes déjà appelées ailleurs : `ContratService.getByBien()` (`POST /contrats/search`) sur Mon logement, car le tableau de bord ne renvoie que le bail **signé** (le bail en attente du locataire n'apparaissait jamais dans « À signer ») ; `BienService.getPrive()` sur `/quittances` (en-tête) ; `BienService.getPublic()` pour la carte d'une demande reçue ; `ChatService.searchConversations()` sur l'accueil d'un candidat seulement. « Télécharger le PDF » relance le `GET` du jeton.
+
+**Écarts restants avec les maquettes**
+
+| Maquette | Écart | Raison | Suite |
+| --- | --- | --- | --- |
+| `Mon-Logement` | Pas de lien « Modifier » sur les caractéristiques | Le locataire ne modifie pas le bien | Aucune |
+| `Mon-Logement` | WhatsApp : lien `wa.me` vers le numéro du propriétaire, pas `kp-bouton-whatsapp` | Ce composant envoie un document du propriétaire au locataire (`/contrats/{id}/lien-whatsapp`) | Aucune |
+| `Mon-Logement` | « Lire et signer » absent si la notification a été lue | `GET /notifications` ne renvoie que les non lues | E9 |
+| `Mon-Logement` | Sans document à signer, « À faire » montre le loyer du mois (statut, échéance) | Information existante de l'écran gardée | Aucune |
+| `Mon-Logement`, `-Quittances` | « Mon logement » n'est pas actif dans la barre du haut sur `/quittances` | Lien actif de la barre (phase 2) sur `/mon-logement` seulement | À décider |
+| `Mon-Logement` | Documents et Messages : pages communes, sans l'en-tête ni les onglets | Elles servent aussi au propriétaire | Aucune |
+| `Mon-Logement-Quittances` | Badges « En attente » / « Loyer reçu » (et non « En attente du propriétaire » / « Signée ») ; colonne « Détail » (échéance ou réception) ; « Reçu » quand le propriétaire a joint le reçu | Libellés existants de `statutQuittance` ; informations de l'ancienne liste gardées | Aucune |
+| `Mon-Logement-Reserve` | Icône au lieu de la photo, adresse au lieu du loyer, pas de « Message à Claire M. », pas de « retiré des annonces » ; actions Notifications et Se désister | `Location` n'a ni photo, ni loyer, ni e-mail ; E8 | E10, E8 |
+| `Nav-Candidat` | Pas de « Favoris » ; « Annonces et carte » sans « alertes » ; pas de « Vous : » | E4, E5, E13 | — |
+| `Nav-Mobile` (locataire) | Le téléphone du locataire arrive sur Mon logement (décision « accueil locataire »), pas sur un accueil à tuiles | Planche `Nav-Locataire` retirée | Aucune |
+| `Signer-Bail` | Titre = adresse du bien ; pas de « Logement meublé · résidence principale » ; lignes grises remplacées par « le texte complet figure dans le PDF » ; cadre du bailleur « ✓ Signé » + « Signé par … le … » | E11, E2, E3 | — |
+| `Signer-Bail` | Cadre de signature blanc (pas grège) | Image envoyée à l'API, blanche dans les deux thèmes | Aucune |
+| `Signer-Mobile` | Confirmation : « Se connecter » ou « Voir mon logement » seulement, pas « Télécharger le PDF » | Le jeton est effacé à la signature | E12 |
+| `Signer-Lien-Invalide` | Icônes Lucide sur aplat (pas les illustrations dessinées) ; écran 409 ajouté ; pas d'« Écrire au propriétaire » | Décision des états vides ; le propriétaire n'est pas connu sans jeton valide | Aucune |
+
+**Non vérifié** : Safari iOS (pas d'appareil) pour l'onglet du PDF — la technique (onglet ouvert pendant le clic, adresse renseignée ensuite) est celle qu'accepte Safari ; mode hors ligne (le service worker ne vise que l'API de production) — vérifié à la lecture : tableau de bord, bien et notifications sont en cache, la lecture des baux retombe sur une liste vide. Données à créer pour vérifier sans simulation, si accord : une demande de location de Claire à Inès (bien 2), puis son acceptation (réservation) ; un lien expiré (410) demande d'attendre l'expiration du jeton.
+
+**Rappel** : `/demandes-location` n'a toujours pas d'entrée de menu (demandes reprises sur l'accueil candidat et sur Mon logement).
+
+**Évolutions découvertes** : E9 à E13.
 
