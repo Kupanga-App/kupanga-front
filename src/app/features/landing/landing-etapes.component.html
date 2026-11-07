@@ -1,0 +1,150 @@
+<section class="etapes" id="comment" aria-labelledby="titre-etapes">
+  <div class="etapes-tete">
+    <h2 id="titre-etapes">Une location en cinq étapes, chacune guidée à l’écran</h2>
+    <p>Chaque écran dit ce qui va se passer ensuite, et ce que l’application ne fait pas à votre place.</p>
+  </div>
+
+  <div class="rangees">
+    <article class="rangee">
+      <div class="texte">
+        <div class="texte-tete">
+          <span class="tuile"><kp-icon name="house" [size]="22" [strokeWidth]="1.5" /></span>
+          <div><span class="numero">Étape 01</span><h3>Publier le bien</h3></div>
+        </div>
+        <p>Une question par écran, huit écrans en tout, avec un récapitulatif avant de publier.</p>
+        <ul>
+          <li><kp-icon name="compass" [size]="18" [strokeWidth]="1.5" />Les champs suivent le pays : DPE et code postal en France, commune, quartier et point de repère en RDC</li>
+          <li><kp-icon name="image" [size]="18" [strokeWidth]="1.5" />Jusqu’à 20 photos, allégées avant l’envoi</li>
+          <li><kp-icon name="map-pin" [size]="18" [strokeWidth]="1.5" />Position publique arrondie à 100 m sur la carte</li>
+        </ul>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="ecran">
+          <div class="ecran-tete"><span>Nouveau bien</span><span class="kp-tabulaire">1 / 8</span></div>
+          <div class="progression"><span></span></div>
+          <span class="ecran-titre">Dans quel pays se trouve le bien ?</span>
+          <div class="mini-segment"><span class="actif">France</span><span>RDC</span></div>
+          <span class="mention">Le pays ne pourra plus être modifié après la publication</span>
+          <span class="kp-btn kp-btn--primary kp-btn--sm fin">Continuer</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="rangee inverse">
+      <div class="texte">
+        <div class="texte-tete">
+          <span class="tuile"><kp-icon name="message-circle" [size]="22" [strokeWidth]="1.5" /></span>
+          <div><span class="numero">Étape 02</span><h3>Échanger avec les candidats</h3></div>
+        </div>
+        <p>Les candidats écrivent depuis l’annonce. Chaque conversation reste rattachée au bien.</p>
+        <ul>
+          <li><kp-icon name="lock" [size]="18" [strokeWidth]="1.5" />Votre e-mail n’est jamais affiché, votre nom apparaît abrégé</li>
+          <li><kp-icon name="phone" [size]="18" [strokeWidth]="1.5" />Message, appel ou WhatsApp depuis la fiche</li>
+          <li><kp-icon name="bell" [size]="18" [strokeWidth]="1.5" />Messages en temps réel, avec notification</li>
+        </ul>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="ecran sans-marge">
+          <div class="conv-tete">
+            <span class="initiales">IM</span>
+            <span class="pile"><strong>Inès Moreau</strong><span class="mention">Appartement T3 avec parking, Brotteaux</span></span>
+          </div>
+          <div class="conv-fil">
+            <span class="mention date">27 octobre</span>
+            <span class="bulle recue">Bonjour, le logement est-il toujours disponible ?</span>
+            <span class="bulle envoyee">Avec plaisir, quel créneau vous arrange ?</span>
+          </div>
+          <div class="conv-saisie">
+            <span class="champ">Message</span>
+            <span class="envoyer"><kp-icon name="send" [size]="16" /></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="rangee">
+      <div class="texte">
+        <div class="texte-tete">
+          <span class="tuile"><kp-icon name="key" [size]="22" [strokeWidth]="1.5" /></span>
+          <div><span class="numero">Étape 03</span><h3>Réserver le logement</h3></div>
+        </div>
+        <p>Vous choisissez votre futur locataire parmi les personnes qui vous ont écrit.</p>
+        <ul>
+          <li><kp-icon name="send" [size]="18" [strokeWidth]="1.5" />Le candidat reçoit une demande à accepter</li>
+          <li><kp-icon name="calendar" [size]="18" [strokeWidth]="1.5" />Une fois acceptée, le logement est réservé 14 jours</li>
+          <li><kp-icon name="file-text" [size]="18" [strokeWidth]="1.5" />Le bail se prépare depuis la fiche du bien</li>
+        </ul>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="ecran">
+          <span class="ecran-titre">Proposer la location</span>
+          <span class="mention">Personnes qui vous ont écrit au sujet de ce bien</span>
+          <div class="choix choisi">
+            <span class="initiales">IM</span>
+            <span class="pile"><strong>Inès Moreau</strong><span class="mention">vous a écrit le 27 octobre</span></span>
+            <span class="radio"></span>
+          </div>
+          <div class="choix">
+            <span class="initiales">LB</span>
+            <span class="pile"><strong>Lucas Bernard</strong><span class="mention">vous a écrit le 29 octobre</span></span>
+            <span class="radio"></span>
+          </div>
+          <span class="kp-btn kp-btn--primary kp-btn--sm fin">Envoyer la demande</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="rangee inverse">
+      <div class="texte">
+        <div class="texte-tete">
+          <span class="tuile"><kp-icon name="pen-line" [size]="22" [strokeWidth]="1.5" /></span>
+          <div><span class="numero">Étape 04</span><h3>Signer le bail et l’état des lieux</h3></div>
+        </div>
+        <p>Les documents se remplissent depuis le bien et se signent à l’écran, sans imprimer.</p>
+        <ul>
+          <li><kp-icon name="file-text" [size]="18" [strokeWidth]="1.5" />Loyer, charges et garantie déjà remplis</li>
+          <li><kp-icon name="mail" [size]="18" [strokeWidth]="1.5" />Vous signez à l’écran, le locataire reçoit un lien et signe sans créer de compte</li>
+          <li><kp-icon name="clipboard-check" [size]="18" [strokeWidth]="1.5" />État des lieux pièce par pièce : compteurs, clés, éléments</li>
+        </ul>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="pile-ecrans">
+          <div class="ecran compact">
+            <div class="ecran-tete"><span>Signature du locataire</span><span>Bail · Studio, Brotteaux</span></div>
+            <div class="trace">
+              <svg viewBox="0 0 160 40" width="160" height="40"><path d="M6 30c8-14 14-22 18-14s2 16 8 8 10-18 16-10 4 14 12 6 10-14 18-10 6 10 14 6 12-8 20-8 14 2 22 0" /></svg>
+            </div>
+            <span class="mention">Signez avec le doigt ou la souris</span>
+          </div>
+          <div class="ecran compact">
+            <span class="mention">État des lieux d’entrée · Cuisine · plaques</span>
+            <div class="mini-segment plein"><span class="actif">Bon</span><span>Usé</span><span>Mauvais</span><span>Hors service</span></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="rangee">
+      <div class="texte">
+        <div class="texte-tete">
+          <span class="tuile"><kp-icon name="receipt" [size]="22" [strokeWidth]="1.5" /></span>
+          <div><span class="numero">Étape 05</span><h3>Gérer la location</h3></div>
+        </div>
+        <p>Le loyer se paie hors de l’application. Vous le déclarez reçu, Kupanga s’occupe des papiers.</p>
+        <ul>
+          <li><kp-icon name="banknote" [size]="18" [strokeWidth]="1.5" />Virement, chèque, espèces ou Mobile Money</li>
+          <li><kp-icon name="check" [size]="18" [strokeWidth]="1.5" />La quittance signée part au locataire dès la déclaration</li>
+          <li><kp-icon name="log-out" [size]="18" [strokeWidth]="1.5" />Congé et fin de bail : dernier jour, dépôt restitué</li>
+        </ul>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="ecran sans-marge">
+          <div class="quit-tete"><span class="ecran-titre">Quittances</span><span class="mention">Studio, Brotteaux</span></div>
+          <div class="quit-ligne"><span>Novembre 2026</span><span class="point point--attente">En attente</span><span class="montant">365 €</span></div>
+          <div class="quit-ligne"><span>Octobre 2026</span><span class="point point--ok">Signée</span><span class="montant">365 €</span></div>
+          <div class="quit-pied"><span class="kp-btn kp-btn--primary kp-btn--sm">Déclarer le loyer reçu</span></div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
