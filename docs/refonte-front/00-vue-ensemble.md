@@ -142,7 +142,7 @@ Nouveaux noms et valeurs : `../frontend-audit/livraison-dev.md`, section « Tabl
 | `--kp-font-display` (10) | supprimé | Titres en Figtree 500 ; le nom « kupanga » est le SVG du logo |
 | `--kp-fs-xs` 12 / `-sm` 14 / `-md` 16 / `-lg` 20 / `-xl` 24 / `-2xl` 32 | `--kp-fs-mention` 12 / `--kp-fs-secondary` 13 / `--kp-fs-body` 15 (interligne 22) / `--kp-fs-card-title` 17 / `--kp-fs-subtitle` 20 / `--kp-fs-page-title` clamp(24px, …, 32px) / `--kp-fs-landing` clamp(40px, …, 56px) | Alias : xs→mention, sm→secondary, md→body, lg→subtitle, xl et 2xl→page-title |
 | `--kp-space-1…8` | conservés (4 · 8 · 12 · 16 · 24 · 32) + `--kp-space-12` 48 | |
-| `--kp-space-5` 20, `--kp-space-10` 40 | conservés temporairement | Hors de la grille de la doc, retirés écran par écran |
+| `--kp-space-5` 20, `--kp-space-10` 40 | `--kp-space-5` gardé pour le retrait horizontal des boutons (20 px dans toutes les maquettes) ; `--kp-space-10` supprimé (phase 5) | Hors de la grille de la doc |
 | `--kp-radius-sm` 8 | `--kp-radius-sm` 8 | |
 | `--kp-radius` 12 (28) | `--kp-radius-md` 12 | |
 | `--kp-radius-lg` 20 | `--kp-radius-lg` 20 | |
@@ -179,6 +179,8 @@ Les couleurs écrites en dur hors de `_theme.scss` (environ 60 occurrences : `la
 | # | Évolution | Origine |
 | --- | --- | --- |
 | F1 | Nouvelles règles de tâches de l'accueil propriétaire (« Répondre à … » pour une conversation non lue, « Créer la quittance du mois » pour un bail signé sans quittance du mois), avec leurs tests | `Nav-Proprio-Tableau`, décision du 7 novembre 2026 |
+| F2 | Filtres d'Explorer « Type de bien », « Loyer », « Pièces » en menus déroulants séparés (aujourd'hui, ils ouvrent la feuille des filtres, comme « Filtres ») | `O1v2-Explorer`, phase 5 |
+| F3 | Échelle GES aux couleurs réglementaires (violets) au lieu de celles du DPE reprises par la maquette | `Annonce-France`, phase 5 |
 
 Toute nouvelle évolution découverte pendant une phase s'ajoute à cette table, dans le commit de documentation de la phase, et figure dans le rapport de fin de phase.
 
@@ -205,7 +207,7 @@ Chaque phase se termine par un rapport, puis **s'arrête** : la suivante est lan
 | 2 | faite (7 nov. 2026) : build vert, 132/132 tests | voir `git log` (« docs(refonte): bilan de la phase 2 ») | Voir « Bilan de la phase 2 » ci-dessous |
 | 3 | faite (7 nov. 2026) : build vert, 154/154 tests | voir `git log` (« docs(refonte): bilan de la phase 3 ») | Voir « Bilan de la phase 3 » ci-dessous |
 | 4 | faite (7 nov. 2026) : build vert, 189/189 tests | voir `git log` (« docs(refonte): bilan de la phase 4 ») | Voir « Bilan de la phase 4 » ci-dessous |
-| 5 | à faire | | |
+| 5 | faite (7 nov. 2026) : build vert, 198/198 tests | voir `git log` (« docs(refonte): bilan de la phase 5 ») | Voir « Bilan de la phase 5 » ci-dessous |
 | 6 | à faire | | |
 
 Chaque session met à jour sa ligne dans le dernier commit de sa phase (`docs(refonte): bilan de la phase N`).
@@ -387,3 +389,47 @@ Page du bail (à signer et signé), états des lieux et quittances revérifiés 
 
 **Évolutions découvertes** : E9 à E13.
 
+### Bilan de la phase 5
+
+**Ce qui est en place**
+
+| Élément | Où | Usage |
+| --- | --- | --- |
+| Landing | `features/landing/landing.component.*`, `landing-etapes.component.*` | Barre publique en pilule, bascule France / RDC (`pays`, RDC par défaut), cinq étapes illustrées (sous-composant : budget de style), vidéo en façade |
+| Explorer | `features/explorer/explorer.component.*` | `vue` calculée : « Liste et carte » par défaut sur ordinateur, Liste / Carte sur téléphone (`vueChoisie`, pas dans l'adresse) ; `selection` partagée liste ↔ carte |
+| Carte des annonces | `features/explorer/carte-annonces.component.ts` | Étiquettes de prix (`divIcon`), `[selection]`, `(survol)`, `(choisir)`, classe `remplir`, `ResizeObserver` → `invalidateSize()` |
+| `kp-carte-bien` | `shared/ui/carte-bien.component.ts` | `disposition="ligne"`, `[selectionne]`, pastille DPE et un atout |
+| `kp-classe-energie` | `shared/ui/classe-energie.component.ts` | `[classe]`, `forme` (`echelle` ou `pastille`), `nom` (DPE, GES) ; jetons `--kp-classe-a…g` |
+| Annonce | `features/explorer/annonce.component.*` (+ spec) | Mosaïque (`kp-galerie` classe `plein-ecran-seul`), carte collée, champs selon `GET /juridictions/{pays}`, vue propriétaire (`vuePrivee`, `estProprietaire`) |
+| Onglet actif ailleurs | `core/navigation/navigation.service.ts` | `Onglet.aussi`, `surAdresse()`, `actifAussi()` ; classe `actif-aussi` (`routerLinkActive` retire la classe `actif` qu'il ne pose pas) |
+| Jetons ajoutés | `styles/_theme.scss` | `--kp-classe-*`, `--kp-photo-fond`, `--kp-whatsapp*`, `--kp-signature-*` ; classes Leaflet `kp-carte-point` / `kp-carte-zone` (`_components.scss`) |
+| `design-system.yml` | racine | Réécrit avec les nouveaux jetons ; renvoie à la table de ce fichier et à `_theme.scss`, qui font foi |
+
+**Retrait des alias** : bloc supprimé de `_theme.scss`, plus aucun ancien nom dans `src/`, plus de `--kp-font-display` ni de `--kp-space-10`. Grep final : aucune couleur hexadécimale hors de `_theme.scss`, sauf le fond blanc du JPEG (`core/media/photos.ts`, traitement d'image), la meta `theme-color` d'`index.html` et le chevron des listes déroulantes (SVG en data URI de `_components.scss`). Aucune occurrence de `DM Sans`, `DM Serif` ou `DM Mono` (anciens logos inutilisés de `src/assets/logos` supprimés, référencés ni par le front ni par l'API).
+
+**Vérifications** : build de production vert à chaque commit ; **198 tests sur 198** avec Edge (189 → 198 : landing, annonce vue par son propriétaire, onglet actif sur les quittances) ; paquet initial **511 ko** (510 ko en phase 4 ; seuil de 500 ko toujours dépassé, avertissement seulement). Budgets de style (avertissement à 8 ko) : landing 9,3 ko, accueil 8,1 ko. Captures Edge (1440 px et 390 × 844, clair et sombre) : visiteur (landing et bascule, vidéo non chargée avant le clic, Explorer dans les trois vues, adresse partagée `?pays=FR&ville=Lyon&meuble=1&tri=prix-croissant` relue à l'identique, annonces 2 (France) et 142 (RDC), « Contacter » → `/auth/login?returnUrl=%2Fmessages%3FbienId%3D2`) ; Claire (sa propre annonce, accueil, fiche, bail, messages, compte, documents, notifications) ; Lucas (Mon logement, quittances : « Mon logement » actif) ; Inès (accueil) ; mauvais mot de passe (« E-mail ou mot de passe incorrect. ») ; page introuvable ; pages légales ; lien de signature inconnu. Aucun message envoyé, aucun bien modifié.
+
+**Appels réseau** : mêmes appels qu'avant, plus trois méthodes déjà appelées ailleurs : `BienService.getPrive()` sur l'annonce, pour un compte qui possède des biens seulement (403 ignoré) ; `JuridictionService.configuration(pays)` sur l'annonce (en cache, déjà lue par le formulaire du bien) ; `ChatService.searchConversations()` (page de 20) sur l'accueil d'un propriétaire.
+
+**Écarts restants avec les maquettes**
+
+| Maquette | Écart | Raison | Suite |
+| --- | --- | --- | --- |
+| `O1v2-Landing` | Bouton clair / sombre dans la barre ; section vidéo entre les étapes et « Les mêmes écrans » | Fonction existante (testée) ; vidéo gardée (décision) | Aucune |
+| `O1v2-Landing` | « Lucas Bernard » à la place de « Thomas Petit » (second candidat de « Proposer la location ») | Décision « Thomas Petit → Inès Moreau » : Inès est déjà la première candidate de la maquette | À valider |
+| `O1v2-Landing` | Étape 3 : « Le bail se prépare depuis la fiche du bien » au lieu de « L'annonce est retirée de la recherche pendant la réservation » | Phrase fausse aujourd'hui (E8) | E8 |
+| `O1v2-Landing` | Ligne « Logement » ajoutée dans la bascule (DPE et GES / heures de courant) ; photos d'exemple `france.jpg` et `rdc.jpg` | Consigne « DPE … en France ; … en RDC » ; images de la maquette non fournies | Aucune |
+| `O1v2-Explorer` | Pas de « Favoris » ni de « Créer une alerte » ; « Type de bien », « Loyer », « Pièces » ouvrent la feuille des filtres | E4, E5 ; mêmes filtres que le code | E4, E5, F2 |
+| `O1v2-Explorer` | Liste déroulante de tri à côté de l'affichage | Tri existant gardé | Aucune |
+| `Annonce-*` | « Votre e-mail n'est pas affiché : vous échangez par la messagerie de Kupanga » au lieu de « Votre e-mail et votre numéro restent privés jusqu'à ce que vous les partagiez » | Le téléphone d'un compte est visible de son propriétaire ou locataire : la promesse de la maquette serait fausse | À valider |
+| `Annonce-France` | Échelle GES aux couleurs du DPE | Couleurs de la maquette | F3 |
+| `Annonce-Proprio` | Barre latérale du propriétaire au lieu de la barre publique (« Mon espace ») | Navigation par profil (phase 2) | Aucune |
+| `Annonce-Proprio` | Adresse de la vue privée, identique à la vue publique pour les biens de démo | La vue publique renvoie déjà rue, ville et code postal | Aucune |
+| Barre de la landing | « Mon espace » + avatar jamais visibles | `landingGuard` envoie un compte connecté vers son accueil | Aucune |
+| Écrans sans maquette | Connexion, inscription, mot de passe, Documents, Notifications, Demandes de location, page introuvable : déjà au design system (phases 1 à 4), seuls les anciens noms de jetons ont changé | — | Aucune |
+
+**Défauts corrigés en passant** : initiale du propriétaire affichée « M.. » sur l'annonce (l'API envoie « M. », le service ajoute un point) ; liste « Trier » d'Explorer qui ne reprenait pas le tri d'une adresse partagée (défaut antérieur) ; correctif du commit « Mon logement actif » fait dans un commit séparé (conflit avec `routerLinkActive`).
+
+**Décisions à prendre** : entrée de menu « Demandes de location » (toujours aucune) ; « Lucas Bernard » sur la landing ; mention de confidentialité de l'annonce ; F2 et F3.
+
+**Évolutions découvertes** : F2 (filtres d'Explorer en menus séparés), F3 (couleurs GES réglementaires). Aucune nouvelle évolution serveur.
