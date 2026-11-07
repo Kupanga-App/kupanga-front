@@ -15,6 +15,16 @@
       <button type="button" class="kp-btn kp-btn--secondary" (click)="ngOnInit()">Réessayer</button>
     </kp-vide>
   } @else if (bien(); as b) {
+    @if (estProprietaire()) {
+      <div class="banniere" role="note">
+        <kp-icon name="eye" [size]="18" [strokeWidth]="1.5" />
+        <p>C’est votre annonce, telle que la voient les visiteurs.</p>
+        <div class="banniere__actions">
+          <a [routerLink]="['/biens', b.id]" class="banniere__lien">Retour à la fiche</a>
+          <a [routerLink]="['/biens', b.id, 'modifier']" class="kp-btn kp-btn--sm banniere__bouton">Modifier le bien</a>
+        </div>
+      </div>
+    }
     <header class="tete">
       <a routerLink="/explorer" class="fil"><kp-icon name="chevron-left" [size]="14" [strokeWidth]="1.5" /> Retour aux annonces</a>
       <h1>{{ b.titre }}</h1>
@@ -62,10 +72,17 @@
             <kp-avatar [photo]="b.proprietaire.urlProfile" [nom]="nomProprietaire()" [taille]="40" />
             <span class="proprietaire__texte"><span class="fort">{{ nomProprietaire() }}</span><span class="mention">Propriétaire sur Kupanga</span></span>
           </div>
-          <button type="button" class="kp-btn kp-btn--primary kp-btn--block contacter" (click)="contacter()">
-            <kp-icon name="message-circle" [size]="18" [strokeWidth]="1.5" /> Contacter
-          </button>
-          <p class="note"><kp-icon name="lock" [size]="14" [strokeWidth]="1.5" /> Votre e-mail n’est pas affiché : vous échangez par la messagerie de Kupanga.</p>
+          @if (estProprietaire()) {
+            <a routerLink="/messages" class="kp-btn kp-btn--secondary kp-btn--block contacter">
+              <kp-icon name="message-circle" [size]="18" [strokeWidth]="1.5" /> Voir les messages reçus
+            </a>
+            <p class="note note--centre">Les visiteurs voient ici le bouton « Contacter ».</p>
+          } @else {
+            <button type="button" class="kp-btn kp-btn--primary kp-btn--block contacter" (click)="contacter()">
+              <kp-icon name="message-circle" [size]="18" [strokeWidth]="1.5" /> Contacter
+            </button>
+            <p class="note"><kp-icon name="lock" [size]="14" [strokeWidth]="1.5" /> Votre e-mail n’est pas affiché : vous échangez par la messagerie de Kupanga.</p>
+          }
         </div>
       </aside>
 
@@ -149,9 +166,13 @@
         <span class="kp-montant">{{ b.loyerMensuel | montant: b.devise : 0 }}</span>
         <span class="par-mois"> par mois</span>
       </p>
-      <button type="button" class="kp-btn kp-btn--primary" (click)="contacter()">
-        <kp-icon name="message-circle" [size]="20" [strokeWidth]="1.5" /> Contacter
-      </button>
+      @if (estProprietaire()) {
+        <a routerLink="/messages" class="kp-btn kp-btn--secondary">Voir les messages reçus</a>
+      } @else {
+        <button type="button" class="kp-btn kp-btn--primary" (click)="contacter()">
+          <kp-icon name="message-circle" [size]="20" [strokeWidth]="1.5" /> Contacter
+        </button>
+      }
     </div>
   }
 </div>

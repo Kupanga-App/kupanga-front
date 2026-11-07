@@ -14,6 +14,17 @@ p { margin: 0; }
 .fort { font-weight: 500; }
 .par-mois { font-size: var(--kp-fs-body); font-weight: 400; color: var(--kp-text-subtle); }
 
+// ───────── Bannière du propriétaire (nuit ; menthe en sombre)
+.banniere {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--kp-space-3) var(--kp-space-4);
+  margin-bottom: var(--kp-space-4); padding: var(--kp-space-3) var(--kp-space-3) var(--kp-space-3) var(--kp-card-pad);
+  border-radius: var(--kp-radius-lg); background: var(--kp-text); color: var(--kp-bg);
+  p { flex: 1 1 240px; }
+}
+.banniere__actions { display: flex; align-items: center; gap: var(--kp-space-4); margin-left: auto; }
+.banniere__lien { color: inherit; text-underline-offset: 3px; }
+.banniere__bouton { border-color: transparent; background: var(--kp-bg); color: var(--kp-text); &:hover { opacity: 0.9; } }
+
 // ───────── En-tête
 .tete { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--kp-space-4); }
 .fil {
@@ -117,6 +128,7 @@ kp-galerie { margin-bottom: var(--kp-space-4); @include mq.tablette { margin: 0;
 }
 .proprietaire__texte { display: flex; flex-direction: column; min-width: 0; }
 .contacter { min-height: 48px; }
+.note--centre { justify-content: center; text-align: center; }
 .note {
   display: flex; align-items: flex-start; gap: var(--kp-space-2); font-size: var(--kp-fs-secondary); color: var(--kp-text-muted);
   kp-icon { margin-top: 3px; color: var(--kp-accent); }

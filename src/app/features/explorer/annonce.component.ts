@@ -1,7 +1,8 @@
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { LogementContextService } from '../../core/services/logement-context.service';
 import { BienService } from '../biens/services/bien.service';
 import {
   BienDTO, LIBELLES_CHAUFFAGE, LIBELLES_EQUIPEMENT, ModeChauffage, adresseLisible, libelleTypeBien, positionApproximative,
@@ -25,6 +26,12 @@ const MOSAIQUE = 5;
  * Annonce publique (sans compte) : `GET /biens/{id}`, propriétaire réduit au prénom et à l'initiale (P0-6).
  * Maquettes `Annonce-France` et `Annonce-RDC` : même gabarit pour les deux pays (mosaïque de photos, colonne
  * principale, carte collée à droite avec le prix et « Contacter »).
+ *
+ * Annonce vue par son propriétaire (`Annonce-Proprio`) : la vue publique n'a ni l'identifiant ni l'e-mail du
+ * propriétaire (P0-6). Pour un compte qui possède des biens, la vue privée (`GET /users/biens/{id}`, déjà lue par la
+ * messagerie) est demandée en plus, son erreur ignorée (403 si le bien n'est pas à lui) : si elle répond et que son
+ * propriétaire est le compte, bannière « C'est votre annonce », « Voir les messages reçus » et adresse complète.
+ * Visiteur, candidat, locataire : aucun appel de plus.
  */
 @Component({
   selector: 'kp-annonce',
@@ -41,6 +48,7 @@ export class AnnonceComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private juridictions = inject(JuridictionService);
+  private logement = inject(LogementContextService);
 
   readonly bien = signal<BienDTO | null>(null);
   readonly chargement = signal(true);
@@ -48,6 +56,30 @@ export class AnnonceComponent implements OnInit {
   readonly erreur = signal(false);
   /** Champs du pays du bien (`GET /juridictions/{pays}`, déjà lu par le formulaire du bien, gardé en cache). */
   readonly juridiction = signal<JuridictionConfig | null>(null);
+  /** Vue privée du bien, reçue seulement si le compte connecté en est le propriétaire. */
+  readonly vuePrivee = signal<BienDTO | null>(null);
+  readonly estProprietaire = computed(() => {
+    const prive = this.vuePrivee();
+    const user = this.auth.currentUser();
+    return !!prive && !!user && prive.proprietaire?.id === user.id;
+  });
+  /** Bien dont la vue privée a déjà été demandée (une fois par annonce). */
+  private priveDemande: number | null = null;
+
+  constructor() {
+    // `aDesBiens` peut arriver après l'annonce (relecture à la connexion) : on attend les deux
+    effect(() => {
+      const bien = this.bien();
+      const proprietaire = this.logement.aDesBiens() && !!this.auth.currentUser();
+      if (bien && proprietaire && this.priveDemande !== bien.id) {
+        this.priveDemande = bien.id;
+        untracked(() => this.bienService.getPrive(bien.id).subscribe({
+          next: prive => this.vuePrivee.set(prive),
+          error: () => undefined,
+        }));
+      }
+    });
+  }
 
   readonly typeBien = computed(() => libelleTypeBien(this.bien()?.typeBien));
   /** « Appartement · loué vide », « Studio · meublé ». */
@@ -58,8 +90,9 @@ export class AnnonceComponent implements OnInit {
     return [this.typeBien(), location, b.colocation ? 'colocation' : ''].filter(Boolean).join(' · ');
   });
   readonly equipements = computed(() => (this.bien()?.equipements ?? []).map(e => LIBELLES_EQUIPEMENT[e] ?? e));
+  /** Adresse de l'annonce ; adresse complète de la vue privée pour son propriétaire. */
   readonly adresse = computed(() => {
-    const b = this.bien();
+    const b = this.estProprietaire() ? this.vuePrivee() : this.bien();
     return b ? adresseLisible(b) : '';
   });
   readonly lieu = computed(() => {
