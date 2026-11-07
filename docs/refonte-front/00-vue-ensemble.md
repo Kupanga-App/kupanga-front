@@ -273,7 +273,7 @@ Aucune nouvelle évolution serveur découverte en phase 1.
 
 **Données de test (créées le 7 novembre 2026, avec l'accord de Gédéon)**, par les mêmes appels que le front :
 - Claire, bien 1 (Lucas) : bail n° 1 signé par les deux parties, état des lieux d'entrée n° 1 signé, quittances de septembre (en attente), octobre (déclarée reçue, virement) et novembre (créée par l'API à la signature du bail, échéance le 5 décembre) ;
-- Patrick, bien 141 (Grâce) : bail n° 2 en attente de la signature du propriétaire (garantie 2 mois, 3 mois d'avance, USD), quittance de novembre en attente.
+- Patrick, bien 141 (Grâce) : bail n° 2 (garantie 2 mois, 3 mois d'avance, USD), quittance de novembre en attente. Pour la phase 4, Patrick a signé le bail n° 2 et l'état des lieux d'entrée n° 2 (Cash Power) : **les deux attendent Grâce**, leurs liens sont valides (détail dans `prompt-04-parcours-locataire-signature.md`).
 Page du bail (à signer et signé), états des lieux et quittances revérifiés sur ces données. Constat : l'API renvoie le mois d'une quittance **en texte** (« 10 ») ; les calculs du front le convertissent (« fix(proprietaire): mois des quittances lu en nombre »).
 
 **Appels réseau** : accueil et fiche font les mêmes requêtes qu'avant (mêmes services, aucun appel retiré). Seul ajout : `POST /conversations/search` (déjà appelé par la messagerie) sur la fiche d'un bien **vacant**, une fois, filtré par titre puis par `bienId`, pour « la dernière personne qui a écrit ».

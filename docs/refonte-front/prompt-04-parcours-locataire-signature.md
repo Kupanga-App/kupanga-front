@@ -12,11 +12,34 @@ Tu réalises la **phase 4 sur 6** de la refonte UX/UI du front Kupanga (Angular 
 - **Logique métier intacte.** Mêmes routes, mêmes appels API, mêmes données, mêmes règles de validation, mêmes guards. Les adresses `/contrats/signer/:token` et `/edl/signer/:token` sont dans les e-mails de l'API : **elles ne changent pas**. Tu peux réutiliser une méthode de service déjà appelée ailleurs dans le front, pas un endpoint nouveau.
 - **Rien d'inventé.** « Favoris » (E4), « alertes » (E5), texte complet du bail (E2) et image de la signature du bailleur (E3) ne sont pas construits. Voir `00-vue-ensemble.md`.
 - **Pas d'installation.** Edge à la place de Chrome.
-- **Données** : **ne signe rien**, n'accepte ni ne refuse aucune demande, ne donne pas congé. Arrête-toi avant l'action finale. Pour les pages de signature avec un lien valide, il faut un jeton réel : demande-moi avant d'en créer un, par exemple en créant un bail de test. Pas de `git push`.
+- **Données** : **ne signe rien**, n'accepte ni ne refuse aucune demande, ne donne pas congé. Arrête-toi avant l'action finale : les deux liens valides de Grâce (section « Données de test » ci-dessous) ne doivent **pas** être consommés. Ne crée aucune autre donnée sans me demander. Pas de `git push`.
 
 ## Branche
 
-Continue sur `refonte-front` : `git checkout refonte-front`. Le dernier commit doit être `docs(refonte): bilan de la phase 3` et l'arbre doit être propre. Sinon, arrête-toi et signale-le.
+Continue sur `refonte-front` : `git checkout refonte-front`. L'arbre doit être propre et le dernier commit doit être `docs(refonte): préparation de la phase 4` (après la phase 3, des correctifs ont suivi : icône des états vides, mois des quittances lu en nombre, champs date / heure `kp-champ-date` / `kp-champ-heure` et listes `<select>` stylées). Sinon, arrête-toi et signale-le.
+
+## Données de test (créées le 7 novembre 2026, avec l'accord de Gédéon)
+
+| Compte | Ce qui existe | Pour vérifier |
+| --- | --- | --- |
+| `lucas.bernard@kupanga.dev` (France) | Bail n° 1 **signé** (Claire, bien 1, 325 € + 40 €, dépôt 650 €), état des lieux d'entrée n° 1 **signé**, quittances de septembre (en attente), octobre (**reçue**, virement) et novembre (en attente, échéance le 5 décembre) | Mon logement complet, quittances locataire, frise terminée |
+| `grace.mukendi@kupanga.dev` (RDC) | Bail n° 2 **signé par Patrick, en attente de Grâce** (bien 141, 480 $US, garantie 2 mois, 3 mois d'avance) ; état des lieux d'entrée n° 2 **signé par Patrick, en attente de Grâce** (Cash Power, 3 pièces, un élément « Hors service ») ; quittance de novembre en attente (480 $US) | Mon logement « bail à signer », frise en cours, devise USD |
+| `ines.moreau@kupanga.dev` | Aucune demande ni réservation à ma connaissance | État vide de l'accueil candidat |
+
+**Liens de signature** (ouvrir sans être connecté ; **ne pas signer**) :
+
+| Cas | Adresse | Réponse de `GET` |
+| --- | --- | --- |
+| Bail valide (RDC) | `/contrats/signer/48b7bf5c-f354-4e88-8440-a4fbcf8d0443` | 200 |
+| État des lieux valide (RDC) | `/edl/signer/ec2a2963-fa20-42c3-865c-c7346c5d81fe` | 200 |
+| Lien inconnu | `/contrats/signer/jeton-inconnu` | 404 |
+| Lien déjà utilisé (Lucas, bail n° 1) | `/contrats/signer/45beb023-12af-4b92-a756-4263ede267be` | **404** : l'API efface le jeton après la signature |
+
+Les liens se retrouvent aussi dans Mailpit (`http://127.0.0.1:8025`, destinataire `grace.mukendi@kupanga.dev`).
+
+**410 et 409 ne peuvent pas être produits avec de vraies données** sans attendre l'expiration du jeton ou modifier la base (interdit). L'API renvoie 409 seulement si le document n'attend plus la signature du locataire alors que le jeton existe encore, ou si la réservation du candidat a expiré (`ContratServiceImpl`, `verifierBailSignable`). Vérifie ces deux écrans avec des **réponses simulées dans le navigateur** : interception CDP `Fetch` (`Fetch.enable` puis `Fetch.fulfillRequest` avec `responseCode` 410 ou 409 et le corps d'erreur de l'API), sans aucune écriture en base, comme en phase 3. Signale-le dans le rapport.
+
+**Outillage (pièges connus)** : connexion API par `POST /auth/login` avec `{ "email", "password" }` (pas `mail`), puis `GET /auth/me` ; l'objet `user` du `localStorage` porte `email`. Sous Git Bash, préfixe les commandes Node qui reçoivent des chemins `/…` par `MSYS_NO_PATHCONV=1`. Le `ng serve` de Gédéon sur le port 4200 (dossier OneDrive) ne voit pas toujours les fichiers écrits par un script : `touch` les fichiers modifiés avant une capture. Pour une capture pleine page qui contient une fenêtre (`kp-sheet`), `captureBeyondViewport` produit un faux effet de transparence : capture la fenêtre visible.
 
 ## À lire avant de commencer
 
@@ -132,9 +155,9 @@ Messages en français, format Conventional Commits. Ajoute la ligne `Co-Authored
    npx ng test --watch=false --browsers=ChromeHeadless
    ```
 3. **Application utilisable** : API locale et `npm start`, mot de passe `Kupanga-Dev-2026`.
-   - `lucas.bernard@kupanga.dev` et `grace.mukendi@kupanga.dev` : arrivée sur Mon logement, onglets, quittances, « Donner congé » ouvert puis annulé.
+   - `lucas.bernard@kupanga.dev` (bail signé) et `grace.mukendi@kupanga.dev` (bail et état des lieux à signer) : arrivée sur Mon logement, onglets, quittances, « Donner congé » ouvert puis annulé.
    - `ines.moreau@kupanga.dev` : accueil candidat. Si aucune demande n'existe, l'état vide est correct.
-   - Signature : `/contrats/signer/jeton-inconnu` (404) sans compte. Pour 410, 409 et un lien valide, il faut des données : **demande-moi** avant d'en créer.
+   - Signature sans compte : bail et état des lieux valides de Grâce (jusqu'à la case « J'ai lu… » cochée et la zone de signature, **sans signer**), `jeton-inconnu` et le lien utilisé de Lucas (404) ; 410 et 409 par réponses simulées (voir « Données de test »).
    - Ordinateur et téléphone, clair et sombre.
 4. **Comparaison aux maquettes** : captures Edge headless par CDP (script Node 24 dans ton dossier temporaire), lues côte à côte avec Read.
    - Mon logement (1440) → `Mon-Logement`.
@@ -150,7 +173,7 @@ Messages en français, format Conventional Commits. Ajoute la ligne `Co-Authored
 - Commits (hash court + message).
 - Build, tests (X sur Y), parcours vérifiés.
 - Écarts avec les maquettes et pourquoi.
-- Écrans non vérifiés faute de données (lien valide, 410, 409, logement réservé, demande reçue), et les données de test à créer si je l'accepte.
+- Écrans non vérifiés faute de données (logement réservé, demande reçue) et ceux vérifiés par réponses simulées (410, 409), avec les données de test à créer si je l'accepte.
 - Évolutions découvertes (ajoutées dans `00-vue-ensemble.md`).
 - Ce que fera la phase 5.
 
