@@ -2,11 +2,12 @@
   @if (bienId() !== null || chargement()) {
     <kp-logement-entete [bien]="bien()" [chargement]="chargement() && !bien()" />
   } @else {
-    <kp-page-header titre="Mon logement" />
+    <kp-page-header titre="Mon logement"
+                    [sousTitre]="reservations() ? 'Votre logement réservé apparaît ici en attendant le bail' : null" />
   }
 
-  <!-- Demandes de location en attente : le logement n'est attribué qu'après acceptation -->
-  <kp-demandes-recues [integre]="true" (acceptee)="charger()" />
+  <!-- Demandes de location en attente et logement réservé : on devient locataire en signant le bail -->
+  <kp-demandes-recues [integre]="true" (acceptee)="charger()" (contenu)="reservations.set($event.reservations)" />
 
   @if (logements().length > 1) {
     <div class="kp-field choix">
@@ -28,10 +29,12 @@
       </div>
     </div>
   } @else if (bienId() === null && !erreur()) {
-    <kp-vide icone="house" titre="Pas encore de logement"
+    @if (!reservations()) {
+      <kp-vide icone="house" titre="Pas encore de logement"
              texte="Quand vous aurez signé le bail d’un logement, il apparaîtra ici avec vos quittances. Un logement réservé s’affiche en haut de cette page en attendant.">
       <a routerLink="/explorer" class="kp-btn kp-btn--primary"><kp-icon name="compass" /> Voir les annonces</a>
-    </kp-vide>
+      </kp-vide>
+    }
   } @else if (erreur()) {
     <kp-vide icone="wifi-off" titre="Logement indisponible" texte="Vérifiez votre connexion puis réessayez.">
       <button type="button" class="kp-btn kp-btn--secondary" (click)="charger()">Réessayer</button>

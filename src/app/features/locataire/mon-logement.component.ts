@@ -87,6 +87,8 @@ export class MonLogementComponent implements OnInit {
   readonly tableau = signal<LocataireDashboardDTO | null>(null);
   /** Baux du logement qui concernent le compte (même recherche que la page Documents) ; vide hors ligne. */
   readonly baux = signal<ContratDTO[]>([]);
+  /** Nombre de logements réservés pour le compte (bloc des demandes, `GET /locations/reservations`). */
+  readonly reservations = signal(0);
 
   readonly adresse = computed(() => {
     const b = this.bien();
