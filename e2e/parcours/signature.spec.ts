@@ -196,7 +196,9 @@ test.describe('Lien de signature de l’état des lieux', () => {
     await page.goto(`/edl/signer/${JETON}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ce lien a expiré');
 
+    const reponse = page.waitForResponse(r => r.url() === `${API}/etats-des-lieux/signer/jeton-inconnu-e2e`, { timeout: 45_000 });
     await page.goto('/edl/signer/jeton-inconnu-e2e');
+    expect((await reponse).status()).toBe(404);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ce lien n’est pas valide');
   });
 });
