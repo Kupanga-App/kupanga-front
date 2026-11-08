@@ -2,7 +2,10 @@ import { Component, effect, input, model, output, signal } from '@angular/core';
 import { SheetComponent } from './sheet.component';
 import { SignatureComponent } from './signature.component';
 
-/** Feuille plein écran (téléphone) avec la zone de signature et le bouton de validation. */
+/**
+ * Feuille plein écran (téléphone) ou fenêtre (ordinateur) avec la zone de signature, « Annuler » et la validation.
+ * La zone reste blanche à l'encre nuit dans les deux thèmes : c'est l'image envoyée à l'API.
+ */
 @Component({
   selector: 'kp-feuille-signature',
   standalone: true,
@@ -19,6 +22,7 @@ import { SignatureComponent } from './signature.component';
         <p class="kp-erreur" role="alert">{{ erreur() }}</p>
       }
       <div pied>
+        <button type="button" class="kp-btn kp-btn--secondary" [disabled]="enCours()" (click)="ouvert.set(false)">Annuler</button>
         <button type="button" class="kp-btn kp-btn--primary" [disabled]="!signature() || enCours()" (click)="valider.emit(signature())">
           @if (enCours()) {
             <span class="kp-spinner"></span>
@@ -28,7 +32,7 @@ import { SignatureComponent } from './signature.component';
       </div>
     </kp-sheet>
   `,
-  styles: [`.texte { margin-bottom: 16px; color: var(--kp-text-2); } .kp-erreur { margin-top: 12px; }`],
+  styles: [`.texte { margin-bottom: 16px; color: var(--kp-text-muted); } .kp-erreur { margin-top: 12px; }`],
 })
 export class FeuilleSignatureComponent {
   readonly ouvert = model(false);

@@ -1,0 +1,567 @@
+// Pages légales (sans encapsulation : le texte est projeté) — toutes les règles sont limitées à .kp-legal.
+@use 'mq';
+
+.kp-legal {
+  --_barre-haut: calc(var(--kp-safe-top) + 12px);
+
+  min-height: 100dvh;
+  padding: 0 calc(var(--kp-safe-right) + var(--kp-page-pad)) calc(32px + var(--kp-safe-bottom))
+    calc(var(--kp-safe-left) + var(--kp-page-pad));
+  background: var(--kp-bg);
+  color: var(--kp-text);
+}
+
+// ── Barre du haut collante, en pilule
+
+.kp-legal__barre {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-top: var(--_barre-haut);
+}
+
+.kp-legal__pilule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 6px;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+}
+
+.kp-legal__marque {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kp-legal__retour {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+  color: var(--kp-text);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--kp-surface-sunken);
+  }
+}
+
+.kp-legal__logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: var(--kp-radius-sm);
+  text-decoration: none;
+}
+
+// Contrôle segmenté : liens de 44 px de haut au moins
+.kp-legal .kp-legal__documents .segment {
+  min-height: 40px;
+}
+
+// ── Conteneur : sommaire + colonne de lecture
+
+.kp-legal__conteneur {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  max-width: 1120px;
+  margin: 32px auto 0;
+}
+
+.kp-legal__sommaire {
+  display: none;
+}
+
+.kp-legal__lecture {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 720px;
+}
+
+.kp-legal__titre {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.kp-legal__date {
+  margin: 8px 0 0;
+  color: var(--kp-text-subtle);
+  font-size: 14px;
+}
+
+.kp-legal__num {
+  color: var(--kp-text-subtle);
+}
+
+// Sommaire repliable (tablette et téléphone)
+.kp-legal__sommaire-replie {
+  margin-top: 20px;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-surface);
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: var(--kp-radius-lg);
+    font-weight: 500;
+    list-style: none;
+    cursor: pointer;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+  }
+
+  &[open] summary kp-icon {
+    transform: rotate(180deg);
+  }
+
+  ol {
+    margin: 0;
+    padding: 0 8px 8px;
+    list-style: none;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 8px;
+    border-radius: var(--kp-radius-md);
+    color: var(--kp-text);
+    text-decoration: none;
+
+    &:hover {
+      background: var(--kp-surface-sunken);
+    }
+  }
+}
+
+// ── Encadré « L'essentiel »
+
+.kp-legal__essentiel {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-surface);
+
+  h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.kp-legal__pastille {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--kp-accent-soft);
+  color: var(--kp-accent);
+
+  &--attention {
+    background: var(--kp-state-warning-bg);
+    color: var(--kp-state-warning-text);
+  }
+}
+
+// ── Texte
+
+.kp-legal__texte {
+  color: var(--kp-text-muted);
+  font-size: 15px;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+
+  > p:first-child {
+    margin-top: 32px;
+  }
+
+  p,
+  ul {
+    margin: 12px 0 0;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  ul ul {
+    margin-top: 4px;
+  }
+
+  li + li {
+    margin-top: 4px;
+  }
+
+  strong {
+    color: var(--kp-text);
+    font-weight: 500;
+  }
+
+  a {
+    color: var(--kp-accent);
+  }
+
+  code {
+    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    font-size: 0.9em;
+  }
+}
+
+.kp-legal__section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--kp-border);
+  scroll-margin-top: 96px;
+
+  h2 {
+    margin: 0;
+    color: var(--kp-text);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+
+    // Focus posé par le sommaire : le titre n'est pas un élément interactif
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}
+
+// Mention à compléter : badge ambre en ligne
+.kp-legal__a-completer {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--kp-state-warning-bg);
+  color: var(--kp-state-warning-text);
+  font-size: 13px;
+  font-weight: 500;
+  box-decoration-break: clone;
+}
+
+// Avertissement (modèles RDC) : bannière ambre
+.kp-legal__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-state-warning-bg);
+  color: var(--kp-state-warning-text);
+
+  kp-icon {
+    margin-top: 2px;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    color: inherit;
+  }
+}
+
+// Responsable du traitement : libellé à gauche, valeur à droite
+.kp-legal__fiche {
+  margin: 16px 0 0;
+  padding: 4px 20px;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-surface);
+
+  > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 24px;
+    padding: 12px 0;
+
+    + div {
+      border-top: 1px solid var(--kp-border);
+    }
+  }
+
+  dt {
+    color: var(--kp-text);
+    font-weight: 500;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+  }
+}
+
+// Tableaux : carte blanche, en-têtes collants, défilement horizontal dans le bloc
+.kp-legal__tableau {
+  max-height: 70vh;
+  margin-top: 16px;
+  overflow: auto;
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-surface);
+  overflow-wrap: normal;
+
+  table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid var(--kp-border);
+    background: var(--kp-bg);
+    color: var(--kp-text);
+    font-weight: 500;
+  }
+
+  tbody tr + tr td {
+    border-top: 1px solid var(--kp-border);
+  }
+
+  td:first-child {
+    color: var(--kp-text);
+    font-weight: 500;
+  }
+}
+
+// ── Pied de page
+
+.kp-legal__pied {
+  max-width: 1120px;
+  margin: 48px auto 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--kp-border);
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 24px;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--kp-text-muted);
+    font-size: 14px;
+  }
+
+  a.actif {
+    color: var(--kp-text);
+    font-weight: 500;
+    text-decoration: none;
+  }
+}
+
+// ── Ordinateur : sommaire collant à gauche
+
+@include mq.ordinateur {
+  .kp-legal__sommaire {
+    position: sticky;
+    top: 96px;
+    display: block;
+    flex: 0 0 240px;
+    align-self: flex-start;
+
+    ol {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    a {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--kp-radius-pill);
+      color: var(--kp-text-muted);
+      font-size: 14px;
+      line-height: 20px;
+      text-decoration: none;
+      transition: background-color var(--kp-duree) var(--kp-ease), color var(--kp-duree) var(--kp-ease);
+
+      &:hover {
+        background: var(--kp-surface-sunken);
+      }
+
+      &:focus-visible {
+        border-radius: var(--kp-radius-pill);
+      }
+
+      &.actif {
+        background: var(--kp-accent-soft);
+        color: var(--kp-text);
+        font-weight: 500;
+      }
+    }
+  }
+
+  .kp-legal__sommaire-titre {
+    margin: 0;
+    padding: 0 14px;
+    color: var(--kp-text-subtle);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .kp-legal__sommaire-replie {
+    display: none;
+  }
+}
+
+// ── Téléphone : choix du document sous le logo, tableaux en cartes
+
+@include mq.telephone {
+  .kp-legal__pilule {
+    border-radius: 28px;
+  }
+
+  .kp-legal .kp-legal__documents {
+    flex: 1 1 100%;
+
+    .segments {
+      display: flex;
+      width: 100%;
+    }
+
+    .segment {
+      flex: 1 1 0;
+      min-height: 44px;
+    }
+  }
+
+  .kp-legal__conteneur {
+    margin-top: 24px;
+  }
+
+  // Barre du haut sur deux rangées
+  .kp-legal__section {
+    scroll-margin-top: 150px;
+  }
+
+  .kp-legal__tableau {
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+
+    table,
+    tbody,
+    tr,
+    td {
+      display: block;
+      min-width: 0;
+    }
+
+    thead {
+      display: none;
+    }
+
+    tr {
+      padding: 4px 16px;
+      border: 1px solid var(--kp-border);
+      border-radius: var(--kp-radius-lg);
+      background: var(--kp-surface);
+
+      + tr {
+        margin-top: 12px;
+      }
+    }
+
+    td {
+      padding: 10px 0;
+
+      &::before {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--kp-text-subtle);
+        content: attr(data-libelle);
+        font-size: 13px;
+        font-weight: 500;
+      }
+    }
+
+    tbody tr + tr td {
+      border-top: 0;
+    }
+
+    td + td {
+      border-top: 1px solid var(--kp-border);
+    }
+
+    td:first-child {
+      font-size: 15px;
+    }
+  }
+
+  .kp-legal__fiche dd {
+    text-align: left;
+  }
+}

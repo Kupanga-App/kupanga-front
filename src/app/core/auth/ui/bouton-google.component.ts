@@ -2,7 +2,8 @@ import { AfterViewInit, Component, ElementRef, NgZone, inject, output, signal, v
 import { environment } from '../../../../environments/environment';
 
 /**
- * Bouton officiel « Continuer avec Google » (Google Identity Services). Émet le jeton d'identité reçu.
+ * Bouton officiel « Continuer avec Google » (Google Identity Services), en pilule avec contour. Émet le jeton d'identité
+ * reçu. Le bouton est dessiné par Google dans un cadre : seuls sa forme, son thème et sa largeur se règlent.
  * Rien n'est affiché si le script de Google ne se charge pas (réseau, bloqueur).
  */
 @Component({
@@ -13,6 +14,7 @@ import { environment } from '../../../../environments/environment';
     :host { display: block; }
     .conteneur { display: flex; justify-content: center; min-height: 0; }
     .conteneur.pret { min-height: 44px; }
+    .conteneur ::ng-deep iframe { border-radius: var(--kp-radius-pill); }
   `],
 })
 export class BoutonGoogleComponent implements AfterViewInit {
@@ -42,7 +44,7 @@ export class BoutonGoogleComponent implements AfterViewInit {
       theme: 'outline',
       size: 'large',
       text: 'continue_with',
-      shape: 'rectangular',
+      shape: 'pill',
       locale: 'fr',
       width: largeur,
     });

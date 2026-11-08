@@ -52,9 +52,9 @@ export class TirerPourActualiserDirective implements OnInit, OnDestroy {
     Object.assign(this.indicateur.style, {
       position: 'fixed', left: '50%', top: 'calc(8px + env(safe-area-inset-top, 0px))', zIndex: '60',
       width: '36px', height: '36px', marginLeft: '-18px', borderRadius: '50%',
-      background: 'var(--kp-surface)', boxShadow: 'var(--kp-shadow)', opacity: '0',
+      background: 'var(--kp-surface)', boxShadow: 'var(--kp-elev-1)', opacity: '0',
       transform: 'translateY(-48px)', pointerEvents: 'none',
-      border: '3px solid var(--kp-surface-3)', borderTopColor: 'var(--kp-primary)',
+      border: '3px solid var(--kp-segment-bg)', borderTopColor: 'var(--kp-accent)',
     } as Partial<CSSStyleDeclaration>);
     this.hote.prepend(this.indicateur);
     this.hote.addEventListener('touchstart', this.debut, { passive: true });

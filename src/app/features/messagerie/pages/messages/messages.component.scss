@@ -1,12 +1,20 @@
 @use 'mq';
 
+// Téléphone : la liste suit le défilement de la page ; la conversation ouverte prend tout l'écran.
+// Tablette et ordinateur (maquette Nav-Proprio-Messages) : une carte à la hauteur de la fenêtre, la page ne
+// défile pas ; liste et conversation ont chacune leur propre défilement.
+
 .messages {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
 
   @include mq.tablette {
-    grid-template-columns: minmax(300px, 380px) 1fr;
-    height: 100dvh;
+    grid-template-columns: clamp(280px, 24vw, 360px) minmax(0, 1fr);
+    height: calc(100dvh - var(--kp-top-offset) - 2 * var(--kp-shell-gap, 12px));
+    overflow: hidden;
+    border-radius: var(--kp-radius-lg);
+    background: var(--kp-surface);
+    box-shadow: var(--kp-elev-0);
   }
 }
 
@@ -14,8 +22,10 @@
   min-width: 0;
 
   @include mq.tablette {
+    min-height: 0;
     overflow-y: auto;
-    border-right: 1px solid var(--kp-border);
+    overscroll-behavior: contain;
+    box-shadow: 1px 0 0 var(--kp-border);
   }
 }
 
@@ -26,11 +36,12 @@
   @include mq.tablette {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
+    min-height: 0;
   }
 }
 
-// Téléphone : la conversation remplace la liste (pile d'écrans)
+// Téléphone : la conversation remplace la liste (pile d'écrans), à la hauteur de la fenêtre ; avec
+// interactive-widget=resizes-content, le clavier réduit 100dvh et la saisie reste visible.
 .messages--conversation {
   @include mq.telephone {
     .colonne-liste {
@@ -51,9 +62,29 @@
   justify-content: center;
   flex: 1;
   padding: 32px;
+  background: var(--kp-fond-fil);
 
   kp-vide {
     max-width: 420px;
     border: 0;
+  }
+}
+
+// Marge en remplissage (et non en marge de la carte) : pas de fusion de marges qui ferait défiler la page
+:host {
+  display: block;
+
+  @include mq.tablette {
+    padding: var(--kp-shell-gap, 12px);
+  }
+
+  // Fond du fil de la conversation, entre le fond de page et la surface
+  --kp-fond-fil: color-mix(in srgb, var(--kp-bg) 55%, var(--kp-surface));
+}
+
+// Sous la barre du haut : aligné sur les bords de la pilule
+:host-context(html[data-barre='haut']) {
+  @include mq.tablette {
+    padding-inline: clamp(8px, 1.6vw, 24px);
   }
 }

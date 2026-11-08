@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, input, output, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ChatService } from '../../services/chat.service';
@@ -6,7 +6,6 @@ import { ChatStoreService } from '../../services/chat-store.service';
 import { ChatWebSocketService } from '../../services/chat-websocket.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ConversationDTO } from '../../models/chat.models';
-import { PageHeaderComponent } from '../../../../shared/ui/page-header.component';
 import { SegmentedComponent, OptionSegment } from '../../../../shared/ui/segmented.component';
 import { AvatarComponent } from '../../../../shared/ui/avatar.component';
 import { VideComponent } from '../../../../shared/ui/vide.component';
@@ -19,7 +18,7 @@ type Filtre = 'toutes' | 'non-lues';
 @Component({
   selector: 'kp-conversation-list',
   standalone: true,
-  imports: [PageHeaderComponent, SegmentedComponent, AvatarComponent, VideComponent, IconComponent, TirerPourActualiserDirective],
+  imports: [SegmentedComponent, AvatarComponent, VideComponent, IconComponent, TirerPourActualiserDirective],
   templateUrl: './conversation-list.component.html',
   styleUrl: './conversation-list.component.scss',
 })
@@ -37,10 +36,14 @@ export class ConversationListComponent implements OnInit, OnDestroy {
   readonly erreur = signal(false);
   readonly heure = heureMessage;
 
-  readonly options: OptionSegment<Filtre>[] = [
-    { valeur: 'toutes', libelle: 'Toutes' },
-    { valeur: 'non-lues', libelle: 'Non lues' },
-  ];
+  /** « Non lues · 2 » : compteur global déjà chargé (ChatStoreService.unreadTotal). */
+  readonly options = computed<OptionSegment<Filtre>[]>(() => {
+    const n = this.store.unreadTotal();
+    return [
+      { valeur: 'toutes', libelle: 'Toutes' },
+      { valeur: 'non-lues', libelle: n > 0 ? `Non lues · ${n > 99 ? '99+' : n}` : 'Non lues' },
+    ];
+  });
 
   private saisie = new Subject<string>();
   private subs = new Subscription();

@@ -1,0 +1,91 @@
+{
+  "claire /accueil": {
+    "montants": [
+      "1985 EUR",
+      "685 EUR",
+      "755 EUR",
+      "965 EUR"
+    ],
+    "dates": [],
+    "statuts": [
+      "Vacant"
+    ]
+  },
+  "claire /biens/1/quittances": {
+    "montants": [
+      "365 EUR"
+    ],
+    "dates": [
+      "4/10",
+      "5/12",
+      "5/9"
+    ],
+    "statuts": [
+      "En attente",
+      "Loyer reçu"
+    ]
+  },
+  "lucas /mon-logement": {
+    "montants": [
+      "325 EUR",
+      "365 EUR",
+      "40 EUR",
+      "650 EUR"
+    ],
+    "dates": [
+      "5/9",
+      "8/11"
+    ],
+    "statuts": [
+      "En attente",
+      "Loyer reçu",
+      "Signé"
+    ]
+  },
+  "lucas /quittances": {
+    "montants": [
+      "365 EUR"
+    ],
+    "dates": [
+      "4/10",
+      "5/12",
+      "5/9"
+    ],
+    "statuts": [
+      "En attente",
+      "Loyer reçu"
+    ]
+  },
+  "patrick /biens/141/quittances": {
+    "montants": [
+      "480 USD"
+    ],
+    "dates": [
+      "10/11"
+    ],
+    "statuts": [
+      "En attente"
+    ]
+  },
+  "visiteur /annonces/142": {
+    "montants": [
+      "2960 USD"
+    ],
+    "dates": [
+      "22/12"
+    ],
+    "statuts": []
+  },
+  "visiteur /annonces/2": {
+    "montants": [
+      "120 EUR",
+      "965 EUR"
+    ],
+    "dates": [
+      "12/11"
+    ],
+    "statuts": [
+      "Loué"
+    ]
+  }
+}

@@ -4,6 +4,8 @@
   [etape]="etape()"
   [aide]="aides[etape()]"
   [peutContinuer]="etapeValide()"
+  [manque]="manque()"
+  [modifie]="modifie()"
   [enCours]="envoi()"
   [erreur]="erreur()"
   libelleFin="Publier le bien"
@@ -291,7 +293,7 @@
           }
           <div class="kp-field">
             <label class="kp-label" for="dispo">Disponible le</label>
-            <input id="dispo" class="kp-input" type="date" formControlName="disponibleDe" [min]="aujourdhui" />
+            <kp-champ-date idChamp="dispo" formControlName="disponibleDe" [min]="aujourdhui" />
           </div>
         </div>
       }

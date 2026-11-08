@@ -5,12 +5,12 @@
 }
 
 .nom {
-  font-size: var(--kp-fs-lg);
-  font-weight: 700;
+  font-size: var(--kp-fs-subtitle);
+  font-weight: 600;
 }
 
 .coche {
-  color: var(--kp-primary-text);
+  color: var(--kp-accent);
 }
 
 button.kp-list__item:disabled {

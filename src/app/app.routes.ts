@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AppShellComponent } from './layouts/app-shell/app-shell.component';
 import { accueilGuard, authGuard, invitesGuard, landingGuard } from './core/auth/guards/auth.guard';
+import { sortieAssistantGuard } from './shared/ui/sortie-assistant.guard';
 
 /**
  * Lot 3 (2026-11-05) : plus de rôle par compte. Les écrans « propriétaire » et « locataire » demandent seulement
@@ -38,6 +39,12 @@ export const routes: Routes = [
   // Page d'accueil publique (visiteur) ; un compte connecté va à son accueil
   { path: '', pathMatch: 'full', canActivate: [landingGuard], title: 'Kupanga · La gestion locative, de l’annonce à la fin du bail',
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent) },
+
+  // Pages légales : publiques, sans compte (adresses déclarées à Google, écran de consentement)
+  { path: 'confidentialite', title: 'Politique de confidentialité · Kupanga',
+    loadComponent: () => import('./features/legal/confidentialite.component').then(m => m.ConfidentialiteComponent) },
+  { path: 'conditions', title: 'Conditions d’utilisation · Kupanga',
+    loadComponent: () => import('./features/legal/conditions.component').then(m => m.ConditionsComponent) },
 
   // Signature depuis le lien reçu par e-mail : publique, plein écran
   { path: 'contrats/signer/:token', title: 'Signer le bail · Kupanga',
@@ -77,7 +84,8 @@ export const routes: Routes = [
         loadComponent: () => import('./features/proprietaire/bail/nouveau-bail.component').then(m => m.NouveauBailComponent) },
       { path: 'biens/:id/etats-des-lieux', canActivate: PROPRIETAIRE, title: 'États des lieux · Kupanga',
         loadComponent: () => import('./features/proprietaire/edl/etats-des-lieux.component').then(m => m.EtatsDesLieuxComponent) },
-      { path: 'biens/:id/etats-des-lieux/nouveau', canActivate: PROPRIETAIRE, data: { pleinEcran: true }, title: 'Nouvel état des lieux · Kupanga',
+      // Retour du navigateur pendant la saisie : même confirmation que « Quitter » (décision du 7 novembre 2026)
+      { path: 'biens/:id/etats-des-lieux/nouveau', canActivate: PROPRIETAIRE, canDeactivate: [sortieAssistantGuard], data: { pleinEcran: true }, title: 'Nouvel état des lieux · Kupanga',
         loadComponent: () => import('./features/proprietaire/edl/nouvel-edl.component').then(m => m.NouvelEdlComponent) },
       { path: 'biens/:id/quittances', canActivate: PROPRIETAIRE, title: 'Quittances · Kupanga',
         loadComponent: () => import('./features/proprietaire/quittances/quittances-bien.component').then(m => m.QuittancesBienComponent) },

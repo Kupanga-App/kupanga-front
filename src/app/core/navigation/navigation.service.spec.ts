@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { Router, provideRouter } from '@angular/router';
+import { Subject, of } from 'rxjs';
 import { AuthService } from '../auth/services/auth.service';
 import { User } from '../auth/models/user.model';
 import { LogementContextService } from '../services/logement-context.service';
 import { NavigationService, ONGLETS_MOBILE_MAX } from './navigation.service';
 
-describe('NavigationService (lot 3 : espaces déduits des données, plus du rôle)', () => {
+describe('NavigationService (profil de navigation déduit des biens et du logement)', () => {
   const utilisateur = signal<User | null>(null);
   const logementBienId = signal<number | null>(null);
   const aDesBiens = signal(false);
@@ -22,6 +22,7 @@ describe('NavigationService (lot 3 : espaces déduits des données, plus du rôl
     logementBienId.set(null);
     aDesBiens.set(false);
     charger.calls.reset();
+    charger.and.returnValue(of(null));
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -36,34 +37,55 @@ describe('NavigationService (lot 3 : espaces déduits des données, plus du rôl
   });
 
   it('visiteur : annonces et connexion', () => {
+    expect(nav.profil()).toBe('visiteur');
+    expect(liens(nav.onglets())).toEqual(['/explorer', '/auth/login']);
     expect(liens(nav.ongletsMobile())).toEqual(['/explorer', '/auth/login']);
   });
 
-  it('compte sans bien ni logement : accueil, annonces, messages, compte (quel que soit le profil choisi)', () => {
+  it('candidat (ni bien ni logement), quel que soit le profil choisi à l’inscription', () => {
     for (const role of ['ROLE_PROPRIETAIRE', 'ROLE_LOCATAIRE'] as const) {
       connecter(role);
-      expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/explorer', '/messages', '/compte']);
+      expect(nav.profil()).toBe('candidat');
+      expect(liens(nav.onglets())).toEqual(['/accueil', '/explorer', '/demandes-location', '/messages']);
+      expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/explorer', '/demandes-location', '/messages', '/compte']);
       expect(nav.aDesDocuments()).toBeFalse();
     }
   });
 
-  it('propriétaire qui loue aussi un logement : Mes biens, Mon logement et Quittances dans la barre latérale', () => {
-    connecter('ROLE_LOCATAIRE');
-    aDesBiens.set(true);
+  it('locataire (un logement, aucun bien) : barre du haut Accueil · Mon logement · Explorer', () => {
+    connecter();
     logementBienId.set(7);
-    expect(liens(nav.onglets())).toEqual(
-      ['/accueil', '/biens', '/mon-logement', '/quittances', '/explorer', '/messages', '/documents', '/compte']);
-    expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/explorer', '/messages', '/documents', '/compte']);
+    expect(nav.profil()).toBe('locataire');
+    expect(liens(nav.onglets())).toEqual(['/accueil', '/mon-logement', '/explorer']);
+    expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/mon-logement', '/messages', '/documents', '/compte']);
   });
 
-  it('ne dépasse jamais 5 onglets en bas sur téléphone, Explorer toujours présent', () => {
+  it('propriétaire : barre latérale Accueil · Mes biens · Messages · Documents', () => {
+    connecter('ROLE_PROPRIETAIRE');
+    aDesBiens.set(true);
+    expect(nav.profil()).toBe('proprietaire');
+    expect(liens(nav.onglets())).toEqual(['/accueil', '/biens', '/messages', '/documents']);
+    expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/biens', '/messages', '/documents', '/compte']);
+  });
+
+  it('propriétaire qui loue aussi : reste propriétaire, avec Mon logement et Quittances dans la barre latérale', () => {
+    connecter();
+    aDesBiens.set(true);
+    logementBienId.set(7);
+    expect(nav.profil()).toBe('proprietaire');
+    expect(liens(nav.onglets())).toEqual(
+      ['/accueil', '/biens', '/mon-logement', '/quittances', '/messages', '/documents']);
+    expect(liens(nav.ongletsMobile())).toEqual(['/accueil', '/biens', '/messages', '/documents', '/compte']);
+  });
+
+  it('jamais plus de 5 onglets en bas sur téléphone, Messages toujours présent pour un compte', () => {
     for (const biens of [false, true]) {
       for (const logement of [null, 3]) {
         connecter();
         aDesBiens.set(biens);
         logementBienId.set(logement);
         expect(nav.ongletsMobile().length).toBeLessThanOrEqual(ONGLETS_MOBILE_MAX);
-        expect(liens(nav.ongletsMobile())).toContain('/explorer');
+        expect(liens(nav.ongletsMobile())).toContain('/messages');
       }
     }
   });
@@ -77,9 +99,61 @@ describe('NavigationService (lot 3 : espaces déduits des données, plus du rôl
     expect(nav.aDesDocuments()).toBeTrue();
   });
 
+  it('déconnexion : retour au profil visiteur', () => {
+    connecter();
+    aDesBiens.set(true);
+    expect(nav.profil()).toBe('proprietaire');
+    utilisateur.set(null);
+    aDesBiens.set(false);
+    expect(nav.profil()).toBe('visiteur');
+  });
+
   it('relit les espaces du compte à la connexion', () => {
     connecter();
     TestBed.flushEffects();
     expect(charger).toHaveBeenCalledWith(1);
+  });
+
+  it('profil inconnu juste après la connexion, tant que l’API n’a pas répondu (pas de bascule de barre)', () => {
+    const reponse = new Subject<number | null>();
+    charger.and.returnValue(reponse);
+    connecter();
+    TestBed.flushEffects();
+    expect(nav.profilConnu()).toBeFalse();
+    reponse.next(null);
+    expect(nav.profilConnu()).toBeTrue();
+  });
+
+  it('profil connu d’emblée avec les valeurs gardées de la session (hors ligne)', () => {
+    charger.and.returnValue(new Subject<number | null>());
+    aDesBiens.set(true);
+    connecter();
+    TestBed.flushEffects();
+    expect(nav.profilConnu()).toBeTrue();
+  });
+  it('locataire : « Mon logement » reste actif sur /quittances (barre du haut et onglets du bas)', async () => {
+    connecter();
+    logementBienId.set(4);
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: '**', children: [] }]);
+    await router.navigateByUrl('/quittances?annee=2026');
+    const enHaut = nav.onglets().find(o => o.lien === '/mon-logement')!;
+    const enBas = nav.ongletsMobile().find(o => o.lien === '/mon-logement')!;
+    expect(nav.actifAussi(enHaut)).toBeTrue();
+    expect(nav.actifAussi(enBas)).toBeTrue();
+    await router.navigateByUrl('/messages');
+    expect(nav.actifAussi(enHaut)).toBeFalse();
+  });
+
+  it('propriétaire qui loue aussi : « Quittances » garde sa propre entrée, « Mon logement » n’est pas actif dessus', async () => {
+    connecter();
+    aDesBiens.set(true);
+    logementBienId.set(4);
+    const router = TestBed.inject(Router);
+    router.resetConfig([{ path: '**', children: [] }]);
+    await router.navigateByUrl('/quittances');
+    const monLogement = nav.onglets().find(o => o.lien === '/mon-logement')!;
+    expect(nav.actifAussi(monLogement)).toBeFalse();
+    expect(liens(nav.onglets())).toContain('/quittances');
   });
 });

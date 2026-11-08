@@ -3,52 +3,60 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { messageErreurApi } from '../../../http/api-error';
-import { AuthLayoutComponent } from '../../ui/auth-layout.component';
+import { AuthShellComponent } from '../../ui/auth-shell.component';
+import { AuthChampComponent } from '../../ui/auth-champ.component';
+import { AuthBanniereComponent } from '../../ui/auth-banniere.component';
 
 /**
  * A14 : page ouverte depuis le lien de confirmation (`/auth/verifier-email?token=…`).
  * Le jeton part dans le corps de la requête ; lien invalide ou expiré → demande d'un nouveau lien.
+ * L'API ne connecte pas à la confirmation : « Continuer vers Kupanga » mène à la connexion.
  */
 @Component({
   selector: 'app-verify-email',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent],
+  imports: [ReactiveFormsModule, RouterLink, AuthShellComponent, AuthChampComponent, AuthBanniereComponent],
   template: `
     @switch (etat()) {
       @case ('verification') {
-        <kp-auth-layout titre="Confirmation en cours">
-          <div class="kp-row"><span class="kp-spinner"></span><p>Un instant…</p></div>
-        </kp-auth-layout>
+        <kp-auth-shell forme="carte" illustration="enveloppe" titre="Confirmation en cours">
+          <p class="attente" role="status"><span class="kp-spinner"></span>Un instant…</p>
+        </kp-auth-shell>
       }
       @case ('confirme') {
-        <kp-auth-layout titre="Adresse confirmée">
-          <div class="kp-stack">
-            <p>Votre compte est actif. Vous pouvez vous connecter.</p>
-            <a routerLink="/auth/login" class="kp-btn kp-btn--primary kp-btn--block">Se connecter</a>
-          </div>
-        </kp-auth-layout>
+        <kp-auth-shell forme="carte" illustration="maison" titre="C’est confirmé"
+                       sousTitre="Votre compte est prêt. Vous pouvez chercher un logement ou publier un bien.">
+          <a actions routerLink="/auth/login" class="kp-btn kp-btn--primary">Continuer vers Kupanga</a>
+        </kp-auth-shell>
       }
       @case ('echec') {
-        <kp-auth-layout titre="Lien expiré ou invalide" [sousTitre]="erreur()">
-          <form class="kp-form" [formGroup]="form" (ngSubmit)="renvoyerLien()" novalidate>
-            <div class="kp-field">
-              <label class="kp-label" for="email">Votre e-mail</label>
+        <kp-auth-shell forme="carte" illustration="lien" titre="Ce lien ne fonctionne plus"
+                       sousTitre="Il a expiré ou a déjà servi. Demandez-en un nouveau : il arrive en quelques instants.">
+          <form id="form-nouveau-lien" class="kp-auth-form" [formGroup]="form" (ngSubmit)="renvoyerLien()" novalidate>
+            @if (infoRenvoi(); as info) {
+              <kp-auth-banniere [ton]="renvoiRate() ? 'danger' : 'ok'"><p>{{ info }}</p></kp-auth-banniere>
+            }
+            <kp-auth-champ libelle="Votre e-mail" pour="email"
+                           [erreur]="form.controls.email.touched && form.controls.email.invalid ? 'Entrez une adresse e-mail valide.' : null">
               <input id="email" class="kp-input" type="email" inputmode="email" formControlName="email" autocomplete="email"
                      autocapitalize="off" spellcheck="false" />
-              @if (form.controls.email.touched && form.controls.email.invalid) {
-                <span class="kp-erreur">Entrez une adresse e-mail valide.</span>
-              }
-            </div>
-            @if (infoRenvoi()) {
-              <p class="kp-bandeau" role="status">{{ infoRenvoi() }}</p>
-            }
-            <button type="submit" class="kp-btn kp-btn--primary kp-btn--block" [disabled]="renvoiEnCours()">Recevoir un nouveau lien</button>
-            <a routerLink="/auth/login" class="kp-btn kp-btn--ghost kp-btn--block">Aller à la connexion</a>
+            </kp-auth-champ>
           </form>
-        </kp-auth-layout>
+          <button actions type="submit" form="form-nouveau-lien" class="kp-btn kp-btn--primary" [disabled]="renvoiEnCours()"
+                  [attr.aria-busy]="renvoiEnCours()">
+            @if (renvoiEnCours()) {
+              <span class="kp-spinner"></span>
+            }
+            Recevoir un nouveau lien
+          </button>
+          <a actions routerLink="/auth/login" class="kp-btn kp-btn--ghost">Retour à la connexion</a>
+        </kp-auth-shell>
       }
     }
   `,
+  styles: [`
+    .attente { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0; color: var(--kp-text-muted); }
+  `],
 })
 export class VerifyEmailComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -57,9 +65,9 @@ export class VerifyEmailComponent implements OnInit {
   private router = inject(Router);
 
   readonly etat = signal<'verification' | 'confirme' | 'echec'>('verification');
-  readonly erreur = signal<string | null>(null);
   readonly renvoiEnCours = signal(false);
   readonly infoRenvoi = signal<string | null>(null);
+  readonly renvoiRate = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
@@ -70,12 +78,12 @@ export class VerifyEmailComponent implements OnInit {
     // Le jeton ne reste pas dans l'URL ni dans l'historique du navigateur
     void this.router.navigate([], { queryParams: {}, replaceUrl: true });
     if (!jeton) {
-      this.echec('Ouvrez le dernier lien reçu par e-mail, ou demandez-en un nouveau.');
+      this.etat.set('echec');
       return;
     }
     this.authService.verifierEmail(jeton).subscribe({
       next: () => this.etat.set('confirme'),
-      error: err => this.echec(messageErreurApi(err, 'Ce lien de confirmation n’est plus valable.')),
+      error: () => this.etat.set('echec'),
     });
   }
 
@@ -89,17 +97,14 @@ export class VerifyEmailComponent implements OnInit {
     this.authService.renvoyerVerification(this.form.controls.email.value.trim()).subscribe({
       next: () => {
         this.renvoiEnCours.set(false);
+        this.renvoiRate.set(false);
         this.infoRenvoi.set('Si un compte attend sa confirmation pour cette adresse, un nouveau lien vient de lui être envoyé.');
       },
       error: err => {
         this.renvoiEnCours.set(false);
+        this.renvoiRate.set(true);
         this.infoRenvoi.set(messageErreurApi(err, 'Le lien n’a pas pu être renvoyé. Réessayez plus tard.'));
       },
     });
-  }
-
-  private echec(message: string): void {
-    this.erreur.set(message);
-    this.etat.set('echec');
   }
 }

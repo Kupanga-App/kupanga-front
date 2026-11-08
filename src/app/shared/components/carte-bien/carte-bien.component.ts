@@ -35,7 +35,7 @@ const RAYON_PUBLIC = 150;
   `,
   styles: [`
     .kp-carte-bien { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-    .kp-carte-bien__map { height: clamp(200px, 35dvh, 300px); width: 100%; border-radius: var(--kp-radius); overflow: hidden; z-index: 0; }
+    .kp-carte-bien__map { height: clamp(200px, 35dvh, 300px); width: 100%; border-radius: var(--kp-radius-md); overflow: hidden; z-index: 0; }
   `],
 })
 export class CarteBienComponent implements AfterViewInit, OnDestroy {
@@ -81,10 +81,10 @@ export class CarteBienComponent implements AfterViewInit, OnDestroy {
 
     const rayon = this.rayon();
     if (rayon == null) {
-      L.circleMarker(point, { radius: 10, color: '#10212B', weight: 3, fillColor: '#8FA464', fillOpacity: 0.95 })
+      L.circleMarker(point, { radius: 10, weight: 3, fillOpacity: 0.95, className: 'kp-carte-point' })
         .addTo(this.carte);
     } else {
-      const zone = L.circle(point, { radius: rayon, color: '#10212B', weight: 2, fillColor: '#8FA464', fillOpacity: 0.25 })
+      const zone = L.circle(point, { radius: rayon, weight: 2, fillOpacity: 0.25, className: 'kp-carte-zone' })
         .addTo(this.carte);
       this.carte.fitBounds(zone.getBounds(), { padding: [16, 16] });
     }

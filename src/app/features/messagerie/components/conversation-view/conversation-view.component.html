@@ -13,6 +13,12 @@
       }
     }
   </div>
+  @if (lienProposer) {
+    <a class="proposer" [routerLink]="lienProposer">
+      <kp-icon name="key" [size]="16" [strokeWidth]="1.75" />
+      <span>Proposer<span class="proposer__suite"> la location</span></span>
+    </a>
+  }
 </header>
 
 @if (!wsConnected()) {

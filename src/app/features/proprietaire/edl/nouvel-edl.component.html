@@ -1,15 +1,27 @@
 <kp-assistant
-  titre="Nouvel état des lieux"
+  [titre]="titreAssistant()"
+  [sousTitre]="sousTitre()"
   [etapes]="etapes"
+  [libelles]="libelles"
+  disposition="haut"
   [etape]="etape()"
-  [aide]="etape() === 3 ? 'Touchez une pièce pour l’ajouter, puis notez l’état de chaque élément.' : null"
+  [aide]="etape() === 3 ? 'Comme aujourd’hui, chaque élément est noté Bon par défaut : changez seulement ce qui ne l’est pas.' : null"
   [peutContinuer]="etapeValide() && !!bien()?.locataire"
+  [manque]="manque()"
+  [modifie]="modifie()"
   [enCours]="envoi()"
   [erreur]="erreur()"
   libelleFin="Créer l’état des lieux"
   (precedent)="precedent()"
   (suivant)="suivant()"
   (quitter)="quitter()">
+
+  @if (etape() === 3 && pieceAffichee() !== null && pieceAffichee()! < pieces.length - 1) {
+    <button actions type="button" class="kp-btn kp-btn--secondary suivante" [class.suivante--liste]="pieceOuverte() === null"
+            (click)="ouvrirPiece(pieceAffichee()! + 1)">
+      Pièce suivante · {{ pieces.at(pieceAffichee()! + 1).controls.nomPiece.value || 'Pièce sans nom' }}
+    </button>
+  }
 
   @switch (etape()) {
     @case (0) {
@@ -26,11 +38,11 @@
         <div class="kp-form-row">
           <div class="kp-field">
             <label class="kp-label" for="date">Date</label>
-            <input id="date" class="kp-input" type="date" formControlName="date" />
+            <kp-champ-date idChamp="date" formControlName="date" />
           </div>
           <div class="kp-field">
             <label class="kp-label" for="heure">Heure <span class="kp-optionnel">(facultatif)</span></label>
-            <input id="heure" class="kp-input" type="time" formControlName="heure" />
+            <kp-champ-heure idChamp="heure" formControlName="heure" [effacable]="true" />
           </div>
         </div>
       </form>
@@ -106,65 +118,115 @@
     }
 
     @case (3) {
-      <div class="kp-stack">
-        <div class="kp-choix">
-          @for (p of piecesProposees; track p) {
-            <button type="button" class="kp-choix-item" (click)="ajouterPiece(p)" [disabled]="pieces.length >= max.pieces">
-              <kp-icon name="plus" [size]="16" /> {{ p }}
-            </button>
-          }
-          <button type="button" class="kp-choix-item" (click)="ajouterPiece('Pièce')" [disabled]="pieces.length >= max.pieces">
-            <kp-icon name="plus" [size]="16" /> Autre pièce
-          </button>
-        </div>
-
-        @for (p of pieces.controls; track p; let i = $index) {
-          <details class="kp-card piece" [open]="i === pieces.length - 1" [formGroup]="p">
-            <summary>
-              <span class="kp-strong">{{ p.controls.nomPiece.value || 'Pièce sans nom' }}</span>
-              <span class="kp-muted kp-small">{{ p.controls.elements.length }} élément{{ p.controls.elements.length > 1 ? 's' : '' }}</span>
-            </summary>
-            <div class="kp-stack">
-              <div class="kp-row">
-                <div class="kp-field kp-spacer">
-                  <label class="kp-label" [for]="'piece-' + i">Nom de la pièce</label>
-                  <input class="kp-input" [id]="'piece-' + i" formControlName="nomPiece" maxlength="100" />
-                </div>
-                <button type="button" class="kp-icon-btn retirer" (click)="pieces.removeAt(i)" aria-label="Retirer cette pièce"><kp-icon name="trash-2" /></button>
-              </div>
-
-              @for (e of p.controls.elements.controls; track e; let j = $index) {
-                <div class="element" [formGroup]="e">
-                  <div class="kp-row kp-row--between">
-                    <label class="kp-sr-only" [for]="'el-' + i + '-' + j">Élément</label>
-                    <select class="kp-input element__type" [id]="'el-' + i + '-' + j" formControlName="typeElement">
-                      @for (o of elementsPossibles; track o.valeur) {
-                        <option [value]="o.valeur">{{ o.libelle }}</option>
-                      }
-                    </select>
-                    <button type="button" class="kp-icon-btn" (click)="p.controls.elements.removeAt(j)" aria-label="Retirer cet élément"><kp-icon name="x" /></button>
-                  </div>
-                  <div class="etats" role="radiogroup" [attr.aria-label]="'État : ' + libelleElement(e.controls.typeElement.value)">
-                    @for (o of etats; track o.valeur) {
-                      <button type="button" class="etat" role="radio" [attr.aria-checked]="e.controls.etatElement.value === o.valeur"
-                              [class]="'etat etat--' + o.valeur" (click)="e.controls.etatElement.setValue(o.valeur)">{{ o.libelle }}</button>
-                    }
-                  </div>
-                  <label class="kp-sr-only" [for]="'obs-' + i + '-' + j">Observation</label>
-                  <input class="kp-input" [id]="'obs-' + i + '-' + j" formControlName="observation" maxlength="1000" placeholder="Observation (facultatif)" />
-                </div>
+      <div class="pieces" [class.pieces--ouverte]="pieceOuverte() !== null">
+        <!-- Liste des pièces -->
+        <section class="pieces__liste" aria-labelledby="titre-pieces">
+          <div class="pieces__entete">
+            <h2 id="titre-pieces">Pièces</h2>
+            <span class="petit">{{ pieces.length }} pièce{{ pieces.length > 1 ? 's' : '' }} · {{ nbElements() }} élément{{ nbElements() > 1 ? 's' : '' }}</span>
+          </div>
+          @if (pieces.length) {
+            <ul class="pieces__items">
+              @for (p of pieces.controls; track p; let i = $index) {
+                <li>
+                  <button type="button" class="piece-item" [class.piece-item--active]="pieceAffichee() === i"
+                          [attr.aria-current]="pieceAffichee() === i ? 'true' : null" (click)="ouvrirPiece(i)">
+                    <span class="piece-item__numero" aria-hidden="true">{{ i + 1 }}</span>
+                    <span class="piece-item__texte">
+                      <span class="fort kp-ellipsis">{{ p.controls.nomPiece.value || 'Pièce sans nom' }}</span>
+                      <span class="petit">
+                        {{ p.controls.elements.length }} élément{{ p.controls.elements.length > 1 ? 's' : '' }}@if (aNoter(p)) { · {{ aNoter(p) }} à noter }
+                      </span>
+                    </span>
+                    <kp-icon name="chevron-right" [size]="18" class="piece-item__chevron" />
+                  </button>
+                </li>
               }
+            </ul>
+          } @else {
+            <p class="secondaire pieces__vide">Faites le tour du logement pièce par pièce : ajoutez la première.</p>
+          }
+          <div class="pieces__ajout" role="group" aria-label="Ajouter une pièce">
+            @for (n of piecesProposees; track n) {
+              <button type="button" class="puce" (click)="ajouterPiece(n)" [disabled]="pieces.length >= max.pieces">
+                <kp-icon name="plus" [size]="14" /> {{ n }}
+              </button>
+            }
+            <button type="button" class="puce" (click)="ajouterPiece('Pièce')" [disabled]="pieces.length >= max.pieces">
+              <kp-icon name="plus" [size]="14" /> Autre
+            </button>
+          </div>
+        </section>
+
+        <!-- Pièce ouverte -->
+        @if (pieceAffichee() !== null) {
+          @if (pieces.at(pieceAffichee()!); as p) {
+            <section class="piece" [formGroup]="p" aria-labelledby="nom-piece">
+              <div class="piece__entete">
+                <button type="button" class="kp-icon-btn piece__retour" (click)="ouvrirPiece(null)" aria-label="Liste des pièces">
+                  <kp-icon name="chevron-left" />
+                </button>
+                <div class="piece__nom">
+                  <label class="kp-sr-only" for="nom-piece">Nom de la pièce</label>
+                  <input id="nom-piece" class="nom" formControlName="nomPiece" maxlength="100" placeholder="Nom de la pièce" />
+                  <span class="petit">Pièce {{ pieceAffichee()! + 1 }} sur {{ pieces.length }}</span>
+                </div>
+                <button type="button" class="kp-icon-btn" (click)="retirerPiece(pieceAffichee()!)" aria-label="Retirer cette pièce">
+                  <kp-icon name="trash-2" />
+                </button>
+              </div>
+              @if (p.controls.nomPiece.touched && p.controls.nomPiece.invalid) {
+                <span class="kp-erreur">Donnez un nom à la pièce.</span>
+              }
+
+              <ul class="elements">
+                @for (e of p.controls.elements.controls; track e; let j = $index) {
+                  <li class="element" [formGroup]="e">
+                    <div class="element__ligne">
+                      <label class="kp-sr-only" [for]="'el-' + j">Élément</label>
+                      <select class="element__type" [id]="'el-' + j" formControlName="typeElement">
+                        @for (o of elementsPossibles; track o.valeur) {
+                          <option [value]="o.valeur">{{ o.libelle }}</option>
+                        }
+                      </select>
+                      <div class="etats" role="radiogroup" [attr.aria-label]="'État : ' + libelleElement(e.controls.typeElement.value)">
+                        @for (o of etats; track o.valeur) {
+                          <button type="button" role="radio" [attr.aria-checked]="e.controls.etatElement.value === o.valeur"
+                                  [attr.aria-label]="o.libelle" [class]="'etat etat--' + o.valeur"
+                                  (click)="e.controls.etatElement.setValue(o.valeur)">
+                            <span class="etat__long">{{ o.libelle }}</span><span class="etat__court" aria-hidden="true">{{ o.court }}</span>
+                          </button>
+                        }
+                      </div>
+                      <div class="element__actions">
+                        <button type="button" class="kp-icon-btn kp-icon-btn--sm" [class.actif]="observationVisible(e)"
+                                (click)="basculerObservation(e)" [attr.aria-expanded]="observationVisible(e)"
+                                [attr.aria-label]="'Observation sur ' + libelleElement(e.controls.typeElement.value)">
+                          <kp-icon name="pencil" [size]="16" />
+                        </button>
+                        <button type="button" class="kp-icon-btn kp-icon-btn--sm" (click)="p.controls.elements.removeAt(j)"
+                                [attr.aria-label]="'Retirer ' + libelleElement(e.controls.typeElement.value)">
+                          <kp-icon name="x" [size]="16" />
+                        </button>
+                      </div>
+                    </div>
+                    @if (observationVisible(e)) {
+                      <label class="kp-sr-only" [for]="'obs-' + j">Observation</label>
+                      <input class="kp-input observation" [id]="'obs-' + j" formControlName="observation" maxlength="1000"
+                             placeholder="Observation (facultatif)" />
+                    }
+                  </li>
+                }
+              </ul>
               @if (p.controls.elements.length < max.elements) {
-                <button type="button" class="kp-btn kp-btn--ghost" (click)="ajouterElement(p)"><kp-icon name="plus" [size]="18" /> Ajouter un élément</button>
+                <button type="button" class="ajout-element" (click)="ajouterElement(p)"><kp-icon name="plus" [size]="18" /> Ajouter un élément</button>
               }
               <div class="kp-field">
-                <label class="kp-label" [for]="'piece-obs-' + i">Remarques sur la pièce <span class="kp-optionnel">(facultatif)</span></label>
-                <textarea class="kp-input" [id]="'piece-obs-' + i" formControlName="observations" maxlength="2000" rows="2"></textarea>
+                <label class="kp-label" for="piece-obs">Remarques sur la pièce <span class="kp-optionnel">(facultatif)</span></label>
+                <textarea class="kp-input" id="piece-obs" formControlName="observations" maxlength="2000" rows="3"></textarea>
               </div>
-            </div>
-          </details>
-        } @empty {
-          <p class="kp-muted">Ajoutez au moins une pièce.</p>
+            </section>
+          }
         }
       </div>
     }

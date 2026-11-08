@@ -194,7 +194,7 @@ import { BoutonWhatsappComponent } from '../../../gestion-logement/components/bo
     .attente p { margin-bottom: 12px; }
     .intro { margin-bottom: 16px; }
     .recherche { position: relative; display: flex; align-items: center; margin-bottom: 16px; }
-    .recherche kp-icon { position: absolute; left: 14px; color: var(--kp-text-3); pointer-events: none; }
+    .recherche kp-icon { position: absolute; left: 14px; color: var(--kp-text-subtle); pointer-events: none; }
     .recherche .kp-input { padding-left: 42px; }
     ul { list-style: none; }
     .confirmation, .reserve { align-items: flex-start; }

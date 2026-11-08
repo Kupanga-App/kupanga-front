@@ -5,20 +5,22 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  background: var(--kp-bg);
+  background: var(--kp-fond-fil, var(--kp-bg));
 }
 
 .entete {
   display: flex;
+  flex: none;
   align-items: center;
   gap: var(--kp-space-3);
   min-height: calc(64px + var(--kp-safe-top));
-  padding: var(--kp-safe-top) var(--kp-space-4) 0 var(--kp-space-2);
-  border-bottom: 1px solid var(--kp-border);
+  padding: var(--kp-safe-top) calc(var(--kp-space-4) + var(--kp-safe-right)) 0 calc(var(--kp-space-2) + var(--kp-safe-left));
+  box-shadow: 0 1px 0 var(--kp-border);
   background: var(--kp-surface);
 
   @include mq.tablette {
-    padding-left: var(--kp-space-5);
+    min-height: 64px;
+    padding: 0 clamp(12px, 1.4vw, 20px);
 
     .retour {
       display: none;
@@ -28,22 +30,62 @@
 
 .qui {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
 }
 
 .nom {
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .bien {
-  color: var(--kp-text-3);
-  font-size: var(--kp-fs-sm);
+  color: var(--kp-text-muted);
+  font-size: var(--kp-fs-secondary);
   text-decoration: none;
 }
 
 a.bien {
-  color: var(--kp-primary-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: var(--kp-text);
+  }
+}
+
+// « Proposer la location » : bouton olive de l'en-tête (maquette Nav-Proprio-Messages)
+.proposer {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-accent);
+  color: var(--kp-text-on-accent);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-accent-hover);
+    color: var(--kp-text-on-accent);
+  }
+}
+
+// Téléphone : « Proposer » à l'écran, la fin du libellé reste lue par les lecteurs d'écran
+.proposer__suite {
+  @include mq.telephone {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 .reconnexion {
@@ -61,7 +103,7 @@ a.bien {
   gap: var(--kp-space-2);
 
   @include mq.tablette {
-    padding: var(--kp-space-5) var(--kp-space-8);
+    padding: clamp(12px, 1.4vw, 20px);
   }
 }
 
@@ -81,12 +123,11 @@ a.bien {
   margin: var(--kp-space-3) 0;
 
   span {
-    padding: 4px 12px;
-    border-radius: var(--kp-radius-full);
-    background: var(--kp-surface-2);
-    color: var(--kp-text-3);
-    font-size: var(--kp-fs-xs);
-    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--kp-surface-sunken);
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-mention);
   }
 }
 
@@ -100,21 +141,26 @@ a.bien {
   }
 }
 
+// Bulles : reçues en surface blanche, envoyées en nuit plein (maquette Nav-Proprio-Messages)
 .bulle {
   max-width: min(80%, 560px);
-  padding: 8px 12px 6px;
-  border-radius: 18px 18px 18px 6px;
+  padding: 10px 16px 6px;
+  border-radius: 16px 16px 16px 4px;
   background: var(--kp-surface);
-  border: 1px solid var(--kp-border);
+  box-shadow: var(--kp-elev-0);
+
+  @include mq.tablette {
+    max-width: min(60%, 560px);
+  }
 
   &--moi {
-    border-color: transparent;
-    border-radius: 18px 18px 6px 18px;
-    background: var(--kp-primary);
-    color: var(--kp-primary-on);
+    border-radius: 16px 16px 4px 16px;
+    background: var(--kp-text);
+    box-shadow: none;
+    color: var(--kp-surface);
 
     .pied {
-      color: rgba(16, 33, 43, 0.7);
+      color: color-mix(in srgb, var(--kp-surface) 72%, transparent);
     }
   }
 
@@ -134,14 +180,14 @@ a.bien {
   align-items: center;
   gap: 4px;
   margin-top: 2px;
-  color: var(--kp-text-3);
-  font-size: var(--kp-fs-xs);
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-mention);
 }
 
 .echec {
   display: flex;
   align-items: center;
   gap: var(--kp-space-2);
-  color: var(--kp-danger);
-  font-size: var(--kp-fs-xs);
+  color: var(--kp-state-danger-text);
+  font-size: var(--kp-fs-mention);
 }

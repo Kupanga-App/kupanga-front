@@ -5,86 +5,78 @@ import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
 import { retourSur } from '../../guards/auth.guard';
 import { messageErreurApi } from '../../../http/api-error';
-import { AuthLayoutComponent } from '../../ui/auth-layout.component';
+import { AuthShellComponent } from '../../ui/auth-shell.component';
+import { AuthChampComponent } from '../../ui/auth-champ.component';
+import { AuthBanniereComponent } from '../../ui/auth-banniere.component';
 import { BoutonGoogleComponent } from '../../ui/bouton-google.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayoutComponent, BoutonGoogleComponent, IconComponent],
+  imports: [ReactiveFormsModule, RouterLink, AuthShellComponent, AuthChampComponent, AuthBanniereComponent, BoutonGoogleComponent, IconComponent],
   template: `
-    <kp-auth-layout titre="Connexion" retour="/explorer">
-      <form class="kp-form" [formGroup]="form" (ngSubmit)="connecter()" novalidate>
-        <div class="kp-field">
-          <label class="kp-label" for="email">E-mail</label>
-          <input id="email" class="kp-input" type="email" formControlName="email" autocomplete="username"
-                 inputmode="email" autocapitalize="off" spellcheck="false" />
-          @if (form.controls.email.touched && form.controls.email.invalid) {
-            <span class="kp-erreur">Entrez une adresse e-mail valide.</span>
-          }
-        </div>
-
-        <div class="kp-field">
-          <div class="kp-row kp-row--between">
-            <label class="kp-label" for="password">Mot de passe</label>
-            <a routerLink="/auth/forgot" class="kp-small">Mot de passe oublié ?</a>
-          </div>
-          <div class="kp-input-groupe">
-            <input id="password" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="password"
-                   autocomplete="current-password" />
-            <button type="button" class="kp-icon-btn oeil" (click)="voir.set(!voir())"
-                    [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
-              <kp-icon [name]="voir() ? 'eye-off' : 'eye'" />
-            </button>
-          </div>
-          @if (form.controls.password.touched && form.controls.password.invalid) {
-            <span class="kp-erreur">Entrez votre mot de passe.</span>
-          }
-        </div>
-
-        @if (erreur()) {
-          <div class="kp-bandeau kp-bandeau--danger" role="alert">
-            <kp-icon name="circle-alert" [size]="18" />
-            <p>{{ erreur() }}</p>
-          </div>
+    <kp-auth-shell titre="Connexion" sousTitre="Retrouvez vos biens, votre logement et vos messages." retour="/explorer">
+      <form id="form-connexion" class="kp-auth-form" [formGroup]="form" (ngSubmit)="connecter()" novalidate>
+        @if (erreur(); as message) {
+          <kp-auth-banniere>
+            @if (identifiantsRefuses()) {
+              <p>E-mail ou mot de passe incorrect. Vérifiez votre saisie ou choisissez « Mot de passe oublié ».</p>
+            } @else {
+              <p>{{ message }}</p>
+            }
+          </kp-auth-banniere>
         }
 
         @if (emailNonVerifie()) {
-          <div class="kp-bandeau kp-bandeau--attention">
-            <kp-icon name="mail" [size]="18" />
-            <div class="kp-stack kp-stack--sm">
-              <p>Confirmez d’abord votre adresse avec le lien reçu par e-mail.</p>
-              @if (infoRenvoi()) {
-                <p role="status">{{ infoRenvoi() }}</p>
-              } @else {
-                <button type="button" class="kp-btn kp-btn--secondary kp-btn--sm" (click)="renvoyerLien()" [disabled]="renvoiEnCours()">
-                  Renvoyer le lien
-                </button>
-              }
-            </div>
-          </div>
+          <kp-auth-banniere ton="attention">
+            <p>Confirmez d’abord votre adresse avec le lien reçu par e-mail.</p>
+            @if (infoRenvoi()) {
+              <p role="status">{{ infoRenvoi() }}</p>
+            } @else {
+              <button type="button" class="kp-btn kp-btn--secondary kp-btn--sm" (click)="renvoyerLien()" [disabled]="renvoiEnCours()">
+                Renvoyer le lien
+              </button>
+            }
+          </kp-auth-banniere>
         }
 
-        <button type="submit" class="kp-btn kp-btn--primary kp-btn--block" [disabled]="envoi() || google()">
-          @if (envoi()) {
-            <span class="kp-spinner"></span>
-          }
-          Se connecter
-        </button>
+        <kp-auth-champ libelle="E-mail" pour="email" [enErreur]="identifiantsRefuses()"
+                       [erreur]="form.controls.email.touched && form.controls.email.invalid ? 'Entrez une adresse e-mail valide.' : null">
+          <input id="email" class="kp-input" type="email" formControlName="email" autocomplete="email"
+                 inputmode="email" autocapitalize="off" spellcheck="false" />
+        </kp-auth-champ>
+
+        <kp-auth-champ libelle="Mot de passe" pour="password" [enErreur]="identifiantsRefuses()"
+                       [erreur]="form.controls.password.touched && form.controls.password.invalid ? 'Entrez votre mot de passe.' : null">
+          <a lien routerLink="/auth/forgot">Mot de passe oublié ?</a>
+          <div class="kp-input-groupe">
+            <input id="password" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="password"
+                   autocomplete="current-password" />
+            <button type="button" class="kp-icon-btn kp-auth-oeil" (click)="voir.set(!voir())"
+                    [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'" [attr.aria-pressed]="voir()">
+              <kp-icon [name]="voir() ? 'eye-off' : 'eye'" [strokeWidth]="1.5" />
+            </button>
+          </div>
+        </kp-auth-champ>
       </form>
 
-      <div class="separateur"><span>ou</span></div>
-      <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
+      <button actions type="submit" form="form-connexion" class="kp-btn kp-btn--primary" [disabled]="envoi() || google()"
+              [attr.aria-busy]="envoi()">
+        @if (envoi()) {
+          <span class="kp-spinner"></span>
+        }
+        Se connecter
+      </button>
+
+      <div suite>
+        <div class="kp-auth-separateur"><span>ou</span></div>
+        <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
+      </div>
 
       <p pied>Pas encore de compte ? <a routerLink="/auth/register" [queryParams]="retourParams()">Créer un compte</a></p>
-    </kp-auth-layout>
+    </kp-auth-shell>
   `,
-  styles: [`
-    .oeil { position: absolute; right: 2px; }
-    .separateur { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--kp-text-3); font-size: var(--kp-fs-sm); }
-    .separateur::before, .separateur::after { content: ''; flex: 1; border-top: 1px solid var(--kp-border); }
-  `],
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -95,6 +87,8 @@ export class LoginComponent {
   readonly envoi = signal(false);
   readonly google = signal(false);
   readonly erreur = signal<string | null>(null);
+  /** 401 : identifiants refusés (bannière dédiée, contour rouge des deux champs). */
+  readonly identifiantsRefuses = signal(false);
   readonly voir = signal(false);
   /** A14 : connexion refusée (403) tant que l'adresse n'est pas confirmée → proposer un nouveau lien. */
   readonly emailNonVerifie = signal(false);
@@ -120,6 +114,7 @@ export class LoginComponent {
     }
     this.envoi.set(true);
     this.erreur.set(null);
+    this.identifiantsRefuses.set(false);
     this.emailNonVerifie.set(false);
     this.infoRenvoi.set(null);
 
@@ -132,6 +127,7 @@ export class LoginComponent {
           this.emailNonVerifie.set(true);
           return;
         }
+        this.identifiantsRefuses.set(err?.status === 401);
         this.erreur.set(
           err?.status === 401 ? 'E-mail ou mot de passe incorrect.' : messageErreurApi(err, 'Connexion impossible. Réessayez.'),
         );
@@ -142,6 +138,7 @@ export class LoginComponent {
   connecterAvecGoogle(jeton: string): void {
     this.google.set(true);
     this.erreur.set(null);
+    this.identifiantsRefuses.set(false);
     this.authService.connecterAvecGoogle(jeton).subscribe({
       next: user => {
         if (!user) {

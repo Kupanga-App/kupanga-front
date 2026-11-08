@@ -12,29 +12,43 @@ export const motsDePasseIdentiques: ValidatorFn = (groupe: AbstractControl): Val
   return confirmation && mdp !== confirmation ? { differents: true } : null;
 };
 
-/** Règles du mot de passe cochées au fil de la saisie (au lieu d'un indicateur de « force »). */
+/**
+ * Critères du mot de passe cochés au fil de la saisie (au lieu d'un indicateur de « force ») : point gris tant que le
+ * critère manque, coche verte ensuite. `id` sert à relier la liste au champ (`aria-describedby`).
+ */
 @Component({
   selector: 'kp-regles-mot-de-passe',
   standalone: true,
   imports: [IconComponent],
   template: `
-    <ul aria-label="Règles du mot de passe">
+    <ul [id]="id()">
+      <li class="kp-sr-only">Le mot de passe doit contenir :</li>
       @for (r of regles(); track r.libelle) {
         <li [class.ok]="r.ok">
-          <kp-icon [name]="r.ok ? 'circle-check' : 'circle'" [size]="16" />
-          {{ r.libelle }}<span class="kp-sr-only">{{ r.ok ? ' : respecté' : ' : manquant' }}</span>
+          @if (r.ok) {
+            <kp-icon name="check" [size]="16" [strokeWidth]="2" />
+          } @else {
+            <span class="point" aria-hidden="true"></span>
+          }
+          {{ r.libelle }}<span class="kp-sr-only">{{ r.ok ? ' : rempli' : ' : manquant' }}</span>
         </li>
       }
     </ul>
   `,
   styles: [`
-    ul { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; font-size: var(--kp-fs-sm); color: var(--kp-text-3); }
-    li { display: inline-flex; align-items: center; gap: 6px; }
-    li.ok { color: var(--kp-success); }
+    ul {
+      display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 2px 0 0; padding: 0; list-style: none;
+      font-size: var(--kp-fs-secondary); color: var(--kp-text-subtle);
+    }
+    li { display: inline-flex; align-items: center; gap: 6px; min-height: 20px; transition: color var(--kp-duree) var(--kp-ease); }
+    li.ok { color: var(--kp-state-success-text); }
+    .point { display: inline-flex; width: 16px; justify-content: center; }
+    .point::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
   `],
 })
 export class ReglesMotDePasseComponent {
   readonly valeur = input<string | null | undefined>('');
+  readonly id = input('regles-mot-de-passe');
 
   readonly regles = computed(() => {
     const mdp = this.valeur() ?? '';

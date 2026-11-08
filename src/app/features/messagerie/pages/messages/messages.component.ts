@@ -1,5 +1,8 @@
 import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { Subscription, catchError } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { NavigationService } from '../../../../core/navigation/navigation.service';
@@ -72,6 +75,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   showView = computed(() => this.viewBienId() > 0 && (!!this.viewInterlocuteur() || this.nouveauContact()));
 
+  /** Téléphone : moins de 768 px (styles/_mq.scss). */
+  private telephone = toSignal(
+    inject(BreakpointObserver).observe('(max-width: 767px)').pipe(map(r => r.matches)),
+    { initialValue: typeof matchMedia === 'function' && matchMedia('(max-width: 767px)').matches },
+  );
+
   selectedConvId = computed(() => this.selectedConv()?.id ?? null);
 
   /** Lien vers le bien depuis l'en-tête de la conversation : fiche privée si on y a accès, annonce sinon. */
@@ -82,6 +91,17 @@ export class MessagesComponent implements OnInit, OnDestroy {
     if (user && bien.proprietaire?.id === user.id) return ['/biens', bien.id];
     if (user && bien.locataire?.id === user.id) return ['/mon-logement'];
     return ['/annonces', bien.id];
+  });
+
+  /**
+   * « Proposer la location » dans l'en-tête de la conversation : seulement pour le propriétaire du bien
+   * (vue privée déjà chargée par loadBienContext), et comme sur la fiche du bien, s'il n'a ni locataire ni archive.
+   */
+  lienProposer = computed(() => {
+    const bien = this.bienContext();
+    const user = this.authService.currentUser();
+    if (!bien || !user || bien.proprietaire?.id !== user.id || bien.locataire || bien.archive) return null;
+    return ['/biens', bien.id, 'locataire'];
   });
 
   constructor() {
@@ -107,8 +127,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Conversation ouverte sur téléphone : plein écran, sans barre d'onglets
-    effect(() => this.nav.pleinEcranDemande.set(this.showView()));
+    // Conversation ouverte sur téléphone seulement : plein écran, sans en-tête ni onglets. Sur tablette et
+    // ordinateur, la barre de navigation reste (liste et conversation côte à côte).
+    effect(() => this.nav.pleinEcranDemande.set(this.telephone() && this.showView()));
   }
 
   ngOnInit(): void {

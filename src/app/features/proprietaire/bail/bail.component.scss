@@ -1,0 +1,164 @@
+@use 'mq';
+
+// Page du bail (Bail-A-Signer) : bannière d'état, frise des signatures, conditions et aperçu
+
+.pile {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 0.8vw, 12px);
+}
+
+.titre-carte {
+  font-size: var(--kp-fs-body);
+  font-weight: 500;
+}
+
+.petit {
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-secondary);
+}
+
+.kp-bandeau .kp-btn {
+  flex: none;
+}
+
+.colonnes {
+  display: grid;
+  gap: clamp(8px, 0.8vw, 12px);
+  align-items: start;
+
+  @include mq.ordinateur {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  }
+}
+
+.conditions {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+
+  .titre-carte {
+    padding: var(--kp-card-pad);
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  dl > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--kp-space-3);
+    min-height: 56px;
+    align-items: center;
+    padding: 8px var(--kp-card-pad);
+    border-top: 1px solid var(--kp-border);
+  }
+
+  dt {
+    color: var(--kp-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: right;
+  }
+}
+
+.apercu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--kp-radius-lg);
+  background: var(--kp-surface-sunken);
+}
+
+.papier {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 28px;
+  border-radius: 4px;
+  background: var(--kp-surface);
+  box-shadow: var(--kp-elev-1);
+  font-size: 13px;
+  line-height: 1.6;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.papier__suite {
+  padding-top: 8px;
+  border-top: 1px dashed var(--kp-border-strong);
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-mention);
+}
+
+.signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.signature {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  padding: 8px;
+  border: 1px dashed var(--kp-border-strong);
+  border-radius: var(--kp-radius-sm);
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-mention);
+  text-align: center;
+
+  &--attendue {
+    border-color: var(--kp-state-warning);
+    color: var(--kp-state-warning-text);
+  }
+
+  &--faite {
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--kp-state-success) 40%, transparent);
+    background: var(--kp-state-success-bg);
+    color: var(--kp-state-success-text);
+  }
+}
+
+.nouveau {
+  align-self: flex-start;
+}
+
+.precedents {
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--kp-space-3);
+    min-height: 56px;
+    border-top: 1px solid var(--kp-border);
+  }
+}
+
+.precedent__texte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}

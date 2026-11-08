@@ -20,10 +20,10 @@ html {
 body {
   min-height: 100dvh;
   font-family: var(--kp-font);
-  font-size: var(--kp-fs-md);
-  line-height: 1.5;
+  font-size: var(--kp-fs-body);
+  line-height: var(--kp-lh-body);
   background: var(--kp-bg);
-  color: var(--kp-text-1);
+  color: var(--kp-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
@@ -45,48 +45,81 @@ select {
   color: inherit;
 }
 
+// Safari iOS zoome sur un champ de moins de 16 px : le corps fait 15 px, les champs restent à 16 px sur téléphone
+@include mq.telephone {
+  input,
+  select,
+  textarea,
+  .kp-input {
+    font-size: 16px !important;
+  }
+}
+
 button {
   cursor: pointer;
 }
 
 a {
-  color: var(--kp-primary-text);
+  color: var(--kp-accent);
   text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  transition: color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    color: var(--kp-accent-hover);
+  }
+}
+
+// Figtree n'est chargée qu'en 400 / 500 / 600 : pas de gras synthétique
+b,
+strong {
+  font-weight: 600;
 }
 
 h1,
 h2,
-h3 {
-  font-weight: 700;
+h3,
+h4 {
+  font-weight: 500;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
+// Titre de page : 24 à 32 px
 h1 {
-  font-size: var(--kp-fs-xl);
-
-  @include mq.tablette {
-    font-size: var(--kp-fs-2xl);
-  }
+  font-size: var(--kp-fs-page-title);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 h2 {
-  font-size: var(--kp-fs-lg);
+  font-size: var(--kp-fs-subtitle);
 }
 
 h3 {
-  font-size: var(--kp-fs-md);
+  font-size: var(--kp-fs-card-title);
+}
+
+h4 {
+  font-size: var(--kp-fs-body);
 }
 
 p {
   overflow-wrap: anywhere;
 }
 
+// Focus clavier toujours visible : anneau nuit (menthe en sombre) détaché de l'élément.
+// Contour transparent gardé pour le mode contraste élevé de Windows, qui ignore box-shadow.
 :focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   box-shadow: var(--kp-focus);
   border-radius: var(--kp-radius-sm);
+}
+
+::selection {
+  background: var(--kp-accent-soft);
+  color: var(--kp-text);
 }
 
 .kp-sr-only {

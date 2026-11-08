@@ -1,140 +1,110 @@
 @if (etape() === 'envoye') {
-  <kp-auth-layout titre="Vérifiez votre e-mail">
+  <kp-auth-shell forme="carte" illustration="enveloppe" titre="Confirmez votre e-mail">
     <div class="envoye">
-      <span class="envoye__icone"><kp-icon name="mail" [size]="28" /></span>
-      <p>Nous avons envoyé un lien de confirmation à <strong>{{ emailInscrit() }}</strong>. Ouvrez-le pour activer votre compte (valable 24 heures).</p>
-      <p class="kp-muted kp-small">Rien reçu ? Regardez dans les indésirables, ou demandez un nouveau lien.</p>
-      @if (infoRenvoi()) {
-        <p class="kp-small" role="status">{{ infoRenvoi() }}</p>
+      <p>Nous avons envoyé un lien à <strong>{{ emailInscrit() }}</strong>. Ouvrez-le pour activer votre compte.</p>
+      <p class="note">Rien reçu ? Regardez dans les indésirables, ou demandez un nouveau lien.</p>
+      @if (infoRenvoi(); as info) {
+        <kp-auth-banniere [ton]="renvoiRate() ? 'danger' : 'ok'"><p>{{ info }}</p></kp-auth-banniere>
       }
-      <button type="button" class="kp-btn kp-btn--secondary kp-btn--block" (click)="renvoyerLien()" [disabled]="renvoiEnCours()">
-        Renvoyer le lien
-      </button>
-      <a routerLink="/auth/login" [queryParams]="retourParams()" class="kp-btn kp-btn--primary kp-btn--block">Aller à la connexion</a>
     </div>
-  </kp-auth-layout>
+    <button actions type="button" class="kp-btn kp-btn--secondary" (click)="renvoyerLien()" [disabled]="renvoiEnCours()"
+            [attr.aria-busy]="renvoiEnCours()">
+      @if (renvoiEnCours()) {
+        <span class="kp-spinner"></span>
+      }
+      Renvoyer le lien
+    </button>
+    <a actions routerLink="/auth/login" [queryParams]="retourParams()" class="kp-btn kp-btn--ghost">Aller à la connexion</a>
+  </kp-auth-shell>
 } @else {
-  <kp-auth-layout [titre]="titres[numeroEtape()]" retour="/explorer">
-    <div class="progression" role="progressbar" aria-valuemin="1" aria-valuemax="3" [attr.aria-valuenow]="numeroEtape() + 1"
-         [attr.aria-label]="'Étape ' + (numeroEtape() + 1) + ' sur 3'">
-      @for (i of [0, 1, 2]; track i) {
-        <span [class.fait]="i <= numeroEtape()"></span>
+  <kp-auth-shell [titre]="titres[numeroEtape()]" retour="/explorer" [progression]="numeroEtape() + 1" [panneau]="panneau()"
+                 [sousTitre]="numeroEtape() === 0 ? 'Vous pourrez faire les deux avec le même compte.' : null">
+    <form id="form-inscription" class="kp-auth-form" [formGroup]="form" (ngSubmit)="suivant()" novalidate>
+      @if (erreur()) {
+        <kp-auth-banniere><p>{{ erreur() }}</p></kp-auth-banniere>
       }
-    </div>
 
-    <form class="kp-form" [formGroup]="form" (ngSubmit)="suivant()" novalidate>
       @switch (etape()) {
         @case (0) {
-          <kp-choix-role formControlName="role" />
+          <kp-choix-role formControlName="role" [legende]="titres[0]" />
         }
         @case (1) {
           <div class="kp-form-row">
-            <div class="kp-field">
-              <label class="kp-label" for="firstName">Prénom</label>
+            <kp-auth-champ libelle="Prénom" pour="firstName" [erreur]="erreurDe('firstName')">
               <input id="firstName" class="kp-input" formControlName="firstName" autocomplete="given-name" maxlength="50" />
-              @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
-                <span class="kp-erreur">Entrez votre prénom.</span>
-              }
-            </div>
-            <div class="kp-field">
-              <label class="kp-label" for="lastName">Nom</label>
+            </kp-auth-champ>
+            <kp-auth-champ libelle="Nom" pour="lastName" [erreur]="erreurDe('lastName')">
               <input id="lastName" class="kp-input" formControlName="lastName" autocomplete="family-name" maxlength="50" />
-              @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
-                <span class="kp-erreur">Entrez votre nom.</span>
-              }
+            </kp-auth-champ>
+          </div>
+          <kp-auth-champ libelle="Téléphone" pour="telephone" [optionnel]="true" [erreur]="erreurDe('telephone')"
+                         aide="Visible seulement par votre propriétaire ou votre locataire. Pratique pour WhatsApp.">
+            <div class="kp-auth-telephone">
+              <span class="kp-auth-indicatif">
+                <select formControlName="indicatif" aria-label="Indicatif du pays">
+                  @for (i of indicatifs; track i.valeur) {
+                    <option [value]="i.valeur">{{ i.libelle }}</option>
+                  }
+                </select>
+                <kp-icon name="chevron-down" [size]="16" [strokeWidth]="1.5" />
+              </span>
+              <input id="telephone" class="kp-input" type="tel" inputmode="tel" formControlName="telephone"
+                     [attr.autocomplete]="indicatif() === 'autre' ? 'tel' : 'tel-national'" [placeholder]="exempleTelephone()" />
             </div>
-          </div>
-          <div class="kp-field">
-            <label class="kp-label" for="telephone">Téléphone <span class="kp-optionnel">(facultatif)</span></label>
-            <input id="telephone" class="kp-input" type="tel" inputmode="tel" formControlName="telephone" autocomplete="tel"
-                   placeholder="+243 81 234 56 78" />
-            @if (form.controls.telephone.touched && form.controls.telephone.invalid) {
-              <span class="kp-erreur">{{ messageTelephone }}</span>
-            } @else {
-              <span class="kp-aide">Visible seulement par votre propriétaire ou votre locataire.</span>
-            }
-          </div>
-          <div class="kp-field">
-            <span class="kp-label">Photo <span class="kp-optionnel">(facultatif)</span></span>
-            <div class="photo">
-              @if (apercu()) {
-                <img class="apercu" [src]="apercu()" alt="Votre photo" />
-              } @else {
-                <span class="apercu-vide"><kp-icon name="user" [size]="28" /></span>
-              }
-              <label class="kp-btn kp-btn--secondary kp-btn--sm">
-                <kp-icon name="camera" [size]="18" /> {{ apercu() ? 'Changer' : 'Ajouter' }}
-                <input type="file" class="kp-sr-only" [accept]="acceptPhotos" (change)="choisirPhoto($event)" />
-              </label>
-              @if (apercu()) {
-                <button type="button" class="kp-btn kp-btn--ghost kp-btn--sm" (click)="retirerPhoto()">Retirer</button>
-              }
-            </div>
-          </div>
+          </kp-auth-champ>
+          <p class="note">Vous ajouterez une photo plus tard, depuis votre compte.</p>
         }
         @case (2) {
-          <div class="kp-field">
-            <label class="kp-label" for="email">E-mail</label>
+          <kp-auth-champ libelle="E-mail" pour="email" [erreur]="erreurDe('email')">
             <input id="email" class="kp-input" type="email" inputmode="email" formControlName="email" autocomplete="email"
                    autocapitalize="off" spellcheck="false" />
-            @if (form.controls.email.touched && form.controls.email.invalid) {
-              <span class="kp-erreur">Entrez une adresse e-mail valide.</span>
-            }
-          </div>
-          <div class="kp-field">
-            <label class="kp-label" for="password">Mot de passe</label>
+          </kp-auth-champ>
+          <kp-auth-champ libelle="Mot de passe" pour="password" decritPar="regles-inscription" [erreur]="erreurDe('password')">
             <div class="kp-input-groupe">
               <input id="password" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="password"
                      autocomplete="new-password" maxlength="72" />
-              <button type="button" class="kp-icon-btn oeil" (click)="voir.set(!voir())"
-                      [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
-                <kp-icon [name]="voir() ? 'eye-off' : 'eye'" />
+              <button type="button" class="kp-icon-btn kp-auth-oeil" (click)="voir.set(!voir())"
+                      [attr.aria-label]="voir() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'" [attr.aria-pressed]="voir()">
+                <kp-icon [name]="voir() ? 'eye-off' : 'eye'" [strokeWidth]="1.5" />
               </button>
             </div>
-            <kp-regles-mot-de-passe [valeur]="motDePasse()" />
-          </div>
-          <div class="kp-field">
-            <label class="kp-label" for="confirmPassword">Confirmez le mot de passe</label>
+            <kp-regles-mot-de-passe apres id="regles-inscription" [valeur]="motDePasse()" />
+          </kp-auth-champ>
+          <kp-auth-champ libelle="Confirmez le mot de passe" pour="confirmPassword" [erreur]="erreurDe('confirmPassword')">
             <input id="confirmPassword" class="kp-input" [type]="voir() ? 'text' : 'password'" formControlName="confirmPassword"
                    autocomplete="new-password" maxlength="72" />
-            @if (form.controls.confirmPassword.touched && form.hasError('differents')) {
-              <span class="kp-erreur">Les deux mots de passe sont différents.</span>
-            }
-          </div>
+          </kp-auth-champ>
         }
       }
-
-      @if (erreur()) {
-        <div class="kp-bandeau kp-bandeau--danger" role="alert">
-          <kp-icon name="circle-alert" [size]="18" />
-          <p>{{ erreur() }}</p>
-        </div>
-      }
-
-      <div class="kp-actions">
-        @if (numeroEtape() > 0) {
-          <button type="button" class="kp-btn kp-btn--secondary" (click)="precedent()" [disabled]="envoi()">Retour</button>
-        }
-        <button type="submit" class="kp-btn kp-btn--primary kp-spacer" [disabled]="envoi()">
-          @if (envoi()) {
-            <span class="kp-spinner"></span>
-          }
-          {{ numeroEtape() === 2 ? 'Créer mon compte' : 'Continuer' }}
-        </button>
-      </div>
     </form>
 
-    @if (numeroEtape() === 0) {
-      <div class="separateur"><span>ou</span></div>
-      <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
+    @if (numeroEtape() > 0) {
+      <button actions type="button" class="kp-btn kp-btn--secondary" (click)="precedent()" [disabled]="envoi()">Retour</button>
     }
+    <button actions type="submit" form="form-inscription" class="kp-btn kp-btn--primary" [disabled]="envoi()" [attr.aria-busy]="envoi()">
+      @if (envoi()) {
+        <span class="kp-spinner"></span>
+      }
+      {{ numeroEtape() === 2 ? 'Créer mon compte' : 'Continuer' }}
+    </button>
 
-    <p class="kp-aide mention-legale">
-      En créant un compte, y compris avec Google, vous acceptez les
-      <a [href]="liens.conditions" target="_blank" rel="noopener noreferrer">conditions d'utilisation</a>
-      et la <a [href]="liens.confidentialite" target="_blank" rel="noopener noreferrer">politique de confidentialité</a>.
-    </p>
-
-    <p pied>Déjà un compte ? <a routerLink="/auth/login" [queryParams]="retourParams()">Se connecter</a></p>
-  </kp-auth-layout>
+    @if (numeroEtape() === 0) {
+      <div suite>
+        <div class="kp-auth-separateur"><span>ou</span></div>
+        <kp-bouton-google (jeton)="connecterAvecGoogle($event)" />
+        <p class="kp-auth-mention">
+          Avec Google, vous acceptez les <a [routerLink]="liens.conditions" target="_blank">conditions d'utilisation</a>
+          et la <a [routerLink]="liens.confidentialite" target="_blank">politique de confidentialité</a>.
+        </p>
+      </div>
+    } @else if (numeroEtape() === 2) {
+      <p suite class="kp-auth-mention">
+        En créant un compte, vous acceptez les <a [routerLink]="liens.conditions" target="_blank">conditions d'utilisation</a>
+        et la <a [routerLink]="liens.confidentialite" target="_blank">politique de confidentialité</a>.
+      </p>
+    }
+    @if (numeroEtape() === 0) {
+      <p pied>Déjà un compte ? <a routerLink="/auth/login" [queryParams]="retourParams()">Se connecter</a></p>
+    }
+  </kp-auth-shell>
 }

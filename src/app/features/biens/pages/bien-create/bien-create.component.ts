@@ -18,6 +18,7 @@ import { DateLonguePipe, aujourdhuiIso } from '../../../../shared/format';
 import { AssistantComponent } from '../../../../shared/ui/assistant.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { CarteRepereComponent, Repere } from '../../../../shared/components/carte-repere/carte-repere.component';
+import { ChampDateComponent } from '../../../../shared/ui/champ-date.component';
 
 const ETAPES = [
   'Dans quel pays ?',
@@ -41,6 +42,35 @@ const AIDES: (string | null)[] = [
   'Le bien sera publié dans les annonces.',
 ];
 
+/** Ce qui manque pour continuer, par champ (mêmes contrôles que `etapeValide`). */
+const MANQUES: Record<string, string> = {
+  pays: 'Choisissez le pays du bien.',
+  typeBien: 'Choisissez le type de bien.',
+  titre: 'Donnez un titre de 3 à 150 caractères.',
+  description: 'La description fait 1000 caractères au plus.',
+  adresse: 'Vérifiez l’adresse (5 caractères au moins).',
+  ville: 'Vérifiez la ville.',
+  codePostal: 'Vérifiez le code postal.',
+  commune: 'Indiquez la commune.',
+  quartier: 'Indiquez le quartier.',
+  avenue: 'Vérifiez l’avenue.',
+  numeroParcelle: 'Vérifiez le numéro de parcelle.',
+  pointDeRepere: 'Le point de repère fait 255 caractères au plus.',
+  surfaceHabitable: 'Indiquez la surface habitable (9 m² au moins).',
+  nombrePieces: 'Indiquez le nombre de pièces.',
+  nombreChambres: 'Vérifiez le nombre de chambres.',
+  etage: 'Vérifiez l’étage.',
+  anneeConstruction: 'L’année de construction va de 1800 à 2100.',
+  heuresElectriciteParJour: 'Les heures d’électricité vont de 0 à 24.',
+  devise: 'Choisissez la devise.',
+  loyerMensuel: 'Indiquez le loyer mensuel.',
+  chargesMensuelles: 'Indiquez les charges (0 s’il n’y en a pas).',
+  depotGarantie: 'Indiquez le dépôt de garantie.',
+  garantieMois: 'Indiquez la garantie, de 0 à 24 mois.',
+  avanceMois: 'Indiquez les loyers payés d’avance, de 0 à 24 mois.',
+  disponibleDe: 'Indiquez la date de disponibilité.',
+};
+
 /**
  * Création d'un bien pas à pas (AUDIT.md §8.3). Le formulaire suit la configuration du pays
  * (`GET /juridictions/{pays}`, J6) : champs obligatoires et masqués, devises, types, équipements ; l'API revalide.
@@ -48,7 +78,7 @@ const AIDES: (string | null)[] = [
 @Component({
   selector: 'app-bien-create',
   standalone: true,
-  imports: [ReactiveFormsModule, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent, CarteRepereComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent, CarteRepereComponent],
   templateUrl: './bien-create.component.html',
   styleUrl: './bien-create.component.scss',
 })
@@ -147,6 +177,27 @@ export class BienCreateComponent {
     // L'API refuse un bien sans photo (400) : au moins une photo avant de passer à la vérification
     if (e === 6 && (this.preparation() || this.photos().length === 0)) return false;
     return this.champsParEtape[e].every(c => this.form.controls[c].valid);
+  });
+
+  readonly manque = computed<string | null>(() => {
+    this.valeurs();
+    const e = this.etape();
+    if (e === 0 && this.form.controls.pays.invalid) return MANQUES['pays'];
+    if (e === 0 && !this.config()) return this.erreurConfig() ? null : 'Chargement des règles du pays…';
+    if (e === 6 && this.preparation()) return 'Photos en cours de préparation…';
+    if (e === 6 && this.photos().length === 0) return 'Ajoutez au moins une photo.';
+    const invalide = this.champsParEtape[e].find(c => this.form.controls[c].invalid);
+    return invalide ? MANQUES[invalide] ?? null : null;
+  });
+
+  /**
+   * Saisie commencée : un champ changé, un équipement ou une photo. Le pays et la devise ne comptent pas
+   * (choisis d'office quand il n'y a qu'un pays, devise par défaut du pays).
+   */
+  private readonly initiales = JSON.stringify({ ...this.form.getRawValue(), pays: null, devise: null });
+  readonly modifie = computed(() => {
+    const v = JSON.stringify({ ...this.form.getRawValue(), ...this.valeurs(), pays: null, devise: null });
+    return this.form.dirty || this.photos().length > 0 || this.equipements().length > 0 || v !== this.initiales;
   });
 
   constructor() {

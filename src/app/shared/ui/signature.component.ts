@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, ElementRef, inject, output, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { IconComponent } from '../components/icon/icon.component';
 
 /** L'API refuse un PNG de plus de 2000 × 1000 px (B6) : la zone de dessin est plafonnée en dessous. */
@@ -23,31 +23,45 @@ const HAUTEUR_MAX = 800;
         <span class="invite" aria-hidden="true">Signez ici</span>
       }
       <span class="ligne" aria-hidden="true"></span>
+      @if (mention()) {
+        <span class="mention">{{ mention() }}</span>
+      }
     </div>
-    <div class="pied">
-      <span class="kp-aide">Dessinez votre signature avec le doigt ou la souris.</span>
-      <button type="button" class="kp-btn kp-btn--ghost kp-btn--sm" (click)="effacer()" [disabled]="vide()">
-        <kp-icon name="eraser" [size]="18" /> Effacer
-      </button>
-    </div>
+    @if (outils()) {
+      <div class="pied">
+        <span class="kp-aide">Dessinez votre signature avec le doigt ou la souris.</span>
+        <button type="button" class="kp-btn kp-btn--ghost kp-btn--sm" (click)="effacer()" [disabled]="vide()">
+          <kp-icon name="eraser" [size]="18" /> Effacer
+        </button>
+      </div>
+    }
   `,
   styles: [`
     :host { display: flex; flex-direction: column; gap: 8px; }
     .zone {
       position: relative; height: clamp(180px, 40dvh, 320px);
-      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius); background: #ffffff; overflow: hidden;
+      border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-md); background: var(--kp-signature-fond); overflow: hidden;
     }
     canvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
     .invite {
       position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%);
-      color: #9aa4a9; font-size: var(--kp-fs-lg); pointer-events: none;
+      color: var(--kp-signature-aide); font-size: var(--kp-fs-subtitle); pointer-events: none;
     }
-    .ligne { position: absolute; left: 24px; right: 24px; bottom: 28%; border-bottom: 1px dashed #c4cab9; pointer-events: none; }
+    .ligne { position: absolute; left: 24px; right: 24px; bottom: 28%; border-bottom: 1px dashed var(--kp-signature-ligne); pointer-events: none; }
     .pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    /* Nom et date sous le trait : texte de l'écran, pas dans l'image envoyée */
+    .mention { position: absolute; left: 24px; right: 24px; bottom: calc(28% - 22px); color: var(--kp-signature-mention); font-size: 12px; pointer-events: none; }
   `],
 })
 export class SignatureComponent implements AfterViewInit {
   readonly signature = output<string>();
+  /** Texte sous le trait (« Lucas Bernard · 6 novembre 2026 ») ; il n'est pas dans l'image envoyée. */
+  readonly mention = input<string | null>(null);
+  /**
+   * Aide et bouton « Effacer » sous la zone ; faux quand l'écran place « Effacer » ailleurs (`effacer()`).
+   * (Pas nommé `pied` : dans une `kp-sheet`, l'attribut serait pris pour le pied de la fenêtre.)
+   */
+  readonly outils = input(true);
   readonly vide = signal(true);
 
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
@@ -81,7 +95,8 @@ export class SignatureComponent implements AfterViewInit {
       this.ctx.lineWidth = 2.5 * ratio;
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
-      this.ctx.strokeStyle = '#10212b';
+      // Trait de l'image envoyée à l'API : jeton --kp-signature-trait (nuit, identique dans les deux thèmes)
+      this.ctx.strokeStyle = getComputedStyle(canvas).getPropertyValue('--kp-signature-trait').trim() || 'black';
     }
     this.marquerVide();
   }

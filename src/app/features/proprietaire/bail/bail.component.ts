@@ -3,31 +3,43 @@ import { RouterLink } from '@angular/router';
 import { forkJoin, switchMap } from 'rxjs';
 import { BienService } from '../../biens/services/bien.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
-import { BienDTO, locataireDuBail } from '../../biens/models/bien.model';
+import { BienDTO, adresseLisible, locataireDuBail } from '../../biens/models/bien.model';
 import { ContratDTO } from '../../gestion-logement/models/contrat.model';
 import { MontantPipe } from '../../../core/money/montant';
 import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
-import { DateLonguePipe, statutSignature } from '../../../shared/format';
-import { PageHeaderComponent } from '../../../shared/ui/page-header.component';
+import { DateLonguePipe, dateLongue, statutSignature } from '../../../shared/format';
+import { EtapeFrise, FriseComponent } from '../../../shared/ui/frise.component';
+import { bailLePlusRecent } from '../etapes-location';
+import { libelleDuree } from './duree';
+import { FicheEnteteComponent } from '../fiche/fiche-entete.component';
 import { StatutComponent } from '../../../shared/ui/statut.component';
 import { VideComponent } from '../../../shared/ui/vide.component';
 import { FeuilleSignatureComponent } from '../../../shared/ui/feuille-signature.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { BoutonWhatsappComponent } from '../../gestion-logement/components/bouton-whatsapp/bouton-whatsapp.component';
 
+/** « 6 nov. 14:40 » */
+function dateHeure(valeur: string | null | undefined): string {
+  if (!valeur) return '';
+  const d = new Date(valeur);
+  if (isNaN(d.getTime())) return '';
+  return `${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
 /**
- * Bail d'un bien : détail du bail en cours, signature du propriétaire, relance du locataire (nouveau lien, B6),
+ * Bail d'un bien (`Bail-A-Signer`) : état des signatures, conditions, aperçu, détail du bail en cours, signature du propriétaire, relance du locataire (nouveau lien, B6),
  * invitation WhatsApp (C7-C16), PDF. Les baux précédents restent consultables.
  */
 @Component({
   selector: 'kp-bail',
   standalone: true,
   imports: [
-    RouterLink, MontantPipe, DateLonguePipe, PageHeaderComponent, StatutComponent, VideComponent,
-    FeuilleSignatureComponent, IconComponent, BoutonWhatsappComponent,
+    RouterLink, MontantPipe, DateLonguePipe, FicheEnteteComponent, StatutComponent, VideComponent,
+    FeuilleSignatureComponent, IconComponent, BoutonWhatsappComponent, FriseComponent,
   ],
   templateUrl: './bail.component.html',
+  styleUrl: './bail.component.scss',
 })
 export class BailComponent implements OnInit {
   readonly id = input.required<string>();
@@ -44,8 +56,49 @@ export class BailComponent implements OnInit {
   readonly signatureEnCours = signal(false);
   readonly erreurSignature = signal<string | null>(null);
 
-  readonly bail = computed(() => this.contrats()[0] ?? null);
-  readonly precedents = computed(() => this.contrats().slice(1));
+  /** Le plus récent par date de début puis identifiant (l'ordre de l'API ne départage pas deux baux du même jour). */
+  readonly bail = computed(() => bailLePlusRecent(this.contrats()));
+  readonly precedents = computed(() => {
+    const bail = this.bail();
+    return this.contrats().filter(c => c !== bail);
+  });
+  readonly duree = (mois: number) => libelleDuree(mois);
+  readonly prenomLocataire = computed(() => (this.bail()?.locataire ?? locataireDuBail(this.bien()))?.firstName ?? 'le locataire');
+  readonly nomCourtLocataire = computed(() => {
+    const l = this.bail()?.locataire ?? locataireDuBail(this.bien());
+    return l ? `${l.firstName} ${l.lastName.charAt(0)}.` : 'le locataire';
+  });
+  readonly nomBailleur = computed(() => {
+    const p = this.bail()?.proprietaire ?? this.bien()?.proprietaire;
+    return p ? `${p.firstName} ${p.lastName}` : '';
+  });
+  readonly logement = computed(() => {
+    const b = this.bien();
+    return this.bail()?.adresseBien || (b ? `${b.titre}, ${adresseLisible(b)}` : '');
+  });
+
+  /** Frise des signatures : bail créé, votre signature, celle du locataire, bail signé. */
+  readonly etapesSignature = computed<EtapeFrise[]>(() => {
+    const c = this.bail();
+    if (!c) return [];
+    const prenom = this.nomCourtLocataire();
+    const proprio = !!c.proprietaireASigné || c.statut === 'EN_ATTENTE_SIGNATURE_LOCATAIRE' || c.statut === 'SIGNE' || c.statut === 'EXPIRE';
+    const locataire = !!c.locataireASigné || c.statut === 'SIGNE';
+    return [
+      { libelle: 'Bail créé', detail: dateHeure(c.createdAt) || null, etat: 'fait' },
+      proprio
+        ? { libelle: 'Votre signature', detail: c.dateSignatureProprietaire ? dateLongue(c.dateSignatureProprietaire, true) : 'Faite', etat: 'fait' }
+        : { libelle: 'Votre signature', detail: 'En attente', etat: 'en-cours', icone: 'pen-line' },
+      locataire
+        ? { libelle: `Signature de ${prenom}`, detail: c.dateSignatureLocataire ? dateLongue(c.dateSignatureLocataire, true) : 'Faite', etat: 'fait' }
+        : proprio
+          ? { libelle: `Signature de ${prenom}`, detail: c.statut === 'EXPIRE' ? 'Lien expiré' : 'Lien envoyé', etat: 'en-cours', icone: 'pen-line' }
+          : { libelle: `Signature de ${prenom}`, detail: 'Lien envoyé après la vôtre', etat: 'a-venir' },
+      locataire
+        ? { libelle: 'Bail signé', detail: 'Disponible pour les deux', etat: 'fait' }
+        : { libelle: 'Bail signé', detail: 'Disponible pour les deux', etat: 'a-venir' },
+    ];
+  });
   readonly statut = computed(() => statutSignature(this.bail()?.statut, 'proprietaire'));
   readonly statutDe = (c: ContratDTO) => statutSignature(c.statut, 'proprietaire');
   readonly nomLocataire = computed(() => {

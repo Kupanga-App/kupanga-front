@@ -1,62 +1,81 @@
-.outils {
-  display: flex;
-  gap: var(--kp-space-2);
+@use '../../../styles/mq' as mq;
+
+// Explorer (maquette O1v2-Explorer) : en-tête, filtres en pilules, liste et carte côte à côte.
+.explorer {
+  max-width: 1600px;
+  padding-top: var(--kp-page-pad);
+  @include mq.tablette { padding-left: var(--kp-page-pad); padding-right: var(--kp-page-pad); }
 }
+
+.tete {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--kp-space-4);
+  margin-bottom: var(--kp-space-4);
+}
+.tete__titres { display: flex; flex-direction: column; gap: var(--kp-space-1); min-width: 0; }
+h1 { margin: 0; font-size: var(--kp-fs-page-title); font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+.sous-titre { margin: 0; min-height: 20px; font-size: 14px; color: var(--kp-text-subtle); }
 
 .recherche {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-
-  kp-icon {
-    position: absolute;
-    left: 14px;
-    color: var(--kp-text-3);
-    pointer-events: none;
+  flex: 0 1 400px; min-width: 0; display: flex; align-items: center; gap: var(--kp-space-2);
+  height: 44px; padding: 0 var(--kp-space-4); box-sizing: border-box;
+  border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-pill); background: var(--kp-surface);
+  color: var(--kp-text-subtle);
+  &:focus-within { box-shadow: var(--kp-focus); }
+  input {
+    flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+    font: inherit; font-size: var(--kp-fs-body); color: var(--kp-text);
+    &::placeholder { color: var(--kp-text-subtle); }
   }
-
-  .kp-input {
-    padding-left: 42px;
-  }
+  @include mq.telephone { flex-basis: 100%; }
 }
 
-.filtres {
-  flex-shrink: 0;
-  padding: 0 var(--kp-space-4);
+.outils {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--kp-space-2) var(--kp-space-3);
+  margin-bottom: var(--kp-space-4);
+}
+.pilules { display: flex; flex-wrap: wrap; gap: var(--kp-space-2); }
+.droite {
+  margin-left: auto; display: flex; align-items: center; gap: var(--kp-space-3);
+  @include mq.telephone { margin-left: 0; width: 100%; justify-content: space-between; }
+}
 
+.pilule {
+  position: relative; display: inline-flex; align-items: center; gap: var(--kp-space-2);
+  height: 40px; padding: 0 var(--kp-space-4); box-sizing: border-box;
+  border: 1px solid var(--kp-border-strong); border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface); color: var(--kp-text); font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--kp-duree) var(--kp-ease), border-color var(--kp-duree) var(--kp-ease);
+  &:hover { background: var(--kp-surface-sunken); }
+  &:focus-visible { outline: none; box-shadow: var(--kp-focus); }
+  &.active { border-color: var(--kp-accent); background: var(--kp-accent-soft); }
   .nombre {
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
-    background: var(--kp-primary);
-    color: var(--kp-primary-on);
-    font-size: var(--kp-fs-xs);
-    line-height: 20px;
+    min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: var(--kp-radius-pill);
+    background: var(--kp-accent); color: var(--kp-text-on-accent); font-size: var(--kp-fs-mention); line-height: 20px; text-align: center;
   }
 }
+.cache-mobile { @include mq.telephone { display: none; } }
 
-.barre {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--kp-space-3);
-  margin: var(--kp-space-4) 0;
-}
-
+// Tri : vrai <select> sans apparence, posé dans une pilule
 .tri {
-  width: auto;
-  min-height: 40px;
-  font-size: var(--kp-fs-sm);
+  padding: 0;
+  select {
+    height: 100%; padding: 0 36px 0 var(--kp-space-4); border: 0; border-radius: inherit; appearance: none;
+    background: transparent; color: inherit; font: inherit; cursor: pointer;
+    &:focus-visible { outline: none; }
+  }
+  &:focus-within { box-shadow: var(--kp-focus); }
+  kp-icon { position: absolute; right: var(--kp-space-3); pointer-events: none; }
 }
 
-.suite {
-  margin-top: var(--kp-space-6);
+// Liste et carte : la carte reste fixe pendant que la liste défile
+.cote-a-cote { display: flex; gap: clamp(12px, 1.2vw, 16px); align-items: flex-start; }
+.liste { flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: var(--kp-space-3); }
+.colonne-carte {
+  flex: 1 1 440px; min-width: 0;
+  position: sticky; top: calc(var(--kp-top-offset) + var(--kp-space-3));
+  height: calc(100dvh - var(--kp-top-offset) - var(--kp-space-6));
+  min-height: 480px;
 }
 
-.carte-aide {
-  margin-top: var(--kp-space-2);
-}
+.suite { margin-top: var(--kp-space-6); }
+.carte-aide { margin-top: var(--kp-space-2); }

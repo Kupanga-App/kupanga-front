@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, signal, viewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,12 +13,16 @@ import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
 import { aujourdhuiIso } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
+import { SortieProtegee } from '../../../shared/ui/sortie-assistant.guard';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
+import { ChampHeureComponent } from '../../../shared/ui/champ-heure.component';
 
 /** B8 : bornes de l'API (au-delà : 400). */
 const MAX = { pieces: 50, elements: 50, compteurs: 10, cles: 20, quantiteCle: 50 } as const;
 
 const ETAPES = ['Type et date', 'Compteurs', 'Clés', 'Pièces', 'Vérifiez et créez'];
+const LIBELLES = ['Type et date', 'Compteurs', 'Clés', 'Pièces', 'Vérification'];
 
 const PIECES = ['Salon', 'Chambre', 'Cuisine', 'Salle de bain', 'WC', 'Entrée', 'Couloir', 'Balcon'];
 const CLES = ['Porte d’entrée', 'Portail', 'Boîte aux lettres'];
@@ -43,16 +47,23 @@ type CompteurForm = FormGroup<{
 }>;
 type CleForm = FormGroup<{ typeCle: FormControl<string>; quantite: FormControl<number> }>;
 
-/** État des lieux pas à pas : type et date, compteurs du pays (C13), clés, pièces et éléments, observations. */
+/**
+ * État des lieux pas à pas (`Assist-EDL`, `Assist-EDL-Mobile`) : type et date, compteurs du pays (C13), clés, puis
+ * les pièces une à une (liste et pièce ouverte côte à côte sur ordinateur, l'une après l'autre sur téléphone),
+ * observations. Pas de photos : stockage serveur absent (évolution E1).
+ */
 @Component({
   selector: 'kp-nouvel-edl',
   standalone: true,
-  imports: [ReactiveFormsModule, AssistantComponent, IconComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, ChampHeureComponent, AssistantComponent, IconComponent],
   templateUrl: './nouvel-edl.component.html',
   styleUrl: './nouvel-edl.component.scss',
 })
-export class NouvelEdlComponent implements OnInit {
+export class NouvelEdlComponent implements OnInit, SortieProtegee {
   readonly id = input.required<string>();
+  private readonly assistant = viewChild(AssistantComponent);
+  /** « Quitter » déjà confirmé, ou état des lieux créé : la sortie n'est plus retenue. */
+  private sortieAutorisee = false;
 
   private router = inject(Router);
   private bienService = inject(BienService);
@@ -61,6 +72,7 @@ export class NouvelEdlComponent implements OnInit {
   private toasts = inject(ToastService);
 
   readonly etapes = ETAPES;
+  readonly libelles = LIBELLES;
   readonly elementsPossibles = ELEMENTS;
   readonly etats = ETATS;
   readonly piecesProposees = PIECES;
@@ -101,6 +113,59 @@ export class NouvelEdlComponent implements OnInit {
     }
   });
 
+  /** Ce qui empêche de continuer, d'après les mêmes contrôles que `etapeValide`. */
+  readonly manque = computed<string | null>(() => {
+    this.changements();
+    this.changementsCompteurs();
+    this.changementsCles();
+    this.changementsInfos();
+    switch (this.etape()) {
+      case 0: return this.infos.controls.date.invalid ? 'Choisissez la date de l’état des lieux.' : null;
+      case 1: return this.compteurs.invalid ? 'Entrez le relevé de chaque compteur, ou retirez-le.' : null;
+      case 2: return this.cles.invalid ? 'Nommez chaque clé, ou retirez-la.' : null;
+      case 3:
+        if (!this.pieces.length) return 'Ajoutez au moins une pièce.';
+        return this.pieces.invalid ? 'Nommez chaque pièce ; une observation fait 1000 caractères au plus.' : null;
+      default: return this.infos.invalid ? 'Les observations font 2000 caractères au plus.' : null;
+    }
+  });
+
+  /** Saisie commencée : différente de ce qui est proposé d'office (clé d'entrée, compteurs du pays). */
+  private initiales: string | null = null;
+  readonly modifie = computed(() => {
+    this.changements();
+    this.changementsCompteurs();
+    this.changementsCles();
+    this.changementsInfos();
+    const formes = [this.infos, this.compteurs, this.cles, this.pieces];
+    return formes.some(f => f.dirty) || this.pieces.length > 0
+      || (this.initiales !== null && this.instantane() !== this.initiales);
+  });
+
+  private instantane(): string {
+    return JSON.stringify([this.infos.getRawValue(), this.compteurs.getRawValue(), this.cles.getRawValue()]);
+  }
+
+  /** Pièce ouverte (téléphone : null = liste des pièces ; ordinateur : la première si aucune). */
+  readonly pieceOuverte = signal<number | null>(null);
+  readonly pieceAffichee = computed(() => {
+    this.changements();
+    const i = this.pieceOuverte();
+    return i !== null && i < this.pieces.length ? i : this.pieces.length ? 0 : null;
+  });
+  /** Éléments dont le champ « observation » est déplié. */
+  readonly observationsOuvertes = signal(new Set<ElementForm>());
+
+  readonly titreAssistant = computed(() => {
+    this.changementsInfos();
+    return this.infos.controls.type.value === 'SORTIE' ? 'État des lieux de sortie' : 'État des lieux d’entrée';
+  });
+  readonly sousTitre = computed(() => {
+    const b = this.bien();
+    const l = b?.locataire;
+    return [l ? `${l.firstName} ${l.lastName}` : '', b?.titre ?? ''].filter(Boolean).join(' · ') || null;
+  });
+
   readonly nbElements = computed(() => {
     this.changements();
     return this.pieces.controls.reduce((n, p) => n + p.controls.elements.length, 0);
@@ -121,6 +186,7 @@ export class NouvelEdlComponent implements OnInit {
           }
           // Compteurs du pays proposés d'office (index à relever sur place)
           this.compteursDuPays().slice(0, 3).forEach(c => this.ajouterCompteur(c.valeur));
+          this.initiales = this.instantane();
         });
       },
       error: err => this.erreur.set(messageErreurApi(err, 'Ce bien est introuvable.')),
@@ -177,6 +243,34 @@ export class NouvelEdlComponent implements OnInit {
     });
     ELEMENTS_PAR_DEFAUT.forEach(t => piece.controls.elements.push(this.nouvelElement(t)));
     this.pieces.push(piece);
+    this.pieceOuverte.set(this.pieces.length - 1);
+  }
+
+  ouvrirPiece(i: number | null): void {
+    this.pieceOuverte.set(i);
+  }
+
+  retirerPiece(i: number): void {
+    this.pieces.removeAt(i);
+    const ouverte = this.pieceOuverte();
+    if (ouverte !== null && ouverte >= this.pieces.length) this.pieceOuverte.set(this.pieces.length ? this.pieces.length - 1 : null);
+  }
+
+  /** Éléments qui ne sont pas en bon état dans une pièce. */
+  aNoter(piece: PieceForm): number {
+    return piece.controls.elements.controls.filter(e => e.controls.etatElement.value !== 'BON').length;
+  }
+
+  basculerObservation(e: ElementForm): void {
+    this.observationsOuvertes.update(s => {
+      const copie = new Set(s);
+      if (copie.has(e)) copie.delete(e); else copie.add(e);
+      return copie;
+    });
+  }
+
+  observationVisible(e: ElementForm): boolean {
+    return this.observationsOuvertes().has(e) || !!e.controls.observation.value;
   }
 
   ajouterElement(piece: PieceForm): void {
@@ -214,7 +308,15 @@ export class NouvelEdlComponent implements OnInit {
   }
 
   quitter(): void {
+    this.sortieAutorisee = true;
     void this.router.navigate(['/biens', this.id(), 'etats-des-lieux']);
+  }
+
+  /** Retour du navigateur : confirmation si la saisie est commencée (`sortieAssistantGuard`). */
+  peutQuitter(): boolean | Promise<boolean> {
+    const assistant = this.assistant();
+    if (this.sortieAutorisee || !this.modifie() || !assistant) return true;
+    return assistant.confirmerSortie();
   }
 
   private creer(): void {
@@ -245,6 +347,7 @@ export class NouvelEdlComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.toasts.ok('État des lieux créé. Signez-le pour l’envoyer au locataire.');
+        this.sortieAutorisee = true;
         void this.router.navigate(['/biens', bien.id, 'etats-des-lieux'], { replaceUrl: true });
       },
       error: err => {

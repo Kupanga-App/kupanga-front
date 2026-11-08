@@ -28,6 +28,19 @@ describe('LogementContextService (lot 3)', () => {
     expect(biensPossedes(biens, null)).toEqual([]);
   });
 
+  it('charger : garde le nombre de biens possédés non archivés, tiré de la même réponse (aucun autre appel)', () => {
+    expect(service.nombreBiens()).toBeNull();
+    service.charger(5).subscribe();
+    http.expectOne(`${environment.apiUrl}/users/biens`).flush([bien(1, 5), bien(3, 5, 8), bien(6, 5, undefined, true), bien(2, 9, 5)]);
+
+    expect(service.nombreBiens()).toBe(2);
+    service.charger(5).subscribe();
+    http.expectNone(`${environment.apiUrl}/users/biens`);
+
+    service.clear();
+    expect(service.nombreBiens()).toBeNull();
+  });
+
   it('charger : propriétaire qui loue aussi → aDesBiens et logement (non archivé en priorité)', () => {
     let logement: number | null | undefined;
     service.charger(5).subscribe(id => (logement = id));

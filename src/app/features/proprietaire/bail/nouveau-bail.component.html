@@ -1,9 +1,17 @@
 <kp-assistant
   titre="Nouveau bail"
+  [sousTitre]="sousTitre()"
   [etapes]="etapes"
+  [libelles]="libelles"
+  [resumes]="resumes()"
+  [note]="'Après la création, vous signerez le bail, puis ' + prenomLocataire() + ' recevra un lien pour le signer à son tour.'"
   [etape]="etape()"
-  [aide]="etape() === 0 && nomLocataire() ? 'Bail de ' + nomLocataire() + ' pour ' + bien()?.titre : null"
+  [aide]="etape() === 0 && nomLocataire() ? 'Bail de ' + nomLocataire() + ' pour ' + bien()?.titre
+    : etape() === 1 ? 'Montants repris de l’annonce. Modifiez-les si vous avez convenu d’autre chose avec ' + prenomLocataire() + '.' : null"
   [peutContinuer]="etapeValide() && !!bien()"
+  [manque]="manque()"
+  [modifie]="modifie()"
+  [apercu]="true"
   [enCours]="envoi()"
   [erreur]="erreur()"
   libelleFin="Créer le bail"
@@ -16,7 +24,7 @@
       @case (0) {
         <div class="kp-field">
           <label class="kp-label" for="dateDebut">Date de début</label>
-          <input id="dateDebut" class="kp-input" type="date" formControlName="dateDebut" [min]="aujourdhui" />
+          <kp-champ-date idChamp="dateDebut" formControlName="dateDebut" [min]="aujourdhui" />
           @if (form.controls.dateDebut.touched && form.controls.dateDebut.invalid) {
             <span class="kp-erreur">Choisissez la date d’entrée dans le logement.</span>
           }
@@ -42,19 +50,23 @@
       @case (1) {
         <div class="kp-form-row">
           <div class="kp-field">
-            <label class="kp-label" for="loyer">Loyer mensuel</label>
-            <div class="kp-input-groupe">
+            <label class="kp-label" for="loyer">Loyer hors charges</label>
+            <div class="kp-input-groupe kp-input-groupe--long">
               <input id="loyer" class="kp-input" type="number" inputmode="decimal" min="0" step="0.01" formControlName="loyerMensuel" />
-              <span class="kp-suffixe">{{ symbole() }}</span>
+              <span class="kp-suffixe">{{ symbole() }} par mois</span>
             </div>
           </div>
           <div class="kp-field">
-            <label class="kp-label" for="charges">Charges mensuelles</label>
-            <div class="kp-input-groupe">
+            <label class="kp-label" for="charges">Charges</label>
+            <div class="kp-input-groupe kp-input-groupe--long">
               <input id="charges" class="kp-input" type="number" inputmode="decimal" min="0" step="0.01" formControlName="chargesMensuelles" />
-              <span class="kp-suffixe">{{ symbole() }}</span>
+              <span class="kp-suffixe">{{ symbole() }} par mois</span>
             </div>
           </div>
+        </div>
+        <div class="total">
+          <span>Total mensuel</span>
+          <span class="total__montant">{{ totalMensuel() | montant: devise() : 0 }}</span>
         </div>
         @if (garantieEnMois()) {
           <div class="kp-form-row">
@@ -82,16 +94,24 @@
               <span class="kp-suffixe">{{ symbole() }}</span>
             </div>
           </div>
+          @if (depotDifferent(); as montant) {
+            <div class="kp-bandeau kp-bandeau--attention" role="status">
+              <kp-icon name="circle-alert" [size]="18" />
+              <div class="kp-bandeau__corps">
+                <p class="kp-bandeau__texte">Ce dépôt diffère de celui de l’annonce ({{ montant }}). Vous pouvez continuer si c’est ce que vous avez convenu avec {{ prenomLocataire() }}.</p>
+              </div>
+            </div>
+          }
         }
       }
       @case (2) {
         @if (form.getRawValue(); as v) {
-          <dl class="kp-details">
+          <dl class="recap">
             <div><dt>Locataire</dt><dd>{{ nomLocataire() }}</dd></div>
             <div><dt>Bien</dt><dd>{{ bien()?.titre }}</dd></div>
             <div><dt>Début</dt><dd>{{ v.dateDebut | dateLongue }}</dd></div>
-            <div><dt>Durée</dt><dd>{{ v.dureeBailMois }} mois</dd></div>
-            <div><dt>Loyer</dt><dd>{{ v.loyerMensuel | montant: devise() }}</dd></div>
+            <div><dt>Durée</dt><dd>{{ duree() }}</dd></div>
+            <div><dt>Loyer hors charges</dt><dd>{{ v.loyerMensuel | montant: devise() }}</dd></div>
             <div><dt>Charges</dt><dd>{{ v.chargesMensuelles | montant: devise() }}</dd></div>
             @if (garantieEnMois()) {
               <div><dt>Garantie</dt><dd>{{ v.garantieMois }} mois ({{ montantGarantie() | montant: devise() }})</dd></div>
@@ -100,9 +120,54 @@
               <div><dt>Dépôt de garantie</dt><dd>{{ v.depotGarantie | montant: devise() }}</dd></div>
             }
           </dl>
-          <p class="kp-aide">Après la création, vous signerez le bail, puis le locataire recevra un lien pour le signer.</p>
+          <p class="kp-aide">Après la création, vous signerez le bail, puis {{ prenomLocataire() }} recevra un lien pour le signer.</p>
+          <!-- Téléphone : l'aperçu n'a pas de colonne, il vient ici -->
+          <div class="apercu-telephone">
+            <ng-container *ngTemplateOutlet="document" />
+          </div>
         }
       }
     }
   </form>
+
+  <div apercu class="apercu">
+    <div class="apercu__haut">
+      <span>Aperçu du document</span>
+      <span class="legende"><span class="legende__carre" aria-hidden="true"></span> Valeurs saisies</span>
+    </div>
+    <ng-container *ngTemplateOutlet="document" />
+  </div>
 </kp-assistant>
+
+<ng-template #document>
+  @if (valeurs(); as v) {
+    <article class="papier" aria-label="Aperçu du bail">
+      <h2>Contrat de location</h2>
+      <p><strong>Entre</strong> {{ nomBailleur() }}, bailleur, <strong>et</strong> {{ nomLocataire() }}, locataire.</p>
+      <p><strong>Logement :</strong> {{ bien()?.titre }}, {{ adresseBien() }}.</p>
+      <p>
+        <strong>Prise d’effet :</strong> <mark>{{ (v.dateDebut | dateLongue) || '…' }}</mark>,
+        pour une durée de <mark>{{ duree() || '…' }}</mark>.
+      </p>
+      <p>
+        <strong>Loyer mensuel :</strong> <mark>{{ (v.loyerMensuel | montant: devise() : 0) || '…' }}</mark> hors charges,
+        et <mark>{{ (v.chargesMensuelles | montant: devise() : 0) || '…' }}</mark> de charges,
+        soit <mark>{{ totalMensuel() | montant: devise() : 0 }}</mark> par mois.
+      </p>
+      @if (garantieEnMois()) {
+        <p>
+          <strong>Garantie :</strong> <mark>{{ v.garantieMois ?? '…' }} mois</mark> de loyer,
+          soit <mark>{{ montantGarantie() | montant: devise() : 0 }}</mark>.
+          <strong>Loyers payés d’avance :</strong> <mark>{{ v.avanceMois ?? '…' }} mois</mark>.
+        </p>
+      } @else {
+        <p><strong>Dépôt de garantie :</strong> <mark>{{ (v.depotGarantie | montant: devise() : 0) || '…' }}</mark>.</p>
+      }
+      <p class="papier__suite">Le texte complet du bail figure dans le PDF, créé avec le bail.</p>
+      <div class="signatures">
+        <span>Signature du bailleur</span>
+        <span>Signature du locataire</span>
+      </div>
+    </article>
+  }
+</ng-template>

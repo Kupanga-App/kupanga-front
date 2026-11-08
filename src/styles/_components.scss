@@ -13,7 +13,7 @@
   padding-right: calc(var(--kp-space-4) + var(--kp-safe-right));
 
   @include mq.tablette {
-    padding: 0 var(--kp-space-8) var(--kp-space-10);
+    padding: 0 var(--kp-space-8) var(--kp-space-12);
   }
 
   &--etroite {
@@ -71,13 +71,13 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--kp-space-3);
-  font-size: var(--kp-fs-md);
-  font-weight: 700;
-  color: var(--kp-text-1);
+  font-size: var(--kp-fs-body);
+  font-weight: 600;
+  color: var(--kp-text);
 
   a,
   button {
-    font-size: var(--kp-fs-sm);
+    font-size: var(--kp-fs-secondary);
     font-weight: 600;
   }
 }
@@ -85,25 +85,33 @@
 // ── Texte ────────────────────────────────────────────────────────────────────
 
 .kp-muted {
-  color: var(--kp-text-3);
+  color: var(--kp-text-subtle);
 }
 
 .kp-small {
-  font-size: var(--kp-fs-sm);
+  font-size: var(--kp-fs-secondary);
 }
 
 .kp-xs {
-  font-size: var(--kp-fs-xs);
+  font-size: var(--kp-fs-mention);
 }
 
 .kp-strong {
   font-weight: 600;
 }
 
+// Montants : chiffres tabulaires (les colonnes de chiffres s'alignent)
 .kp-montant {
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-feature-settings: 'tnum' 1;
+  font-weight: 600;
   white-space: nowrap;
+}
+
+// Chiffres tabulaires sans graisse (tableaux, lignes de liste)
+.kp-tabulaire {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
 .kp-ellipsis {
@@ -114,83 +122,127 @@
 }
 
 // ── Boutons ──────────────────────────────────────────────────────────────────
+// Quatre niveaux (DS-Fondations) : principal olive plein (une action forte par écran), secondaire contour,
+// discret, danger (confirmation ensuite). Pilule, 44 px ; 40 px avec --sm et dans les barres.
+// Sans variante, un .kp-btn a le rendu du secondaire.
 
 .kp-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--kp-space-2);
-  min-height: 48px;
+  min-height: var(--kp-tap);
   padding: 0 var(--kp-space-5);
-  border: 1px solid transparent;
-  border-radius: var(--kp-radius);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-1);
-  font-size: var(--kp-fs-md);
-  font-weight: 600;
+  border: 1px solid var(--kp-border-strong);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface);
+  color: var(--kp-text);
+  font-size: var(--kp-fs-body);
+  font-weight: 500;
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--kp-duree), border-color var(--kp-duree), opacity var(--kp-duree);
+  transition:
+    background-color var(--kp-duree) var(--kp-ease),
+    border-color var(--kp-duree) var(--kp-ease),
+    color var(--kp-duree) var(--kp-ease),
+    opacity var(--kp-duree) var(--kp-ease);
 
-  @include mq.tablette {
-    min-height: 44px;
+  &:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--kp-surface-sunken);
   }
 
   &:active:not(:disabled) {
     opacity: 0.85;
   }
 
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--kp-focus);
+    border-radius: var(--kp-radius-pill);
+  }
+
+  // Désactivé : surface en retrait, texte discret (pas d'opacité, le libellé reste lisible)
   &:disabled,
   &[aria-disabled='true'] {
-    opacity: 0.5;
+    background: var(--kp-surface-sunken);
+    border-color: transparent;
+    color: var(--kp-text-subtle);
     cursor: not-allowed;
+    text-decoration: none;
+  }
+
+  // Envoi en cours : <span class="kp-spinner"></span> dans le bouton
+  .kp-spinner {
+    width: 16px;
+    height: 16px;
+  }
+
+  &[aria-busy='true'] {
+    cursor: progress;
+    opacity: 0.85;
   }
 
   &--primary {
-    background: var(--kp-primary);
-    color: var(--kp-primary-on);
+    background: var(--kp-accent);
+    border-color: transparent;
+    color: var(--kp-text-on-accent);
 
-    &:hover:not(:disabled) {
-      background: var(--kp-primary-hover);
+    &:hover:not(:disabled):not([aria-disabled='true']) {
+      background: var(--kp-accent-hover);
+    }
+
+    // Pendant un envoi, le bouton (désactivé contre le double envoi) garde sa couleur
+    &:disabled:has(.kp-spinner) {
+      background: var(--kp-accent);
+      color: var(--kp-text-on-accent);
+      opacity: 0.85;
     }
   }
 
   &--secondary {
     background: var(--kp-surface);
     border-color: var(--kp-border-strong);
-
-    &:hover:not(:disabled) {
-      background: var(--kp-surface-2);
-    }
   }
 
+  // Discret : texte souligné, sans fond ni contour
   &--ghost {
     background: transparent;
-    color: var(--kp-primary-text);
+    border-color: transparent;
+    color: var(--kp-text);
     padding: 0 var(--kp-space-3);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
 
-    &:hover:not(:disabled) {
-      background: var(--kp-surface-2);
+    &:disabled,
+    &[aria-disabled='true'] {
+      background: transparent;
     }
   }
 
   &--danger {
-    background: transparent;
-    border-color: var(--kp-border-strong);
-    color: var(--kp-danger);
+    background: var(--kp-surface);
+    border-color: color-mix(in srgb, var(--kp-state-danger) 40%, transparent);
+    color: var(--kp-state-danger);
 
-    &:hover:not(:disabled) {
-      background: var(--kp-danger-subtle);
+    &:hover:not(:disabled):not([aria-disabled='true']) {
+      background: var(--kp-state-danger-bg);
     }
   }
 
+  // Couleur de marque WhatsApp, volontairement hors jetons
   &--whatsapp {
-    background: #1f7a3f;
-    color: #ffffff;
+    background: var(--kp-whatsapp);
+    border-color: transparent;
+    color: var(--kp-whatsapp-texte);
+
+    &:hover:not(:disabled):not([aria-disabled='true']) {
+      background: var(--kp-whatsapp-hover);
+    }
   }
 
   &--block {
@@ -200,7 +252,7 @@
   &--sm {
     min-height: 40px;
     padding: 0 var(--kp-space-4);
-    font-size: var(--kp-fs-sm);
+    font-size: 14px;
   }
 }
 
@@ -213,19 +265,32 @@
   height: var(--kp-tap);
   padding: 0;
   border: 0;
-  border-radius: var(--kp-radius-full);
+  border-radius: var(--kp-radius-pill);
   background: transparent;
-  color: var(--kp-text-1);
+  color: var(--kp-text);
   cursor: pointer;
   position: relative;
+  text-decoration: none;
+  transition: background-color var(--kp-duree) var(--kp-ease);
 
   &:hover {
-    background: var(--kp-surface-2);
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
   }
 
   &:disabled {
-    opacity: 0.5;
+    color: var(--kp-text-subtle);
+    background: transparent;
     cursor: not-allowed;
+  }
+
+  // Dans une barre : 40 px
+  &--sm {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -236,13 +301,14 @@
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: var(--kp-radius-full);
-  background: var(--kp-danger);
-  color: #ffffff;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-state-danger);
+  color: var(--kp-text-on-accent);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 18px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .kp-actions {
@@ -301,14 +367,18 @@
   align-items: center;
   gap: var(--kp-space-2);
   min-height: 56px;
-  padding: 0 var(--kp-space-5);
+  padding: 0 var(--kp-space-6);
   border: 0;
-  border-radius: var(--kp-radius-lg);
-  background: var(--kp-primary);
-  color: var(--kp-primary-on);
-  font-weight: 700;
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-accent);
+  color: var(--kp-text-on-accent);
+  font-weight: 500;
   text-decoration: none;
-  box-shadow: var(--kp-shadow);
+  box-shadow: var(--kp-elev-1);
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
+  }
 
   @include mq.tablette {
     display: none;
@@ -316,11 +386,12 @@
 }
 
 // ── Champs de formulaire ─────────────────────────────────────────────────────
+// Rayon 12, libellé au-dessus, unité à droite (« € par mois »), aide dessous, erreur en rouge avec texte.
 
 .kp-form {
   display: flex;
   flex-direction: column;
-  gap: var(--kp-space-5);
+  gap: var(--kp-space-4);
 }
 
 .kp-form-row {
@@ -341,66 +412,151 @@
 }
 
 .kp-label {
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
-  color: var(--kp-text-1);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--kp-text);
 }
 
 .kp-optionnel {
   font-weight: 400;
-  color: var(--kp-text-3);
+  color: var(--kp-text-subtle);
 }
 
 .kp-input {
   width: 100%;
-  min-height: 48px;
-  padding: 0 var(--kp-space-4);
+  min-height: var(--kp-tap);
+  padding: 0 var(--kp-space-3);
   border: 1px solid var(--kp-border-strong);
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-md);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
-  // 16 px : iOS ne zoome pas sur le champ
-  font-size: var(--kp-fs-md);
-  transition: border-color var(--kp-duree), box-shadow var(--kp-duree);
+  color: var(--kp-text);
+  // 15 px ; 16 px sur téléphone (_base.scss, zoom de Safari iOS)
+  font-size: var(--kp-fs-body);
+  transition:
+    border-color var(--kp-duree) var(--kp-ease),
+    box-shadow var(--kp-duree) var(--kp-ease);
 
   &::placeholder {
-    color: var(--kp-text-3);
-    opacity: 0.8;
+    color: var(--kp-text-subtle);
+    opacity: 1;
   }
 
-  &:focus {
+  &:hover:not(:disabled):not([readonly]) {
+    border-color: color-mix(in srgb, var(--kp-text) 30%, transparent);
+  }
+
+  &:focus,
+  &:focus-visible {
     outline: none;
-    border-color: var(--kp-primary);
-    box-shadow: var(--kp-focus);
+    border-color: var(--kp-accent);
+    box-shadow: 0 0 0 1px var(--kp-accent);
+    border-radius: var(--kp-radius-md);
   }
 
   &:disabled,
   &[readonly] {
-    background: var(--kp-surface-2);
-    color: var(--kp-text-2);
+    background: var(--kp-surface-sunken);
+    color: var(--kp-text-muted);
   }
 
+  // Erreur : contour rouge de 2 px ; le message en texte (.kp-erreur) reste obligatoire
   &--erreur,
   &.ng-invalid.ng-touched {
-    border-color: var(--kp-danger);
+    border-color: var(--kp-state-danger);
+    box-shadow: inset 0 0 0 1px var(--kp-state-danger);
   }
 }
 
 textarea.kp-input {
-  min-height: 112px;
-  padding: var(--kp-space-3) var(--kp-space-4);
+  min-height: 88px;
+  padding: 10px var(--kp-space-3);
   resize: vertical;
-  line-height: 1.5;
+  line-height: var(--kp-lh-body);
 }
 
 select.kp-input {
   appearance: none;
-  padding-right: var(--kp-space-10);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235c6b74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  padding-right: var(--kp-space-8);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23636f76' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
 }
 
+// Liste ouverte d'un <select> au style Kupanga (Edge et Chrome 135 et plus : `appearance: base-select`).
+// Ailleurs, la liste reste celle du navigateur ; le champ fermé garde le style ci-dessus. Le <select> reste natif :
+// mêmes valeurs, mêmes formulaires, clavier et lecteurs d'écran du navigateur.
+@supports (appearance: base-select) {
+  // select.kp-input : plus spécifique que `select.kp-input { appearance: none }` ci-dessus
+  select,
+  select.kp-input,
+  ::picker(select) {
+    appearance: base-select;
+  }
+
+  select {
+    cursor: pointer;
+  }
+
+  // En base-select, le champ fermé devient une boîte flexible : texte centré verticalement
+  select.kp-input {
+    display: flex;
+    align-items: center;
+  }
+
+  // Le chevron de .kp-input est déjà dessiné en image de fond
+  select.kp-input::picker-icon {
+    display: none;
+  }
+
+  select:not(.kp-input)::picker-icon {
+    color: var(--kp-text-subtle);
+  }
+
+  ::picker(select) {
+    max-height: min(320px, 50dvh);
+    margin-block: 6px;
+    padding: 6px;
+    border: 0;
+    border-radius: var(--kp-radius-md);
+    background: var(--kp-surface);
+    color: var(--kp-text);
+    box-shadow: var(--kp-elev-2), 0 0 0 1px var(--kp-border);
+    overscroll-behavior: contain;
+  }
+
+  select option {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: var(--kp-radius-sm);
+    font-size: var(--kp-fs-body);
+    cursor: pointer;
+
+    &::checkmark {
+      display: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      outline: none;
+      background: var(--kp-bg);
+    }
+
+    &:checked {
+      background: var(--kp-text);
+      color: var(--kp-text-on-accent);
+      font-weight: 500;
+    }
+
+    &:disabled {
+      color: var(--kp-text-subtle);
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Unité à droite du champ : .kp-input-groupe > input.kp-input + span.kp-suffixe
 .kp-input-groupe {
   position: relative;
   display: flex;
@@ -412,22 +568,27 @@ select.kp-input {
 
   .kp-suffixe {
     position: absolute;
-    right: var(--kp-space-4);
-    color: var(--kp-text-3);
-    font-size: var(--kp-fs-sm);
-    font-weight: 600;
+    right: var(--kp-space-3);
+    color: var(--kp-text-subtle);
+    font-size: var(--kp-fs-body);
+    font-weight: 400;
     pointer-events: none;
+  }
+
+  // Unité longue (« € par mois »)
+  &--long .kp-input {
+    padding-right: 104px;
   }
 }
 
 .kp-aide {
-  font-size: var(--kp-fs-sm);
-  color: var(--kp-text-3);
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-text-subtle);
 }
 
 .kp-erreur {
-  font-size: var(--kp-fs-sm);
-  color: var(--kp-danger);
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-state-danger);
 }
 
 .kp-check {
@@ -435,18 +596,18 @@ select.kp-input {
   align-items: center;
   gap: var(--kp-space-3);
   min-height: var(--kp-tap);
-  font-size: var(--kp-fs-md);
+  font-size: var(--kp-fs-body);
   cursor: pointer;
 
   input {
     flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    accent-color: var(--kp-primary);
+    width: 20px;
+    height: 20px;
+    accent-color: var(--kp-accent);
   }
 }
 
-// Puces à choix (équipements, types)
+// Puces à choix (équipements, types) et filtres en pilule
 .kp-choix {
   display: flex;
   flex-wrap: wrap;
@@ -456,26 +617,39 @@ select.kp-input {
 .kp-choix-item {
   display: inline-flex;
   align-items: center;
-  gap: var(--kp-space-2);
-  min-height: 44px;
+  gap: 6px;
+  min-height: 40px;
   padding: 0 var(--kp-space-4);
   border: 1px solid var(--kp-border-strong);
-  border-radius: var(--kp-radius-full);
+  border-radius: var(--kp-radius-pill);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
+  color: var(--kp-text);
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
+  transition:
+    background-color var(--kp-duree) var(--kp-ease),
+    border-color var(--kp-duree) var(--kp-ease);
+
+  &:hover {
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-pill);
+  }
 
   &[aria-pressed='true'],
   &--actif {
-    border-color: var(--kp-primary);
-    background: var(--kp-primary-subtle);
-    color: var(--kp-primary-text);
+    border-color: var(--kp-accent);
+    background: var(--kp-accent-soft);
+    color: var(--kp-text);
+    font-weight: 500;
   }
 }
 
-// ── Liste groupée (style réglages) ───────────────────────────────────────────
+// ── Lignes de liste ──────────────────────────────────────────────────────────
+// 56 px, vignette de 40 px, titre sur une ligne coupé par une ellipse (texte complet dans l'attribut title).
 
 .kp-list {
   display: flex;
@@ -483,26 +657,30 @@ select.kp-input {
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--kp-border);
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-lg);
   background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
   overflow: hidden;
 }
 
 .kp-list__item {
   display: flex;
   align-items: center;
-  gap: var(--kp-space-3);
+  gap: var(--kp-space-4);
   min-height: 56px;
   width: 100%;
-  padding: var(--kp-space-3) var(--kp-space-4);
+  padding: var(--kp-space-2) var(--kp-space-4);
   border: 0;
   border-bottom: 1px solid var(--kp-border);
   background: transparent;
-  color: var(--kp-text-1);
-  font-size: var(--kp-fs-md);
+  color: var(--kp-text);
+  font-size: var(--kp-fs-body);
   text-align: left;
   text-decoration: none;
+
+  @include mq.tablette {
+    padding-inline: var(--kp-card-pad);
+  }
 
   &:last-child {
     border-bottom: 0;
@@ -512,19 +690,25 @@ select.kp-input {
 a.kp-list__item,
 button.kp-list__item {
   cursor: pointer;
+  transition: background-color var(--kp-duree) var(--kp-ease);
 
   &:hover {
-    background: var(--kp-surface-2);
+    background: var(--kp-surface-sunken);
+  }
+
+  &:focus-visible {
+    border-radius: 0;
+    box-shadow: inset 0 0 0 2px var(--kp-text);
   }
 
   &::after {
     content: '';
     flex-shrink: 0;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     margin-left: var(--kp-space-1);
-    border-right: 2px solid var(--kp-text-3);
-    border-bottom: 2px solid var(--kp-text-3);
+    border-right: 1.5px solid var(--kp-text-subtle);
+    border-bottom: 1.5px solid var(--kp-text-subtle);
     transform: rotate(-45deg);
   }
 }
@@ -534,24 +718,32 @@ button.kp-list__item {
 }
 
 .kp-list__item--danger {
-  color: var(--kp-danger);
-  font-weight: 600;
+  color: var(--kp-state-danger);
+  font-weight: 500;
 
   &::after {
     display: none;
   }
 }
 
+// Vignette : icône ou photo de 40 px
 .kp-list__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--kp-radius-sm);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-2);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-muted);
+  overflow: hidden;
+
+  > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .kp-list__body {
@@ -562,29 +754,32 @@ button.kp-list__item {
 }
 
 .kp-list__title {
-  font-weight: 600;
-  overflow-wrap: anywhere;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .kp-list__sub {
-  font-size: var(--kp-fs-sm);
-  color: var(--kp-text-3);
+  font-size: var(--kp-fs-secondary);
+  color: var(--kp-text-subtle);
   overflow-wrap: anywhere;
 }
 
 .kp-list__value {
   flex-shrink: 0;
   max-width: 55%;
-  color: var(--kp-text-2);
+  color: var(--kp-text-muted);
+  font-size: 14px;
   text-align: right;
   overflow-wrap: anywhere;
 }
 
 .kp-list-header {
   padding: 0 var(--kp-space-1);
-  font-size: var(--kp-fs-sm);
-  font-weight: 600;
-  color: var(--kp-text-3);
+  font-size: var(--kp-fs-secondary);
+  font-weight: 500;
+  color: var(--kp-text-subtle);
 }
 
 // Liste de définitions (détails d'un bail, d'un bien)
@@ -592,9 +787,9 @@ button.kp-list__item {
   display: grid;
   grid-template-columns: 1fr;
   margin: 0;
-  border: 1px solid var(--kp-border);
-  border-radius: var(--kp-radius);
+  border-radius: var(--kp-radius-lg);
   background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
   overflow: hidden;
 
   > div {
@@ -606,110 +801,154 @@ button.kp-list__item {
     padding: var(--kp-space-3) var(--kp-space-4);
     border-bottom: 1px solid var(--kp-border);
 
+    @include mq.tablette {
+      padding-inline: var(--kp-card-pad);
+    }
+
     &:last-child {
       border-bottom: 0;
     }
   }
 
   dt {
-    color: var(--kp-text-3);
+    color: var(--kp-text-subtle);
   }
 
   dd {
     margin: 0;
-    font-weight: 600;
+    font-weight: 500;
     text-align: right;
     overflow-wrap: anywhere;
   }
 }
 
 // ── Cartes ───────────────────────────────────────────────────────────────────
+// Rayon 20, élévation 0 (liseré), marge intérieure --kp-card-pad.
 
 .kp-card {
   display: flex;
   flex-direction: column;
   gap: var(--kp-space-3);
-  padding: var(--kp-space-4);
-  border: 1px solid var(--kp-border);
-  border-radius: var(--kp-radius);
+  padding: var(--kp-card-pad);
+  border: 0;
+  border-radius: var(--kp-radius-lg);
   background: var(--kp-surface);
-  color: var(--kp-text-1);
+  box-shadow: var(--kp-elev-0);
+  color: var(--kp-text);
   text-decoration: none;
+}
 
-  @include mq.tablette {
-    padding: var(--kp-space-5);
-  }
+.kp-card__titre {
+  font-size: var(--kp-fs-card-title);
+  font-weight: 500;
 }
 
 a.kp-card,
 button.kp-card {
   cursor: pointer;
   text-align: left;
+  transition: box-shadow var(--kp-duree) var(--kp-ease);
 
   &:hover {
-    border-color: var(--kp-border-strong);
+    box-shadow: var(--kp-elev-1);
+  }
+
+  &:focus-visible {
+    border-radius: var(--kp-radius-lg);
+    box-shadow: var(--kp-focus);
   }
 }
 
-// Carte « à faire » : bordure d'accent selon l'urgence
+// Carte « à faire » : liseré gauche de la couleur de l'urgence (bordure : reste visible au survol)
 .kp-tache {
-  border-left: 4px solid var(--kp-border-strong);
+  border-left: 3px solid var(--kp-state-neutral);
 
   &--urgent {
-    border-left-color: var(--kp-danger);
+    border-left-color: var(--kp-state-danger);
   }
 
   &--attention {
-    border-left-color: var(--kp-warning);
+    border-left-color: var(--kp-state-warning);
   }
 
   &--info {
-    border-left-color: var(--kp-info);
+    border-left-color: var(--kp-accent);
   }
 }
 
-// ── Puces de statut ──────────────────────────────────────────────────────────
+// ── Badges d'état ────────────────────────────────────────────────────────────
+// Point + texte ; jamais la couleur seule. Badge (fond / texte) dans les tableaux et listes de documents,
+// .kp-statut--point (point coloré + texte courant) dans le corps d'une carte.
+// Tons du code → états : ok → success, attention → warning, danger → danger, info et neutre → neutral.
 
 .kp-statut {
+  --_point: var(--kp-state-neutral);
+  --_fond: var(--kp-state-neutral-bg);
+  --_texte: var(--kp-state-neutral-text);
+
   display: inline-flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  height: 26px;
+  height: 24px;
   padding: 0 10px;
-  border-radius: var(--kp-radius-full);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-2);
-  font-size: var(--kp-fs-xs);
-  font-weight: 700;
+  border-radius: var(--kp-radius-pill);
+  background: var(--_fond);
+  color: var(--_texte);
+  font-size: var(--kp-fs-secondary);
+  font-weight: 500;
+  line-height: 1;
   white-space: nowrap;
 
   &::before {
     content: '';
+    flex-shrink: 0;
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: currentColor;
+    background: var(--_point);
   }
 
   &--ok {
-    background: var(--kp-success-subtle);
-    color: var(--kp-success);
+    --_point: var(--kp-state-success);
+    --_fond: var(--kp-state-success-bg);
+    --_texte: var(--kp-state-success-text);
   }
 
   &--attention {
-    background: var(--kp-warning-subtle);
-    color: var(--kp-warning);
+    --_point: var(--kp-state-warning);
+    --_fond: var(--kp-state-warning-bg);
+    --_texte: var(--kp-state-warning-text);
   }
 
   &--danger {
-    background: var(--kp-danger-subtle);
-    color: var(--kp-danger);
+    --_point: var(--kp-state-danger);
+    --_fond: var(--kp-state-danger-bg);
+    --_texte: var(--kp-state-danger-text);
   }
 
+  // « En attente de l'autre partie » : pas d'équivalent « info » dans la table des états
   &--info {
-    background: var(--kp-info-subtle);
-    color: var(--kp-info);
+    --_point: var(--kp-state-neutral);
+    --_fond: var(--kp-state-neutral-bg);
+    --_texte: var(--kp-state-neutral-text);
+  }
+
+  // Dans le texte courant : point de 8 px + texte, sans fond
+  &--point {
+    height: auto;
+    padding: 0;
+    gap: 8px;
+    background: none;
+    color: var(--kp-text);
+    font-size: inherit;
+    font-weight: 400;
+    line-height: inherit;
+
+    &::before {
+      width: 8px;
+      height: 8px;
+    }
   }
 }
 
@@ -719,64 +958,104 @@ button.kp-card {
   gap: 6px;
   min-height: 28px;
   padding: 0 10px;
-  border-radius: var(--kp-radius-full);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-2);
-  font-size: var(--kp-fs-sm);
+  border-radius: var(--kp-radius-pill);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-muted);
+  font-size: var(--kp-fs-secondary);
 }
 
-// ── Bandeaux d'information ───────────────────────────────────────────────────
+// ── Bannières ────────────────────────────────────────────────────────────────
+// En haut du bloc concerné, pour ce qui demande une action ou reste vrai. Une erreur ne disparaît jamais seule
+// (pas de minuterie sur une bannière). Liseré gauche et icône de la couleur de l'état, texte courant en nuit.
+// Structure conseillée : kp-icon + .kp-bandeau__corps (.kp-bandeau__titre, .kp-bandeau__texte) + .kp-bandeau__action
 
 .kp-bandeau {
+  --_point: var(--kp-state-neutral);
+
   display: flex;
   align-items: flex-start;
   gap: var(--kp-space-3);
   padding: var(--kp-space-3) var(--kp-space-4);
-  border-radius: var(--kp-radius);
-  background: var(--kp-info-subtle);
-  color: var(--kp-info);
-  font-size: var(--kp-fs-sm);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-state-neutral-bg);
+  box-shadow: inset 3px 0 0 var(--_point);
+  color: var(--kp-text);
+  font-size: 14px;
+  line-height: 1.45;
 
   > kp-icon {
-    margin-top: 2px;
+    margin-top: 1px;
+    color: var(--_point);
   }
 
   &--ok {
-    background: var(--kp-success-subtle);
-    color: var(--kp-success);
+    --_point: var(--kp-state-success);
+
+    background: var(--kp-state-success-bg);
   }
 
   &--attention {
-    background: var(--kp-warning-subtle);
-    color: var(--kp-warning);
+    --_point: var(--kp-state-warning);
+
+    background: var(--kp-state-warning-bg);
   }
 
   &--danger {
-    background: var(--kp-danger-subtle);
-    color: var(--kp-danger);
+    --_point: var(--kp-state-danger);
+
+    background: var(--kp-state-danger-bg);
   }
 
   p,
   strong {
     color: inherit;
   }
+
+  strong {
+    font-weight: 500;
+  }
+}
+
+.kp-bandeau__corps {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kp-bandeau__titre {
+  font-weight: 500;
+}
+
+.kp-bandeau__texte {
+  color: var(--kp-text-muted);
+}
+
+.kp-bandeau__action {
+  flex-shrink: 0;
+  align-self: center;
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
 }
 
 // ── Chargement ───────────────────────────────────────────────────────────────
+// Squelettes pour les pages ; indicateur rond (.kp-spinner) seulement dans un bouton pendant un envoi.
 
 .kp-skeleton {
   display: block;
   border-radius: var(--kp-radius-sm);
-  background: linear-gradient(90deg, var(--kp-surface-2) 25%, var(--kp-surface-3) 50%, var(--kp-surface-2) 75%);
-  background-size: 200% 100%;
-  animation: kp-shimmer 1.4s ease-in-out infinite;
+  // Fond du contrôle segmenté : reste visible posé directement sur le fond de page
+  background: var(--kp-segment-bg);
+  animation: kp-pulsation 1600ms var(--kp-ease) infinite;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
   }
 
   &--ligne {
-    height: 16px;
+    height: 12px;
   }
 
   &--titre {
@@ -786,33 +1065,46 @@ button.kp-card {
 
   &--carte {
     height: 96px;
-    border-radius: var(--kp-radius);
+    border-radius: var(--kp-radius-lg);
   }
 
   &--photo {
     aspect-ratio: 4 / 3;
-    border-radius: var(--kp-radius);
+    border-radius: var(--kp-radius-md);
+  }
+
+  // Vignette de ligne de liste
+  &--vignette {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
   }
 }
 
-@keyframes kp-shimmer {
-  from {
-    background-position: 200% 0;
+@keyframes kp-pulsation {
+  0%,
+  100% {
+    opacity: 1;
   }
 
-  to {
-    background-position: -200% 0;
+  50% {
+    opacity: 0.5;
   }
 }
 
 .kp-spinner {
   display: inline-block;
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
+  border: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
   border-radius: 50%;
   animation: kp-tourne 0.8s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 2.4s;
+  }
 }
 
 @keyframes kp-tourne {
@@ -827,8 +1119,8 @@ button.kp-card {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: var(--kp-radius);
-  background: var(--kp-surface-2);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-surface-sunken);
 }
 
 .kp-photo-vide {
@@ -837,7 +1129,181 @@ button.kp-card {
   justify-content: center;
   width: 100%;
   aspect-ratio: 4 / 3;
-  border-radius: var(--kp-radius);
-  background: var(--kp-surface-2);
-  color: var(--kp-text-3);
+  border-radius: var(--kp-radius-md);
+  background: var(--kp-surface-sunken);
+  color: var(--kp-text-subtle);
+}
+
+// ── Tableaux ─────────────────────────────────────────────────────────────────
+// Ordinateur : en-têtes collants, actions en fin de ligne. Tablette : colonnes .kp-table__secondaire masquées.
+// Téléphone : une carte par ligne (chaque <td> peut porter data-libelle="Montant" pour rappeler sa colonne).
+// Le tri se fait à l'écran (bouton .kp-table__tri dans l'en-tête, aria-sort sur le <th>).
+//
+// <div class="kp-table-cadre"><table class="kp-table">
+//   <thead><tr><th>Quittance</th><th class="kp-table__secondaire">Locataire</th>…<th><span class="kp-sr-only">Actions</span></th></tr></thead>
+//   <tbody><tr><td class="kp-table__titre">…</td>…<td class="kp-table__actions">…</td></tr></tbody>
+// </table></div>
+
+.kp-table-cadre {
+  border-radius: 16px;
+  background: var(--kp-surface);
+  box-shadow: var(--kp-elev-0);
+  overflow: clip;
+}
+
+.kp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 44px;
+    padding: 0 var(--kp-space-4);
+    background: color-mix(in srgb, var(--kp-surface-sunken) 45%, var(--kp-surface));
+    color: var(--kp-text-muted);
+    font-size: var(--kp-fs-secondary);
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 56px;
+    padding: 0 var(--kp-space-4);
+    border-top: 1px solid var(--kp-border);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color var(--kp-duree) var(--kp-ease);
+  }
+
+  tbody tr:hover {
+    background: color-mix(in srgb, var(--kp-surface-sunken) 40%, transparent);
+  }
+}
+
+.kp-table__titre {
+  max-width: 0;
+  width: 100%;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kp-table__nombre {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kp-table__discret {
+  color: var(--kp-text-muted);
+}
+
+.kp-table__actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.kp-table__tri {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.kp-table-pied {
+  padding: var(--kp-space-2) var(--kp-space-4);
+  border-top: 1px solid var(--kp-border);
+  color: var(--kp-text-subtle);
+  font-size: var(--kp-fs-mention);
+}
+
+// Tablette : colonnes secondaires masquées
+@media (min-width: 768px) and (max-width: 1099px) {
+  .kp-table .kp-table__secondaire {
+    display: none;
+  }
+}
+
+// Téléphone : une carte par ligne
+@include mq.telephone {
+  .kp-table-cadre {
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .kp-table {
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: var(--kp-space-2);
+    }
+
+    tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 4px var(--kp-space-2);
+      padding: var(--kp-space-3) var(--kp-space-4);
+      border-radius: 16px;
+      background: var(--kp-surface);
+      box-shadow: var(--kp-elev-0);
+    }
+
+    td {
+      height: auto;
+      padding: 0;
+      border: 0;
+    }
+
+    td[data-libelle]:not(.kp-table__titre):not(.kp-table__nombre)::before {
+      content: attr(data-libelle) ' · ';
+      color: var(--kp-text-subtle);
+    }
+
+    .kp-table__secondaire {
+      display: none;
+    }
+  }
+
+  .kp-table__titre {
+    max-width: none;
+    width: auto;
+  }
+
+  .kp-table__actions {
+    width: auto;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+
+// Repère et zone sur les cartes Leaflet (chemins SVG) : couleurs en jetons par classe, Leaflet n'écrit que des attributs
+.kp-carte-point,
+.kp-carte-zone {
+  stroke: var(--kp-text);
+  fill: var(--kp-accent);
 }

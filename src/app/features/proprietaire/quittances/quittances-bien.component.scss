@@ -1,22 +1,65 @@
-.quittances {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+// Quittances du bien (tableau DS-Composants)
+
+.barre-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
 }
 
-h2 {
-  font-size: var(--kp-fs-md);
+.mois::first-letter {
+  text-transform: uppercase;
+}
 
-  &::first-letter {
-    text-transform: uppercase;
+.actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.tri {
+  opacity: 0.35;
+  transition: transform var(--kp-duree) var(--kp-ease);
+}
+
+.tri--ascending,
+.tri--descending {
+  opacity: 1;
+}
+
+.tri--ascending {
+  transform: rotate(180deg);
+}
+
+.recap-quittance {
+  margin-bottom: var(--kp-space-3);
+  line-height: 2;
+
+  kp-statut {
+    vertical-align: middle;
   }
 }
 
-.montant {
-  font-size: var(--kp-fs-lg);
+.whatsapp {
+  margin-top: var(--kp-space-3);
 }
 
-label.kp-btn[aria-disabled='true'] {
-  opacity: 0.6;
-  pointer-events: none;
+label.kp-list__item {
+  cursor: pointer;
+
+  &[aria-disabled='true'] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Téléphone : « Déclarer reçu » reste dans le menu de la carte
+@media (max-width: 767px) {
+  .declarer {
+    display: none;
+  }
+}
+
+.sans-cesure {
+  white-space: nowrap;
 }

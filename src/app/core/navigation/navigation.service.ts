@@ -9,30 +9,43 @@ export interface Onglet {
   icone: string;
   lien: string;
   /** Pastille de non-lus. */
-  compteur?: 'messages';
+  /** `messages` : pastille des non-lus ; `biens` : nombre de biens possédés, discret. */
+  compteur?: 'messages' | 'biens';
   /**
-   * Faux : barre latérale seulement (la barre du bas d'un téléphone n'a de place que pour 5 onglets) ;
-   * l'écran reste joignable depuis l'accueil et le compte.
+   * Autres adresses où l'onglet reste marqué actif (en plus de `lien` et de ses sous-adresses) :
+   * « Mon logement » du locataire sur `/quittances`, dont l'en-tête montre les onglets de Mon logement.
    */
-  mobile?: boolean;
+  aussi?: string[];
 }
+
+/**
+ * Profil de navigation, déduit des données du compte (pas de rôle depuis le lot 3) :
+ * un compte qui possède un bien est « propriétaire », même s'il loue aussi un logement.
+ */
+export type ProfilNavigation = 'visiteur' | 'candidat' | 'locataire' | 'proprietaire';
 
 /** Nombre maximal d'onglets dans la barre du bas d'un téléphone. */
 export const ONGLETS_MOBILE_MAX = 5;
 
 const EXPLORER: Onglet = { libelle: 'Explorer', icone: 'compass', lien: '/explorer' };
+const CONNEXION: Onglet = { libelle: 'Se connecter', icone: 'log-in', lien: '/auth/login' };
 const MESSAGES: Onglet = { libelle: 'Messages', icone: 'message-circle', lien: '/messages', compteur: 'messages' };
 const COMPTE: Onglet = { libelle: 'Compte', icone: 'user', lien: '/compte' };
 const DOCUMENTS: Onglet = { libelle: 'Documents', icone: 'file-text', lien: '/documents' };
 const ACCUEIL: Onglet = { libelle: 'Accueil', icone: 'house', lien: '/accueil' };
-const BIENS: Onglet = { libelle: 'Mes biens', icone: 'building-2', lien: '/biens', mobile: false };
-const MON_LOGEMENT: Onglet = { libelle: 'Mon logement', icone: 'key', lien: '/mon-logement', mobile: false };
-const QUITTANCES: Onglet = { libelle: 'Quittances', icone: 'receipt', lien: '/quittances', mobile: false };
+const BIENS: Onglet = { libelle: 'Mes biens', icone: 'building-2', lien: '/biens', compteur: 'biens' };
+const MON_LOGEMENT: Onglet = { libelle: 'Mon logement', icone: 'key', lien: '/mon-logement' };
+/** Demandes de location reçues (propositions d'un propriétaire), décision du 7 novembre 2026. */
+const DEMANDES: Onglet = { libelle: 'Demandes', icone: 'inbox', lien: '/demandes-location' };
+const QUITTANCES: Onglet = { libelle: 'Quittances', icone: 'receipt', lien: '/quittances' };
+/** Locataire seulement : ses quittances sont un onglet de Mon logement (un propriétaire qui loue a sa propre entrée). */
+const MON_LOGEMENT_LOCATAIRE: Onglet = { ...MON_LOGEMENT, aussi: ['/quittances'] };
 
 /**
- * Navigation (AUDIT.md §6.2) : barre d'onglets du bas sur téléphone, barre latérale ailleurs.
- * Explorer est proposé à tout le monde : propriétaires et locataires peuvent toujours chercher un autre logement.
- * La cloche des notifications est dans l'en-tête des écrans (`kp-cloche`) et dans la barre latérale.
+ * Navigation par profil (docs/refonte-front/00-vue-ensemble.md, « Profils de navigation ») :
+ * - ordinateur : barre latérale pour le propriétaire, barre du haut pour les autres ;
+ * - téléphone : en-tête et onglets du bas, pour tous.
+ * La cloche des notifications et le compte sont dans la barre (latérale, du haut ou en-tête du téléphone).
  */
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
@@ -41,7 +54,7 @@ export class NavigationService {
   private router = inject(Router);
 
   /**
-   * Écran plein (assistant, signature, conversation ouverte sur téléphone) : sans onglets.
+   * Écran plein (assistant, signature, conversation ouverte sur téléphone) : sans barres.
    * `pleinEcran: true` dans les données de la route, ou `pleinEcranDemande` posé par un écran (et remis à faux
    * par lui à sa destruction).
    */
@@ -49,50 +62,96 @@ export class NavigationService {
   readonly pleinEcranDemande = signal(false);
   readonly pleinEcran = computed(() => this.pleinEcranRoute() || this.pleinEcranDemande());
 
-  /**
-   * Lot 3 : mêmes onglets pour tous les comptes ; « Biens » apparaît quand le compte possède un bien,
-   * « Mon logement » et « Quittances » quand il loue un logement (barre latérale ; sur téléphone, depuis l'accueil).
-   */
-  readonly onglets = computed<Onglet[]>(() => {
-    const user = this.auth.currentUser();
-    if (!user) {
-      return [EXPLORER, { libelle: 'Se connecter', icone: 'log-in', lien: '/auth/login' }];
-    }
-    const onglets: Onglet[] = [ACCUEIL];
-    if (this.logement.aDesBiens()) {
-      onglets.push(BIENS);
-    }
-    if (this.logement.hasLogement()) {
-      onglets.push(MON_LOGEMENT, QUITTANCES);
-    }
-    onglets.push(EXPLORER, MESSAGES);
-    if (this.aDesDocuments()) {
-      onglets.push(DOCUMENTS);
-    }
-    onglets.push(COMPTE);
-    return onglets;
-  });
+  /** Adresse courante (sans paramètres ni fragment), relue à chaque navigation. */
+  private readonly chemin = signal(cheminDe(this.router.url));
+
+  /** L'adresse courante est `adresse` ou l'une de ses sous-adresses. */
+  surAdresse(adresse: string): boolean {
+    const c = this.chemin();
+    return c === adresse || c.startsWith(adresse + '/');
+  }
+
+  /** Onglet actif par l'une de ses adresses `aussi` (`routerLinkActive` couvre déjà `lien`). */
+  actifAussi(onglet: Onglet): boolean {
+    return !!onglet.aussi?.some(a => this.surAdresse(a));
+  }
+
+  /** Les espaces du compte (biens, logement) ont été relus depuis l'API pendant cette session (ou hors ligne). */
+  private readonly espacesLus = signal(false);
 
   /** Le compte possède au moins un bien / loue un logement. */
   readonly aDesBiens = computed(() => this.logement.aDesBiens());
   readonly aUnLogement = computed(() => this.logement.hasLogement());
 
-  /** Onglets de la barre du bas (téléphone). */
-  readonly ongletsMobile = computed(() => this.onglets().filter(o => o.mobile !== false));
+  readonly profil = computed<ProfilNavigation>(() => {
+    if (!this.auth.currentUser()) return 'visiteur';
+    if (this.logement.aDesBiens()) return 'proprietaire';
+    if (this.logement.hasLogement()) return 'locataire';
+    return 'candidat';
+  });
+
+  /**
+   * Profil sûr : faux tant qu'un compte connecté n'a ni valeur en cache ni réponse de l'API (juste après la
+   * connexion). La mise en page attend alors pour ne pas montrer la barre du candidat puis basculer.
+   */
+  readonly profilConnu = computed(() => {
+    const user = this.auth.currentUser();
+    return !user?.role || this.espacesLus() || this.logement.aDesBiens() || this.logement.hasLogement();
+  });
 
   /** Accès aux documents (bail, états des lieux, quittances) : le compte possède un bien ou loue un logement. */
   readonly aDesDocuments = computed(() =>
     !!this.auth.currentUser() && (this.logement.aDesBiens() || this.logement.hasLogement()));
+
+  /** Entrées de la barre latérale (propriétaire) ou de la barre du haut (autres profils), sur ordinateur. */
+  readonly onglets = computed<Onglet[]>(() => {
+    switch (this.profil()) {
+      case 'visiteur':
+        return [EXPLORER, CONNEXION];
+      case 'proprietaire': {
+        const onglets = [ACCUEIL, BIENS];
+        if (this.logement.hasLogement()) onglets.push(MON_LOGEMENT, QUITTANCES);
+        onglets.push(MESSAGES);
+        if (this.aDesDocuments()) onglets.push(DOCUMENTS);
+        return onglets;
+      }
+      case 'locataire':
+        return [ACCUEIL, MON_LOGEMENT_LOCATAIRE, EXPLORER];
+      case 'candidat':
+        return [ACCUEIL, EXPLORER, DEMANDES, MESSAGES];
+    }
+  });
+
+  /** Onglets de la barre du bas (téléphone). */
+  readonly ongletsMobile = computed<Onglet[]>(() => {
+    const documents = this.aDesDocuments() ? [DOCUMENTS] : [];
+    switch (this.profil()) {
+      case 'visiteur':
+        return [EXPLORER, CONNEXION];
+      case 'proprietaire':
+        return [ACCUEIL, BIENS, MESSAGES, ...documents, COMPTE];
+      case 'locataire':
+        return [ACCUEIL, MON_LOGEMENT_LOCATAIRE, MESSAGES, ...documents, COMPTE];
+      case 'candidat':
+        return [ACCUEIL, EXPLORER, DEMANDES, MESSAGES, COMPTE];
+    }
+  });
 
   constructor() {
     // Lot 3 : espaces (biens possédés, logement loué) relus à la connexion d'un compte
     effect(() => {
       const user = this.auth.currentUser();
       if (user?.role) {
-        untracked(() => this.logement.charger(user.id).subscribe());
+        untracked(() => this.logement.charger(user.id).subscribe({
+          next: () => this.espacesLus.set(true),
+          error: () => this.espacesLus.set(true),
+        }));
+      } else {
+        untracked(() => this.espacesLus.set(false));
       }
     });
-    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => {
+      this.chemin.set(cheminDe((e as NavigationEnd).urlAfterRedirects));
       let route: ActivatedRouteSnapshot | null = this.router.routerState.snapshot.root;
       let plein = false;
       while (route) {
@@ -102,4 +161,8 @@ export class NavigationService {
       this.pleinEcranRoute.set(plein);
     });
   }
+}
+
+function cheminDe(url: string): string {
+  return url.split(/[?#]/)[0] || '/';
 }

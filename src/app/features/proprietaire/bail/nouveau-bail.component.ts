@@ -6,23 +6,43 @@ import { catchError, of } from 'rxjs';
 import { BienService } from '../../biens/services/bien.service';
 import { JuridictionService } from '../../biens/services/juridiction.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
-import { BienDTO, locataireDuBail } from '../../biens/models/bien.model';
+import { BienDTO, adresseLisible, locataireDuBail } from '../../biens/models/bien.model';
 import { champVisible } from '../../biens/models/juridiction.model';
-import { MontantPipe, symboleDevise } from '../../../core/money/montant';
+import { MontantPipe, formatMontant, symboleDevise } from '../../../core/money/montant';
 import { messageErreurApi } from '../../../core/http/api-error';
 import { ToastService } from '../../../core/ui/toast.service';
-import { DateLonguePipe, aujourdhuiIso } from '../../../shared/format';
+import { DateLonguePipe, aujourdhuiIso, dateLongue } from '../../../shared/format';
 import { AssistantComponent } from '../../../shared/ui/assistant.component';
+import { libelleDuree } from './duree';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChampDateComponent } from '../../../shared/ui/champ-date.component';
 
 const ETAPES = ['Début et durée du bail', 'Loyer et garantie', 'Vérifiez le bail'];
+const LIBELLES = ['Début et durée', 'Loyer et garantie', 'Vérification'];
 const DUREES = [12, 24, 36];
 
-/** Création d'un bail en 3 étapes ; la juridiction du bien dit si la garantie est en montant ou en mois (C12). */
+const MANQUES_BAIL: Record<string, string> = {
+  dateDebut: 'Choisissez la date de début du bail.',
+  dureeBailMois: 'Indiquez une durée de 1 à 120 mois.',
+  loyerMensuel: 'Indiquez le loyer hors charges.',
+  chargesMensuelles: 'Indiquez les charges (0 s’il n’y en a pas).',
+  depotGarantie: 'Indiquez le dépôt de garantie (0 s’il n’y en a pas).',
+  garantieMois: 'Indiquez la garantie, de 0 à 24 mois.',
+  avanceMois: 'Indiquez les loyers payés d’avance, de 0 à 24 mois.',
+};
+
+/**
+ * Création d'un bail en 3 étapes (`Assist-Bail`) ; la juridiction du bien dit si la garantie est en montant ou en
+ * mois (C12). Aperçu en direct construit avec les valeurs du formulaire : parties, logement, durée, loyer et charges,
+ * dépôt ou garantie et avance. Le texte complet du bail n'existe que dans le PDF (évolution E2).
+ */
 @Component({
   selector: 'kp-nouveau-bail',
   standalone: true,
-  imports: [ReactiveFormsModule, MontantPipe, DateLonguePipe, AssistantComponent],
+  imports: [ReactiveFormsModule, ChampDateComponent, NgTemplateOutlet, MontantPipe, DateLonguePipe, AssistantComponent, IconComponent],
   templateUrl: './nouveau-bail.component.html',
+  styleUrl: './nouveau-bail.component.scss',
 })
 export class NouveauBailComponent implements OnInit {
   readonly id = input.required<string>();
@@ -35,6 +55,7 @@ export class NouveauBailComponent implements OnInit {
   private toasts = inject(ToastService);
 
   readonly etapes = ETAPES;
+  readonly libelles = LIBELLES;
   readonly durees = DUREES;
   readonly aujourdhui = aujourdhuiIso();
   readonly etape = signal(0);
@@ -54,13 +75,48 @@ export class NouveauBailComponent implements OnInit {
     avanceMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
   });
 
-  private readonly valeurs = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+  protected readonly valeurs = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
   readonly devise = computed(() => this.bien()?.devise);
   readonly symbole = computed(() => symboleDevise(this.devise()));
   readonly nomLocataire = computed(() => {
     const l = locataireDuBail(this.bien());
     return l ? `${l.firstName} ${l.lastName}` : '';
   });
+  readonly prenomLocataire = computed(() => locataireDuBail(this.bien())?.firstName ?? 'le locataire');
+  readonly nomBailleur = computed(() => {
+    const p = this.bien()?.proprietaire;
+    return p ? `${p.firstName} ${p.lastName}` : '';
+  });
+  readonly adresseBien = computed(() => {
+    const b = this.bien();
+    return b ? adresseLisible(b) : '';
+  });
+  readonly sousTitre = computed(() => [this.nomLocataire(), this.bien()?.titre].filter(Boolean).join(' · ') || null);
+  readonly duree = computed(() => libelleDuree(this.valeurs().dureeBailMois));
+  readonly totalMensuel = computed(() => {
+    const v = this.valeurs();
+    return (Number(v.loyerMensuel) || 0) + (Number(v.chargesMensuelles) || 0);
+  });
+  /** Résumé des étapes passées, sous leur libellé. */
+  readonly resumes = computed(() => {
+    const v = this.valeurs();
+    return [
+      [dateLongue(v.dateDebut ?? null, true), this.duree()].filter(Boolean).join(' · '),
+      formatMontant(this.totalMensuel(), this.devise(), 0) + ' par mois',
+      null,
+    ];
+  });
+  /**
+   * Avertissement non bloquant : le dépôt saisi n'est pas celui de l'annonce. Aucun plafond légal n'est connu du
+   * code (ni de `GET /juridictions/{pays}`) : la règle n'est pas inventée ici.
+   */
+  readonly depotDifferent = computed(() => {
+    const annonce = this.bien()?.depotGarantie;
+    const saisi = this.valeurs().depotGarantie;
+    return !this.garantieEnMois() && annonce != null && saisi != null && (saisi as unknown) !== '' && Number(saisi) !== Number(annonce)
+      ? formatMontant(annonce, this.devise(), 0) : null;
+  });
+
   readonly montantGarantie = computed(() => {
     const v = this.valeurs();
     return (Number(v.loyerMensuel) || 0) * (Number(v.garantieMois) || 0);
@@ -77,6 +133,21 @@ export class NouveauBailComponent implements OnInit {
     return this.champsParEtape[this.etape()].every(c => this.form.controls[c].valid);
   });
 
+  /** Ce qui empêche de continuer, d'après les mêmes contrôles que `etapeValide`. */
+  readonly manque = computed<string | null>(() => {
+    this.valeurs();
+    if (!this.bien()) return this.erreur() ? null : 'Chargement du bien…';
+    const invalide = this.champsParEtape[this.etape()].find(c => this.form.controls[c].invalid);
+    return invalide ? MANQUES_BAIL[invalide] : null;
+  });
+
+  /** Valeurs reprises du bien : la saisie commence quand elles changent. */
+  private initiales: string | null = null;
+  readonly modifie = computed(() => {
+    const v = this.valeurs();
+    return this.form.dirty || (this.initiales !== null && JSON.stringify(v) !== this.initiales);
+  });
+
   ngOnInit(): void {
     const id = Number(this.id());
     this.bienService.getPrive(id).subscribe({
@@ -89,6 +160,7 @@ export class NouveauBailComponent implements OnInit {
           garantieMois: bien.garantieMois ?? null,
           avanceMois: bien.avanceMois ?? null,
         });
+        this.initiales = JSON.stringify(this.form.getRawValue());
         this.juridictions.configuration(bien.pays).pipe(catchError(() => of(null))).subscribe(config => {
           this.appliquerGarantie(config ? !champVisible(config, 'depotGarantie') : bien.garantieMois != null);
         });

@@ -1,11 +1,12 @@
-<div class="kp-page kp-page--etroite">
-  <kp-page-header titre="Quittances" [sousTitre]="bien()?.titre" [retour]="['/biens', id()]">
-    @if (bien()?.locataire && !bien()?.archive) {
-      <a actions class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'quittances', 'nouvelle']">
-        <kp-icon name="plus" [size]="18" /> Nouvelle
+<div class="kp-page">
+  <kp-fiche-entete [bien]="bien()" />
+  @if (bien()?.locataire && !bien()?.archive && quittances().length) {
+    <div class="barre-actions">
+      <a class="kp-btn kp-btn--primary kp-btn--sm" [routerLink]="['/biens', id(), 'quittances', 'nouvelle']">
+        <kp-icon name="plus" [size]="18" /> Nouvelle quittance
       </a>
-    }
-  </kp-page-header>
+    </div>
+  }
 
   @if (chargement() && !bien()) {
     <div class="kp-stack" aria-busy="true">
@@ -24,52 +25,110 @@
       }
     </kp-vide>
   } @else {
-    <ul class="kp-stack quittances">
-      @for (q of quittances(); track q.id) {
-        <li class="kp-card">
-          <div class="kp-row kp-row--between">
-            <h2>{{ mois(q) }}</h2>
-            <kp-statut [statut]="statut(q)" />
-          </div>
-          <p class="kp-montant montant">{{ q.montantTotal | montant: q.devise }}</p>
-          <p class="kp-small kp-muted">
-            @if (q.statut === 'PAYEE') {
-              Reçu le {{ q.datePaiement | dateLongue }}{{ q.modePaiement ? ' · ' + libellesMode[q.modePaiement] : '' }}{{ q.referencePaiement ? ' · réf. ' + q.referencePaiement : '' }}
-            } @else {
-              Échéance le {{ q.dateEcheance | dateLongue }}
-            }
-          </p>
-          <div class="kp-actions">
-            @if (q.statut !== 'PAYEE' && !bien()?.archive) {
-              <button type="button" class="kp-btn kp-btn--primary" (click)="declarer(q)">
-                <kp-icon name="banknote" [size]="18" /> Déclarer le loyer reçu
-              </button>
-            }
-            @if (q.statut === 'PAYEE') {
-              @if (q.urlPdf) {
-                <a class="kp-btn kp-btn--secondary" [href]="q.urlPdf" target="_blank" rel="noopener"><kp-icon name="download" [size]="18" /> Quittance</a>
-              }
-              @if (q.urlRecu) {
-                <a class="kp-btn kp-btn--secondary" [href]="q.urlRecu" target="_blank" rel="noopener"><kp-icon name="image" [size]="18" /> Reçu</a>
-              }
-              @if (!bien()?.archive) {
-                <label class="kp-btn kp-btn--ghost" [attr.aria-disabled]="envoiRecuId() === q.id">
+    <div class="kp-table-cadre">
+      <table class="kp-table">
+        <caption class="kp-sr-only">Quittances du bien</caption>
+        <thead>
+          <tr>
+            <th scope="col" [attr.aria-sort]="ariaSort('mois')">
+              <button type="button" class="kp-table__tri" (click)="trier('mois')">Mois <kp-icon name="chevron-down" [size]="14" [class]="'tri tri--' + ariaSort('mois')" /></button>
+            </th>
+            <th scope="col" [attr.aria-sort]="ariaSort('montant')">
+              <button type="button" class="kp-table__tri" (click)="trier('montant')">Montant <kp-icon name="chevron-down" [size]="14" [class]="'tri tri--' + ariaSort('montant')" /></button>
+            </th>
+            <th scope="col" class="kp-table__secondaire" [attr.aria-sort]="ariaSort('echeance')">
+              <button type="button" class="kp-table__tri" (click)="trier('echeance')">Échéance <kp-icon name="chevron-down" [size]="14" [class]="'tri tri--' + ariaSort('echeance')" /></button>
+            </th>
+            <th scope="col" class="kp-table__secondaire">Paiement</th>
+            <th scope="col">État</th>
+            <th scope="col"><span class="kp-sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (q of quittancesTriees(); track q.id) {
+            <tr>
+              <td class="kp-table__titre mois" [title]="mois(q)">{{ mois(q) }}</td>
+              <td class="kp-table__nombre" data-libelle="Montant"><span class="kp-montant">{{ q.montantTotal | montant: q.devise }}</span></td>
+              <td class="kp-table__secondaire kp-table__discret sans-cesure" data-libelle="Échéance">{{ q.dateEcheance | dateLongue: true }}</td>
+              <td class="kp-table__secondaire kp-table__discret sans-cesure" data-libelle="Paiement">
+                @if (q.statut === 'PAYEE') {
+                  {{ q.datePaiement | dateLongue: true }}{{ q.modePaiement ? ' · ' + libellesMode[q.modePaiement] : '' }}
+                } @else {
+                  —
+                }
+              </td>
+              <td><kp-statut [statut]="statut(q)" /></td>
+              <td class="kp-table__actions">
+                <span class="actions">
                   @if (envoiRecuId() === q.id) {
-                    <span class="kp-spinner"></span> Envoi…
-                  } @else {
-                    <kp-icon name="camera" [size]="18" /> {{ q.urlRecu ? 'Remplacer le reçu' : 'Joindre le reçu' }}
+                    <span class="kp-spinner" role="status" aria-label="Envoi du reçu"></span>
                   }
-                  <input type="file" class="kp-sr-only" [accept]="acceptPhotos" (change)="joindreRecu(q, $event)" [disabled]="envoiRecuId() === q.id" />
-                </label>
-              }
-            }
-          </div>
-          @if (q.statut !== 'PAYEE' && bien()?.pays) {
-            <kp-bouton-whatsapp type="quittance" [documentId]="q.id" [pays]="bien()!.pays" libelle="Rappel par WhatsApp" />
+                  @if (q.statut !== 'PAYEE' && !bien()?.archive) {
+                    <button type="button" class="kp-btn kp-btn--secondary kp-btn--sm declarer" (click)="declarer(q)">Déclarer reçu</button>
+                  }
+                  @if (q.statut === 'PAYEE' && q.urlPdf) {
+                    <a class="kp-icon-btn" [href]="q.urlPdf" target="_blank" rel="noopener" [attr.aria-label]="'Quittance de ' + mois(q) + ' (PDF)'">
+                      <kp-icon name="download" [size]="18" />
+                    </a>
+                  }
+                  <button type="button" class="kp-icon-btn" (click)="actionsDe.set(q)" [attr.aria-label]="'Actions sur la quittance de ' + mois(q)">
+                    <kp-icon name="ellipsis" [size]="18" />
+                  </button>
+                </span>
+              </td>
+            </tr>
           }
-        </li>
+        </tbody>
+      </table>
+    </div>
+
+    <kp-sheet [ouvert]="!!actionsDe()" (ouvertChange)="!$event && actionsDe.set(null)" [titre]="actionsDe() ? 'Quittance de ' + mois(actionsDe()!) : 'Quittance'">
+      @if (actionsDe(); as q) {
+        <p class="recap-quittance">
+          <span class="kp-montant">{{ q.montantTotal | montant: q.devise }}</span> · <kp-statut [statut]="statut(q)" />
+          <br />
+          @if (q.statut === 'PAYEE') {
+            Reçu le {{ q.datePaiement | dateLongue }}{{ q.modePaiement ? ' · ' + libellesMode[q.modePaiement] : '' }}{{ q.referencePaiement ? ' · réf. ' + q.referencePaiement : '' }}
+          } @else {
+            Échéance le {{ q.dateEcheance | dateLongue }}
+          }
+        </p>
+        <div class="kp-list">
+          @if (q.statut !== 'PAYEE' && !bien()?.archive) {
+            <button type="button" class="kp-list__item" (click)="declarer(q)">
+              <span class="kp-list__icon"><kp-icon name="banknote" /></span>
+              <span class="kp-list__body"><span class="kp-list__title">Déclarer le loyer reçu</span></span>
+            </button>
+          }
+          @if (q.statut === 'PAYEE') {
+            @if (q.urlPdf) {
+              <a class="kp-list__item" [href]="q.urlPdf" target="_blank" rel="noopener">
+                <span class="kp-list__icon"><kp-icon name="download" /></span>
+                <span class="kp-list__body"><span class="kp-list__title">Quittance (PDF)</span></span>
+              </a>
+            }
+            @if (q.urlRecu) {
+              <a class="kp-list__item" [href]="q.urlRecu" target="_blank" rel="noopener">
+                <span class="kp-list__icon"><kp-icon name="image" /></span>
+                <span class="kp-list__body"><span class="kp-list__title">Reçu</span></span>
+              </a>
+            }
+            @if (!bien()?.archive) {
+              <label class="kp-list__item" [attr.aria-disabled]="envoiRecuId() === q.id">
+                <span class="kp-list__icon"><kp-icon name="camera" /></span>
+                <span class="kp-list__body"><span class="kp-list__title">{{ q.urlRecu ? 'Remplacer le reçu' : 'Joindre le reçu' }}</span></span>
+                <input type="file" class="kp-sr-only" [accept]="acceptPhotos" (change)="joindreRecu(q, $event); actionsDe.set(null)" [disabled]="envoiRecuId() === q.id" />
+              </label>
+            }
+          }
+        </div>
+        @if (q.statut !== 'PAYEE' && bien()?.pays) {
+          <div class="whatsapp">
+            <kp-bouton-whatsapp type="quittance" [documentId]="q.id" [pays]="bien()!.pays" libelle="Rappel par WhatsApp" />
+          </div>
+        }
       }
-    </ul>
+    </kp-sheet>
   }
 </div>
 
@@ -90,7 +149,7 @@
     <div class="kp-form-row">
       <div class="kp-field">
         <label class="kp-label" for="datePaiement">Reçu le <span class="kp-optionnel">(aujourd’hui si vide)</span></label>
-        <input id="datePaiement" class="kp-input" type="date" formControlName="datePaiement" [max]="aujourdhui" />
+        <kp-champ-date idChamp="datePaiement" formControlName="datePaiement" [max]="aujourdhui" [effacable]="true" placeholder="Aujourd’hui" />
       </div>
       <div class="kp-field">
         <label class="kp-label" for="reference">Référence <span class="kp-optionnel">(facultatif)</span></label>

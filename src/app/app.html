@@ -11,7 +11,7 @@
 }
 @if (horsLigne.enLigne() && !horsLigne.nouvelleVersion() && installation.proposition(); as mode) {
   <aside class="installation" aria-label="Installer l’application">
-    <img class="installation__logo" src="icons/icon-96x96.png" alt="" width="40" height="40">
+    <img class="installation__logo" src="icons/icone-app-192.png" alt="" width="40" height="40">
     @if (mode === 'natif') {
       <p class="installation__texte"><strong>Installez Kupanga</strong> : plus rapide, même hors ligne.</p>
       <button type="button" class="installation__action" (click)="installation.installer()">Installer</button>
