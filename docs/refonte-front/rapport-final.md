@@ -186,9 +186,8 @@ s'était rabattu sur un transport (`jsonp_send`, corps encodé `d=…`) que la p
 décodait pas. Corrigé dans le même commit que le test (tous les transports `*_send`, corps décodé, WebSocket compris),
 vérifié en forçant le repli XHR et sur une dizaine d'exécutions sans nouvelle fuite. Je ne l'ai pas supprimé : la
 consigne interdit d'écrire en base et l'API n'a pas de suppression de message. Il apparaît comme dernier message de
-la conversation Claire ↔ Inès, donc aussi dans `reference.json` et les instantanés de la messagerie. **À décider** :
-le garder, ou le supprimer en base (`DELETE FROM messages WHERE id = 67;` puis recalcul du dernier message de la
-conversation) et réenregistrer la référence et les instantanés concernés.
+la conversation Claire ↔ Inès, donc aussi dans `reference.json` et les instantanés de la messagerie. **Décidé le
+8 novembre 2026** : Gédéon le garde (test manuel de sa part) ; référence réenregistrée sur cet état, sans écart.
 
 Autre écart de méthode : un de mes scripts de diagnostic (hors tests, sans garde-fou) a appelé une fois
 `POST /messages/conversation/claire.martin@kupanga.dev/lire?bienId=1` pour Lucas. Lucas n'ayant aucune conversation
@@ -243,7 +242,7 @@ sur les assistants de bail, de nouveau bien et de quittance (même défaut que c
 
 ## 8. Points à décider
 
-1. **Message de test n° 67** : le garder, ou le supprimer en base puis réenregistrer la référence et les instantanés (§ 5).
+1. ~~Message de test n° 67~~ : **gardé** (décision du 8 novembre 2026), référence réenregistrée.
 2. **Garde de sortie** sur les trois autres assistants (F4) et réglage `canceledNavigationResolution: 'computed'`.
 3. **E2e dans la CI** : non ajoutés (ils demandent l'API, la base de démo et Edge). Possible avec un job qui lance
    `docker compose -f docker-compose-dev.yml up` ; les instantanés devront alors être générés sur la même machine
