@@ -78,12 +78,18 @@
             <div class="kp-field">
               <label class="kp-label" for="garantie">Garantie</label>
               <div class="kp-input-groupe">
-                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" max="24" formControlName="garantieMois" />
+                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" [attr.max]="regles().garantieMax" formControlName="garantieMois" />
                 <span class="kp-suffixe">mois</span>
               </div>
+              @if (form.controls.garantieMois.invalid) {
+                <span class="kp-erreur">Entre 0 et {{ regles().garantieMax }} mois de loyer.</span>
+              }
+              @if (!regles().avance) {
+                <span class="kp-aide">{{ mentionLoiRdc }}</span>
+              }
             </div>
           }
-          @if (visible('avanceMois')) {
+          @if (visible('avanceMois') && regles().avance) {
             <div class="kp-field">
               <label class="kp-label" for="avance">Loyers payés d’avance</label>
               <div class="kp-input-groupe">

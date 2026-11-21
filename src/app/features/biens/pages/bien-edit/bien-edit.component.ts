@@ -1,13 +1,14 @@
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { BienService } from '../../services/bien.service';
 import { JuridictionService } from '../../services/juridiction.service';
 import {
   BienDTO, BienFormDTO, BienType, ClasseEnergie, ClasseGes, Equipement, LIBELLES_CHAUFFAGE, LIBELLES_EQUIPEMENT, ModeChauffage,
   TYPES_BIEN, adresseLisible, positionApproximative, typeSansLogement,
+  MENTION_LOI_LOGEMENT_RDC, ReglesGarantie, reglesGarantie, validateurAvanceMois, validateurGarantieMois,
 } from '../../models/bien.model';
 import { JuridictionConfig, champVisible } from '../../models/juridiction.model';
 import { Devise, LIBELLES_DEVISE, symboleDevise } from '../../../../core/money/montant';
@@ -53,6 +54,10 @@ export class BienEditComponent implements OnInit {
   readonly chauffages = Object.entries(LIBELLES_CHAUFFAGE) as [ModeChauffage, string][];
   readonly classes: ClasseEnergie[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
+  /** Règles de garantie et d'avance du pays du bien et du type choisi (lues à la validation). */
+  private readonly reglesActuelles = (): ReglesGarantie =>
+    reglesGarantie(this.bien()?.pays, this.form?.controls.typeBien.value);
+
   readonly form = this.fb.group({
     titre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150), Validators.pattern(MOTIF_TITRE)]],
     typeBien: [null as BienType | null, Validators.required],
@@ -73,14 +78,19 @@ export class BienEditComponent implements OnInit {
     loyerMensuel: [null as number | null, [Validators.required, Validators.min(1)]],
     chargesMensuelles: [null as number | null, [Validators.required, Validators.min(0)]],
     depotGarantie: [null as number | null, [Validators.min(0)]],
-    garantieMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
-    avanceMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
+    garantieMois: [null as number | null, [Validators.min(0), validateurGarantieMois(() => this.reglesActuelles())]],
+    avanceMois: [null as number | null, [Validators.min(0), Validators.max(24), validateurAvanceMois(() => this.reglesActuelles())]],
     disponibleDe: ['', Validators.required],
   });
 
   private readonly valeurs = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
   readonly symbole = computed(() => symboleDevise(this.valeurs().devise));
   readonly sansLogement = computed(() => typeSansLogement(this.valeurs().typeBien));
+  readonly regles = computed(() => reglesGarantie(this.bien()?.pays, this.valeurs().typeBien));
+  readonly mentionLoiRdc = MENTION_LOI_LOGEMENT_RDC;
+  /** Loi n° 15/025 : un changement de type revérifie la garantie et remet l'avance à 0 si elle est interdite. */
+  private readonly suiviType = this.form.controls.typeBien.valueChanges.pipe(takeUntilDestroyed())
+    .subscribe(() => this.appliquerReglesGarantie());
   readonly devisesDuPays = computed(() => this.config()?.devises ?? []);
   readonly equipementsDuPays = computed(() => this.config()?.equipements ?? []);
   readonly typesDuPays = computed(() => {
@@ -113,6 +123,7 @@ export class BienEditComponent implements OnInit {
         }
         this.bien.set(b);
         this.remplir(b);
+        this.appliquerReglesGarantie();
         this.juridictions.configuration(b.pays).pipe(catchError(() => of(null))).subscribe(c => this.config.set(c));
         this.chargement.set(false);
       },
@@ -121,6 +132,13 @@ export class BienEditComponent implements OnInit {
         this.chargement.set(false);
       },
     });
+  }
+
+  private appliquerReglesGarantie(): void {
+    const { garantieMois, avanceMois } = this.form.controls;
+    if (!this.reglesActuelles().avance && avanceMois.value) avanceMois.setValue(0, { emitEvent: false });
+    garantieMois.updateValueAndValidity({ emitEvent: false });
+    avanceMois.updateValueAndValidity({ emitEvent: false });
   }
 
   private remplir(b: BienDTO): void {

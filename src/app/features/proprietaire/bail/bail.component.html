@@ -108,7 +108,7 @@
               } @else if (c.depotGarantie != null) {
                 <div><dt>Dépôt de garantie</dt><dd class="kp-tabulaire">{{ c.depotGarantie | montant: c.devise }}</dd></div>
               }
-              @if (c.avanceMois != null) { <div><dt>Loyers d’avance</dt><dd>{{ c.avanceMois }} mois</dd></div> }
+              @if (c.avanceMois) { <div><dt>Loyers d’avance</dt><dd>{{ c.avanceMois }} mois</dd></div> }
             </dl>
           </section>
 
@@ -120,7 +120,7 @@
                 À compter du {{ c.dateDebut | dateLongue }} pour {{ duree(c.dureeBailMois) }}.
                 Loyer {{ c.loyerMensuel | montant: c.devise : 0 }} et {{ c.chargesMensuelles | montant: c.devise : 0 }} de charges.
                 @if (c.garantieMois != null) {
-                  Garantie de {{ c.garantieMois }} mois ({{ c.depotGarantie | montant: c.devise : 0 }}){{ c.avanceMois != null ? ', ' + c.avanceMois + ' mois de loyer d’avance' : '' }}.
+                  Garantie de {{ c.garantieMois }} mois ({{ c.depotGarantie | montant: c.devise : 0 }}){{ c.avanceMois ? ', ' + c.avanceMois + ' mois de loyer d’avance' : '' }}.
                 } @else if (c.depotGarantie != null) {
                   Dépôt de garantie {{ c.depotGarantie | montant: c.devise : 0 }}.
                 }

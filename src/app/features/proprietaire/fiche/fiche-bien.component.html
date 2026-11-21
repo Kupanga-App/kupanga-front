@@ -44,7 +44,7 @@
               @if (b.chargesMensuelles) { <div><dt>Charges</dt><dd>{{ b.chargesMensuelles | montant: b.devise : 0 }} par mois</dd></div> }
               @if (b.depotGarantie) { <div><dt>Dépôt de garantie</dt><dd>{{ b.depotGarantie | montant: b.devise : 0 }}</dd></div> }
               @if (b.garantieMois != null) { <div><dt>Garantie</dt><dd>{{ b.garantieMois }} mois de loyer</dd></div> }
-              @if (b.avanceMois != null) { <div><dt>Loyers d’avance</dt><dd>{{ b.avanceMois }} mois</dd></div> }
+              @if (b.avanceMois) { <div><dt>Loyers d’avance</dt><dd>{{ b.avanceMois }} mois</dd></div> }
               @if (b.disponibleDe) { <div><dt>Disponible le</dt><dd>{{ b.disponibleDe | dateLongue }}</dd></div> }
               <div><dt>Meublé</dt><dd>{{ b.meuble ? 'Oui' : 'Non' }}</dd></div>
               <div><dt>Colocation</dt><dd>{{ b.colocation ? 'Oui' : 'Non' }}</dd></div>

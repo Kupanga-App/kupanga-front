@@ -271,15 +271,18 @@
             <div class="kp-field">
               <label class="kp-label" for="garantie">Garantie</label>
               <div class="kp-input-groupe">
-                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" max="24" formControlName="garantieMois" />
+                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" [attr.max]="regles().garantieMax" formControlName="garantieMois" />
                 <span class="kp-suffixe">mois</span>
               </div>
               @if (form.controls.garantieMois.touched && form.controls.garantieMois.invalid) {
-                <span class="kp-erreur">Entre 0 et 24 mois de loyer.</span>
+                <span class="kp-erreur">Entre 0 et {{ regles().garantieMax }} mois de loyer.</span>
+              }
+              @if (!regles().avance) {
+                <span class="kp-aide">{{ mentionLoiRdc }}</span>
               }
             </div>
           }
-          @if (visible('avanceMois')) {
+          @if (visible('avanceMois') && regles().avance) {
             <div class="kp-field">
               <label class="kp-label" for="avance">Loyers payés d’avance</label>
               <div class="kp-input-groupe">
@@ -348,7 +351,7 @@
             <div><dt>Charges</dt><dd>{{ v.chargesMensuelles | montant: v.devise }}</dd></div>
             @if (v.depotGarantie != null && visible('depotGarantie')) { <div><dt>Dépôt</dt><dd>{{ v.depotGarantie | montant: v.devise }}</dd></div> }
             @if (v.garantieMois != null && visible('garantieMois')) { <div><dt>Garantie</dt><dd>{{ v.garantieMois }} mois</dd></div> }
-            @if (v.avanceMois != null && visible('avanceMois')) { <div><dt>Avance</dt><dd>{{ v.avanceMois }} mois</dd></div> }
+            @if (v.avanceMois != null && visible('avanceMois') && regles().avance) { <div><dt>Avance</dt><dd>{{ v.avanceMois }} mois</dd></div> }
             <div><dt>Disponible le</dt><dd>{{ v.disponibleDe | dateLongue }}</dd></div>
             <div><dt>Photos</dt><dd>{{ photos().length }}</dd></div>
           </dl>

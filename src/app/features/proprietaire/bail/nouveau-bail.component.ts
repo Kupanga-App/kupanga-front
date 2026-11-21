@@ -6,7 +6,10 @@ import { catchError, of } from 'rxjs';
 import { BienService } from '../../biens/services/bien.service';
 import { JuridictionService } from '../../biens/services/juridiction.service';
 import { ContratService } from '../../gestion-logement/services/contrat.service';
-import { BienDTO, adresseLisible, locataireDuBail } from '../../biens/models/bien.model';
+import {
+  BienDTO, MENTION_LOI_LOGEMENT_RDC, ReglesGarantie, adresseLisible, locataireDuBail, reglesGarantie,
+  validateurAvanceMois, validateurGarantieMois,
+} from '../../biens/models/bien.model';
 import { champVisible } from '../../biens/models/juridiction.model';
 import { MontantPipe, formatMontant, symboleDevise } from '../../../core/money/montant';
 import { messageErreurApi } from '../../../core/http/api-error';
@@ -28,7 +31,7 @@ const MANQUES_BAIL: Record<string, string> = {
   loyerMensuel: 'Indiquez le loyer hors charges.',
   chargesMensuelles: 'Indiquez les charges (0 s’il n’y en a pas).',
   depotGarantie: 'Indiquez le dépôt de garantie (0 s’il n’y en a pas).',
-  garantieMois: 'Indiquez la garantie, de 0 à 24 mois.',
+  garantieMois: 'Indiquez la garantie, en mois de loyer (3 au plus pour un logement en RDC).',
   avanceMois: 'Indiquez les loyers payés d’avance, de 0 à 24 mois.',
 };
 
@@ -65,18 +68,24 @@ export class NouveauBailComponent implements OnInit {
   /** C12 : garantie en mois de loyer quand le pays masque le dépôt en montant (RDC). */
   readonly garantieEnMois = signal(false);
 
+  /** Règles de garantie et d'avance du bien (lues à la validation : le bien est chargé après le formulaire). */
+  private readonly reglesActuelles = (): ReglesGarantie =>
+    reglesGarantie(this.bien()?.pays, this.bien()?.typeBien);
+
   readonly form = this.fb.group({
     dateDebut: [this.aujourdhui, Validators.required],
     dureeBailMois: [12, [Validators.required, Validators.min(1), Validators.max(120)]],
     loyerMensuel: [null as number | null, [Validators.required, Validators.min(0.01)]],
     chargesMensuelles: [0 as number | null, [Validators.required, Validators.min(0)]],
     depotGarantie: [null as number | null, [Validators.min(0)]],
-    garantieMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
-    avanceMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
+    garantieMois: [null as number | null, [Validators.min(0), validateurGarantieMois(() => this.reglesActuelles())]],
+    avanceMois: [null as number | null, [Validators.min(0), Validators.max(24), validateurAvanceMois(() => this.reglesActuelles())]],
   });
 
   protected readonly valeurs = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
   readonly devise = computed(() => this.bien()?.devise);
+  readonly regles = computed(() => reglesGarantie(this.bien()?.pays, this.bien()?.typeBien));
+  readonly mentionLoiRdc = MENTION_LOI_LOGEMENT_RDC;
   readonly symbole = computed(() => symboleDevise(this.devise()));
   readonly nomLocataire = computed(() => {
     const l = locataireDuBail(this.bien());
@@ -158,7 +167,8 @@ export class NouveauBailComponent implements OnInit {
           chargesMensuelles: bien.chargesMensuelles ?? 0,
           depotGarantie: bien.depotGarantie ?? null,
           garantieMois: bien.garantieMois ?? null,
-          avanceMois: bien.avanceMois ?? null,
+          // Loi n° 15/025 : aucun loyer d'avance pour un logement en RDC
+          avanceMois: reglesGarantie(bien.pays, bien.typeBien).avance ? bien.avanceMois ?? null : 0,
         });
         this.initiales = JSON.stringify(this.form.getRawValue());
         this.juridictions.configuration(bien.pays).pipe(catchError(() => of(null))).subscribe(config => {

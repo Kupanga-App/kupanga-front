@@ -7,6 +7,7 @@ import { JuridictionService } from '../../services/juridiction.service';
 import {
   BienFormDTO, BienType, ClasseEnergie, ClasseGes, Equipement, LIBELLES_CHAUFFAGE, LIBELLES_EQUIPEMENT, ModeChauffage, Pays, TYPES_BIEN,
   typeSansLogement,
+  MENTION_LOI_LOGEMENT_RDC, ReglesGarantie, reglesGarantie, validateurAvanceMois, validateurGarantieMois,
 } from '../../models/bien.model';
 import { JuridictionConfig, PaysPrisEnCharge, champObligatoire, champVisible } from '../../models/juridiction.model';
 import { Devise, LIBELLES_DEVISE, MontantPipe, symboleDevise } from '../../../../core/money/montant';
@@ -66,7 +67,7 @@ const MANQUES: Record<string, string> = {
   loyerMensuel: 'Indiquez le loyer mensuel.',
   chargesMensuelles: 'Indiquez les charges (0 s’il n’y en a pas).',
   depotGarantie: 'Indiquez le dépôt de garantie.',
-  garantieMois: 'Indiquez la garantie, de 0 à 24 mois.',
+  garantieMois: 'Indiquez la garantie, en mois de loyer (3 au plus pour un logement en RDC).',
   avanceMois: 'Indiquez les loyers payés d’avance, de 0 à 24 mois.',
   disponibleDe: 'Indiquez la date de disponibilité.',
 };
@@ -111,6 +112,10 @@ export class BienCreateComponent {
   readonly repere = signal<Repere | null>(null);
   readonly equipements = signal<Equipement[]>([]);
 
+  /** Règles de garantie et d'avance du pays et du type choisis (lues à la validation : le formulaire n'existe pas encore ici). */
+  private readonly reglesActuelles = (): ReglesGarantie =>
+    reglesGarantie(this.form?.controls.pays.value, this.form?.controls.typeBien.value);
+
   readonly form = this.fb.group({
     pays: [null as Pays | null, Validators.required],
     typeBien: [null as BienType | null, Validators.required],
@@ -140,8 +145,8 @@ export class BienCreateComponent {
     loyerMensuel: [null as number | null, [Validators.required, Validators.min(1)]],
     chargesMensuelles: [0 as number | null, [Validators.required, Validators.min(0)]],
     depotGarantie: [null as number | null, [Validators.min(0)]],
-    garantieMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
-    avanceMois: [null as number | null, [Validators.min(0), Validators.max(24)]],
+    garantieMois: [null as number | null, [Validators.min(0), validateurGarantieMois(() => this.reglesActuelles())]],
+    avanceMois: [null as number | null, [Validators.min(0), Validators.max(24), validateurAvanceMois(() => this.reglesActuelles())]],
     disponibleDe: [this.aujourdhui, Validators.required],
   });
 
@@ -154,6 +159,8 @@ export class BienCreateComponent {
   readonly devisesDuPays = computed(() => this.config()?.devises ?? []);
   readonly equipementsDuPays = computed(() => this.config()?.equipements ?? []);
   readonly sansLogement = computed(() => typeSansLogement(this.valeurs().typeBien));
+  readonly regles = computed(() => reglesGarantie(this.valeurs().pays, this.valeurs().typeBien));
+  readonly mentionLoiRdc = MENTION_LOI_LOGEMENT_RDC;
   readonly symbole = computed(() => symboleDevise(this.valeurs().devise));
   readonly libelleType = computed(() => TYPES_BIEN.find(t => t.value === this.valeurs().typeBien)?.label ?? '');
   readonly libellePays = computed(() => this.paysOptions().find(p => p.pays === this.valeurs().pays)?.libelle ?? '');
@@ -212,6 +219,7 @@ export class BienCreateComponent {
         else c.addValidators(Validators.required);
         c.updateValueAndValidity({ emitEvent: false });
       }
+      this.appliquerReglesGarantie();
     });
     destroyRef.onDestroy(() => this.apercus().forEach(u => URL.revokeObjectURL(u)));
   }
@@ -272,7 +280,16 @@ export class BienCreateComponent {
     this.equipements.update(liste => liste.filter(e => config.equipements.includes(e)));
     if (!c.devise.value || !config.devises.includes(c.devise.value)) c.devise.setValue(config.deviseDefaut);
     if (c.typeBien.value && !config.typesBien.includes(c.typeBien.value)) c.typeBien.setValue(null);
+    this.appliquerReglesGarantie();
     this.form.updateValueAndValidity();
+  }
+
+  /** Loi n° 15/025 (logement en RDC) : avance remise à 0, garantie revérifiée. */
+  private appliquerReglesGarantie(): void {
+    const { garantieMois, avanceMois } = this.form.controls;
+    if (!this.reglesActuelles().avance && avanceMois.value !== 0) avanceMois.setValue(0, { emitEvent: false });
+    garantieMois.updateValueAndValidity({ emitEvent: false });
+    avanceMois.updateValueAndValidity({ emitEvent: false });
   }
 
   basculerEquipement(e: Equipement): void {

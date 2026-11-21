@@ -73,11 +73,15 @@
             <div class="kp-field">
               <label class="kp-label" for="garantie">Garantie</label>
               <div class="kp-input-groupe">
-                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" max="24" formControlName="garantieMois" />
+                <input id="garantie" class="kp-input" type="number" inputmode="numeric" min="0" [attr.max]="regles().garantieMax" formControlName="garantieMois" />
                 <span class="kp-suffixe">mois</span>
               </div>
               <span class="kp-aide">Soit {{ montantGarantie() | montant: devise() : 0 }}</span>
+              @if (form.controls.garantieMois.invalid) {
+                <span class="kp-erreur">Entre 0 et {{ regles().garantieMax }} mois de loyer.</span>
+              }
             </div>
+            @if (regles().avance) {
             <div class="kp-field">
               <label class="kp-label" for="avance">Loyers payés d’avance</label>
               <div class="kp-input-groupe">
@@ -85,7 +89,11 @@
                 <span class="kp-suffixe">mois</span>
               </div>
             </div>
+            }
           </div>
+          @if (!regles().avance) {
+            <p class="kp-aide">{{ mentionLoiRdc }}</p>
+          }
         } @else {
           <div class="kp-field">
             <label class="kp-label" for="depot">Dépôt de garantie</label>
@@ -115,7 +123,7 @@
             <div><dt>Charges</dt><dd>{{ v.chargesMensuelles | montant: devise() }}</dd></div>
             @if (garantieEnMois()) {
               <div><dt>Garantie</dt><dd>{{ v.garantieMois }} mois ({{ montantGarantie() | montant: devise() }})</dd></div>
-              <div><dt>Loyers d’avance</dt><dd>{{ v.avanceMois }} mois</dd></div>
+              @if (regles().avance) { <div><dt>Loyers d’avance</dt><dd>{{ v.avanceMois }} mois</dd></div> }
             } @else {
               <div><dt>Dépôt de garantie</dt><dd>{{ v.depotGarantie | montant: devise() }}</dd></div>
             }
@@ -158,7 +166,9 @@
         <p>
           <strong>Garantie :</strong> <mark>{{ v.garantieMois ?? '…' }} mois</mark> de loyer,
           soit <mark>{{ montantGarantie() | montant: devise() : 0 }}</mark>.
-          <strong>Loyers payés d’avance :</strong> <mark>{{ v.avanceMois ?? '…' }} mois</mark>.
+          @if (regles().avance) {
+            <strong>Loyers payés d’avance :</strong> <mark>{{ v.avanceMois ?? '…' }} mois</mark>.
+          }
         </p>
       } @else {
         <p><strong>Dépôt de garantie :</strong> <mark>{{ (v.depotGarantie | montant: devise() : 0) || '…' }}</mark>.</p>

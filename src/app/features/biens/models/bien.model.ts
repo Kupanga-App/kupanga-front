@@ -1,3 +1,4 @@
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Devise } from '../../../core/money/montant';
 
 /** J1 : code ISO 3166 du pays du bien (l'API refuse toute autre valeur). */
@@ -54,6 +55,50 @@ export function libelleTypeBien(type: string | null | undefined): string {
 /** C10 : sans logement, surface habitable et nombre de pièces ne sont pas exigés. */
 export function typeSansLogement(type: BienType | null | undefined): boolean {
   return type === 'PARCELLE' || type === 'TERRAIN';
+}
+
+/**
+ * Usage du bien, qui fixe le régime du bail en RDC (même règle que TypeBien.usageBail() de l'API) :
+ * habitation (loi n° 15/025), usage professionnel (Acte uniforme OHADA) ou terrain nu.
+ */
+export type UsageBail = 'HABITATION' | 'PROFESSIONNEL' | 'TERRAIN_NU';
+
+export function usageBail(type: BienType | null | undefined): UsageBail {
+  if (type === 'LOCAL_COMMERCIAL' || type === 'ENTREPOT') return 'PROFESSIONNEL';
+  if (type === 'TERRAIN') return 'TERRAIN_NU';
+  return 'HABITATION';
+}
+
+export interface ReglesGarantie {
+  /** Garantie maximale, en mois de loyer. */
+  garantieMax: number;
+  /** Loyers payés d'avance permis. */
+  avance: boolean;
+}
+
+/**
+ * RDC, logement : garantie de 3 mois de loyer au plus (loi n° 15/025, art. 18) et aucun loyer d'avance (art. 22),
+ * sous peine de sanctions pénales ; l'API refuse le reste en 400. Ailleurs : 0 à 24 mois.
+ */
+export function reglesGarantie(pays: string | null | undefined, type: BienType | null | undefined): ReglesGarantie {
+  return pays === 'CD' && usageBail(type) === 'HABITATION' ? { garantieMax: 3, avance: false } : { garantieMax: 24, avance: true };
+}
+
+export const MENTION_LOI_LOGEMENT_RDC =
+  'Logement en RDC : la garantie ne peut dépasser 3 mois de loyer et les loyers d’avance sont interdits (loi n° 15/025, articles 18 et 22).';
+
+/** Validateur de la garantie (en mois) selon les règles courantes. */
+export function validateurGarantieMois(regles: () => ReglesGarantie): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    const max = regles().garantieMax;
+    return c.value != null && c.value !== '' && Number(c.value) > max ? { max: { max, actual: c.value } } : null;
+  };
+}
+
+/** Validateur des loyers d'avance (en mois) : 0 seulement quand ils sont interdits. */
+export function validateurAvanceMois(regles: () => ReglesGarantie): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null =>
+    !regles().avance && c.value != null && c.value !== '' && Number(c.value) > 0 ? { avanceInterdite: true } : null;
 }
 
 /** C11 : équipements ; ceux proposés dépendent du pays. */

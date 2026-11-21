@@ -179,7 +179,7 @@ export class FicheBienComponent implements OnInit {
       b.loyerMensuel != null ? { libelle: 'Loyer', valeur: montant(b.loyerMensuel) } : null,
       b.depotGarantie ? { libelle: 'Dépôt de garantie', valeur: montant(b.depotGarantie) } : null,
       b.garantieMois != null ? { libelle: 'Garantie', valeur: `${b.garantieMois} mois de loyer` } : null,
-      b.avanceMois != null ? { libelle: 'Loyers d’avance', valeur: `${b.avanceMois} mois` } : null,
+      b.avanceMois ? { libelle: 'Loyers d’avance', valeur: `${b.avanceMois} mois` } : null,
       b.disponibleDe ? { libelle: 'Disponible le', valeur: dateLongue(b.disponibleDe) } : null,
     ];
     return t.filter((x): x is Tuile => !!x);
